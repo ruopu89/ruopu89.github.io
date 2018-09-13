@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="nginx配置文件12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx配置文件说明">
+<meta property="og:url" content="http://yoursite.com/2018/09/13/nginx配置文件/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="nginx配置文件12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2018-09-13T06:40:25.513Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx配置文件说明">
+<meta name="twitter:description" content="nginx配置文件12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/09/13/nginx配置文件/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>nginx配置文件说明 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx配置文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">nginx配置文件说明
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-13 12:45:47 / 修改時間：14:40:25" itemprop="dateCreated datePublished" datetime="2018-09-13T12:45:47+08:00">2018-09-13</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="nginx配置文件"><a href="#nginx配置文件" class="headerlink" title="nginx配置文件"></a>nginx配置文件</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##配置文件中的include出现了多次，在全局中和http、server中都有</span></span></span><br><span class="line">	user nginx;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##进程以哪个用户的身份运行</span></span></span><br><span class="line">	worker_proceseese auto;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##配置工作进程数的，auto指自动探测主机的物理核心数，并启动与核心数一样的进程数。或输入数字。这里只能是等于或小于物理核心数</span></span></span><br><span class="line">	error_log	/var/log/nginx/error.log;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##错误日志位置</span></span></span><br><span class="line">	pid		/run/nginx.pid;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##进程id</span></span></span><br><span class="line">	worker_cpu_affinity auto;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##自动绑定cpu，如果当前主机只运行nginx就非常有效，如果有其他服务，如mysql，就不要做了</span></span></span><br><span class="line">	include	/usr/share/nginx/modules/*.conf;</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment">##装载需要的模块的位置。模块位置在/usr/share/nginx/modules中，其中的mod-http-geoip.conf是根据IP地址查询其所在的位置的</span></span></span><br><span class="line">	events&#123;</span><br><span class="line">		use   epoll;             </span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##epoll是多路复用IO(I/O Multiplexing)中的一种方式,但是仅用于linux2.6以上内核,可以大大提高nginx的性能</span></span></span><br><span class="line">		worker_connections 1024；</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##配置事件驱动模型的，这里默认是单进程响应1024个请求。worker_proceseese乘以这里的worker_connections就是一共可以并发响应的总数。如果不够可以将1024改大，但不要随便改</span></span></span><br><span class="line">	&#125;</span><br><span class="line">	http &#123;</span><br><span class="line">		log_format 	main	'$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">                      		'$status $body_bytes_sent "$http_referer" '</span><br><span class="line">                      		'"$http_user_agent" "$http_x_forwarded_for"';</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##日志格式，main是名称，之后使用的是nginx的内置变量，官方文档中有对变量的解释</span></span></span><br><span class="line">		access_log	/var/log/nginx/access.log  main;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##访问日志位置及格式</span></span></span><br><span class="line">		sendfile	on;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##提升性能的配置，从内核直接响应用户。sendfile 指令指定 nginx 是否调用 sendfile 函数（zero copy 方式）来输出文件，对于普通应用，必须设为 on,如果用来进行下载等应用磁盘IO重负载应用，可设置为 off，以平衡磁盘与网络I/O处理速度，降低系统的uptime.</span></span></span><br><span class="line">		tcp_nopush	on;</span><br><span class="line">		tcp_nodelay	on;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##也是提升性能的</span></span></span><br><span class="line">		keepalive_tiomout 65;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##保持长连接，超时65秒</span></span></span><br><span class="line">		gzip  on;</span><br><span class="line"><span class="meta">		#</span><span class="bash">开启gzip压缩</span></span><br><span class="line">    	gzip_disable "MSIE [1-6].";</span><br><span class="line">    	gzip_comp_level  6;</span><br><span class="line">    	gzip_min_length  1000; </span><br><span class="line">    	#置对数据启用压缩的最少字节数。如果一个请求小于1000字节，我们最好不要压缩它，因为压缩这些小的数据会降低处理此请求的所有进程的速度。</span><br><span class="line">    	gzip_proxied     expired no-cache no-store private auth;</span><br><span class="line">    	gzip_types       text/plain application/x-javascript text/xml text/css application/xml;</span><br><span class="line">		types_hash_max_size 2048;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> types_hash_max_size 影响散列表的冲突率。types_hash_max_size越大，就会消耗更多的内存，但散列key的冲突率会降低，检索速度就更快。types_hash_max_size越小，消耗的内存就越小，但散列key的冲突率可能上升。</span></span><br><span class="line">		include		/etc/nginx/mime.types;</span><br><span class="line">		default_type	application/octet-stream;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##让nginx知道支持哪些类型。设定mime类型,类型由mime.type文件定义</span></span></span><br><span class="line">		client_header_buffer_size    1k;</span><br><span class="line">    	large_client_header_buffers  4 4k;</span><br><span class="line">    	#设定请求缓冲</span><br><span class="line">		include /etc/nginx/conf.d/*.conf</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##启动要加载的配置，如虚拟主机</span></span></span><br><span class="line">	upstream mysvr &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash">设定负载均衡的服务器列表</span></span><br><span class="line">        server 192.168.8.1:3128 weight=5;</span><br><span class="line">    	server 192.168.8.2:80  weight=1;</span><br><span class="line">    	server 192.168.8.3:80  weight=6;</span><br><span class="line">    	#weigth参数表示权值，权值越高被分配到的几率越大</span><br><span class="line">    	#本机上的Squid开启3128端口</span><br><span class="line">    &#125;</span><br><span class="line">	server &#123;</span><br><span class="line">		listen 80 default_server;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##监听端口，default_server表示默认虚拟主机，如根据主机名访问，如果都不匹配，那么就找第一个虚拟主机。也就是所有匹配不到的虚拟主机，都由默认虚拟主机响应</span></span></span><br><span class="line">		listen [::]:80	default_server;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##这是IPV6的地址</span></span></span><br><span class="line">		server_name _;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##对默认虚拟主机来说，下划线可以匹配所有主机名</span></span></span><br><span class="line">		root	/usr/share/nginx/html;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##定义默认网页和路径的</span></span></span><br><span class="line">		include /etc/nginx/default.d/*.conf;</span><br><span class="line">		access_log  logs/www.xx.com.access.log  main;</span><br><span class="line"><span class="meta">		#</span><span class="bash">设定本虚拟主机的访问日志</span></span><br><span class="line">		location / &#123;</span><br><span class="line"><span class="meta">		#</span><span class="bash"><span class="comment">##location指明个人的配置</span></span></span><br><span class="line">			root   /root;      </span><br><span class="line"><span class="meta">			#</span><span class="bash">定义服务器的默认网站根目录位置</span></span><br><span class="line">          	index index.php index.html index.htm;   </span><br><span class="line">          	#定义首页索引文件的名称</span><br><span class="line">        &#125;</span><br><span class="line">		error_page 404 /404.html</span><br><span class="line"><span class="meta">			#</span><span class="bash"><span class="comment">##自定义404错误页是什么</span></span></span><br><span class="line">			location = /40x.html &#123;</span><br><span class="line">			root   /root;</span><br><span class="line">        &#125;</span><br><span class="line">        error_page 500 502 503 504 /50x.html;</span><br><span class="line">            location = /50x.html &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    	location ~ ^/(images|javascript|js|css|flash|media|static)/ &#123;</span><br><span class="line">    	#静态文件，nginx自己处理</span><br><span class="line">            root /var/www/virtual/htdocs;</span><br><span class="line">            #过期30天，静态文件不怎么更新，过期可以设大一点，如果频繁更新，则可以设置得小一点。</span><br><span class="line">            expires 30d;</span><br><span class="line">        &#125;</span><br><span class="line">        location ~ \.php$ &#123;</span><br><span class="line">            root /root;</span><br><span class="line">            fastcgi_pass 127.0.0.1:9000;</span><br><span class="line">            fastcgi_index index.php;</span><br><span class="line">            fastcgi_param SCRIPT_FILENAME /home/www/www$fastcgi_script_name;</span><br><span class="line">            include fastcgi_params;</span><br><span class="line">        &#125;</span><br><span class="line">        #PHP 脚本请求全部转发到 FastCGI处理. 使用FastCGI默认配置.</span><br><span class="line">        location /NginxStatus &#123;</span><br><span class="line">            stub_status            on;</span><br><span class="line">            access_log              on;</span><br><span class="line">            auth_basic              "NginxStatus";</span><br><span class="line">            auth_basic_user_file  conf/htpasswd;</span><br><span class="line">        &#125;</span><br><span class="line">        #设定查看Nginx状态的地址</span><br><span class="line">        location ~ /\.ht &#123;</span><br><span class="line">            deny all;</span><br><span class="line">        &#125;</span><br><span class="line">        #禁止访问 .htxxx 文件</span><br><span class="line">        location ~ .*\.aspx$ &#123;</span><br><span class="line">         	root   /root;      </span><br><span class="line">         	#定义服务器的默认网站根目录位置</span><br><span class="line">			index index.php index.html index.htm;   </span><br><span class="line"><span class="meta">			#</span><span class="bash">定义首页索引文件的名称</span></span><br><span class="line">          	proxy_pass  http://mysvr;</span><br><span class="line"><span class="meta">			#</span><span class="bash">请求转向mysvr定义的服务器列表</span></span><br><span class="line">			proxy_redirect off;</span><br><span class="line"><span class="meta">			#</span><span class="bash">以下是一些反向代理的配置可删除.</span></span><br><span class="line">			proxy_set_header Host $host;</span><br><span class="line">			proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line"><span class="meta">			#</span><span class="bash">后端的Web服务器可以通过X-Forwarded-For获取用户真实IP</span></span><br><span class="line">			client_max_body_size 10m;    </span><br><span class="line"><span class="meta">			#</span><span class="bash">允许客户端请求的最大单文件字节数</span></span><br><span class="line">			client_body_buffer_size 128k;  </span><br><span class="line"><span class="meta">			#</span><span class="bash">缓冲区代理缓冲用户端请求的最大字节数，</span></span><br><span class="line">			proxy_connect_timeout 90;  </span><br><span class="line"><span class="meta">			#</span><span class="bash">nginx跟后端服务器连接超时时间(代理连接超时)</span></span><br><span class="line">			proxy_send_timeout 90;        </span><br><span class="line"><span class="meta">			#</span><span class="bash">后端服务器数据回传时间(代理发送超时)</span></span><br><span class="line">			proxy_read_timeout 90;         </span><br><span class="line"><span class="meta">			#</span><span class="bash">连接成功后，后端服务器响应时间(代理接收超时)</span></span><br><span class="line">			proxy_buffer_size 4k;             </span><br><span class="line"><span class="meta">			#</span><span class="bash">设置代理服务器（nginx）保存用户头信息的缓冲区大小</span></span><br><span class="line">			proxy_buffers 4 32k;               </span><br><span class="line"><span class="meta">			#</span><span class="bash">proxy_buffers缓冲区，网页平均在32k以下的话，这样设置</span></span><br><span class="line">			proxy_busy_buffers_size 64k;    </span><br><span class="line"><span class="meta">			#</span><span class="bash">高负荷下缓冲大小（proxy_buffers*2）</span></span><br><span class="line">			proxy_temp_file_write_size 64k;  </span><br><span class="line"><span class="meta">			#</span><span class="bash">设定缓存文件夹大小，大于这个值，将从upstream服务器传</span></span><br><span class="line">       &#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/12/nginx程序架构/" rel="next" title="nginx程序架构">
+                <i class="fa fa-chevron-left"></i> nginx程序架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/13/nginx安装/" rel="prev" title="nginx安装">
+                nginx安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nginx配置文件"><span class="nav-number">1.</span> <span class="nav-text">nginx配置文件</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
