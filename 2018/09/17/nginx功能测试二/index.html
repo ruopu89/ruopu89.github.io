@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="[TOC] https1234567891011121314151617181920212223242526272829303132333435363738* 创建CA服务器cd /etc/pki/CA(umask 077;openssl genrsa -out private/cakey.pem 2048)openssl req -new -x509 -key private/cakey.pem">
+<meta name="keywords" content="Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx功能测试二">
+<meta property="og:url" content="http://yoursite.com/2018/09/17/nginx功能测试二/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="[TOC] https1234567891011121314151617181920212223242526272829303132333435363738* 创建CA服务器cd /etc/pki/CA(umask 077;openssl genrsa -out private/cakey.pem 2048)openssl req -new -x509 -key private/cakey.pem">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2018-09-17T05:17:14.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx功能测试二">
+<meta name="twitter:description" content="[TOC] https1234567891011121314151617181920212223242526272829303132333435363738* 创建CA服务器cd /etc/pki/CA(umask 077;openssl genrsa -out private/cakey.pem 2048)openssl req -new -x509 -key private/cakey.pem">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/09/17/nginx功能测试二/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>nginx功能测试二 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/nginx功能测试二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">nginx功能测试二
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-17 11:10:22 / 修改時間：13:17:14" itemprop="dateCreated datePublished" datetime="2018-09-17T11:10:22+08:00">2018-09-17</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>[TOC]</p>
+<h1 id="https"><a href="#https" class="headerlink" title="https"></a>https</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">* 创建CA服务器</span><br><span class="line">cd /etc/pki/CA</span><br><span class="line">(umask 077;openssl genrsa -out private/cakey.pem 2048)</span><br><span class="line">openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 365</span><br><span class="line">touch index.txt serial</span><br><span class="line">echo 01 &gt; serial</span><br><span class="line">* 到web服务器</span><br><span class="line">mkdir /etc/nginx/ssl</span><br><span class="line">cd /etc/nginx/ssl</span><br><span class="line">(umask 077;openssl genrsa -out nginx.key 2048)</span><br><span class="line">openssl req -new -key http.key -out nginx.csr</span><br><span class="line">scp nginx.csr 192.168.1.2:/tmp</span><br><span class="line">* 到CA服务器</span><br><span class="line">openssl ca -in /tmp/nginx.csr -out /etc/pki/CA/certs/nginx.crt -days 365</span><br><span class="line"><span class="meta">#</span><span class="bash">newcerts中的也是证书，是pem格式的</span></span><br><span class="line">scp certs/nginx.crt 192.168.1.3:/etc/nginx/ssl</span><br><span class="line">* 到web服务器</span><br><span class="line">cp conf.d/vhost1.conf conf.d/vhost1_ssl.conf</span><br><span class="line">vim conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 443 ssl;</span><br><span class="line">        server_name www.ruopu.com;</span><br><span class="line">        root /data/nginx/vhost1;</span><br><span class="line">        access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">        #当前虚拟主机使用PEM格式的证书文件</span><br><span class="line">        ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">        #当前虚拟主机上与其证书匹配的私钥文件</span><br><span class="line">        ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">        #支持ssl协议版本，默认为后三个</span><br><span class="line">        ssl_session_cache shared:SSL:10m;</span><br><span class="line">        #在各worker之间使用一个共享的缓存。SSL是自定义的名字，1m内存空间可以缓存4000个会话，这里定义10M。</span><br><span class="line">    &#125;    </span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">ss -tln</span><br><span class="line">访问https://www.ruopu.com，将cacert.pem传到主机，这里定义的CA服务器与客户端的主机名是一样的，访问时通过了。</span><br></pre></td></tr></table></figure>
+<h1 id="重写"><a href="#重写" class="headerlink" title="重写"></a><strong>重写</strong></h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">    	rewrite /(.*)\.png$ /$1.jpg;</span><br><span class="line">    	#rewrite放在server中，另外放在location或if中也可以。上面配置表示，所有以.png结尾的文件都转成.jpg格式的。括号是为了后面的$1引用，/是根，png前面的点需要转义，后面的.jpg的点不需要转义</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/images/fish.png，这里实际访问的是一个叫fish.jpg的文件，名字一样但格式不同。</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       error_page 404 /notfound.html;</span><br><span class="line">    #   rewrite /(.*)$ https://www.ruopu.com/$1;</span><br><span class="line">       rewrite /(.*)\.png$ https://www.ruopu.com/$1.jpg;</span><br><span class="line">       #用户请求任何内容，都转到https的页面上。但两条不要一起写，如果一起写，在访问www.ruopu.com/images/night.png时会先匹配上面的规则，下面的规则就不会生效了。</span><br><span class="line">       location = /notfound.html &#123;</span><br><span class="line">            root /data/nginx/error_pages;</span><br><span class="line">       &#125;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* ^/(admin|login) &#123;</span><br><span class="line">            auth_basic "admin area or login url";</span><br><span class="line">            auth_basic_user_file /etc/nginx/.ngxpasswd;</span><br><span class="line">       &#125;</span><br><span class="line">       location /ngxstatus &#123;</span><br><span class="line">            stub_status;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">vim /etc/nginx/conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 443 ssl;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">       ssl on;</span><br><span class="line">       ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">       ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">       ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">       ssl_session_cache shared:SSL:10m;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">vhost1_ssl.conf配置文件中也要有与vhost1.conf中相同的配置，这样才能正常访问，这里是定义的别名与vhost1.conf中是一样的，也就是要有相同的访问路径，不然不能正常访问，会有404的错误提示。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">上面的重写要写在监听80端口的server中，不能写在监听在443端口的server中，如果写在监听在443端口的server中，那么请求会无限重定向，最后是无法访问的。监听80端口与监听443端口的两个server中定义的内容应该是一样的。不然访问80端口时能访问的路径被重定向到443端口时就访问不到了。如果想让访问80端口的任何以png结尾的文件，都被重定向到443端口的.jpg文件，那么就要在监听443端口的配置文件中加入 rewrite /(.*)\.png$ /<span class="variable">$1</span>.jpg;，如果在监听80端口的server中定义是不起作用的。这是在要将所有访问的内容都重定向到443端口，并且还要让访问png文件的请求重定向到443端口的jpg文件，这两个条件都存在的情况下需要的配置。但如果只是将访问80端口的以png结尾的文件重定向到443端口的jpg文件的话，只要在监听80端口的server中写入 rewrite /(.*)\.png$ https://www.ruopu.com/<span class="variable">$1</span>.jpg; 就行了。</span></span><br><span class="line">nginx -s reload</span><br><span class="line">访问https://www.ruopu.com/images/night.png，rewrite规则可以写多条，rewrite匹配并重写url后会以新的url地址重新匹配配置文件或重新检查location的规则，如果可以匹配到，就会再重写一遍，直到匹配不到。默认的行为是last，就是重写的url会被重新再匹配一遍规则。还有break、redirect、permanent</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">		rewrite /(.*)\.png$ /$1.jpg redirect;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">redirect是重定向，客户端要重新发起请求。如果是permanent就是永久重定向，也需要客户端重新发请求。last和<span class="built_in">break</span>是不需要客户端重新发请求的，只是服务器内部做了转换</span></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">[flag]：</span></span><br><span class="line">	last：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后对新的URI启动新一轮重写检查；提前重启新一轮循环；</span><br><span class="line">    break：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后直接跳转至重写规则配置块之后的其它配置；结束循环；</span><br><span class="line">    redirect：重写完成后以临时重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；不能以http://或https://开头；302</span><br><span class="line">    permanent：重写完成后以永久重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；301</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/14/阿里云数据库连接与设置阿里云RDS字符集/" rel="next" title="阿里云数据库连接与设置阿里云RDS字符集">
+                <i class="fa fa-chevron-left"></i> 阿里云数据库连接与设置阿里云RDS字符集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/17/mysql备份与还原/" rel="prev" title="mysql备份与还原">
+                mysql备份与还原 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#https"><span class="nav-number">1.</span> <span class="nav-text">https</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重写"><span class="nav-number">2.</span> <span class="nav-text">重写</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

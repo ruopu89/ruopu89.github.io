@@ -134,19 +134,19 @@
 
 
 
-  <meta name="description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负载加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
+  <meta name="description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负责加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
 <meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
 <meta property="og:title" content="nginx程序架构">
 <meta property="og:url" content="http://yoursite.com/2018/09/12/nginx程序架构/index.html">
 <meta property="og:site_name" content="ruopu&#39;s blog">
-<meta property="og:description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负载加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
+<meta property="og:description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负责加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
 <meta property="og:locale" content="zh-TW">
 <meta property="og:image" content="http://static.oschina.net/uploads/img/201212/11163331_QmZ1.png">
-<meta property="og:updated_time" content="2018-09-13T03:44:43.042Z">
+<meta property="og:updated_time" content="2018-09-17T00:41:13.197Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nginx程序架构">
-<meta name="twitter:description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负载加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
+<meta name="twitter:description" content="[TOC] &amp;emsp;&amp;emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负责加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。  worker模型&amp;emsp;&amp;emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的">
 <meta name="twitter:image" content="http://static.oschina.net/uploads/img/201212/11163331_QmZ1.png">
 
 
@@ -384,7 +384,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2018-09-13 11:44:43" itemprop="dateModified" datetime="2018-09-13T11:44:43+08:00">2018-09-13</time>
+                <time title="修改時間：2018-09-17 08:41:13" itemprop="dateModified" datetime="2018-09-17T08:41:13+08:00">2018-09-17</time>
               
             
           </span>
@@ -436,7 +436,7 @@
 
       
         <p>[TOC]</p>
-<p>&emsp;&emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负载加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。</p>
+<p>&emsp;&emsp;nginx是一个模块化的、事件驱动的、异步，单线程的、非阻断的服务。nginx启动后会有master与worker进程，master进程只有一个，负责加载和分析配置文件、管理worker进程、平滑升级。worker进程有一个或多个，负责处理并响应用户请求。</p>
 <p><img src="http://static.oschina.net/uploads/img/201212/11163331_QmZ1.png" alt=""></p>
 <h1 id="worker模型"><a href="#worker模型" class="headerlink" title="worker模型"></a>worker模型</h1><p>&emsp;&emsp;nginx并不为每个连接产生一个进程或线程。工作进程从一个共享的“listen”socket接受新的请求，每个worker内运行循环高效执行。每个worker处理数以千计的连接。在启动时，一组初始的监听套接字被创建。当处理HTTP请求和响应时，worker不断接受，读取和写入到socket。</p>
 <p>&emsp;&emsp;nginx的worker代码的运行循环是最复杂的部分。它包括全部的内部调用，并在很大程度上依赖于异步处理任务的想法。异步操作通过模块化，事件通知，广泛使用回调函数和微调定时器实现。总体而言，关键的原则是尽可能的非阻塞。 唯一可以让nginx阻塞的情形是，没有足够的磁盘存储供worker操作。</p>
@@ -584,7 +584,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-count">14</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -607,7 +607,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">5</span>
+                      
+                    
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分類</span>
                   </a>
                 </div>
@@ -630,7 +632,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">5</span>
+                      
+                    
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
