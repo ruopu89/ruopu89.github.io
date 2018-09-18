@@ -319,6 +319,349 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云日志文件备份/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/18/阿里云日志文件备份/" itemprop="url">
+                  阿里云日志文件备份
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-18 16:09:41 / 修改時間：16:17:14" itemprop="dateCreated datePublished" datetime="2018-09-18T16:09:41+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>密钥访问</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* 备份日志的服务器</span><br><span class="line">ssh-keygen -t rsa -P ''</span><br><span class="line">ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.250</span><br></pre></td></tr></table></figure>
+<ul>
+<li>脚本</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">vim /root/sh</span><br><span class="line">    #!/bin/bash</span><br><span class="line">    #</span><br><span class="line">    nettylog=/apps/echarging/log/nettylog</span><br><span class="line">    processorlog=/apps/echarging/log/processor_1_log</span><br><span class="line">    nettyback=/home/nettylog</span><br><span class="line">    processorback=/home/processorlog1</span><br><span class="line">    nettybackR=/home/logbackup/nettylog</span><br><span class="line">    processorbackR=/home/logbackup/processorlog1</span><br><span class="line"></span><br><span class="line">    cd $nettylog</span><br><span class="line">    find ./ -name netty.log-`date +%F`."*".log -exec cp &#123;&#125; $nettyback \;</span><br><span class="line">    tar -zcf $nettyback/netty-log.`date +%F`.tar.gz $nettyback/*.log</span><br><span class="line">    scp $nettyback/netty-log.`date +%F`.tar.gz 192.168.2.250:$nettybackR</span><br><span class="line">    rm -rf $nettyback/*</span><br><span class="line"></span><br><span class="line">    cd $processorlog</span><br><span class="line">    find ./ -name processor_1.log-`date +%F`."*".log -exec cp &#123;&#125; $processorback \;</span><br><span class="line">    tar -zcf $processorback/processor_1.log-`date +%F`.tar.gz $processorback/*.log</span><br><span class="line">    scp $processorback/processor_1.log-`date +%F`.tar.gz 192.168.2.250:$processorbackR</span><br><span class="line">    rm -rf $processorback/*</span><br></pre></td></tr></table></figure>
+<ul>
+<li>定时任务</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br><span class="line">	* 4 * * * /bin/bash /root/sh/scplog.sh</span><br><span class="line">crontab -l</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云RDS数据库备份下载/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/18/阿里云RDS数据库备份下载/" itemprop="url">
+                  阿里云RDS数据库备份下载
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-18 10:20:56 / 修改時間：10:52:10" itemprop="dateCreated datePublished" datetime="2018-09-18T10:20:56+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li><p>下载RDS数据备份或日志备份</p>
+<ol>
+<li>登录RDS管理控制台</li>
+<li>选择目标实例所在地域。</li>
+<li>单击目标实例的ID，进入基本信息页面</li>
+<li>在左侧导航栏中，选择备份恢复，进入备份恢复页面</li>
+<li>选择数据备份标签页</li>
+<li>选择查询的时间范围，然后单击查询。</li>
+<li>在数据备份列表中，找到要下载的数据备份，并单击其对应的下载</li>
+<li>在实例备份文件下载窗口，单击复制外网地址，获取数据备份文件外网下载地址。这里可以直接下载到本地，也可以通过内网或外网地址下载</li>
+<li>登录云服务器ECS</li>
+<li>下载数据备份文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget -c '&lt;数据备份文件内网或外网下载地址&gt;' -O &lt;自定义文件名&gt;.tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash">-c：启用断点续传模式。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">-O：将下载的结果保存为指定的文件（建议使用URL中包含的文件名）。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">说明：若提示显示100%进度，则表示文件下载完成。</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/mysql备份与还原/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -365,12 +708,24 @@
                 
               
 
-              <time title="創建時間：2018-09-17 14:08:03 / 修改時間：17:49:32" itemprop="dateCreated datePublished" datetime="2018-09-17T14:08:03+08:00">2018-09-17</time>
+              <time title="創建時間：2018-09-17 14:08:03" itemprop="dateCreated datePublished" datetime="2018-09-17T14:08:03+08:00">2018-09-17</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-09-18 11:52:33" itemprop="dateModified" datetime="2018-09-18T11:52:33+08:00">2018-09-18</time>
               
             
           </span>
@@ -424,10 +779,11 @@
         
           
             <p>[TOC]</p>
-<h1 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h1><h2 id="基本备份"><a href="#基本备份" class="headerlink" title="基本备份"></a>基本备份</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/my.cnf.d/server.cnf</span><br><span class="line">    [mysqld]</span><br><span class="line">    log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">vim /root/.my.cnf</span><br><span class="line">	[client]</span><br><span class="line">    user = 'root'</span><br><span class="line">    password = 'centos'</span><br><span class="line">    host = 'localhost'</span><br><span class="line"><span class="meta">#</span><span class="bash">实现免用户名密码登录</span></span><br><span class="line">mysql -uroot -p &lt; /root/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">将jiaowu.sql文件导入到数据库中</span></span><br><span class="line">mysql</span><br><span class="line">SHOW DATABASES;</span><br><span class="line"><span class="meta">#</span><span class="bash">有jiaowu库了</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置</span></span><br><span class="line">FLUSH TABLES WITH READ LOCK;</span><br><span class="line"><span class="meta">#</span><span class="bash">再打开一个终端执行此命令，刷新表並且以只讀的方式鎖定所有表，這時再備分</span></span><br><span class="line">mysqldump -uroot -p jiaowu &gt; /tmp/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">导出jiaowu库</span></span><br><span class="line">FLUSH LOGS;</span><br><span class="line">UNLOCK TABLES;</span><br><span class="line"><span class="meta">#</span><span class="bash">備份完成後立即釋放鎖</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置，只取滾動後新建的日志</span></span><br></pre></td></tr></table></figure>
-<h2 id="mysqldump命令选项"><a href="#mysqldump命令选项" class="headerlink" title="mysqldump命令选项"></a>mysqldump命令选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">備份</span></span><br><span class="line">mysqldump -uroot -p --master-data=2 jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">用了第二條命令會在備份的文件中有CHANGE MASTER TO NASTER_LOG_FILE=`mysql-bin.000008, MASTER_LOG_POS=107`指明現在的日志名稱及位置</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases &gt; /root/all.sql  </span><br><span class="line"><span class="meta">#</span><span class="bash">因為不是所有庫都是InnoDB引擎的，所以要用--lock-all-tables選項，之後備份所有庫，還可以加上--master-data=2選項</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases --master-data=2 &gt; /root/all.sql</span><br><span class="line">less /root/all.sql         </span><br><span class="line"><span class="meta">#</span><span class="bash">查看</span></span><br><span class="line">=======================================================================================</span><br><span class="line">mysqldump</span><br><span class="line">    --master-data=n	    n=&#123;0、1、2&#125;</span><br><span class="line">        0表示不記錄二進制日志文件及路位置</span><br><span class="line">        1表示以CHNAGER MASTER TO的方式記錄位置，可用於恢復後直接啟動從服務器</span><br><span class="line">        2表示以CHNAGER MASTER TO的方式記錄位置，但默認被注釋了</span><br><span class="line">    --lock-all-tables：備份前鎖定所有表</span><br><span class="line">    --flush-logs：備份前鎖完表執行日志滾動             flush滾動</span><br><span class="line">    #如果指定庫中的表類型均為InnoDB，可使用--single-transaction啟動熱備，這時就不用鎖定表了--lock-all-tables，這個過程可能很長</span><br><span class="line">    * 備份多個庫</span><br><span class="line">    --all-databases：備份所有庫</span><br><span class="line">    --databases DB_NAME,DB_NAME,…：備份指定庫              </span><br><span class="line">    #這兩個命令由於備份不只一個數據庫，所以會自動創建create databases命令，還原前就不用手動再指定庫了</span><br><span class="line">    --events：備份事件</span><br><span class="line">    --routines：備份存儲過程存儲函數</span><br><span class="line">    --triggers：備份觸發器</span><br></pre></td></tr></table></figure>
-<h2 id="備份及即時點還原"><a href="#備份及即時點還原" class="headerlink" title="備份及即時點還原"></a>備份及即時點還原</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">備份及即時點還原</span><br><span class="line">備份策略：每周完全+每日增量</span><br><span class="line">    完全備份：mysqldump</span><br><span class="line">    增量備份：備份二進制日志文件（先flush logs）</span><br><span class="line">    </span><br><span class="line">步骤：</span><br><span class="line">1. 做全量备份</span><br><span class="line">2. 删除现有二进制日志之前的所有日志</span><br><span class="line">3. 删除某表中的一些行，以便下面测试</span><br><span class="line">4. 滚动日志</span><br><span class="line">5. 复制现有二进制日志到其他路径或将再有二进制日志转为sql文件保存到其他目录</span><br><span class="line">6. 在删除了行的表中插入新行</span><br><span class="line">7. 将滚动后的日志（也是现在的日志）复制到其他路径</span><br><span class="line">8. 删除数据目录中的所有文件</span><br><span class="line">9. 停止、启动服务器，实现数据初始</span><br><span class="line">10. 修改root密码</span><br><span class="line">11. 导入全量备份的sql文件</span><br><span class="line">12. 导入增量备份的sql文件</span><br><span class="line">13. 将最新的日志文件转为sql文件并导入。</span><br><span class="line">14. 这里全量备份不存在对应的二进制日志，因为被删除了。删除后仅剩一个二进制日志，这个日志就是增量备份的日志。之后做其他操作后又滚动过一次日志，也就是最新的日志。这个过程涉及两个日志和一个全量备份的sql文件。</span><br><span class="line">mysqldump -uroot -p --master-data=2 --flush-logs --all-databases --lock-all-tables &gt; /root/alldatabases.sql</span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash">建議在刪除備份前的二進制日志前先將其備份一份，可能以後有用。</span></span><br><span class="line">less /root/ alldatabases.sql</span><br><span class="line">PURGE BINARY LOGS TO 'mysql_bin.000011';             </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除二進制文件，這是為了避免空間被佔滿，这是删除mysql_bin.000011之前的所有二进制日志</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">DELETE FROM tutors WHERE Age&gt;80;            </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除一些行</span></span><br><span class="line">* 下面做增量備份</span><br><span class="line">mysql</span><br><span class="line">FLUSH LOGS;         </span><br><span class="line"><span class="meta">#</span><span class="bash">滾動</span></span><br><span class="line">quit        </span><br><span class="line"><span class="meta">#</span><span class="bash">退出mysql</span></span><br><span class="line">cd /mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">到數據目錄中</span></span><br><span class="line">cp mysql-bin.000011 /root/          </span><br><span class="line"><span class="meta">#</span><span class="bash">因之前已經滾動了日志，所以倒數第二個就是我們要增量備份的日志，將其拷貝到root目錄即可。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000011 &gt; /root/mon-incremental.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">這種方式的增量備份更好一些</span></span><br><span class="line">mysql</span><br><span class="line">use studb;</span><br><span class="line">INSERT INTO tutors (Tname) Values (‘stu123’);</span><br><span class="line">退出</span><br><span class="line">* 模擬刪除了數據庫，而不能刪二進制日志</span><br><span class="line">cp mysql-bin.000012 /root           </span><br><span class="line"><span class="meta">#</span><span class="bash">將二進制日志拷出去</span></span><br><span class="line">rm -rf ./*        </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除數據目錄中的所有文件</span></span><br><span class="line">service mysqld stop        </span><br><span class="line"><span class="meta">#</span><span class="bash">現在無法停止mysql</span></span><br><span class="line">killall mysqld              </span><br><span class="line"><span class="meta">#</span><span class="bash">殺死mysql進程</span></span><br><span class="line">cd /usr/local/mysql/            </span><br><span class="line"><span class="meta">#</span><span class="bash">到此目錄初始化mysql</span></span><br><span class="line">scripts/mysql_install_db --user=mysql --datadir=/mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">初始化，这是编译安装的。如果是yum安装的可以直接启动，就会初始化</span></span><br><span class="line">service mysqld start        </span><br><span class="line"><span class="meta">#</span><span class="bash">啟動mysql</span></span><br><span class="line">mysql</span><br><span class="line">UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';</span><br><span class="line"><span class="meta">#</span><span class="bash">设置root的密码</span></span><br><span class="line">mysql -uroot -p &lt; alldatabases.sql            </span><br><span class="line"><span class="meta">#</span><span class="bash">還原完全備份</span></span><br><span class="line">mysql</span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">退出             </span><br><span class="line"><span class="meta">#</span><span class="bash">這一過程是為了驗證增量備份恢復後的變化</span></span><br><span class="line">mysql -uroot -p &lt; mon-incremental.sql          </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復增量備份</span></span><br><span class="line">mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">進入</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;             </span><br><span class="line"><span class="meta">#</span><span class="bash">查看證明有變化</span></span><br><span class="line">退出</span><br><span class="line">mysqlbinlog mysql-bin.000012 &gt; temp.sql    </span><br><span class="line"><span class="meta">#</span><span class="bash">把日志文件導出為.sql文件</span></span><br><span class="line">mysql -uroot -p &lt; temp.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">即時點還原。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000012 | mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">這樣一條命令即可實現即時點還原</span></span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">上面這樣的試驗只適合在數據量小的時候，如果大的話，mysqldump備份會很慢。視頻中要求寫一個mysql完全備份腳本，增量備份寫成另一個腳本，盡量使用變量定義保存位置，使用日期保存備份的文件名稱。還可用腳本還原</span></span><br></pre></td></tr></table></figure>
-<h1 id="还原"><a href="#还原" class="headerlink" title="还原"></a>还原</h1>
+<h1 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h1><h2 id="mysqldump备份恢复"><a href="#mysqldump备份恢复" class="headerlink" title="mysqldump备份恢复"></a>mysqldump备份恢复</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/my.cnf.d/server.cnf</span><br><span class="line">    [mysqld]</span><br><span class="line">    log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">vim /root/.my.cnf</span><br><span class="line">	[client]</span><br><span class="line">    user = 'root'</span><br><span class="line">    password = 'centos'</span><br><span class="line">    host = 'localhost'</span><br><span class="line"><span class="meta">#</span><span class="bash">实现免用户名密码登录</span></span><br><span class="line">mysql -uroot -p &lt; /root/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">将jiaowu.sql文件导入到数据库中</span></span><br><span class="line">mysql</span><br><span class="line">SHOW DATABASES;</span><br><span class="line"><span class="meta">#</span><span class="bash">有jiaowu库了</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置</span></span><br><span class="line">FLUSH TABLES WITH READ LOCK;</span><br><span class="line"><span class="meta">#</span><span class="bash">再打开一个终端执行此命令，刷新表並且以只讀的方式鎖定所有表，這時再備分</span></span><br><span class="line">mysqldump -uroot -p jiaowu &gt; /tmp/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">导出jiaowu库</span></span><br><span class="line">FLUSH LOGS;</span><br><span class="line">UNLOCK TABLES;</span><br><span class="line"><span class="meta">#</span><span class="bash">備份完成後立即釋放鎖</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置，只取滾動後新建的日志</span></span><br></pre></td></tr></table></figure>
+<h2 id="mysqldump命令选项"><a href="#mysqldump命令选项" class="headerlink" title="mysqldump命令选项"></a>mysqldump命令选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">備份</span></span><br><span class="line">mysqldump -uroot -p --master-data=2 jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">用了第二條命令會在備份的文件中有CHANGE MASTER TO NASTER_LOG_FILE=`mysql-bin.000008, MASTER_LOG_POS=107`指明現在的日志名稱及位置</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases &gt; /root/all.sql  </span><br><span class="line"><span class="meta">#</span><span class="bash">因為不是所有庫都是InnoDB引擎的，所以要用--lock-all-tables選項，之後備份所有庫，還可以加上--master-data=2選項</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases --master-data=2 &gt; /root/all.sql</span><br><span class="line">less /root/all.sql         </span><br><span class="line"><span class="meta">#</span><span class="bash">查看</span></span><br><span class="line">=======================================================================================</span><br><span class="line">mysqldump</span><br><span class="line">    --master-data=n	    n=&#123;0、1、2&#125;</span><br><span class="line">        0表示不記錄二進制日志文件记录位置</span><br><span class="line">        1表示以CHNAGER MASTER TO的方式記錄位置，可用於恢復後直接啟動從服務器</span><br><span class="line">        2表示以CHNAGER MASTER TO的方式記錄位置，但默認被注釋了</span><br><span class="line">    --lock-all-tables：備份前鎖定所有表</span><br><span class="line">    --flush-logs：備份前鎖完表執行日志滾動             flush滾動</span><br><span class="line">    #如果指定庫中的表類型均為InnoDB，可使用--single-transaction啟動熱備，這時就不用鎖定表了--lock-all-tables，這個過程可能很長</span><br><span class="line">    * 備份多個庫</span><br><span class="line">    --all-databases：備份所有庫</span><br><span class="line">    --databases DB_NAME,DB_NAME,…：備份指定庫              </span><br><span class="line">    #這兩個命令由於備份不只一個數據庫，所以會自動創建create databases命令，還原前就不用手動再指定庫了</span><br><span class="line">    --events：備份事件</span><br><span class="line">    --routines：備份存儲過程存儲函數</span><br><span class="line">    --triggers：備份觸發器</span><br></pre></td></tr></table></figure>
+<h2 id="備份及即時點還原"><a href="#備份及即時點還原" class="headerlink" title="備份及即時點還原"></a>備份及即時點還原</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">備份及即時點還原</span><br><span class="line">備份策略：每周完全+每日增量</span><br><span class="line">    完全備份：mysqldump</span><br><span class="line">    增量備份：備份二進制日志文件（先flush logs）</span><br><span class="line">    </span><br><span class="line">步骤：</span><br><span class="line">1. 做全量备份</span><br><span class="line">2. 删除现有二进制日志之前的所有日志</span><br><span class="line">3. 删除某表中的一些行，以便下面测试</span><br><span class="line">4. 滚动日志</span><br><span class="line">5. 复制滚动前二进制日志到其他路径或将滚动前二进制日志转为sql文件保存到其他目录，实现增量备份</span><br><span class="line">6. 在删除了行的表中插入新行</span><br><span class="line">7. 将滚动后的日志（也是现在的日志）复制到其他路径</span><br><span class="line">8. 删除数据目录中的所有文件</span><br><span class="line">9. 停止、启动服务器，实现数据初始</span><br><span class="line">10. 修改root密码</span><br><span class="line">11. 导入全量备份的sql文件</span><br><span class="line">12. 导入增量备份的sql文件</span><br><span class="line">13. 将最新的日志文件转为sql文件并导入，实现即时点还原。</span><br><span class="line">14. 这里全量备份不存在对应的二进制日志，因为被删除了。删除后仅剩一个二进制日志，这个日志就是增量备份的日志。之后做其他操作后又滚动过一次日志，也就是最新的日志。这个过程涉及两个日志和一个全量备份的sql文件。</span><br><span class="line"></span><br><span class="line">mysqldump -uroot -p --master-data=2 --flush-logs --all-databases --lock-all-tables &gt; /root/alldatabases.sql</span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash">建議在刪除備份前的二進制日志前先將其備份一份，可能以後有用。</span></span><br><span class="line">less /root/ alldatabases.sql</span><br><span class="line">PURGE BINARY LOGS TO 'mysql_bin.000011';             </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除二進制文件，這是為了避免空間被佔滿，这是删除mysql_bin.000011之前的所有二进制日志</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">DELETE FROM tutors WHERE Age&gt;80;            </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除一些行</span></span><br><span class="line">* 下面做增量備份</span><br><span class="line">mysql</span><br><span class="line">FLUSH LOGS;         </span><br><span class="line"><span class="meta">#</span><span class="bash">滾動</span></span><br><span class="line">quit        </span><br><span class="line"><span class="meta">#</span><span class="bash">退出mysql</span></span><br><span class="line">cd /mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">到數據目錄中</span></span><br><span class="line">cp mysql-bin.000011 /root/          </span><br><span class="line"><span class="meta">#</span><span class="bash">因之前已經滾動了日志，所以倒數第二個就是我們要增量備份的日志，將其拷貝到root目錄即可。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000011 &gt; /root/mon-incremental.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">這種方式的增量備份更好一些</span></span><br><span class="line">mysql</span><br><span class="line">use studb;</span><br><span class="line">INSERT INTO tutors (Tname) Values (‘stu123’);</span><br><span class="line">退出</span><br><span class="line">* 模擬刪除了數據庫，而不能刪二進制日志</span><br><span class="line">cp mysql-bin.000012 /root           </span><br><span class="line"><span class="meta">#</span><span class="bash">將二進制日志拷出去</span></span><br><span class="line">rm -rf ./*        </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除數據目錄中的所有文件</span></span><br><span class="line">service mysqld stop        </span><br><span class="line"><span class="meta">#</span><span class="bash">現在無法停止mysql</span></span><br><span class="line">killall mysqld              </span><br><span class="line"><span class="meta">#</span><span class="bash">殺死mysql進程</span></span><br><span class="line">cd /usr/local/mysql/            </span><br><span class="line"><span class="meta">#</span><span class="bash">到此目錄初始化mysql</span></span><br><span class="line">scripts/mysql_install_db --user=mysql --datadir=/mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">初始化，这是编译安装的。如果是yum安装的可以直接启动，就会初始化</span></span><br><span class="line">service mysqld start        </span><br><span class="line"><span class="meta">#</span><span class="bash">啟動mysql</span></span><br><span class="line">mysql</span><br><span class="line">UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';</span><br><span class="line"><span class="meta">#</span><span class="bash">设置root的密码</span></span><br><span class="line">mysql -uroot -p &lt; alldatabases.sql            </span><br><span class="line"><span class="meta">#</span><span class="bash">還原完全備份</span></span><br><span class="line">mysql</span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">退出             </span><br><span class="line"><span class="meta">#</span><span class="bash">這一過程是為了驗證增量備份恢復後的變化</span></span><br><span class="line">mysql -uroot -p &lt; mon-incremental.sql          </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復增量備份</span></span><br><span class="line">mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">進入</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;             </span><br><span class="line"><span class="meta">#</span><span class="bash">查看證明有變化</span></span><br><span class="line">退出</span><br><span class="line">mysqlbinlog mysql-bin.000012 &gt; temp.sql    </span><br><span class="line"><span class="meta">#</span><span class="bash">把日志文件導出為.sql文件</span></span><br><span class="line">mysql -uroot -p &lt; temp.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">即時點還原。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000012 | mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">這樣一條命令即可實現即時點還原</span></span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">上面這樣的試驗只適合在數據量小的時候，如果大的話，mysqldump備份會很慢。視頻中要求寫一個mysql完全備份腳本，增量備份寫成另一個腳本，盡量使用變量定義保存位置，使用日期保存備份的文件名稱。還可用腳本還原</span></span><br></pre></td></tr></table></figure>
+<h1 id="xtrabackup备份恢复"><a href="#xtrabackup备份恢复" class="headerlink" title="xtrabackup备份恢复"></a>xtrabackup备份恢复</h1><p># </p>
+
           
         
       
@@ -1693,448 +2049,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/修改tomcat默认页面/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/12/修改tomcat默认页面/" itemprop="url">
-                  修改tomcat默认页面
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-12 12:50:03 / 修改時間：13:09:51" itemprop="dateCreated datePublished" datetime="2018-09-12T12:50:03+08:00">2018-09-12</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tomcat/" itemprop="url" rel="index"><span itemprop="name">tomcat</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>修改tomcat的默认页面为自己的主页，再使用nginx反代到tomcat。实现访问域名即可打开主页。</p>
-</blockquote>
-<ul>
-<li>tomcat</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">	&lt;Host name="localhost"  appBase="webapps"</span><br><span class="line">            unpackWARs="true" autoDeploy="true"&gt;</span><br><span class="line">        &lt;Context path="" docBase="echarge" reloadable="true" /&gt;</span><br><span class="line">//在Host下面加入Context一行，设置path为空，这样就不会访问到默认页了。之后用docBase指定主页的路径，这里写echarge表示是在webapps下的echarge目录。reloadable表示是否自动装载。</span><br><span class="line">/usr/local/tomcat/bin/shutdown.sh</span><br><span class="line">/usr/local/tomcat/bin/startup.sh</span><br><span class="line">//此例中已将主机的IP地址解析为域名了，另外tomcat监听在8081端口。这时可以通过"域名:8081"访问到主页了。</span><br></pre></td></tr></table></figure>
-<ul>
-<li>nginx</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/web.conf</span><br><span class="line">	proxy_cache_path /etc/nginx/cache levels=1:2:2 keys_zone=web_cache:10m max_size=2g;</span><br><span class="line">    server&#123;</span><br><span class="line">       server_name web.jdyichong.com;</span><br><span class="line">       index index.html index.htm;</span><br><span class="line">       charset utf-8;</span><br><span class="line">       proxy_cache web_cache;</span><br><span class="line">       proxy_cache_key $request_uri;</span><br><span class="line">       proxy_cache_methods GET HEAD;</span><br><span class="line">       proxy_cache_min_uses 1;</span><br><span class="line">       proxy_cache_valid 200 302 10m;</span><br><span class="line">       proxy_cache_valid 400 1m;</span><br><span class="line">       proxy_cache_use_stale http_502;</span><br><span class="line"></span><br><span class="line">       location / &#123;</span><br><span class="line">            proxy_pass http://web.jdyichong.com:8081;</span><br><span class="line">            //这里只要将所有访问都反代到本机的tomcat上即可。</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">//用nginx加入缓存设置，之后反向代理到本机的tomcat上，这样使用域名即可访问到主页了。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/IO基础知识/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/12/IO基础知识/" itemprop="url">
-                  IO基础知识
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-12 12:46:45 / 修改時間：15:28:50" itemprop="dateCreated datePublished" datetime="2018-09-12T12:46:45+08:00">2018-09-12</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>[TOC]</p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>同步</li>
-</ul>
-<p>等待对方返回消息； 发出调用以后不可进行其他工作。</p>
-<ul>
-<li>异步</li>
-</ul>
-<p>被调用者通过状态、通知或回调机制通知调用者被调用者。发出调用以后还可以进行其他工作。</p>
-<ul>
-<li>阻塞I/O模型</li>
-</ul>
-<p>blocking，调用结果返回之前，调用者会被挂起，处于不可中断睡眠状态。在这个状态下，cpu不会给线程分配时间片，即线程暂停运行。属于闲等</p>
-<p>对于同步调用来说，很多时候当前线程还是激活的，只是从逻辑上当前函数没有返回而已。 例如，我们在socket中调用recv函数，如果缓冲区中没有数据，这个函数就会一直等待，直到有数据才返回。而此时，当前线程还会继续处理各种各样的消息。</p>
-<ul>
-<li>非阻塞I/O模型</li>
-</ul>
-<p>nonblocking，调用结果返回之前，调用者不会被挂起；在规定时间内不停询问进程执行结果。在不能立刻得到结果之前，该函数不会阻塞当前线程，而会立刻返回。属于忙等</p>
-<ul>
-<li>区别</li>
-</ul>
-<p>阻塞和非阻塞是指当server端的进程访问的数据如果尚未就绪，进程是否需要等待，简单说这相当于函数内部的实现区别，也就是未就绪时是直接返回还是等待就绪</p>
-<p>而同步和异步是指client端访问数据的机制，同步一般指主动请求并等待I/O操作完毕的方式，当数据就绪后在读写的时候必须阻塞(区别就绪与读写二个阶段，同步的读写必须阻塞)，异步则指主动请求数据后便可以继续处理其它任务，随后等待I/O，操作完毕的通知，这可以使进程在数据读写时也不阻塞。(等待”通知”)</p>
-<p>同步IO和异步IO的区别：数据访问的时候进程是否阻塞</p>
-<p>阻塞IO和非阻塞IO的区别：应用程序的调用是否立即返回</p>
-<p>同步/异步与阻塞/非阻塞经常看到是成对出现：</p>
-<p>同步阻塞，异步非阻塞，同步非阻塞</p>
-<p>一次文件IO请求，都会由两阶段组成：<br>第一步：等待数据，即数据从磁盘到内核内存；<br>第二步：复制数据，即数据从内核内存到进程内存；</p>
-<ul>
-<li>node.js</li>
-</ul>
-<p>线程在执行中如果遇到磁盘读写或网络通信（统称为I/O 操作），通常要耗费较长的时间，这时操作系统会剥夺这个线程的CPU 控制权，使其暂停执行，同时将资源让给其他的工作线程，这种线程调度方式称为 阻塞。当I/O 操作完毕时，操作系统将这个线程的阻塞状态解除，恢复其对CPU的控制权，令其继续执行。这种I/O 模式就是通常的同步式I/O（Synchronous I/O）或阻塞式I/O （Blocking I/O）。</p>
-<p>相应地，异步式I/O （Asynchronous I/O）或非阻塞式I/O （Non-blocking I/O）则针对所有I/O 操作不采用阻塞的策略。当线程遇到I/O 操作时，不会以阻塞的方式等待I/O 操作的完成或数据的返回，而只是将I/O 请求发送给操作系统，继续执行下一条语句。当操作系统完成I/O 操作时，以事件的形式通知执行I/O 操作的线程，线程会在特定时候处理这个事件。为了处理异步I/O，线程必须有事件循环，不断地检查有没有未处理的事件，依次予以处理。阻塞模式下，一个线程只能处理一项任务，要想提高吞吐量必须通过多线程。而非阻塞模式下，一个线程永远在执行计算操作，这个线程所使用的CPU 核心利用率永远是100%&gt;，I/O 以事件的方式通知。在阻塞模式下，多线程往往能提高系统吞吐量，因为一个线程阻塞时还有其他线程在工作，多线程可以让CPU 资源不被阻塞中的线程浪费。而在非阻塞模式下，线程不会被I/O 阻塞，永远在利用CPU。多线程带来的好处仅仅是在多核CPU 的情况下利用更多的核，而Node.js的单线程也能带来同样的好处。这就是为什么Node.js 使用了单线程、非阻塞的事件编程模式。</p>
-<ul>
-<li>I/O复用模型</li>
-</ul>
-<p>主要是select和epoll；对一个IO端口，两次调用，两次返回，比阻塞IO并没有什么优越性；关键是能实现同时对多个IO端口进行监听</p>
-<p>I/O复用模型会用到select、poll、epoll函数，这几个函数也会使进程阻塞，但是和阻塞I/O所不同的的，这两个函数可以同时阻塞多个I/O操作。而且可以同时对多个读操作，多个写操作的I/O函数进行检测，直到有数据可读或可写时，才真正调用I/O操作函数。</p>
-<ul>
-<li>信号驱动I/O模型</li>
-</ul>
-<p>两次调用，两次返回</p>
-<p>首先我们允许套接口进行信号驱动I/O，并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I/O操作函数处理数据。</p>
-<ul>
-<li>异步I/O</li>
-</ul>
-<p>数据拷贝的时候进程无需阻塞。</p>
-<p>当一个异步过程调用发出后，调用者不能立刻得到结果。实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者的输入输出操作</p>
-<ul>
-<li>select() &amp; poll() &amp; epoll()</li>
-</ul>
-<p>epoll跟select都能提供多路I/O复用的解决方案。在现在的Linux内核里有都能够支持，其中epoll是Linux所特有，而select则应该是POSIX所规定，一般操作系统均有实现</p>
-<ul>
-<li><ul>
-<li>select本质上是通过设置或者检查存放fd标志位的数据结构来进行下一步处理。这样所带来的缺点是：</li>
-</ul>
-<ol>
-<li>单个进程可监视的fd数量被限制，即能监听端口的大小有限。<br>  一般来说这个数目和系统内存关系很大，具体数目可以cat /proc/sys/fs/file-max察看。32位机默认是1024个。64位机默认是2048.</li>
-<li><p>对socket进行扫描时是线性扫描，即采用轮询的方法，效率较低：<br>当套接字比较多的时候，每次select()都要通过遍历FD_SETSIZE个Socket来完成调度，不管哪个Socket是活跃的，都遍历一遍。这会浪费很多CPU时间。如果能给套接字注册某个回调函数，当他们活跃时，自动完成相关操作，那就避免了轮询，这正是epoll(Linux)与kqueue(BSD)做的。</p>
-<ol start="3">
-<li>需要维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递该结构时复制开销大</li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-<ul>
-<li><ul>
-<li><p>poll本质上和select没有区别，它将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，如果设备就绪则在设备等待队列中加入一项并继续遍历，如果遍历完所有fd后没有发现就绪设备，则挂起当前进程，直到设备就绪或者主动超时，被唤醒后它又要再次遍历fd。这个过程经历了多次无谓的遍历。</p>
-<p>它没有最大连接数的限制，原因是它是基于链表来存储的，但是同样有一个缺点：</p>
-</li>
-</ul>
-<ol>
-<li>大量的fd的数组被整体复制于用户态和内核地址空间之间，而不管这样的复制是不是有意义。</li>
-<li>poll还有一个特点是“水平触发”，如果报告了fd后，没有被处理，那么下次poll时会再次报告该fd。</li>
-</ol>
-</li>
-<li><ul>
-<li>epoll</li>
-</ul>
-</li>
-</ul>
-<p>epoll支持水平触发和边缘触发，最大的特点在于边缘触发，它只告诉进程哪些fd刚刚变为就需态，并且只会通知一次。还有一个特点是，epoll使用“事件”的就绪通知方式，通过epoll_ctl注册fd，一旦该fd就绪，内核就会采用类似callback的回调机制来激活该fd，epoll_wait便可以收到通知</p>
-<p>epoll的优点：</p>
-<pre><code>1. 没有最大并发连接的限制，能打开的FD的上限远大于1024（1G的内存上能监听约10万个端口）；
-2. 效率提升，不是轮询的方式，不会随着FD数目的增加效率下降。只有活跃可用的FD才会调用callback函数；即epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此在实际的网络环境中，Epoll的效率就会远远高于select和poll。
-3. 内存拷贝，利用mmap()文件映射内存加速与内核空间的消息传递；即epoll使用mmap减少复制开销。
-</code></pre><ul>
-<li><p>select、poll、epoll 区别总结：</p>
-<ol>
-<li>支持一个进程所能打开的最大连接数</li>
-</ol>
-<p>select单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32<em>32，同理64位机器上FD_SETSIZE为32</em>64），当然我们可以对其进行修改，然后重新编译内核，但是性能可能会受到影响，这需要进一步的测试。</p>
-<p>poll本质上和select没有区别，但是它没有最大连接数的限制，原因是它是基于链表来存储的</p>
-<p>epoll虽然连接数有上限，但是很大，1G内存的机器上可以打开10万左右的连接，2G内存的机器可以打开20万左右的连接</p>
-<ol start="2">
-<li>FD剧增后带来的IO效率问题</li>
-</ol>
-<p>select因为每次调用时都会对连接进行线性遍历，所以随着FD的增加会造成遍历速度慢的“线性下降性能问题”。</p>
-<p>poll同上</p>
-<p>epoll因为内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题。</p>
-<ol start="3">
-<li>消息传递方式</li>
-</ol>
-<p>select内核需要将消息传递到用户空间，都需要内核拷贝动作</p>
-<p>poll同上</p>
-<p>epoll通过内核和用户空间共享一块内存来实现的。</p>
-</li>
-</ul>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>总结</strong></p>
-<p>综上，在选择select，poll，epoll时要根据具体的使用场合以及这三种方式的自身特点。</p>
-<ol>
-<li><p>表面上看epoll的性能最好，但是在连接数少并且连接都十分活跃的情况下，select和poll的性能可能比epoll好，毕竟epoll的通知机制需要很多函数回调。</p>
-</li>
-<li><p>select低效是因为每次它都需要轮询。但低效也是相对的，视情况而定，也可通过良好的设计改善</p>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2182,7 +2096,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-count">16</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
