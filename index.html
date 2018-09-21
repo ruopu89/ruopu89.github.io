@@ -319,6 +319,175 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/21/阿里云创建pptp-vpn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/21/阿里云创建pptp-vpn/" itemprop="url">
+                  阿里云创建pptp_vpn
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-21 09:12:17 / 修改時間：15:26:12" itemprop="dateCreated datePublished" datetime="2018-09-21T09:12:17+08:00">2018-09-21</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>[TOC]</p>
+<h1 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y ppp pptpd</span><br></pre></td></tr></table></figure>
+<h2 id="配置pptpd文件"><a href="#配置pptpd文件" class="headerlink" title="配置pptpd文件"></a>配置pptpd文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/pptpd.conf</span><br><span class="line">	localip 172.17.89.106</span><br><span class="line">	remoteip 172.17.0.120-123</span><br><span class="line"><span class="meta">#</span><span class="bash">localip 172.17.89.106和remoteip 172.17.0.120-123分别是VPN的网关地址和VPN拨号获取地址段。</span></span><br><span class="line"></span><br><span class="line">vim /etc/ppp/options.pptpd</span><br><span class="line">	ms-dns 223.5.5.5</span><br><span class="line">	ms-dns 223.6.6.6</span><br><span class="line"><span class="meta">#</span><span class="bash">IP 地址 223.5.5.5 和 223.6.6.6是阿里云的公共 DNS 服务器地址，您可以根据需要调整为其它公共 DNS 服务地址。</span></span><br><span class="line"></span><br><span class="line">vim /etc/ppp/chap-secrets</span><br><span class="line">	test    *       123456     *</span><br><span class="line"><span class="meta">#</span><span class="bash">设置 pptpd 的用户名和密码。根据需要添加账号，一行只添加一个用户账号。按照 用户名 pptpd 密码 IP地址 的格式输入，每一项用空格隔开。保存后退出。示例：<span class="built_in">test</span> pptpd 123456 *，其中 * 表示所有IP。</span></span><br><span class="line"></span><br><span class="line">vim /etc/ppp/ip-up</span><br><span class="line">	ifconfig ppp0 mtu 1472</span><br><span class="line"><span class="meta">#</span><span class="bash">设置最大传输单元 MTU，在命令符 [ -x /etc/ppp/ip-up.local ] &amp;&amp; /etc/ppp/ip-up.local “<span class="variable">$@</span>” 下面添加 ifconfig ppp0 mtu 1472。</span></span><br></pre></td></tr></table></figure>
+<h2 id="修改内核参数"><a href="#修改内核参数" class="headerlink" title="修改内核参数"></a>修改内核参数</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysctl.conf</span><br><span class="line">	net.ipv4.ip_forward = 1</span><br><span class="line">sysctl -p</span><br><span class="line"></span><br><span class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line"><span class="meta">#</span><span class="bash">临时生效</span></span><br></pre></td></tr></table></figure>
+<h2 id="添加防火墙规则"><a href="#添加防火墙规则" class="headerlink" title="添加防火墙规则"></a>添加防火墙规则</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -j MASQUERADE</span><br><span class="line">iptables -t nat -A POSTROUTING -s 192.168.0.0/255.255.255.0 -j SNAT --to-source 123.127.82.11</span><br><span class="line"><span class="meta">#</span><span class="bash">添加 NAT 转发规则，其中123.127.82.11为您的实例公网 IP 地址</span></span><br><span class="line">iptables-save</span><br></pre></td></tr></table></figure>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start pptpd</span><br><span class="line">systemctl enable pptpd</span><br></pre></td></tr></table></figure>
+<h1 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h1><h2 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y ppp pptp pptp-setup</span><br></pre></td></tr></table></figure>
+<h2 id="创建连接"><a href="#创建连接" class="headerlink" title="创建连接"></a>创建连接</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pptpsetup --create test --server 123.127.82.11 --username test --password 123456 --encrypt --start</span><br><span class="line"><span class="meta">#</span><span class="bash">创建后会自动连接</span></span><br><span class="line">vim /etc/ppp/options.pptpd</span><br><span class="line">	require-mppe-128</span><br><span class="line"><span class="meta">#</span><span class="bash">如果有报错，要加入这一行。</span></span><br></pre></td></tr></table></figure>
+<h2 id="添加路由"><a href="#添加路由" class="headerlink" title="添加路由"></a>添加路由</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">* 实际情况，因为测试发现连接VPN后，可以连接kafka，但硬件设备不能向netty发送数据。但不连接VPN时，硬件设备可以向netty发送数据，但连接不上阿里云的kafka。判断认为，这是由于使用了阿里云提供的添加路由的方法，替换了默认网关。所以有此现象。重新调整了添加路由的命令如下</span><br><span class="line">ip route add 172.17.0.0/16 via 172.17.89.106 dev ppp0</span><br><span class="line"><span class="meta">#</span><span class="bash">添加一条路由，到172.17.0.0/16网络，下一跳地址是172.17.89.106，设备是ppp0。使用via指定下一跳地址。</span></span><br><span class="line">* 阿里云方法，实际中这样是不行的</span><br><span class="line">ip route replace default dev ppp0</span><br><span class="line"><span class="meta">#</span><span class="bash">测试发现，要先连接VPN，再添加路由。如果VPN断开，要重新添加路由。添加后会有三条信息加入，如下第一条和最后两条</span></span><br><span class="line">[root@bogon ~]# ip route l</span><br><span class="line">default dev ppp0 scope link </span><br><span class="line">default via 10.5.5.1 dev ens160 proto static metric 100 </span><br><span class="line">10.5.5.0/24 dev ens160 proto kernel scope link src 10.5.5.25 metric 100 </span><br><span class="line">113.52.7.78 via 10.5.5.1 dev ens160 src 10.5.5.25 </span><br><span class="line">172.17.89.106 dev ppp0 proto kernel scope link src 172.17.0.120</span><br></pre></td></tr></table></figure>
+<h2 id="添加命令"><a href="#添加命令" class="headerlink" title="添加命令"></a>添加命令</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/doc/ppp-2.4.5/scripts/pon /usr/sbin</span><br><span class="line">cp /usr/share/doc/ppp-2.4.5/scripts/poff /usr/sbin</span><br><span class="line">chmod +x /usr/sbin/pon /usr/sbin/poff</span><br></pre></td></tr></table></figure>
+<h2 id="使用命令"><a href="#使用命令" class="headerlink" title="使用命令"></a>使用命令</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pon test</span><br><span class="line"><span class="meta">#</span><span class="bash">连接vpn</span></span><br><span class="line">poff test</span><br><span class="line"><span class="meta">#</span><span class="bash">关闭vpn连接</span></span><br></pre></td></tr></table></figure>
+<p>参考：<a href="https://help.aliyun.com/knowledge_detail/41345.html?spm=5176.11065259.1996646101.searchclickresult.7c0b72c0WCltyE&amp;accounttraceid=1de748fe-9665-48c9-972a-021e6cfdf811#CentOSVPNclient" target="_blank" rel="noopener">https://help.aliyun.com/knowledge_detail/41345.html?spm=5176.11065259.1996646101.searchclickresult.7c0b72c0WCltyE&amp;accounttraceid=1de748fe-9665-48c9-972a-021e6cfdf811#CentOSVPNclient</a></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/20/docker使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -365,12 +534,24 @@
                 
               
 
-              <time title="創建時間：2018-09-20 14:26:06 / 修改時間：15:12:58" itemprop="dateCreated datePublished" datetime="2018-09-20T14:26:06+08:00">2018-09-20</time>
+              <time title="創建時間：2018-09-20 14:26:06" itemprop="dateCreated datePublished" datetime="2018-09-20T14:26:06+08:00">2018-09-20</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-09-21 13:11:15" itemprop="dateModified" datetime="2018-09-21T13:11:15+08:00">2018-09-21</time>
               
             
           </span>
@@ -424,13 +605,16 @@
         
           
             <p>[TOC]</p>
-<h1 id="基本运行方式"><a href="#基本运行方式" class="headerlink" title="基本运行方式"></a>基本运行方式</h1><h2 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker search centos</span><br><span class="line"><span class="meta">#</span>搜索centos镜像</span><br><span class="line">NAME                               DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED</span><br><span class="line">centos                             The official build of CentOS.                   4726                [OK]                </span><br><span class="line">ansible/centos7-ansible            Ansible on Centos7                              118                                     [OK]</span><br><span class="line">jdeathe/centos-ssh                 CentOS-6 6.10 x86_64 / CentOS-7 7.5.1804 x86…   99                                      [OK]</span><br><span class="line">consol/centos-xfce-vnc             Centos container with "headless" VNC session…   63                                      [OK]</span><br><span class="line">imagine10255/centos6-lnmp-php56    centos6-lnmp-php56                              45                                      [OK]</span><br></pre></td></tr></table></figure>
-<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull guyton/centos6</span><br><span class="line"><span class="meta">#</span>下载guyton/centos6镜像，官方没有普通的centos6镜像</span><br></pre></td></tr></table></figure>
-<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run -it guyton/centos6 bash</span><br><span class="line"><span class="meta">#</span>这是最简单的运行方式。此命令可以运行多次，每运行一次，就是创建一个新的容器。选项功能如下</span><br><span class="line"><span class="meta">#</span>-i：交互式操作；-t：终端。我们这里打算进入bash执行一些命令并查看返回结果，因此我们需要交互式终端。bash：放在镜像名后的是命令，这里我们希望有个交互式 Shell，因此用的是 bash 。</span><br></pre></td></tr></table></figure>
-<h2 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">* 查看正在运行的容器</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              24 seconds ago      Up 23 seconds                           zen_lamarr</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              5 minutes ago       Up 5 minutes                            sad_haibt</span><br><span class="line"><span class="meta">#</span>因为运行了两次docker run -it guyton/centos6 bash，所以这里有两个容器</span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="meta">#</span>标题含义：</span><br><span class="line"><span class="meta">#</span>CONTAINER ID:容器的唯一表示ID。</span><br><span class="line"><span class="meta">#</span>IMAGE:创建容器时使用的镜像。</span><br><span class="line"><span class="meta">#</span>COMMAND:容器最后运行的命令。</span><br><span class="line"><span class="meta">#</span>CREATED:创建容器的时间。</span><br><span class="line"><span class="meta">#</span>STATUS:容器状态。</span><br><span class="line"><span class="meta">#</span>PORTS:对外开放的端口。</span><br><span class="line"><span class="meta">#</span>NAMES:容器名。可以和容器ID一样唯一标识容器，同一台宿主机上不允许有同名容器存在，否则会冲突。</span><br><span class="line">=======================================================================================</span><br><span class="line">* 查看所有容器</span><br><span class="line">docker@boot2docker:~$ docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              2 minutes ago       Exited (0) 8 seconds ago                       zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              4 minutes ago       Exited (0) 2 minutes ago                       festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              7 minutes ago       Up 7 minutes                                   sad_haibt</span><br><span class="line"><span class="meta">#</span>可从STATUS列看出只有一个运行，另外两个已停止</span><br><span class="line"></span><br><span class="line">* 查看最新创建的容器，只列出最后创建的</span><br><span class="line">docker@boot2docker:~$ docker ps -l</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              5 minutes ago       Exited (0) 3 minutes ago                       zen_lamarr</span><br><span class="line"></span><br><span class="line">* 列出最后创建的x个容器</span><br><span class="line">docker@boot2docker:~$ docker ps -n=2</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              6 minutes ago       Exited (0) 4 minutes ago                       zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              8 minutes ago       Exited (0) 6 minutes ago                       festive_davinci</span><br><span class="line"><span class="meta">#</span>:-n=x选项，会列出最后创建的x个容器</span><br></pre></td></tr></table></figure>
-<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">* 语法：</span><br><span class="line">docker start docker_name</span><br><span class="line">docker start docker_ID</span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">docker@boot2docker:~$ docker start f2da3e7678a4</span><br><span class="line">f2da3e7678a4</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              10 minutes ago      Up 2 seconds                            festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              14 minutes ago      Up 13 minutes                           sad_haibt</span><br><span class="line">docker@boot2docker:~$ docker start zen_lamarr</span><br><span class="line">zen_lamarr</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              9 minutes ago       Up 4 seconds                            zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              11 minutes ago      Up About a minute                       festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              15 minutes ago      Up 15 minutes                           sad_haibt</span><br><span class="line"><span class="meta">#</span>第一个是通过ID启动的，第二个通过name启动</span><br></pre></td></tr></table></figure>
+<h1 id="基本运行方式"><a href="#基本运行方式" class="headerlink" title="基本运行方式"></a>基本运行方式</h1><h2 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker search centos</span><br><span class="line"><span class="meta">#</span><span class="bash">搜索centos镜像</span></span><br><span class="line">NAME                               DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED</span><br><span class="line">centos                             The official build of CentOS.                   4726                [OK]                </span><br><span class="line">ansible/centos7-ansible            Ansible on Centos7                              118                                     [OK]</span><br><span class="line">jdeathe/centos-ssh                 CentOS-6 6.10 x86_64 / CentOS-7 7.5.1804 x86…   99                                      [OK]</span><br><span class="line">consol/centos-xfce-vnc             Centos container with "headless" VNC session…   63                                      [OK]</span><br><span class="line">imagine10255/centos6-lnmp-php56    centos6-lnmp-php56                              45                                      [OK]</span><br></pre></td></tr></table></figure>
+<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull guyton/centos6</span><br><span class="line"><span class="meta">#</span><span class="bash">下载guyton/centos6镜像，官方没有普通的centos6镜像</span></span><br></pre></td></tr></table></figure>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run -it guyton/centos6 bash</span><br><span class="line"><span class="meta">#</span><span class="bash">这是最简单的运行方式。此命令可以运行多次，每运行一次，就是创建一个新的容器。选项功能如下</span></span><br><span class="line"><span class="meta">#</span><span class="bash">-i：交互式操作；-t：终端。我们这里打算进入bash执行一些命令并查看返回结果，因此我们需要交互式终端。bash：放在镜像名后的是命令，这里我们希望有个交互式 Shell，因此用的是 bash 。</span></span><br></pre></td></tr></table></figure>
+<h2 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">* 查看正在运行的容器</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              24 seconds ago      Up 23 seconds                           zen_lamarr</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              5 minutes ago       Up 5 minutes                            sad_haibt</span><br><span class="line"><span class="meta">#</span><span class="bash">因为运行了两次docker run -it guyton/centos6 bash，所以这里有两个容器</span></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">标题含义：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">CONTAINER ID:容器的唯一表示ID。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">IMAGE:创建容器时使用的镜像。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">COMMAND:容器最后运行的命令。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">CREATED:创建容器的时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">STATUS:容器状态。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">PORTS:对外开放的端口。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">NAMES:容器名。可以和容器ID一样唯一标识容器，同一台宿主机上不允许有同名容器存在，否则会冲突。</span></span><br><span class="line">=======================================================================================</span><br><span class="line">* 查看所有容器</span><br><span class="line">docker@boot2docker:~$ docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              2 minutes ago       Exited (0) 8 seconds ago                       zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              4 minutes ago       Exited (0) 2 minutes ago                       festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              7 minutes ago       Up 7 minutes                                   sad_haibt</span><br><span class="line"><span class="meta">#</span><span class="bash">可从STATUS列看出只有一个运行，另外两个已停止</span></span><br><span class="line"></span><br><span class="line">* 查看最新创建的容器，只列出最后创建的</span><br><span class="line">docker@boot2docker:~$ docker ps -l</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              5 minutes ago       Exited (0) 3 minutes ago                       zen_lamarr</span><br><span class="line"></span><br><span class="line">* 列出最后创建的x个容器</span><br><span class="line">docker@boot2docker:~$ docker ps -n=2</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              6 minutes ago       Exited (0) 4 minutes ago                       zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              8 minutes ago       Exited (0) 6 minutes ago                       festive_davinci</span><br><span class="line"><span class="meta">#</span><span class="bash">:-n=x选项，会列出最后创建的x个容器</span></span><br></pre></td></tr></table></figure>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">* 语法：</span><br><span class="line">docker start docker_name</span><br><span class="line">docker start docker_ID</span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">docker@boot2docker:~$ docker start f2da3e7678a4</span><br><span class="line">f2da3e7678a4</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              10 minutes ago      Up 2 seconds                            festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              14 minutes ago      Up 13 minutes                           sad_haibt</span><br><span class="line">docker@boot2docker:~$ docker start zen_lamarr</span><br><span class="line">zen_lamarr</span><br><span class="line">docker@boot2docker:~$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">1cd2b28b4f21        guyton/centos6      "bash"              9 minutes ago       Up 4 seconds                            zen_lamarr</span><br><span class="line">f2da3e7678a4        guyton/centos6      "bash"              11 minutes ago      Up About a minute                       festive_davinci</span><br><span class="line">418cbf256f89        guyton/centos6      "bash"              15 minutes ago      Up 15 minutes                           sad_haibt</span><br><span class="line"><span class="meta">#</span><span class="bash">第一个是通过ID启动的，第二个通过name启动</span></span><br></pre></td></tr></table></figure>
 <h2 id="终止"><a href="#终止" class="headerlink" title="终止"></a>终止</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* 语法：</span><br><span class="line">docker stop [NAME]/[CONTAINER ID]:将容器退出。</span><br><span class="line">docker kill [NAME]/[CONTAINER ID]:强制停止一个容器。</span><br></pre></td></tr></table></figure>
-<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">docker rm [NAME]/[CONTAINER ID]:不能够删除一个正在运行的容器，会报错。需要先停止容器。</span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">docker rm 'docker ps -a -q'</span><br><span class="line"><span class="meta">#</span>-a标志列出所有容器，-q标志只列出容器的ID，然后传递给rm命令，依次删除容器。</span><br><span class="line"><span class="meta">#</span>一次性删除：docker本身没有提供一次性删除操作，但是可以使用如上命令实现</span><br></pre></td></tr></table></figure>
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">docker rm [NAME]/[CONTAINER ID]:不能够删除一个正在运行的容器，会报错。需要先停止容器。</span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">docker rm 'docker ps -a -q'</span><br><span class="line"><span class="meta">#</span><span class="bash">-a标志列出所有容器，-q标志只列出容器的ID，然后传递给rm命令，依次删除容器。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">一次性删除：docker本身没有提供一次性删除操作，但是可以使用如上命令实现</span></span><br></pre></td></tr></table></figure>
+<h2 id="进入"><a href="#进入" class="headerlink" title="进入"></a>进入</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker@boot2docker:~$ docker attach 1cd2b28b4f21</span><br><span class="line"><span class="meta">#</span><span class="bash">使用attach通过ID进入docker</span></span><br><span class="line"></span><br><span class="line">docker@boot2docker:~$ docker exec -it f2da3e7678a4 /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash">使用<span class="built_in">exec</span>参数进入</span></span><br></pre></td></tr></table></figure>
+<h2 id="退出"><a href="#退出" class="headerlink" title="退出"></a>退出</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. exit（命令）：退出后，这个容器也就消失了，容器销毁ps查不到</span><br><span class="line">2. Ctrl+D（快捷方式）：退出后，这个容器也就消失了,容器销毁ps查不到	</span><br><span class="line">3. 先按Ctrl+P;再按Ctrl+Q（快捷方式）：退出容器，ps能查到，还在后台运行</span><br></pre></td></tr></table></figure>
+<h2 id="端口暴露"><a href="#端口暴露" class="headerlink" title="端口暴露"></a>端口暴露</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -P training/webapp</span><br><span class="line"><span class="meta">#</span><span class="bash">docker自动在host上打开49000到49900的端口，映射到容器（由镜像指定，或者--expose参数指定）的暴露端口</span></span><br><span class="line">docker run -d -p 5000:80 training/webapp</span><br><span class="line"><span class="meta">#</span><span class="bash">host上5000号端口，映射到容器暴露的80端口</span></span><br><span class="line">docker run -d -p 127.0.0.1:5000:80 training/webapp</span><br><span class="line"><span class="meta">#</span><span class="bash">host上127.0.0.1:5000号端口，映射到容器暴露的80端口</span></span><br><span class="line">docker run -d -p 127.0.0.1::5000 training/webapp</span><br><span class="line"><span class="meta">#</span><span class="bash">host上127.0.0.1:随机端口，映射到容器暴露的80端口</span></span><br><span class="line">docker run -d -p 127.0.0.1:5000:5000/udp training/webapp</span><br><span class="line"><span class="meta">#</span><span class="bash">绑定udp端口</span></span><br><span class="line">docker run -it --privileged --name test --hostname test -p 8080:80 centos</span><br><span class="line"><span class="meta">#</span><span class="bash">测试发现，在创建时要使用-it选项，不然之后使用docker start 命令是不能启动容器的，原因待查。--name指定容器名，--hostname指定容器内的主机名</span></span><br><span class="line">=======================================================================================</span><br><span class="line">docker run选项：</span><br><span class="line">Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br><span class="line">  -a, --attach=[]            登录容器（以docker run -d启动的容器）</span><br><span class="line">  -c, --cpu-shares=0         设置容器CPU权重，在CPU共享场景使用</span><br><span class="line">  --cap-add=[]               添加权限，权限清单详见：http://linux.die.net/man/7/capabilities</span><br><span class="line">  --cap-drop=[]              删除权限，权限清单详见：http://linux.die.net/man/7/capabilities</span><br><span class="line">  --cidfile=""               运行容器后，在指定文件中写入容器PID值，一种典型的监控系统用法</span><br><span class="line">  --cpuset=""                设置容器可以使用哪些CPU，此参数可以用来容器独占CPU</span><br><span class="line">  -d, --detach=false         指定容器运行于前台还是后台，-d表示在后台运行</span><br><span class="line">  --device=[]                添加主机设备给容器，相当于设备直通</span><br><span class="line">  --dns=[]                   指定容器的dns服务器</span><br><span class="line">  --dns-search=[]            指定容器的dns搜索域名，写入到容器的/etc/resolv.conf文件</span><br><span class="line">  -e, --env=[]               指定环境变量，容器中可以使用该环境变量</span><br><span class="line">  --entrypoint=""            覆盖image的入口点</span><br><span class="line">  --env-file=[]              指定环境变量文件，文件格式为每行一个环境变量</span><br><span class="line">  --expose=[]                指定容器暴露的端口，即修改镜像的暴露端口</span><br><span class="line">  -h, --hostname=""          指定容器的主机名</span><br><span class="line">  -i, --interactive=false    打开STDIN，用于控制台交互</span><br><span class="line">  --link=[]                  指定容器间的关联，使用其他容器的IP、env等信息</span><br><span class="line">  --lxc-conf=[]              指定容器的配置文件，只有在指定--exec-driver=lxc时使用</span><br><span class="line">  -m, --memory=""            指定容器的内存上限</span><br><span class="line">  --name=""                  指定容器名字，后续可以通过名字进行容器管理，links特性需要使用名字</span><br><span class="line">  --net="bridge"             容器网络设置，待详述</span><br><span class="line">  -P, --publish-all=false    指定容器暴露的端口，待详述</span><br><span class="line">  -p, --publish=[]           指定容器暴露的端口，待详述</span><br><span class="line">  --privileged=false         指定容器是否为特权容器，特权容器拥有所有的capabilities</span><br><span class="line">  --restart=""               指定容器停止后的重启策略，待详述</span><br><span class="line">  --rm=false                 指定容器停止后自动删除容器(不支持以docker run -d启动的容器)</span><br><span class="line">  --sig-proxy=true           设置由代理接受并处理信号，但是SIGCHLD、SIGSTOP和SIGKILL不能被代理</span><br><span class="line">  -t, --tty=false            分配tty设备，该可以支持终端登录</span><br><span class="line">  -u, --user=""              指定容器的用户</span><br><span class="line">  -v, --volume=[]            给容器挂载存储卷，挂载到容器的某个目录</span><br><span class="line">  --volumes-from=[]          给容器挂载其他容器上的卷，挂载到容器的某个目录</span><br><span class="line">  -w, --workdir=""           指定容器的工作目录</span><br></pre></td></tr></table></figure>
 
           
         
@@ -607,7 +791,7 @@
 <ol start="5">
 <li>查看default虚拟机的IP地址，使用Xshell连接</li>
 </ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">打开cmd</span><br><span class="line">docker-machine ls</span><br><span class="line"><span class="meta">#</span>查看default地址</span><br><span class="line"><span class="meta">#</span>登录default信息</span><br><span class="line"><span class="meta">#</span>用户名：docker</span><br><span class="line"><span class="meta">#</span>密码：tcuser</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">打开cmd</span><br><span class="line">docker-machine ls</span><br><span class="line"><span class="meta">#</span><span class="bash">查看default地址</span></span><br><span class="line"><span class="meta">#</span><span class="bash">登录default信息</span></span><br><span class="line"><span class="meta">#</span><span class="bash">用户名：docker</span></span><br><span class="line"><span class="meta">#</span><span class="bash">密码：tcuser</span></span><br></pre></td></tr></table></figure>
 <ol start="6">
 <li>更改虚拟磁盘存储位置</li>
 </ol>
@@ -635,7 +819,7 @@
 </ol>
 <p>登录阿里云<a href="https://cr.console.aliyun.com，点击右侧的镜像加速器，复制地址。最后用命令修改镜像地址即可" target="_blank" rel="noopener">https://cr.console.aliyun.com，点击右侧的镜像加速器，复制地址。最后用命令修改镜像地址即可</a></p>
 <p><img src="\images\docker\docker16.jpg" alt=""></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">登录虚拟机default</span><br><span class="line">sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=加速地址 |g" /var/lib/boot2docker/profile</span><br><span class="line"><span class="meta">#</span>修改后，可调整default的硬件配置，如CPU，memory，disk等，disk可以不用复制，创建一个新的，大一点的空间。另外，不可取消光驱的启动，因为启动时要用到boot2docker.iso文件</span><br><span class="line">打开cmd</span><br><span class="line">docker-machine restart default</span><br><span class="line"><span class="meta">#</span>重启docker服务</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">登录虚拟机default</span><br><span class="line">sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=加速地址 |g" /var/lib/boot2docker/profile</span><br><span class="line"><span class="meta">#</span><span class="bash">修改后，可调整default的硬件配置，如CPU，memory，disk等，disk可以不用复制，创建一个新的，大一点的空间。另外，不可取消光驱的启动，因为启动时要用到boot2docker.iso文件</span></span><br><span class="line">打开cmd</span><br><span class="line">docker-machine restart default</span><br><span class="line"><span class="meta">#</span><span class="bash">重启docker服务</span></span><br></pre></td></tr></table></figure>
 <p>参考：<a href="https://www.cnblogs.com/canger/p/9028723.html" target="_blank" rel="noopener">https://www.cnblogs.com/canger/p/9028723.html</a></p>
 
           
@@ -1929,166 +2113,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/13/nginx安装/" itemprop="url">
-                  nginx安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-13 14:44:16 / 修改時間：14:53:51" itemprop="dateCreated datePublished" datetime="2018-09-13T14:44:16+08:00">2018-09-13</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>[TOC]</p>
-<h1 id="rpm包安装"><a href="#rpm包安装" class="headerlink" title="rpm包安装"></a>rpm包安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/yum.repos.d/nginx.repo</span><br><span class="line">    [nginx]</span><br><span class="line">    name=nginx repository</span><br><span class="line">    baseurl=http://nginx.org/packages/centos/7/$basearch/</span><br><span class="line">    gpgcheck=0</span><br><span class="line">    enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##自建repo文件或用以下命令；如果是CentOS6上安装nginx，就将上面源地址中的7改为6就可以了。也可以下载安装http://http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm。另外，在CentOS6上如果要安装nginx，还要将openssl升级到1.0.2版本以上。到https://www.openssl.org/source/openssl-1.0.2h.tar.gz下载，之后编译安装</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##如果提示需要公钥验证，需要执行此命令rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7</span></span></span><br><span class="line">rpm -ivh https://mirrors.ustc.edu.cn/epel/epel-release-latest-7.noarch.rpm</span><br><span class="line">------------------------------------------------------------------------------------</span><br><span class="line">rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm</span><br><span class="line">//此命令安装后也会自建一个叫nginx.repo的源</span><br><span class="line">yum repolist</span><br><span class="line">yum info nginx</span><br><span class="line">yum install nginx</span><br><span class="line">------------------------------------------------------------------------------------</span><br><span class="line">yum install epel-release -y</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##也可以用yum安装epel-release包得到epel仓库。也可以安装epel库来安装nginx，这样安装nginx后会自动配置配色方案</span></span></span><br><span class="line"></span><br><span class="line">注：nginx配置文件默认没有配色，使用下面方法解决</span><br><span class="line">mkdir -pv ~/.vim/syntax</span><br><span class="line">cd ~/.vim/syntax</span><br><span class="line">wget http://www.vim.org/scripts/download_script.php?src_id=14376 -O nginx.vim</span><br><span class="line">vim ~/.vim/filetype.vim</span><br><span class="line">	au BufRead,BufNewFile /etc/nginx/* set ft=nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##其中路径为你的nginx.conf文件路径</span></span></span><br></pre></td></tr></table></figure>
-<h1 id="源码安装"><a href="#源码安装" class="headerlink" title="源码安装"></a>源码安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">yum install zlib-devel pcre-devel</span><br><span class="line">yum groupinstall "开发工具"</span><br><span class="line">tar nginx-1.12.2.tar.gz</span><br><span class="line">cd nginx-1.12.2</span><br><span class="line">./configure --with-pcre --with-zlib</span><br><span class="line">/usr/local/nginx/sbin/nginx     </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##启动</span></span></span><br><span class="line">/usr/local/nginx/sbin/nginx -s reload    </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##重启</span></span></span><br><span class="line">/usr/local/nginx/sbin/nginx -s stop    </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##关闭</span></span></span><br><span class="line">vim /usr/lib/systemd/system/nginx.service</span><br><span class="line">    [Unit]</span><br><span class="line">        Description=Nginx Service</span><br><span class="line">    [Service]</span><br><span class="line">        Type=forking</span><br><span class="line">        PIDFile=/usr/local/nginx/logs/nginx.pid</span><br><span class="line">        ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf</span><br><span class="line">        ExecReload=/usr/local/nginx/sbin/nginx -s reload</span><br><span class="line">        ExecStop=/usr/local/nginx/sbin/nginx -s stop</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##实现systemd管理nginx</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##这里一定要注意PIDFile的路径，在/usr/local/nginx/conf/nginx.conf配置文件中，默认pid文件放在/usr/local/nginx/logs中，如果写错路径，nginx是无法启动的，报错为：PID file /run/nginx.pid not readable (yet?) after start.</span></span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2136,7 +2160,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-count">19</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2148,8 +2172,6 @@
                 <div class="site-state-item site-state-categories">
                   <a href="/categories/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -2177,8 +2199,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
