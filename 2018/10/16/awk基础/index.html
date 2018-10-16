@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="语法12345678910111213# 我们在linux上所使用的awk其实是gawk，也就是GNU awk，简称为gawk。awk其实是一门编程语言，它支持条件判断、数组、循环等功能。grep：更适合单纯的查找或匹配文本、sed：更适合编辑匹配到的文本、awk：更适合格式化文本，对文本进行较复杂格式处理[root@bogon ~]# ll /usr/bin/awk lrwxrwxrwx. 1">
+<meta name="keywords" content="awk基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="awk基础">
+<meta property="og:url" content="http://yoursite.com/2018/10/16/awk基础/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="语法12345678910111213# 我们在linux上所使用的awk其实是gawk，也就是GNU awk，简称为gawk。awk其实是一门编程语言，它支持条件判断、数组、循环等功能。grep：更适合单纯的查找或匹配文本、sed：更适合编辑匹配到的文本、awk：更适合格式化文本，对文本进行较复杂格式处理[root@bogon ~]# ll /usr/bin/awk lrwxrwxrwx. 1">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2018-10-16T09:04:02.730Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="awk基础">
+<meta name="twitter:description" content="语法12345678910111213# 我们在linux上所使用的awk其实是gawk，也就是GNU awk，简称为gawk。awk其实是一门编程语言，它支持条件判断、数组、循环等功能。grep：更适合单纯的查找或匹配文本、sed：更适合编辑匹配到的文本、awk：更适合格式化文本，对文本进行较复杂格式处理[root@bogon ~]# ll /usr/bin/awk lrwxrwxrwx. 1">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/16/awk基础/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>awk基础 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-基础" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/16/awk基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">awk基础
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-16 13:54:49 / 修改時間：17:04:02" itemprop="dateCreated datePublished" datetime="2018-10-16T13:54:49+08:00">2018-10-16</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 我们在linux上所使用的awk其实是gawk，也就是GNU awk，简称为gawk。awk其实是一门编程语言，它支持条件判断、数组、循环等功能。grep：更适合单纯的查找或匹配文本、sed：更适合编辑匹配到的文本、awk：更适合格式化文本，对文本进行较复杂格式处理</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# ll /usr/bin/awk </span><br><span class="line">lrwxrwxrwx. 1 root root 4 Oct  8 14:20 /usr/bin/awk -&gt; gawk</span><br><span class="line"></span><br><span class="line">* 语法</span><br><span class="line">awk [options] 'program' file1 , file2 , ...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 对于上述语法中的program来说，又可以细分成pattern（模式）和action（动作），也就是说，awk的基本语法如下</span></span><br><span class="line">awk [options] 'Pattern&#123;Action&#125;' file</span><br><span class="line">-F：用于指定输入分隔符。</span><br><span class="line">-v：用于设置变量的值。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">0 表示显示整行 ，<span class="variable">$NF</span>表示当前行分割后的最后一列（<span class="variable">$0</span>和<span class="variable">$NF</span>均为内置变量）。<span class="variable">$NF</span> 和 NF 要表达的意思是不一样的，对于awk来说，<span class="variable">$NF</span>表示最后一个字段，NF表示当前行被分隔符切开以后，一共有几个字段。假如一行文本被空格分成了7段，那么NF的值就是7，<span class="variable">$NF</span>的值就是<span class="variable">$7</span>,  而<span class="variable">$7</span>表示当前行的第7个字段，也就是最后一列，那么每行的倒数第二列可以写为$(NF-1)。</span></span><br></pre></td></tr></table></figure>
+<h5 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">* 打印全部</span><br><span class="line">[root@bogon ~]# echo ddd &gt; testd</span><br><span class="line">[root@bogon ~]# awk '&#123;print&#125;' testd </span><br><span class="line">ddd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将testd文件中的内容打印了出来</span></span><br><span class="line">[root@bogon ~]# awk '&#123;print $0&#125;' test</span><br><span class="line">abc 345 ssd asdf lkj;l</span><br><span class="line">123 klj adf daff adeills adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面两种写法都可以打印整行</span></span><br><span class="line"></span><br><span class="line">* 打印某列</span><br><span class="line">[root@bogon ~]# df -h | awk '&#123;print $2&#125;'</span><br><span class="line">Size</span><br><span class="line">30G</span><br><span class="line">234M</span><br><span class="line">245M</span><br><span class="line">245M</span><br><span class="line">245M</span><br><span class="line">1014M</span><br><span class="line">976M</span><br><span class="line">49M</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出df的信息的第2列，<span class="variable">$2</span>表示将当前行按照分隔符分割后的第2列，不指定分隔符时，默认使用空格作为分隔符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> awk是逐行处理的，处理完当前行，再处理下一行。awk默认以<span class="string">"换行符"</span>为标记，识别每一行，每次遇到<span class="string">"回车换行"</span>，就认为是当前行的结束，新的一行的开始，awk会按照用户指定的分割符去分割当前行</span></span><br><span class="line"></span><br><span class="line">* 打印多个列</span><br><span class="line">[root@bogon ~]# cat test</span><br><span class="line">abc 345 ssd asdf lkj;l</span><br><span class="line">123 klj adf daff adeills adsfei</span><br><span class="line">[root@bogon ~]# awk '&#123;print $2,$5,$6&#125;' test</span><br><span class="line">345 lkj;l </span><br><span class="line">klj adeills adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一行并没有第六列，所以并没有输出任何文本，而第二行有第六列，所以输出了。</span></span><br><span class="line"></span><br><span class="line">* 添加自己的字段</span><br><span class="line">[root@bogon ~]# awk '&#123;print $1,$2,"string"&#125;' test</span><br><span class="line">abc 345 string</span><br><span class="line">123 klj string</span><br><span class="line">[root@bogon ~]# awk  '&#123;print $1,$2,423&#125;' test</span><br><span class="line">abc 345 423</span><br><span class="line">123 klj 423</span><br><span class="line">[root@bogon ~]# awk '&#123;print "diyilie:" $1,"diyilie:" $2&#125;' test</span><br><span class="line">diyilie:abc diyilie:345</span><br><span class="line">diyilie:123 diyilie:klj</span><br><span class="line">[root@bogon ~]# awk '&#123;print "diyilie:"$1,"diyilie:"$2&#125;' test</span><br><span class="line">diyilie:abc diyilie:345</span><br><span class="line">diyilie:123 diyilie:klj</span><br><span class="line">[root@bogon ~]# awk '&#123;print "diyilie:"$1,"534","diyilie:"$2&#125;' test</span><br><span class="line">diyilie:abc 534 diyilie:345</span><br><span class="line">diyilie:123 534 diyilie:klj</span><br><span class="line">[root@bogon ~]# cat test | awk '&#123;print $1&#125;'</span><br><span class="line">abc</span><br><span class="line">123</span><br><span class="line">[root@bogon ~]# cat test | awk '&#123;print "$1"&#125;'</span><br><span class="line"><span class="meta">$</span><span class="bash">1</span></span><br><span class="line"><span class="meta">$</span><span class="bash">1</span></span><br><span class="line">[root@bogon ~]# cat test | awk '&#123;print "firstF:"$1&#125;'</span><br><span class="line">firstF:abc</span><br><span class="line">firstF:123</span><br><span class="line">[root@bogon ~]# cat test | awk '&#123;print "firstF:$1"&#125;'</span><br><span class="line">firstF:$1</span><br><span class="line">firstF:$1</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="variable">$1</span>这种内置变量的外侧不能加入双引号，否则<span class="variable">$1</span>会被当做文本输出</span></span><br></pre></td></tr></table></figure>
+<h4 id="特殊模式"><a href="#特殊模式" class="headerlink" title="特殊模式"></a>特殊模式</h4><h5 id="BEGIN"><a href="#BEGIN" class="headerlink" title="BEGIN"></a>BEGIN</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> BEGIN 模式指定了处理文本之前需要执行的操作</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa","bbb"&#125;' test</span><br><span class="line">aaa bbb</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在开始处理<span class="built_in">test</span>文件中的文本之前，先执行打印动作，输出的内容为<span class="string">"aaa"</span>,<span class="string">"bbb"</span>.</span></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa","bbb"&#125;'</span><br><span class="line">aaa bbb</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为不打算处理文本文件，所以也可以不指定文本文件，只进行一个处理前的打印动作。</span></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa","bbb"&#125;&#123;print $1,$2&#125;' test</span><br><span class="line">aaa bbb</span><br><span class="line">abc 345</span><br><span class="line">123 klj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以先进行处理前打印，再处理文本文件，但两次打印要分开写</span></span><br></pre></td></tr></table></figure>
+<h5 id="END"><a href="#END" class="headerlink" title="END"></a>END</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> END 模式指定了处理完所有行之后所需要执行的操作</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa","bbb"&#125;&#123;print $1,$2&#125;END&#123;print "ccc","ddd"&#125;' test</span><br><span class="line">aaa bbb</span><br><span class="line">abc 345</span><br><span class="line">123 klj</span><br><span class="line">ccc ddd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 结合BEGIN模式和END模式一起使用</span></span><br></pre></td></tr></table></figure>
+<h4 id="分隔符"><a href="#分隔符" class="headerlink" title="分隔符"></a>分隔符</h4><ul>
+<li><p>awk的分隔符还分为两种，”输入分隔符” 和 “输出分隔符”</p>
+</li>
+<li><p>输入分隔符，英文原文为field separator，此处简称为FS。awk默认以空白字符为分隔符对每一行进行分割。</p>
+</li>
+<li><p>输出分割符，英文原文为output field separator，此处简称为OFS。awk默认的输出分割符也是空格。</p>
+</li>
+</ul>
+<h5 id="输入分隔符"><a href="#输入分隔符" class="headerlink" title="输入分隔符"></a>输入分隔符</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# cat test1</span><br><span class="line"><span class="meta">aaa#</span><span class="bash">dfa<span class="comment">#123#jkl;</span></span></span><br><span class="line"><span class="meta">aiew#</span><span class="bash">adkf<span class="comment">#alkdjf#asdjfj</span></span></span><br><span class="line">[root@bogon ~]# awk -F# '&#123;print $1,$2&#125;' test</span><br><span class="line">abc 345 ssd asdf lkj;l </span><br><span class="line">123 klj adf daff adeills adsfei </span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定默认分隔符为<span class="comment">#号，对文本进行分隔</span></span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -v FS='#' '&#123;print $1,$2&#125;' test</span><br><span class="line">abc 345 ssd asdf lkj;l </span><br><span class="line">123 klj adf daff adeills adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 还能够通过设置内部变量的方式，指定awk的输入分隔符，awk内置变量FS可以用于指定输入分隔符，但是在使用变量时，需要使用-v选项，用于指定对应的变量</span></span><br></pre></td></tr></table></figure>
+<h5 id="输出分隔符"><a href="#输出分隔符" class="headerlink" title="输出分隔符"></a>输出分隔符</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 当我们要对处理完的文本进行输出的时候，以什么文本或符号作为分隔符。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;print $1,$2&#125;' test</span><br><span class="line">abc 345</span><br><span class="line">123 klj</span><br><span class="line">[root@bogon ~]# awk -v OFS="+++" '&#123;print $1,$2&#125;' test</span><br><span class="line">abc+++345</span><br><span class="line">123+++klj</span><br><span class="line">[root@bogon ~]# awk -v OFS='+++' '&#123;print $1,$2&#125;' test</span><br><span class="line">abc+++345</span><br><span class="line">123+++klj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加号两侧可以是单引号或双引号</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -v FS='#' -v OFS='---' '&#123;print $1,$2&#125;' test1</span><br><span class="line">aaa---dfa</span><br><span class="line">aiew---adkf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同时指定输入分隔符和输出分割符</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;print $1,$2&#125;' test</span><br><span class="line">abc 345</span><br><span class="line">123 klj</span><br><span class="line">[root@bogon ~]# awk '&#123;print $1 $2&#125;' test</span><br><span class="line">abc345</span><br><span class="line">123klj</span><br><span class="line">[root@bogon ~]# awk '&#123;print $1$2&#125;' test</span><br><span class="line">abc345</span><br><span class="line">123klj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出不使用分隔符，打印在一起</span></span><br></pre></td></tr></table></figure>
+<h4 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h4><ul>
+<li><p>“变量”又分为”内置变量” 和 “自定义变量” , “输入分隔符FS”和”输出分隔符OFS”都属于内置变量。内置变量就是awk预定义好的、内置在awk内部的变量，而自定义变量就是用户定义的变量。</p>
+</li>
+<li><p>常用内置变量：</p>
+<p>FS：输入字段分隔符， 默认为空白字符</p>
+<p>OFS：输出字段分隔符， 默认为空白字符</p>
+<p>RS：输入记录分隔符(输入换行符)， 指定输入时的换行符</p>
+<p>ORS：输出记录分隔符（输出换行符），输出时用指定符号代替换行符</p>
+<p>NF：number of Field，当前行的字段的个数(即当前行被分割成了几列)，字段数量</p>
+<p>NR：行号，当前处理的文本行的行号。</p>
+<p>FNR：各文件分别计数的行号</p>
+<p>FILENAME：当前文件名</p>
+<p>ARGC：命令行参数的个数</p>
+<p>ARGV：数组，保存的是命令行所给定的各参数</p>
+</li>
+</ul>
+<h5 id="内置变量NR"><a href="#内置变量NR" class="headerlink" title="内置变量NR"></a>内置变量NR</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在awk中，只有在引用<span class="variable">$0</span>、<span class="variable">$1</span>等内置变量的值的时候才会用到<span class="string">"$"</span>,引用其他变量时，不管是内置变量，还是自定义变量，都不使用<span class="string">"$"</span>,而是直接使用变量名。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# cat test</span><br><span class="line">abc 345 ssd asdf lkj;l</span><br><span class="line">123 klj adf daff adeills adsfei</span><br><span class="line">[root@bogon ~]# awk '&#123;print NR,NF&#125;' test</span><br><span class="line">1 5</span><br><span class="line">2 6</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打印每一行的行号以及每一行对应的列的数量。内置变量NR表示每一行的行号，内置变量NF表示每一行中一共有几列</span></span><br><span class="line">[root@bogon ~]# awk '&#123;print NR,$0&#125;' test</span><br><span class="line">1 abc 345 ssd asdf lkj;l</span><br><span class="line">2 123 klj adf daff adeills adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先打印出行号，再打印出整行的内容</span></span><br></pre></td></tr></table></figure>
+<h5 id="内置变量FNR"><a href="#内置变量FNR" class="headerlink" title="内置变量FNR"></a>内置变量FNR</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk '&#123;print NR,$0&#125;' test test1</span><br><span class="line">1 abc 345 ssd asdf lkj;l</span><br><span class="line">2 123 klj adf daff adeills adsfei</span><br><span class="line">3 aaa#dfa#123#jkl;</span><br><span class="line">4 aiew#adkf#alkdjf#asdjfj</span><br><span class="line"><span class="meta">#</span><span class="bash"> awk处理多个文件的时候，如果使用NR显示行号，那么，多个文件的所有行会按照顺序进行排序。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;print FNR,$0&#125;' test test1</span><br><span class="line">1 abc 345 ssd asdf lkj;l</span><br><span class="line">2 123 klj adf daff adeills adsfei</span><br><span class="line">1 aaa#dfa#123#jkl;</span><br><span class="line">2 aiew#adkf#alkdjf#asdjfj</span><br><span class="line"><span class="meta">#</span><span class="bash"> FNR变量可以在处理多个文件时分开显示行号。</span></span><br></pre></td></tr></table></figure>
+<h5 id="内置变量RS"><a href="#内置变量RS" class="headerlink" title="内置变量RS"></a>内置变量RS</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk '&#123;print NR,$0&#125;' test</span><br><span class="line">1 abc 345 ssd asdf lkj;l</span><br><span class="line">2 123 klj adf daff adeills adsfei</span><br><span class="line">[root@bogon ~]# awk -v RS=" " '&#123;print NR,$0&#125;' test</span><br><span class="line">1 abc</span><br><span class="line">2 345</span><br><span class="line">3 ssd</span><br><span class="line">4 asdf</span><br><span class="line">5 lkj;l</span><br><span class="line">123</span><br><span class="line">6 klj</span><br><span class="line">7 adf</span><br><span class="line">8 daff</span><br><span class="line">9 adeills</span><br><span class="line">10 adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定空格为换行符并打印，第5行是因为<span class="built_in">test</span>文本中的第一行行尾和第二行开头之间没有空格，只有回车，所以打印成这个样子。</span></span><br></pre></td></tr></table></figure>
+<h5 id="内置变量ORS"><a href="#内置变量ORS" class="headerlink" title="内置变量ORS"></a>内置变量ORS</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk  -v ORS='+++' '&#123;print NR,$0&#125;' test</span><br><span class="line">1 abc 345 ssd asdf lkj;l+++2 123 klj adf daff adeills adsfei+++[root@bogon ~]#</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定输出换行符，awk认为有+++号就是换行了，所以才打印成这个样子</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -v RS=" " -v ORS='+++' '&#123;print NR,$0&#125;' test</span><br><span class="line">1 abc+++2 345+++3 ssd+++4 asdf+++5 lkj;l</span><br><span class="line">123+++6 klj+++7 adf+++8 daff+++9 adeills+++10 adsfei</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一起使用输入输出换行符。</span></span><br></pre></td></tr></table></figure>
+<h5 id="内置变量FILENAME"><a href="#内置变量FILENAME" class="headerlink" title="内置变量FILENAME"></a>内置变量FILENAME</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk '&#123;print FILENAME,FNR,$0&#125;' test test1</span><br><span class="line">test 1 abc 345 ssd asdf lkj;l</span><br><span class="line">test 2 123 klj adf daff adeills adsfei</span><br><span class="line">test1 1 aaa#dfa#123#jkl;</span><br><span class="line">test1 2 aiew#adkf#alkdjf#asdjfj</span><br><span class="line"><span class="meta">#</span><span class="bash"> FILENAME是为了显示文件名的。上面每行都打印了文件名，行号，文件内容</span></span><br></pre></td></tr></table></figure>
+<h5 id="内置变量ARGC与ARGV"><a href="#内置变量ARGC与ARGV" class="headerlink" title="内置变量ARGC与ARGV"></a>内置变量ARGC与ARGV</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa",ARGV[1]&#125;' test test1</span><br><span class="line">aaa test</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa",ARGV[1],ARGV[2]&#125;' test test1</span><br><span class="line">aaa test test1</span><br><span class="line"><span class="meta">#</span><span class="bash"> ARGV内置变量表示的是一个数组.数组的索引都是从0开始的，所以，ARGV[1]表示引用ARGV数组中的第二个元素的值。命令后的文件名组成了这个数组，使用ARGV调用数组中的元素值，ARGV[1]对应的值为<span class="built_in">test</span>，ARGV[2]对应的值为test1，ARGV[0]对应的值为awk</span></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa",ARGV[0]&#125;' test</span><br><span class="line">aaa awk</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "aaa",ARGV[0],ARGV[1],ARGV[2],ARGC&#125;' test test1</span><br><span class="line">aaa awk test test1 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在上面的例子中，应该有三个参数，awk、<span class="built_in">test</span>、test1，这三个参数作为数组的元素存放于ARGV中，而ARGC则表示参数的数量，也可以理解为ARGV数组的长度。</span></span><br></pre></td></tr></table></figure>
+<h5 id="自定义变量"><a href="#自定义变量" class="headerlink" title="自定义变量"></a>自定义变量</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 自定义变量方法</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 方法一：-v varname=value  变量名区分字符大小写。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 方法二：在program中直接定义。</span></span><br><span class="line"></span><br><span class="line">* 方法一</span><br><span class="line">[root@bogon ~]# awk -v myVar="testVar" 'BEGIN&#123;print myVar&#125;'</span><br><span class="line">testVar</span><br><span class="line"></span><br><span class="line">* 方法二</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;myvar="ttt";print myvar&#125;'</span><br><span class="line">ttt</span><br><span class="line"><span class="meta">#</span><span class="bash"> ttt两侧一定要使用双引号，不能使用单引号。分号两侧有没有空格都可以。</span></span><br><span class="line"></span><br><span class="line">* 一次定义多个变量</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;myvar1="111";myvar2="222";print myvar1,myvar2&#125;'</span><br><span class="line">111 222</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# abc=123</span><br><span class="line">[root@bogon ~]# awk -v myvar=$abc 'BEGIN&#123;print myvar&#125;'</span><br><span class="line">123</span><br><span class="line"><span class="meta">#</span><span class="bash"> 需要在awk中引用shell中的变量的时候，可以通过方法一间接的引用。</span></span><br></pre></td></tr></table></figure>
+<h4 id="printf命令"><a href="#printf命令" class="headerlink" title="printf命令"></a>printf命令</h4><ul>
+<li>printf命令的作用是按照我们指定的格式输出文本。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 语法</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">printf</span> <span class="string">"指定的格式"</span> <span class="string">"文本1"</span> <span class="string">"文本2"</span> <span class="string">"文本3"</span> ......</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# echo abc</span><br><span class="line">abc</span><br><span class="line">[root@bogon ~]# printf abc</span><br><span class="line">abc[root@bogon ~]#</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">echo</span>命令会对输出的文本进行换行，而<span class="built_in">printf</span>命令则不会对输出的文本进行换行</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# echo -e "abc \ndef \njkl \ndfj"</span><br><span class="line">abc </span><br><span class="line">def </span><br><span class="line">jkl </span><br><span class="line">dfj</span><br><span class="line">[root@bogon ~]# printf "abc \ndef \njkl \ndfj \n"</span><br><span class="line">abc </span><br><span class="line">def </span><br><span class="line">jkl </span><br><span class="line">dfj</span><br><span class="line">[root@bogon ~]# printf "%s\n" abc def jkl dfj</span><br><span class="line">abc</span><br><span class="line">def</span><br><span class="line">jkl</span><br><span class="line">dfj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 前两种方法要使用转义符\n进行换行。第三条命令中的每一个<span class="string">"文本"</span>都会被当做参数项传入<span class="built_in">printf</span>命令，而每个被传入的参数都会按照指定的<span class="string">"格式"</span>被<span class="string">"格式化"</span>。<span class="string">"%s\n"</span>就是格式，而后面的每一段字符串，都被当做参数传入到了<span class="built_in">printf</span>命令中，并按照我们指定的格式进行了格式化。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %s是<span class="string">"格式替换符"</span>。使用<span class="string">"%s"</span>代替传入的每一个参数，上面命令中的参数就是abc def jkl dfj，如果我们指定的格式为<span class="string">"%s\n"</span>，当abc被当做参数传入<span class="built_in">printf</span>命令时，<span class="built_in">printf</span>就会把<span class="string">"%s\n"</span>中的%s替换成abc，于是，abc就变成了我们指定的格式<span class="string">"abc\n"</span>，最终<span class="built_in">printf</span>输出的就是格式化后的<span class="string">"abc\n"</span>，以此类推，每一段文本都被当做一个参数传入<span class="built_in">printf</span>命令，然后按照指定的格式输出了。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# printf "%s\n" 1 11 213 11123</span><br><span class="line">1</span><br><span class="line">11</span><br><span class="line">213</span><br><span class="line">11123</span><br><span class="line">[root@bogon ~]# printf "%f\n" 1 11 213 11123</span><br><span class="line">1.000000</span><br><span class="line">11.000000</span><br><span class="line">213.000000</span><br><span class="line">11123.000000</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"%f"</span>也代替了每一个传入的参数，它会将每一个传入的参数转换成<span class="string">"浮点类型"</span></span></span><br><span class="line"></span><br><span class="line">* 格式替换符</span><br><span class="line"><span class="meta">#</span><span class="bash"> %s 字符串</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %f 浮点格式（也就是我们概念中的<span class="built_in">float</span>或者double）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %b 相对应的参数中包含转义字符时，可以使用此替换符进行替换，对应的转义字符会被转义。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %c ASCII字符。显示相对应参数的第一个字符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %d, %i 十进制整数</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %o 不带正负号的八进制值</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %u 不带正负号的十进制值</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %x 不带正负号的十六进制值，使用a至f表示10至15</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %X 不带正负号的十六进制值，使用A至F表示10至15</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> %% 表示<span class="string">"%"</span>本身</span></span><br><span class="line">* printf常用的转义符</span><br><span class="line"><span class="meta">#</span><span class="bash"> \a 警告字符，通常为ASCII的BEL字符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \b 后退</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \c 抑制（不显示）输出结果中任何结尾的换行字符（只在%b格式指示符控制下的参数字符串中有效），而且，任何留在参数里的字符、任何接下来的参数以及任何留在格式字符串中的字符，都被忽略</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \f 换页（formfeed）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \n 换行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \r 回车（Carriage <span class="built_in">return</span>）</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \t 水平制表符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \v 垂直制表符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \\ 一个字面上的反斜杠字符，即<span class="string">"\"本身。</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \ddd 表示1到3位数八进制值的字符，仅在格式字符串中有效</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> \0ddd 表示1到3位的八进制值字符</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# printf "( %s ) " 1 23 234 23423;echo ""</span><br><span class="line">( 1 ) ( 23 ) ( 234 ) ( 23423 )</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为每个传入的参数添加一对<span class="string">"括号"</span>，并且括号内侧需要有空格。最后的<span class="built_in">echo</span>命令是为了换行</span></span><br><span class="line">[root@bogon ~]# printf "%s\t" 1 23 234 23423;echo ""</span><br><span class="line">1	23	234	23423</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"制表符"</span>隔开每个参数</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# printf "%s %s\n" a b df ad e r</span><br><span class="line">a b</span><br><span class="line">df ad</span><br><span class="line">e r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定的<span class="string">"格式"</span>中所包含的<span class="string">"格式替换符"</span>的数量，就代表每次格式化的参数的数量，每个<span class="string">"格式替换符"</span>与参数都是一一对应的</span></span><br><span class="line">[root@bogon ~]# printf "%s %s %s\n" a b c d e f </span><br><span class="line">a b c</span><br><span class="line">d e f</span><br><span class="line">[root@bogon ~]# printf "%s %s %s\n" 姓名 性别 年龄 董鹏 男 29 少松 女 39</span><br><span class="line">姓名 性别 年龄</span><br><span class="line">董鹏 男 29</span><br><span class="line">少松 女 39</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面的年龄与其上面的标题没有对齐</span></span><br><span class="line">[root@bogon ~]# printf "%7s %5s %4s\n" 姓名 性别 年龄 董鹏 男 29 少松 女 39</span><br><span class="line"> 姓名 性别 年龄</span><br><span class="line"> 董鹏   男   29</span><br><span class="line"> 少松   女   39</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在原来的<span class="string">"格式替换符"</span>中间加入了特定的数字，可以使输出的文字向右对齐。如果想向左对齐，就将数字改为负数，如：%-9s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果使用%+9s，表示给后面对应的参数前加一个+号。</span></span><br><span class="line">[root@bogon ~]# printf "aaa fff\n";printf "%-9s %-12f \n" abc 123.123123 bbb 2312.12345</span><br><span class="line">aaa fff</span><br><span class="line">abc       123.123123   </span><br><span class="line">bbb       2312.123450</span><br><span class="line">[root@bogon ~]# printf "aaa fff\n";printf "%-9s %-12.2f \n" abc 123.123123 bbb 2312.12345</span><br><span class="line">aaa fff</span><br><span class="line">abc       123.12       </span><br><span class="line">bbb       2312.12 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一条命令的数字修饰符为12，表示对应的替换符<span class="string">"%f"</span>的输出宽度为12个字符，第二条命令的数字修饰符为12.2 ，表示对应的替换符<span class="string">"%f"</span>的输出宽度为12个字符，并且小数点的精度为2。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# printf "aaa fff\n";printf "%-9s %-12d \n" abc 123 bbb 2312</span><br><span class="line">aaa fff</span><br><span class="line">abc       123          </span><br><span class="line">bbb       2312 </span><br><span class="line">[root@bogon ~]# printf "aaa fff\n";printf "%-9s %-12.4d \n" abc 123 bbb 2312</span><br><span class="line">aaa fff</span><br><span class="line">abc       0123         </span><br><span class="line">bbb       2312</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当格式替换符为<span class="string">"%d"</span>时，如果数字修饰符带有小数点，则数字修饰符小数点后的数字表示整数的长度，长度不够时，高位用0补全</span></span><br></pre></td></tr></table></figure>
+<h4 id="printf动作"><a href="#printf动作" class="headerlink" title="printf动作"></a>printf动作</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk '&#123;print $1&#125;' test</span><br><span class="line">abc</span><br><span class="line">123</span><br><span class="line">[root@bogon ~]# awk '&#123;printf $1&#125;' test</span><br><span class="line">abc123[root@bogon ~]#</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">printf</span>动作不会自动换行</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;printf "%s\n",$1&#125;' test</span><br><span class="line">abc</span><br><span class="line">123</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用格式替换符，不要忘记<span class="variable">$1</span>前面的逗号</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;printf "%s\n",1,2,3,4,5&#125;'</span><br><span class="line">1</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;printf "%s\n%s\n%s\n%s\n%s\n",1,2,3,4,5&#125;'</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在awk中，格式替换符的数量必须与传入的参数的数量相同。也就是格式替换符必须与需要格式化的参数一一对应。不可以像使用<span class="built_in">printf</span>命令一样，一个格式替换符可以反复使用。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="built_in">printf</span>动作注意事项</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1. 使用<span class="built_in">printf</span>动作输出的文本不会换行，如果需要换行，可以在对应的<span class="string">"格式替换符"</span>后加入<span class="string">"\n"</span>进行转义。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 使用<span class="built_in">printf</span>动作时，<span class="string">"指定的格式"</span> 与 <span class="string">"被格式化的文本"</span> 之间，需要用<span class="string">"逗号"</span>隔开。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 使用<span class="built_in">printf</span>动作时，<span class="string">"格式"</span>中的<span class="string">"格式替换符"</span>必须与 <span class="string">"被格式化的文本"</span> 一一对应。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;printf "第一列： %s 第二列： %s\n",$1,$2&#125;' test</span><br><span class="line">第一列： abc 第二列： 345</span><br><span class="line">第一列： 123 第二列： klj</span><br><span class="line">[root@bogon ~]# awk -v FS="#" '&#123;printf "第一列： %s 第二列： %s\n",$1,$2&#125;' test1</span><br><span class="line">第一列： aaa 第二列： dfa</span><br><span class="line">第一列： aiew 第二列： adkf</span><br><span class="line">[root@bogon ~]# awk -v FS=":" 'BEGIN&#123;printf "%-10s\t %s\n","用户名称","用户ID"&#125;&#123;printf "%-10s\t %s\n",$1,$3&#125;' /etc/passwd</span><br><span class="line">用户名称      	 用户ID</span><br><span class="line">root      	 0</span><br><span class="line">bin       	 1</span><br><span class="line">daemon    	 2</span><br><span class="line">adm       	 3</span><br><span class="line">lp        	 4</span><br><span class="line">sync      	 5</span><br><span class="line">shutdown  	 6</span><br><span class="line">halt      	 7</span><br><span class="line">mail      	 8</span><br><span class="line">operator  	 11</span><br><span class="line">games     	 12</span><br><span class="line">ftp       	 14</span><br><span class="line">nobody    	 99</span><br><span class="line">systemd-network	 192</span><br><span class="line">dbus      	 81</span><br><span class="line">polkitd   	 999</span><br><span class="line">postfix   	 89</span><br><span class="line">sshd      	 74</span><br><span class="line">openvpn   	 998</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/awk基础/" rel="tag"># awk基础</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/iptables动作/" rel="next" title="iptables动作">
+                <i class="fa fa-chevron-left"></i> iptables动作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#语法"><span class="nav-number">1.</span> <span class="nav-text">语法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#测试"><span class="nav-number">1.1.</span> <span class="nav-text">测试</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#特殊模式"><span class="nav-number">2.</span> <span class="nav-text">特殊模式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#BEGIN"><span class="nav-number">2.1.</span> <span class="nav-text">BEGIN</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#END"><span class="nav-number">2.2.</span> <span class="nav-text">END</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分隔符"><span class="nav-number">3.</span> <span class="nav-text">分隔符</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#输入分隔符"><span class="nav-number">3.1.</span> <span class="nav-text">输入分隔符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#输出分隔符"><span class="nav-number">3.2.</span> <span class="nav-text">输出分隔符</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#变量"><span class="nav-number">4.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量NR"><span class="nav-number">4.1.</span> <span class="nav-text">内置变量NR</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量FNR"><span class="nav-number">4.2.</span> <span class="nav-text">内置变量FNR</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量RS"><span class="nav-number">4.3.</span> <span class="nav-text">内置变量RS</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量ORS"><span class="nav-number">4.4.</span> <span class="nav-text">内置变量ORS</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量FILENAME"><span class="nav-number">4.5.</span> <span class="nav-text">内置变量FILENAME</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内置变量ARGC与ARGV"><span class="nav-number">4.6.</span> <span class="nav-text">内置变量ARGC与ARGV</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自定义变量"><span class="nav-number">4.7.</span> <span class="nav-text">自定义变量</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#printf命令"><span class="nav-number">5.</span> <span class="nav-text">printf命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#printf动作"><span class="nav-number">6.</span> <span class="nav-text">printf动作</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
