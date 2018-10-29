@@ -204,7 +204,7 @@
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job2.jpg">
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job3.jpg">
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job4.jpg">
-<meta property="og:updated_time" content="2018-10-29T09:08:06.310Z">
+<meta property="og:updated_time" content="2018-10-29T09:10:09.870Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Jenkins安装与部署">
 <meta name="twitter:description" content="Jenkins依赖环境准备123456789101112131415161718192021222324252627282930313233343536* 安装java环境[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel[root@jenkins ~]# vim /etc/profile.d/java.sh	export JAVA_">
@@ -445,7 +445,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2018-10-29 17:08:06" itemprop="dateModified" datetime="2018-10-29T17:08:06+08:00">2018-10-29</time>
+                <time title="修改時間：2018-10-29 17:10:09" itemprop="dateModified" datetime="2018-10-29T17:10:09+08:00">2018-10-29</time>
               
             
           </span>
@@ -738,9 +738,11 @@
 <li>Maven版本是在jenkins设置中设置好的，目标是一条Maven命令“clean install -Dmaven.test.skip=true”</li>
 </ul>
 <p><img src="/images/jenkins/设置job3.jpg" alt=""></p>
-<p><img src="/images/jenkins/设置job4.jpg" alt=""></p>
 <ul>
 <li>设置构建后操作。WAR/EAR files是一个相对路径，相对/root/.jenkins/workspace/echarging/而言，echarging是项目的名称，项目下的target中有war文件，这里输入c-rest/target表示在项目目录下还有一层。Context path是访问的名称，之后就可以使用IP:8080/rest访问了。再选择下面的Containers为Tomcat8.x，这要根据实际情况选择，然后添加一个可以访问tomcat的manager_webapp页面的用户名和密码，这是在部署代码的tomcat中设置的。下面就是Tomcat的访问地址。都输入正确后保存即可。这样，在Maven处理完代码后，就会自动部署到部署代码的tomcat服务器上了。</li>
+</ul>
+<p><img src="/images/jenkins/设置job4.jpg" alt=""></p>
+<ul>
 <li>在部署代码的服务器上设置tomcat</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@rabbitmq tomcat]# vim webapps/manager/META-INF/context.xml</span><br><span class="line">	&lt;Context antiResourceLocking="false" privileged="true" &gt;</span><br><span class="line">  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"</span><br><span class="line">         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|10.5.5.90|10.5.5.9" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里加入两个地址，一个是本地的地址，为了测试页面是否可以打开。一个是jenkins的地址。如果不加jenkins的地址，jenkins的部署会报错。</span></span><br></pre></td></tr></table></figure>
