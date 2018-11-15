@@ -204,7 +204,7 @@
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job2.jpg">
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job3.jpg">
 <meta property="og:image" content="http://yoursite.com/images/jenkins/设置job4.jpg">
-<meta property="og:updated_time" content="2018-10-29T09:16:24.672Z">
+<meta property="og:updated_time" content="2018-10-29T09:37:00.981Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Jenkins安装与部署">
 <meta name="twitter:description" content="Jenkins依赖环境准备123456789101112131415161718192021222324252627282930313233343536* 安装java环境[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel[root@jenkins ~]# vim /etc/profile.d/java.sh	export JAVA_">
@@ -445,7 +445,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2018-10-29 17:16:24" itemprop="dateModified" datetime="2018-10-29T17:16:24+08:00">2018-10-29</time>
+                <time title="修改時間：2018-10-29 17:37:00" itemprop="dateModified" datetime="2018-10-29T17:37:00+08:00">2018-10-29</time>
               
             
           </span>
@@ -650,6 +650,7 @@
 <p><img src="/images/jenkins/git插件3.jpg" alt=""></p>
 <h3 id="创建一个Jenkins-Job"><a href="#创建一个Jenkins-Job" class="headerlink" title="创建一个Jenkins Job"></a>创建一个Jenkins Job</h3><blockquote>
 <p>在jenkins里，一个任务叫做一个job。一般我们的项目会有多个分支，比如开发分支和产品分支，我们可以对每一个分支都新建一个job，比如，我们对开发分支创建一个测试的job,每次有代码提交就自动运行一次测试，对产品分支创建一个打包的job，每次有代码提交就运行打包任务。</p>
+<p>在系统设置中设置的项就是为了可以在任务中得到引用。</p>
 </blockquote>
 <p><img src="/images/jenkins/创建jenkinsjob1.jpg" alt=""></p>
 <ul>
@@ -703,6 +704,9 @@
 <li>如果测试正常，在页面最上方会有HTTP 200的提示</li>
 </ul>
 <p><img src="/images/jenkins/webhook4.jpg" alt=""></p>
+<ul>
+<li>webhook就是为了在有人上传代码时，就会触发上面设置的地址，只要触发这个地址，jenkins就会自动部署</li>
+</ul>
 <h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><ul>
 <li>到要部署代码的服务器上，安装nginx。</li>
 <li>到jenkins服务器上安装git，准备拉取代码</li>
@@ -745,7 +749,7 @@
 <ul>
 <li>在部署代码的服务器上设置tomcat</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@rabbitmq tomcat]# vim webapps/manager/META-INF/context.xml</span><br><span class="line">	&lt;Context antiResourceLocking="false" privileged="true" &gt;</span><br><span class="line">  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"</span><br><span class="line">         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|10.5.5.90|10.5.5.9" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里加入两个地址，一个是本地的地址，为了测试页面是否可以打开。一个是jenkins的地址。如果不加jenkins的地址，jenkins的部署会报错。</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon local]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@bogon ~]# vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">[root@bogon tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@bogon tomcat]# vim webapps/manager/META-INF/context.xml</span><br><span class="line">	&lt;Context antiResourceLocking="false" privileged="true" &gt;</span><br><span class="line">  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"</span><br><span class="line">         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|10.5.5.90|10.5.5.9" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里加入两个地址，一个是本地的地址，为了测试页面是否可以打开。一个是jenkins的地址。如果不加jenkins的地址，jenkins的部署会报错。</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>到Job中，点击立即构建</li>
 </ul>
@@ -864,7 +868,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -903,7 +907,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">13</span>
+                      
+                    
+                    <span class="site-state-item-count">14</span>
                     <span class="site-state-item-name">分類</span>
                   </a>
                 </div>
@@ -974,7 +980,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">29</span>
+                      
+                    
+                    <span class="site-state-item-count">30</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
