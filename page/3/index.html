@@ -319,6 +319,354 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/iptables匹配条件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/12/iptables匹配条件/" itemprop="url">
+                  iptables匹配条件
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-12 16:35:15" itemprop="dateCreated datePublished" datetime="2018-10-12T16:35:15+08:00">2018-10-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-10-15 13:55:17" itemprop="dateModified" datetime="2018-10-15T13:55:17+08:00">2018-10-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="基本匹配条件"><a href="#基本匹配条件" class="headerlink" title="基本匹配条件"></a>基本匹配条件</h3><h4 id="指定地址"><a href="#指定地址" class="headerlink" title="指定地址"></a>指定地址</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">* 一次指定多个源地址</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249,10.5.5.224 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用逗号分隔多个地址</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 55 packets, 4698 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       all  --  *      *       10.5.5.224           0.0.0.0/0           </span><br><span class="line">2          12     1008 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定后会一次添加两条规则</span></span><br><span class="line"></span><br><span class="line">* 指定网段</span><br><span class="line">[root@bogon ~]# iptables -I FORWARD -s 10.5.5.0/16 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.0网段的所有地址访问</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL FORWARD</span><br><span class="line">Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       all  --  *      *       10.5.0.0/16          0.0.0.0/0</span><br><span class="line"></span><br><span class="line">* 对条件取反</span><br><span class="line">[root@bogon ~]# iptables -A INPUT ! -s 10.5.5.25 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"! -s 10.5.5.25"</span>表示对 -s 10.5.5.25这个匹配条件取反， -s 10.5.5.25表示报文源IP地址为10.5.5.25即可满足匹配条件，使用 <span class="string">"!"</span> 取反后则表示，报文源地址IP只要不为10.5.5.25即满足条件，那么，上例中规则表达的意思就是，只要发往本机的报文的源地址不是10.5.5.25，就接受报文。但10.5.5.25还是可以ping通这台主机，因为filter表的INPUT链中只有一条规则，这条规则要表达的意思就是：只要报文的源IP不是10.5.5.25，那么就接受此报文，但并不能代表，报文的源IP是10.5.5.25时，会被拒绝。因为并没有任何一条规则指明源IP是10.5.5.25时，该执行怎样的动作，所以，当来自10.5.5.25的报文经过INPUT链时，并不能匹配上例中的规则，于是，此报文就继续匹配后面的规则，因为只有一条规则，于是，此报文就会去匹配当前链的默认动作(默认策略)，因为默认策略是ACCEPT，所以10.5.5.25还可以ping通这台主机。</span></span><br><span class="line">[root@bogon ~]# iptables --line -vnxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         159    12226 ACCEPT     all  --  *      *      !10.5.5.25            0.0.0.0/0 </span><br><span class="line"></span><br><span class="line">* 指定目标地址</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -d 10.5.5.22 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-d选项指定目标地址。如果我们不指定任何目标地址，则目标地址默认为0.0.0.0/0，同理，如果我们不指定源地址，源地址默认为0.0.0.0/0。-d选项也可以使用<span class="string">"叹号"</span>进行取反，也能够同时指定多个IP地址，使用<span class="string">"逗号"</span>隔开即可。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 但是请注意，不管是-s选项还是-d选项，取反操作与同时指定多个IP的操作不能同时使用。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当一条规则中有多个匹配条件时，这多个匹配条件之间，默认存在<span class="string">"与"</span>的关系。如上面规则表示源地址与目标地址必须同时能被这两个条件匹配，才算作被当前规则匹配</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          12     1008 DROP       all  --  *      *       10.5.5.249           10.5.5.22           </span><br><span class="line">2        1978   144348 ACCEPT     all  --  *      *      !10.5.5.25            0.0.0.0/0</span><br></pre></td></tr></table></figure>
+<h4 id="协议类型"><a href="#协议类型" class="headerlink" title="协议类型"></a>协议类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.249的tcp请求，所以ssh无法连接，但可以ping通。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当不使用-p指定协议类型时，默认表示所有类型的协议都会被匹配到，与使用-p all的效果相同。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT ! -p udp -s 10.5.5.249 -j DROP</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 192 packets, 11044 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          18     1512 DROP      !udp  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 DROP       tcp  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> -p用于匹配报文的协议类型,可以匹配的协议类型tcp、udp、udplite、icmp、esp、ah、sctp等（centos7中还支持icmpv6、mh）</span></span><br></pre></td></tr></table></figure>
+<h4 id="网卡接口"><a href="#网卡接口" class="headerlink" title="网卡接口"></a>网卡接口</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">* 流入</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -i eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp ! -i eth0 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> -i用于匹配报文是从哪个网卡接口流入本机的，由于匹配条件只是用于匹配报文流入的网卡，所以在OUTPUT链与POSTROUTING链中不能使用此选项。</span></span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 52 packets, 4422 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       icmp --  !eth0  *       0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">2          25     2100 DROP       icmp --  eth0   *       0.0.0.0/0            0.0.0.0/0</span><br><span class="line"></span><br><span class="line">* 流出</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p icmp -o eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p icmp ! -o eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL OUTPUT</span><br><span class="line">Chain OUTPUT (policy ACCEPT 65 packets, 6908 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       icmp --  *      !eth0   0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">2          23     1932 DROP       icmp --  *      eth0    0.0.0.0/0            0.0.0.0/0</span><br></pre></td></tr></table></figure>
+<h3 id="扩展匹配条件"><a href="#扩展匹配条件" class="headerlink" title="扩展匹配条件"></a>扩展匹配条件</h3><h4 id="tcp扩展模块"><a href="#tcp扩展模块" class="headerlink" title="tcp扩展模块"></a>tcp扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">* 目标端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m tcp --dport 22 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-m选项来指定扩展模块，如果想要使用--dport这个扩展匹配条件，则必须依靠某个扩折模块完成，上例中，这个扩展模块就是tcp扩展模块。 -m tcp表示使用tcp扩展模块，--dport表示tcp扩展模块中的一个扩展匹配条件，可用于匹配报文的目标端口。-p tcp与 -m tcp并不冲突，-p用于匹配报文的协议，-m 用于指定扩展模块的名称，正好，这个扩展模块也叫tcp。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 基本匹配条件我们可以直接使用，而如果想要使用扩展匹配条件，则需要依赖一些扩展模块</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 扩展匹配条件是可以取反的，同样是使用<span class="string">"!"</span>进行取反，比如 <span class="string">"! --dport 22"</span>，表示目标端口不是22的报文将会被匹配到。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport 22 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 也可以省略-m选项。当使用-p选项指定了报文的协议时，如果在没有使用-m指定对应的扩展模块名称的情况下，使用了扩展匹配条件，  iptables默认会调用与-p选项对应的协议名称相同的模块。</span></span><br><span class="line"></span><br><span class="line">* 源端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --sport 22 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 59 packets, 4224 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 ACCEPT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp spt:22</span><br><span class="line">2           1       60 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpt:22 reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 指定端口范围</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport 22:25 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 9 packets, 662 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpts:22:25 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> --dport 22:25表示目标端口为22到25之间的所有端口</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport :22 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --sport 80: -j REJECT </span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 46 packets, 3358 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp spts:80:65535 reject-with icmp-port-unreachable</span><br><span class="line">2           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpts:0:22 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> --sport和--dport都可以指定多个端口，第一条表示从0到22端口，第二条表示80端口到65535端口</span></span><br><span class="line"></span><br><span class="line">* --tcp-flags</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--tcp-flags"</span>指的就是tcp头中的标志位，我们可以通过此扩展匹配条件，去匹配tcp报文的头部的标识位，然后根据标识位的实际情况实现访问控制的功能。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-m tcp --dport 22"</span>的表示使用tcp扩展模块，指定目标端口为22号端口(ssh默认端口)，<span class="string">"--tcp-flags"</span>用于匹配报文tcp头部的标志位，<span class="string">"SYN,ACK,FIN,RST,URG,PSH SYN"</span>就是用于配置我们要匹配的标志位的，我们可以把这串字符拆成两部分去理解，第一部分为<span class="string">"SYN,ACK,FIN,RST,URG,PSH"</span>，第二部分为<span class="string">"SYN"</span>。第一部分表示：我们需要匹配报文tcp头中的哪些标志位，这里指定了六个标志位。第二部分表示：第一部分的标志位列表中，哪些标志位必须为1，这里指定的是SYN标志位必须为1，其他标志位必须为0。也就是tcp三次握手时第一次握手时的情况。</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 44 packets, 3226 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22 flags:0x3F/0x02 reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp -m tcp --sport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN,ACK -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一条命令匹配到的报文是第一次握手的报文，第二条命令匹配到的报文是第二次握手的报文。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --tcp-flags ALL SYN -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp -m tcp --sport 22 --tcp-flags ALL SYN,ACK -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面两条命令可以简写成这样，也就是将六个标志位用ALL代替</span></span><br><span class="line"></span><br><span class="line">* --syn</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --syn -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"--syn"</span>选项匹配第一次握手，这相当于使用<span class="string">"--tcp-flags SYN,RST,ACK,FIN  SYN"</span>，也就是说，可以使用<span class="string">"--syn"</span>选项去匹配tcp新建连接的请求报文。</span></span><br></pre></td></tr></table></figure>
+<h4 id="udp扩展"><a href="#udp扩展" class="headerlink" title="udp扩展"></a>udp扩展</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -I INPUT -p udp -m udp --dport 137 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp -m udp --dport 138 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行samba服务的137与138这两个UDP端口</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 137 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 138 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以省略-m选项</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 137:157 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开放137到157之间的所有udp端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> udp中的--sport与--dport也只能指定连续的端口范围，并不能一次性指定多个离散的端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用multiport扩展模块，即可指定多个离散的UDP端口</span></span><br></pre></td></tr></table></figure>
+<h4 id="icmp扩展"><a href="#icmp扩展" class="headerlink" title="icmp扩展"></a>icmp扩展</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ICMP协议的全称为Internet Control Message Protocol，翻译为互联网控制报文协议，它主要用于探测网络上的主机是否可用，目标是否可达，网络是否通畅，路由是否可用等。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 我们平常使用ping命令ping某主机时，如果主机可达，对应主机会对我们的ping请求做出回应（此处不考虑禁ping等情况），也就是说，我们发出ping请求，对方回应ping请求，虽然ping请求报文与ping回应报文都属于ICMP类型的报文，但是如果在概念上细分的话，它们所属的类型还是不同的，我们发出的ping请求属于类型8的icmp报文，而对方主机的ping回应报文则属于类型0的icmp报文，根据应用场景的不同，icmp报文被细分为如下各种类型。</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/iptables/icmp.png"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 从上图可以看出，所有表示<span class="string">"目标不可达"</span>的icmp报文的<span class="built_in">type</span>码为3，而<span class="string">"目标不可达"</span>又可以细分为多种情况，是网络不可达呢？还是主机不可达呢？再或者是端口不可达呢？所以，为了更加细化的区分它们，icmp对每种<span class="built_in">type</span>又细分了对应的code，用不同的code对应具体的场景，  所以，我们可以使用<span class="built_in">type</span>/code去匹配具体类型的ICMP报文，比如可以使用<span class="string">"3/1"</span>表示主机不可达的icmp报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上图中的第一行就表示ping回应报文，它的<span class="built_in">type</span>为0，code也为0，从上图可以看出，ping回应报文属于查询类（query）的ICMP报文，从大类上分，ICMP报文还能分为查询类与错误类两大类，目标不可达类的icmp报文则属于错误类报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 而我们发出的ping请求报文对应的<span class="built_in">type</span>为8，code为0。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上例中，我们并没有使用任何扩展匹配条件，我们只是使用<span class="string">"-p icmp"</span>匹配了所有icmp协议类型的报文。如果进行了上述设置，别的主机向我们发送的ping请求报文无法进入防火墙，我们向别人发送的ping请求对应的回应报文也无法进入防火墙。所以，我们既无法ping通别人，别人也无法ping通我们。</span></span><br><span class="line">[root@bogon ~]# iptables -F</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type 8/0 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 本机可以ping通外部主机，但外部主机不能ping通本机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-m icmp"</span>表示使用icmp扩展，因为上例中使用了<span class="string">"-p icmp"</span>，所以<span class="string">"-m icmp"</span>可以省略，使用<span class="string">"--icmp-type"</span>选项表示根据具体的<span class="built_in">type</span>与code去匹配对应的icmp报文，而上图中的<span class="string">"--icmp-type 8/0"</span>表示icmp报文的<span class="built_in">type</span>为8，code为0才会被匹配到，也就是只有ping请求类型的报文才能被匹配到，所以，别人对我们发起的ping请求将会被拒绝通过防火墙，而我们之所以能够ping通别人，是因为别人回应我们的报文的icmp <span class="built_in">type</span>为0，code也为0，所以无法被上述规则匹配到，所以我们可以看到别人回应我们的信息。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type 8 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为<span class="built_in">type</span>为8的类型下只有一个code为0的类型，所以我们可以省略对应的code</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type "echo-request" -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 我们可以用icmp报文的描述名称去匹配对应类型的报文。使用 --icmp-type <span class="string">"echo-request"</span>与 --icmp-type 8/0的效果完全相同</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 名称中的<span class="string">"空格"</span>需要替换为<span class="string">"-"</span>，如<span class="built_in">echo</span> request要命令中要写为<span class="built_in">echo</span>-request</span></span><br></pre></td></tr></table></figure>
+<h4 id="multiport扩展模块"><a href="#multiport扩展模块" class="headerlink" title="multiport扩展模块"></a>multiport扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">* 指定不连续端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m multiport --dports 22,36,80 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 121 packets, 7270 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            multiport dports 22,36,80 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 禁止来自249的主机上的tcp报文访问本机的22号端口、36号端口以及80号端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用multiport模块的--sports扩展条件同时指定多个离散的源端口。使用multiport模块的--dports扩展条件同时指定多个离散的目标端口</span></span><br><span class="line"></span><br><span class="line">* 指定连续端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m multiport --dports 22,80:88 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 47 packets, 3474 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            multiport dports 22,80:88 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用multiport模块的--sports与--dpors时，也可以指定连续的端口范围，并且能够在指定连续的端口范围的同时，指定离散的端口号</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝来自10.5.5.249的tcp报文访问当前主机的22号端口以及80到88之间的所有端口号</span></span><br></pre></td></tr></table></figure>
+<h4 id="iprange扩展模块"><a href="#iprange扩展模块" class="headerlink" title="iprange扩展模块"></a>iprange扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用iprange扩展模块可以指定<span class="string">"一段连续的IP地址范围"</span>，用于匹配报文的源地址或者目标地址。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> iprange扩展模块中有两个扩展匹配条件可以使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --src-range</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --dst-range</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m iprange --src-range 10.5.5.240-10.5.5.249 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nxvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 208 packets, 11763 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            source IP range 10.5.5.240-10.5.5.249 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果报文的源IP地址在10.5.5.240到10.5.5.249之间，则丢弃报文，IP段的始末IP使用<span class="string">"横杠"</span>连接，--src-range与--dst-range和其他匹配条件一样，能够使用<span class="string">"!"</span>取反</span></span><br></pre></td></tr></table></figure>
+<h4 id="string扩展模块"><a href="#string扩展模块" class="headerlink" title="string扩展模块"></a>string扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用string扩展模块，可以指定要匹配的字符串，如果报文中包含对应的字符串，则符合匹配条件。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> string模块的常用选项</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --algo：用于指定匹配算法，可选的算法有bm与kmp，此选项为必须选项，我们不用纠结于选择哪个算法，但是我们必须指定一个。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --string：用于指定需要匹配的字符串。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面在10.5.5.249上部署</span></span><br><span class="line">[root@test html]# yum install -y httpd</span><br><span class="line">[root@test html]# vim /var/www/html/index.html</span><br><span class="line">	OOXX</span><br><span class="line">[root@test html]# vim /var/www/html/index1.html</span><br><span class="line">	Hello World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面到10.5.5.22主机访问</span></span><br><span class="line">[root@bogon ~]# curl 10.5.5.249</span><br><span class="line">OOXX</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249/index1.html</span><br><span class="line">Hello World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在249主机上安装httpd，提供两个网页，内容分别为OOXX和Hello World。此时在另一台主机可以正常访问</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m string --algo bm --string "OOXX" -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果报文中包含<span class="string">"OOXX"</span>字符，我们就拒绝报文进入本机。<span class="string">'-m string'</span>表示使用string模块，<span class="string">'--algo bm'</span>表示使用bm算法去匹配指定的字符串，<span class="string">' --string "OOXX" '</span>则表示我们想要匹配的字符串为<span class="string">"OOXX"</span></span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 51 packets, 3603 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            STRING match  "OOXX" ALGO name bm TO 65535 reject-with icmp-port-unreachable</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249</span><br><span class="line">^C</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249/index1.html</span><br><span class="line">Hello World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在22主机上设置规则后，因为249主机的默认页中包含“OOXX”，所以访问时会停留在空白处，没有信息返回。如果访问index1.html页面是没有问题的。</span></span><br></pre></td></tr></table></figure>
+<h4 id="time扩展模块"><a href="#time扩展模块" class="headerlink" title="time扩展模块"></a>time扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 可以通过time扩展模块，根据时间段区匹配报文，如果报文到达的时间在指定的时间范围以内，则符合匹配条件。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --monthdays与--weekdays可以使用<span class="string">"!"</span>取反，其他选项不能取反。</span></span><br><span class="line"></span><br><span class="line">* 指定时间</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --timestart 09:00:00 --timestop 18:00:00 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 443 -m time --timestart 09:00:00 --timestop 18:00:00 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每天早上9点到下午6点不能看网页。<span class="string">"-m time"</span>表示使用time扩展模块，--timestart选项用于指定起始时间，--timestop选项用于指定结束时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试时，此条设置完未生效，依然可以访问网页</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL OUTPUT</span><br><span class="line">Chain OUTPUT (policy ACCEPT 37 packets, 3516 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 TIME from 09:00:00 to 18:00:00 UTC reject-with icmp-port-unreachable</span><br><span class="line">2           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 TIME from 09:00:00 to 18:00:00 UTC reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 按周指定日期</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --weekdays 6,7 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 只有周六日不能看网页。使用--weekdays选项可以指定每个星期的具体哪一天，可以同时指定多个，用逗号隔开，除了能够数字表示<span class="string">"星期几"</span>,还能用缩写表示，例如：Mon, Tue, Wed, Thu, Fri, Sat, Sun</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --timestart 09:00:00 --timestop 18:00:00 --weekdays 6,7 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将上面两种方法结合使用。指定只有周六日的早上9点到下午6点不能浏览网页。</span></span><br><span class="line"></span><br><span class="line">* 指月指定日期</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --monthdays 22,23 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--monthdays选项可以具体指定的每个月的22号，23号不能访问网页。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --weekdays 5 --monthdays 22,23,24,25,26,27,28 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当一条规则中同时存在多个条件时，多个条件之间默认存在<span class="string">"与"</span>的关系。所以，上面的规则表示匹配的时间必须为星期五，并且这个<span class="string">"星期五"</span>同时还需要是每个月的22号到28号之间的一天，也就表示每个月的第4个星期五</span></span><br><span class="line"></span><br><span class="line">* 指定具体时间</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --datestart 2018-10-15 --datestop 2018-10-19 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用--datestart 选项与-datestop选项，指定具体的日期范围。测试中，此条可以生效。</span></span><br></pre></td></tr></table></figure>
+<p>####　connlimit扩展模块</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用connlimit扩展模块，可以限制每个IP地址同时链接到server端的链接数量，注意：我们不用指定IP，其默认就是针对<span class="string">"每个客户端IP"</span>，即对单IP的并发连接数限制。</span></span><br><span class="line"></span><br><span class="line">* --connlimit-above</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 2 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 超过两个连接就拒绝。使用<span class="string">"-m connlimit"</span>指定使用connlimit扩展，使用<span class="string">"--connlimit-above 2"</span>表示限制每个IP的链接数量上限为2，再配合-p tcp --dport 22，即表示限制每个客户端IP的ssh并发链接数量不能超过(above)2。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> centos6中，我们可以对--connlimit-above选项进行取反</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit ! --connlimit-above 2 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每个客户端IP的ssh链接数量只要不超过两个，则允许链接。但上例的规则并不能表示：每个客户端IP的ssh链接数量超过两个则拒绝链接。因为匹配不到时要匹配默认规则，如果默认规则是ACCEPT,那么依然可以连接</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 即使我们配置了上例中的规则，也不能达到<span class="string">"限制"</span>的目的，所以我们通常并不会对此选项取反，因为既然使用了此选项，我们的目的通常就是<span class="string">"限制"</span>连接数量。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> centos7中iptables为我们提供了一个新的选项，--connlimit-upto，这个选项的含义与<span class="string">"! --commlimit-above"</span>的含义相同，即链接数量未达到指定的连接数量之意，所以综上所述，--connlimit-upto选项也不常用。</span></span><br><span class="line"></span><br><span class="line">* --connlimit-mask</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 24 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--connlimit-mask 24"</span>表示某个C类网段。上面规则表示，一个最多包含254个IP的C类网络中，同时最多只能有2个ssh客户端连接到当前服务器</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 10 --connlimit-mask 27 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--connlimit-mask 27"</span>表示某个C类网段，通过计算后可以得知，这个网段中最多只能有30台机器（30个IP），这30个IP地址最多只能有10个ssh连接同时连接到服务器端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在不使用--connlimit-mask的情况下，连接数量的限制是针对<span class="string">"每个IP"</span>而言的，当使用了--connlimit-mask选项以后，则可以针对<span class="string">"某类IP段内的一定数量的IP"</span>进行连接数量的限制</span></span><br></pre></td></tr></table></figure>
+<h4 id="limit扩展模块"><a href="#limit扩展模块" class="headerlink" title="limit扩展模块"></a>limit扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">limit</span>模块是对<span class="string">"报文到达速率"</span>进行限制的.如果想要限制单位时间内流入的包的数量，就能用<span class="built_in">limit</span>模块</span></span><br><span class="line"></span><br><span class="line">* --limit</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m limit --limit 10/minute -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-p icmp"</span>表示我们针对ping请求添加了一条规则（ping使用icmp协议），<span class="string">"-m limit"</span>表示使用<span class="built_in">limit</span>模块， <span class="string">"--limit 10/minute -j ACCEPT"</span>表示每分钟最多放行10个包，就相当于每6秒钟最多放行一个包</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 5950 packets, 5128996 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         111     9416 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面的规则并不会起作用。因为每6秒放行一个包，那么iptables就会计时，每6秒一个轮次，到第6秒时，达到的报文就会匹配到对应的规则，执行对应的动作ACCEPT。那么在第6秒之前到达的包，则无法被上述规则匹配到。那么这些包就要向下匹配策略中的其他规则，如果都不能匹配，就会匹配默认策略，因为默认策略是ACCEPT，所以ping此主机的时候还是会正常运行。</span></span><br><span class="line">[root@bogon ~]# iptables -A INPUT -p icmp -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝所有的ping包</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 428 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         150    12692 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 5</span><br><span class="line">2          56     4704 REJECT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一条规则表示每分钟最多放行10个icmp包，也就是6秒放行一个，第6秒的icmp包会被上例中的第一条规则匹配到，第6秒之前的包则不会被第一条规则匹配到，于是被后面的拒绝规则匹配到了</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时再ping此主机时就可以发现每6秒才能ping通一次了。但还有一个问题，就是最开始的5个ping包是不受限制的，可以正常ping通。现象如下，下面解释原因</span></span><br><span class="line">[root@test ~]# ping 10.5.5.22</span><br><span class="line">PING 10.5.5.22 (10.5.5.22) 56(84) bytes of data.</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=1 ttl=64 time=0.248 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=2 ttl=64 time=0.355 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=3 ttl=64 time=0.332 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=4 ttl=64 time=0.261 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=5 ttl=64 time=0.528 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=6 Destination Port Unreachable</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=7 ttl=64 time=0.418 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=8 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=9 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=10 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=11 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=12 Destination Port Unreachable</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=13 ttl=64 time=0.435 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=14 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=15 Destination Port Unreachable</span><br><span class="line"></span><br><span class="line">* --limit-burst</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--limit-burst"</span>可以指定<span class="string">"空闲时可放行的包的数量。在不使用"</span>--<span class="built_in">limit</span>-burst<span class="string">"选项明确指定放行包的数量时，默认值为5，所以才会有上面的现象。</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想要彻底了解<span class="built_in">limit</span>模块的工作原理，我们需要先了解一下<span class="string">"令牌桶"</span>算法，因为<span class="built_in">limit</span>模块使用了令牌桶算法。我们可以这样想象，有一个木桶，木桶里面放了5块令牌，而且这个木桶最多也只能放下5块令牌，所有报文如果想要出关入关，都必须要持有木桶中的令牌才行，这个木桶有一个神奇的功能，就是每隔6秒钟会生成一块新的令牌，如果此时，木桶中的令牌不足5块，那么新生成的令牌就存放在木桶中，如果木桶中已经存在5块令牌，新生成的令牌就无处安放了，只能溢出木桶（令牌被丢弃），如果此时有5个报文想要入关，那么这5个报文就去木桶里找令牌，正好一人一个，于是他们5个手持令牌，快乐的入关了，此时木桶空了，再有报文想要入关，已经没有对应的令牌可以使用了，但是，过了6秒钟，新的令牌生成了，此刻，正好来了一个报文想要入关，于是，这个报文拿起这个令牌，就入关了，在这个报文之后，如果很长一段时间内没有新的报文想要入关，木桶中的令牌又会慢慢的积攒了起来，直到达到5个令牌，并且一直保持着5个令牌，直到有人需要使用这些令牌，这就是令牌桶算法的大致逻辑。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--limit"</span>选项就是用于指定<span class="string">"多长时间生成一个新令牌的"</span>，<span class="string">"--limit-burst"</span>选项就是用于指定<span class="string">"木桶中最多存放几个令牌的"</span></span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m limit --limit-burst 1 --limit 10/minute -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"--limit"</span>选项时，可以选择的时间单位有多种，如：/second、/minute、/hour、/day。比如，3/second表示每秒生成3个<span class="string">"令牌"</span>，30/minute表示没分钟生成30个<span class="string">"令牌"</span>。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 174 packets, 11316 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          13     1092 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 1</span><br><span class="line">2         194    16296 REJECT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br></pre></td></tr></table></figure>
+<h4 id="state扩展模块"><a href="#state扩展模块" class="headerlink" title="state扩展模块"></a>state扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 对于state模块而言的<span class="string">"连接"</span>并不能与tcp的<span class="string">"连接"</span>画等号，在TCP/IP协议簇中，UDP和ICMP是没有所谓的连接的，但是对于state模块来说，tcp报文、udp报文、icmp报文都是有连接状态的。对于state模块而言，只要两台机器在<span class="string">"你来我往"</span>的通信，就算建立起了连接</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> state模块中的报文状态</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> NEW：连接中的第一个包，状态就是NEW，我们可以理解为新连接的第一个包的状态为NEW。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ESTABLISHED：我们可以把NEW状态包后面的包的状态理解为ESTABLISHED，表示连接已建立。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> RELATED：从字面上理解RELATED译为关系、相关的，但是这样仍然不容易理解，我们举个例子。比如FTP服务，FTP服务端会建立两个进程，一个命令进程，一个数据进程。命令进程负责服务端与客户端之间的命令传输（我们可以把这个传输过程理解成state中所谓的一个<span class="string">"连接"</span>，暂称为<span class="string">"命令连接"</span>）。数据进程负责服务端与客户端之间的数据传输 ( 我们把这个过程暂称为<span class="string">"数据连接"</span> )。但是具体传输哪些数据，是由命令去控制的，所以，<span class="string">"数据连接"</span>中的报文与<span class="string">"命令连接"</span>是有<span class="string">"关系"</span>的。那么，<span class="string">"数据连接"</span>中的报文可能就是RELATED状态，因为这些报文与<span class="string">"命令连接"</span>中的报文有关系。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># (注：如果想要对ftp进行连接追踪，需要单独加载对应的内核模块nf_conntrack_ftp，如果想要自动加载，可以配置/etc/sysconfig/iptables-config文件)</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> INVALID：如果一个包没有办法被识别，或者这个包没有任何状态，那么这个包的状态就是INVALID，我们可以主动屏蔽状态为INVALID的报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> UNTRACKED：报文的状态为untracked时，表示报文未被追踪，当报文的状态为Untracked时通常表示无法找到相关的连接。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -A INPUT -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将状态为RELATED和ESTABLISHED的报文都放行，这样，就表示只有回应我们的报文能够通过防火墙，如果是别人主动发送过来的新的报文，则无法通过防火墙。如想通过ssh连接本机，是不行的，但本机可以ssh连接其他主机。</span></span><br></pre></td></tr></table></figure>
+<h3 id="黑白名单机制"><a href="#黑白名单机制" class="headerlink" title="黑白名单机制"></a>黑白名单机制</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 当链的默认策略为ACCEPT时，链中的规则对应的动作应该为DROP或者REJECT，表示只有匹配到规则的报文才会被拒绝，没有被规则匹配到的报文都会被默认接受，这就是<span class="string">"黑名单"</span>机制。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当链的默认策略为DROP时，链中的规则对应的动作应该为ACCEPT，表示只有匹配到规则的报文才会被放行，没有被规则匹配到的报文都会被默认拒绝，这就是<span class="string">"白名单"</span>机制。</span></span><br><span class="line"></span><br><span class="line">* 白名单</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 80 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -P INPUT DROP</span><br><span class="line">[root@bogon ~]# iptables --line -nxvL INPUT</span><br><span class="line">Chain INPUT (policy DROP 336 packets, 17902 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80</span><br><span class="line">2         130     9172 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行22与80端口，并将默认策略改为DROP，这样其他端口都是无法访问的。因为只改了INPUT链为DROP，OUTPUT链的默认策略还是ACCEPT，所以可以访问80与22端口。如果OUTPUT的默认策略也是DROP，那就要再写两条出的规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果此时有误操作，删除了防火墙规则，那么所有连接就都无法进来了。也就是无法通过远程连接主机了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想要使用<span class="string">"白名单"</span>的机制，最好将链的默认策略保持为<span class="string">"ACCEPT"</span>，然后将<span class="string">"拒绝所有请求"</span>这条规则放在链的尾部，将<span class="string">"放行规则"</span>放在前面，这样做，既能实现<span class="string">"白名单"</span>机制，又能保证在规则被清空时，管理员还有机会连接到主机</span></span><br><span class="line">[root@bogon ~]# iptables -P INPUT ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -A INPUT -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当所有放行规则设置完成后，在INPUT链的尾部，设置一条拒绝所有请求的规则。这样就能必免上面的问题了</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/iptables基本操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/12/iptables基本操作/" itemprop="url">
+                  iptables基本操作
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-12 14:03:43 / 修改時間：15:58:25" itemprop="dateCreated datePublished" datetime="2018-10-12T14:03:43+08:00">2018-10-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -t filter -L</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">OUTPUT_direct  all  --  anywhere             anywhere</span><br><span class="line"><span class="meta">#</span><span class="bash"> 列出filter表的所有规则</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 报文发往本机时，会经过PREROUTING链与INPUT链。所以，如果我们想要禁止某些报文发往本机，我们只能在PREROUTING链和INPUT链中定义规则，但是PREROUTING链并不存在于filter表中，因为PREROUTING链没有过滤功能，所以，只能在INPUT链上定义</span></span><br><span class="line"></span><br><span class="line">root@bogon ~]# iptables -L INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash">只查看指定表中的指定链规则。可以省略-t filter，当没有使用-t选项指定表时，默认为操作filter表</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -vL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"> 1894  144K ACCEPT     all  --  any    any     anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-v选项可以显示更多信息。字段含义如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pkts:对应规则匹配到的报文的个数。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bytes:对应匹配到的报文包的大小总和。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> target:规则对应的target，往往表示规则对应的<span class="string">"动作"</span>，即规则匹配成功后需要采取的措施。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> prot:表示规则对应的协议，是否只针对某些协议应用此规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> opt:表示规则对应的选项。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">in</span>:表示数据包由哪个接口(网卡)流入，我们可以设置通过哪块网卡流入的报文需要匹配当前规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> out:表示数据包由哪个接口(网卡)流出，我们可以设置通过哪块网卡流出的报文需要匹配当前规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">source</span>:表示规则对应的源头地址，可以是一个IP，也可以是一个网段。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> destination:表示规则对应的目标地址。可以是一个IP，也可以是一个网段。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">source</span>与destination为anywhere是因为做了名称解析</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -nvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"> 1918  146K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在规则非常多的情况下如果进行名称解析，效率会比较低。可以使用-n选项，表示不对IP地址进行名称反解，直接显示IP地址</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line-number -nvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num   pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line">1     1971  150K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--line-numbers即可显示规则的编号。--line-numbers选项并没有对应的短选项，不过我们缩写成--line</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Chain INPUT (policy ACCEPT 0 packets, 0 bytes)的含义如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> policy表示当前链的默认策略，policy ACCEPT表示INPUT的链的默认动作为ACCEPT，默认接受通过INPUT关卡的所有请求</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> packets表示当前链（上例为INPUT链）默认策略匹配到的包的数量，0 packets表示默认策略匹配到0个包。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bytes表示当前链默认策略匹配到的所有包的大小总和。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line -xnvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 5557 packets, 332K bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        2012   153468 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 其实，我们可以把packets与bytes称作<span class="string">"计数器"</span>，上例中的计数器记录了默认策略匹配到的报文数量与总大小，<span class="string">"计数器"</span>只会在使用-v选项时，才会显示出来。当被匹配到的包达到一定数量时，计数器会自动将匹配到的包的大小转换为可读性较高的单位。如果你想要查看精确的计数值，而不是经过可读性优化过的计数值，那么你可以使用-x选项，表示显示精确的计数值</span></span><br></pre></td></tr></table></figure>
+<h4 id="添加规则"><a href="#添加规则" class="headerlink" title="添加规则"></a>添加规则</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">* 拒绝某地址访问</span><br><span class="line">[root@bogon ~]# iptables -t filter -I INPUT -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.249访问本机，这时249主机不能ping通本机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -I表示将规则插入到每一条，-s指定源地址，-j指定动作。在iptables中，动作被称之为<span class="string">"target"</span></span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 519 packets, 33559 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         193    16212 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 有193个包被对应的规则匹配到，总计大小33359bytes。</span></span><br><span class="line">[root@bogon ~]# iptables -A INPUT -s 10.5.5.249 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> -A为append之意，表示追加一条规则到末尾，</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 86 packets, 6164 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         598    50232 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 追加规则后发现追加的规则并未匹配到，因为数据是按规则序列从上向下匹配的，第一条规则已经拒绝了所有请求，所以后面的规则也不会匹配到了。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT 3 -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定将规则插入到INPUT链的第三条</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 51 packets, 3610 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         941    79044 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">3           0        0 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br></pre></td></tr></table></figure>
+<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -D INPUT 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除INPUT链中的第三条规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 466 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        1040    87360 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line">[root@bogon ~]# iptables -D INPUT -s 10.5.5.249 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 根据匹配条件删除规则，这里要删除的是源地址是10.5.5.249，动作是ACCEPT的规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 428 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        1128    94752 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line">[root@bogon ~]# iptables -t filter -F</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除filter表中的所有规则</span></span><br></pre></td></tr></table></figure>
+<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -R INPUT 1 -s 10.5.5.249 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> -R选项表示修改指定的链，使用-R INPUT 1表示修改INPUT链的第1条规则，使用-j REJECT表示将INPUT链中的第一条规则的动作修改为REJECT，注意：上例中， -s选项以及对应的源地址不可省略。在使用-R选项修改某个规则时，必须指定规则对应的原本的匹配条件。如果上例中的命令没有使用-s指定对应规则中原本的源地址，那么在修改完成后，你修改的规则中的源地址会自动变为0.0.0.0/0</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你想要修改某条规则，还不如先将这条规则删除，然后在同样位置再插入一条新规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 9 packets, 662 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           2      168 REJECT     all  --  *      *       10.5.5.249           0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 修改默认策略</span><br><span class="line">[root@bogon ~]# iptables -P FORWARD DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-P选项修改默认策略，修改filter表中的FORWARD链的默认策略为DROP</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL FORWARD</span><br><span class="line">Chain FORWARD (policy DROP 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到policy后面是DROP了</span></span><br></pre></td></tr></table></figure>
+<h4 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">* CentOS6</span><br><span class="line">[root@bogon ~]# service iptables save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使修改的规则永久生效</span></span><br><span class="line">[root@bogon ~]# cat /etc/sysconfig/iptables</span><br><span class="line"><span class="meta">#</span><span class="bash"> 规则保存在/etc/sysconfig/iptables中</span></span><br><span class="line"></span><br><span class="line">* CentOS7</span><br><span class="line">[root@test ~]# yum install -y iptables-services</span><br><span class="line">[root@bogon ~]# systemctl start iptables</span><br><span class="line">[root@bogon ~]# systemctl enable iptables</span><br><span class="line">[root@bogon ~]# service iptables save</span><br><span class="line">iptables: Saving firewall rules to /etc/sysconfig/iptables:[  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要安装iptables-services后才能使用service命令保存规则</span></span><br><span class="line"></span><br><span class="line">* 其他保存方法</span><br><span class="line">[root@bogon ~]# iptables-save &gt; /etc/sysconfig/iptables</span><br><span class="line"></span><br><span class="line">* 重新加载规则</span><br><span class="line">[root@bogon ~]# iptables-restore &lt; /etc/sysconfig/iptables</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/jdyc环境简单部署/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1930,382 +2278,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云RDS数据库备份下载/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/18/阿里云RDS数据库备份下载/" itemprop="url">
-                  阿里云RDS数据库备份下载
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-18 10:20:56" itemprop="dateCreated datePublished" datetime="2018-09-18T10:20:56+08:00">2018-09-18</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-11-15 13:05:28" itemprop="dateModified" datetime="2018-11-15T13:05:28+08:00">2018-11-15</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云RDS数据库备份下载/" itemprop="url" rel="index"><span itemprop="name">阿里云RDS数据库备份下载</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p>下载RDS数据备份或日志备份</p>
-<ol>
-<li>登录RDS管理控制台</li>
-<li>选择目标实例所在地域。</li>
-<li>单击目标实例的ID，进入基本信息页面</li>
-<li>在左侧导航栏中，选择备份恢复，进入备份恢复页面</li>
-<li>选择数据备份标签页</li>
-<li>选择查询的时间范围，然后单击查询。</li>
-<li>在数据备份列表中，找到要下载的数据备份，并单击其对应的下载</li>
-<li>在实例备份文件下载窗口，单击复制外网地址，获取数据备份文件外网下载地址。这里可以直接下载到本地，也可以通过内网或外网地址下载</li>
-<li>登录云服务器ECS</li>
-<li>下载数据备份文件</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget -c '&lt;数据备份文件内网或外网下载地址&gt;' -O &lt;自定义文件名&gt;.tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash">-c：启用断点续传模式。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">-O：将下载的结果保存为指定的文件（建议使用URL中包含的文件名）。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">说明：若提示显示100%进度，则表示文件下载完成。</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/mysql备份与还原/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/17/mysql备份与还原/" itemprop="url">
-                  mysql备份与还原
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-17 14:08:03" itemprop="dateCreated datePublished" datetime="2018-09-17T14:08:03+08:00">2018-09-17</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-10-12 10:45:21" itemprop="dateModified" datetime="2018-10-12T10:45:21+08:00">2018-10-12</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="mysqldump"><a href="#mysqldump" class="headerlink" title="mysqldump"></a>mysqldump</h1><h2 id="mysqldump备份恢复"><a href="#mysqldump备份恢复" class="headerlink" title="mysqldump备份恢复"></a>mysqldump备份恢复</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/my.cnf.d/server.cnf</span><br><span class="line">    [mysqld]</span><br><span class="line">    log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">vim /root/.my.cnf</span><br><span class="line">	[client]</span><br><span class="line">    user = 'root'</span><br><span class="line">    password = 'centos'</span><br><span class="line">    host = 'localhost'</span><br><span class="line"><span class="meta">#</span><span class="bash">实现免用户名密码登录</span></span><br><span class="line">mysql -uroot -p &lt; /root/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">将jiaowu.sql文件导入到数据库中</span></span><br><span class="line">mysql</span><br><span class="line">SHOW DATABASES;</span><br><span class="line"><span class="meta">#</span><span class="bash">有jiaowu库了</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置</span></span><br><span class="line">FLUSH TABLES WITH READ LOCK;</span><br><span class="line"><span class="meta">#</span><span class="bash">再打开一个终端执行此命令，刷新表並且以只讀的方式鎖定所有表，這時再備分</span></span><br><span class="line">mysqldump -uroot -p jiaowu &gt; /tmp/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">导出jiaowu库</span></span><br><span class="line">FLUSH LOGS;</span><br><span class="line">UNLOCK TABLES;</span><br><span class="line"><span class="meta">#</span><span class="bash">備份完成後立即釋放鎖</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置，只取滾動後新建的日志</span></span><br></pre></td></tr></table></figure>
-<h2 id="mysqldump命令选项"><a href="#mysqldump命令选项" class="headerlink" title="mysqldump命令选项"></a>mysqldump命令选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">備份</span></span><br><span class="line">mysqldump -uroot -p --master-data=2 jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">用了第二條命令會在備份的文件中有CHANGE MASTER TO NASTER_LOG_FILE=`mysql-bin.000008, MASTER_LOG_POS=107`指明現在的日志名稱及位置</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases &gt; /root/all.sql  </span><br><span class="line"><span class="meta">#</span><span class="bash">因為不是所有庫都是InnoDB引擎的，所以要用--lock-all-tables選項，之後備份所有庫，還可以加上--master-data=2選項</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases --master-data=2 &gt; /root/all.sql</span><br><span class="line">less /root/all.sql         </span><br><span class="line"><span class="meta">#</span><span class="bash">查看</span></span><br><span class="line">=======================================================================================</span><br><span class="line">mysqldump</span><br><span class="line">    --master-data=n	    n=&#123;0、1、2&#125;</span><br><span class="line">        0表示不記錄二進制日志文件记录位置</span><br><span class="line">        1表示以CHNAGER MASTER TO的方式記錄位置，可用於恢復後直接啟動從服務器</span><br><span class="line">        2表示以CHNAGER MASTER TO的方式記錄位置，但默認被注釋了</span><br><span class="line">    --lock-all-tables：備份前鎖定所有表</span><br><span class="line">    --flush-logs：備份前鎖完表執行日志滾動             flush滾動</span><br><span class="line">    #如果指定庫中的表類型均為InnoDB，可使用--single-transaction啟動熱備，這時就不用鎖定表了--lock-all-tables，這個過程可能很長</span><br><span class="line">    * 備份多個庫</span><br><span class="line">    --all-databases：備份所有庫</span><br><span class="line">    --databases DB_NAME,DB_NAME,…：備份指定庫              </span><br><span class="line">    #這兩個命令由於備份不只一個數據庫，所以會自動創建create databases命令，還原前就不用手動再指定庫了</span><br><span class="line">    --events：備份事件</span><br><span class="line">    --routines：備份存儲過程存儲函數</span><br><span class="line">    --triggers：備份觸發器</span><br></pre></td></tr></table></figure>
-<h2 id="備份及即時點還原"><a href="#備份及即時點還原" class="headerlink" title="備份及即時點還原"></a>備份及即時點還原</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">備份及即時點還原</span><br><span class="line">備份策略：每周完全+每日增量</span><br><span class="line">    完全備份：mysqldump</span><br><span class="line">    增量備份：備份二進制日志文件（先flush logs）</span><br><span class="line">    </span><br><span class="line">步骤：</span><br><span class="line">1. 做全量备份</span><br><span class="line">2. 删除现有二进制日志之前的所有日志</span><br><span class="line">3. 删除某表中的一些行，以便下面测试</span><br><span class="line">4. 滚动日志</span><br><span class="line">5. 复制滚动前二进制日志到其他路径或将滚动前二进制日志转为sql文件保存到其他目录，实现增量备份</span><br><span class="line">6. 在删除了行的表中插入新行</span><br><span class="line">7. 将滚动后的日志（也是现在的日志）复制到其他路径</span><br><span class="line">8. 删除数据目录中的所有文件</span><br><span class="line">9. 停止、启动服务器，实现数据初始</span><br><span class="line">10. 修改root密码</span><br><span class="line">11. 导入全量备份的sql文件</span><br><span class="line">12. 导入增量备份的sql文件</span><br><span class="line">13. 将最新的日志文件转为sql文件并导入，实现即时点还原。</span><br><span class="line">14. 这里全量备份不存在对应的二进制日志，因为被删除了。删除后仅剩一个二进制日志，这个日志就是增量备份的日志。之后做其他操作后又滚动过一次日志，也就是最新的日志。这个过程涉及两个日志和一个全量备份的sql文件。</span><br><span class="line"></span><br><span class="line">mysqldump -uroot -p --master-data=2 --flush-logs --all-databases --lock-all-tables &gt; /root/alldatabases.sql</span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash">建議在刪除備份前的二進制日志前先將其備份一份，可能以後有用。</span></span><br><span class="line">less /root/ alldatabases.sql</span><br><span class="line">PURGE BINARY LOGS TO 'mysql_bin.000011';             </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除二進制文件，這是為了避免空間被佔滿，这是删除mysql_bin.000011之前的所有二进制日志</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">DELETE FROM tutors WHERE Age&gt;80;            </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除一些行</span></span><br><span class="line">* 下面做增量備份</span><br><span class="line">mysql</span><br><span class="line">FLUSH LOGS;         </span><br><span class="line"><span class="meta">#</span><span class="bash">滾動</span></span><br><span class="line">quit        </span><br><span class="line"><span class="meta">#</span><span class="bash">退出mysql</span></span><br><span class="line">cd /mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">到數據目錄中</span></span><br><span class="line">cp mysql-bin.000011 /root/          </span><br><span class="line"><span class="meta">#</span><span class="bash">因之前已經滾動了日志，所以倒數第二個就是我們要增量備份的日志，將其拷貝到root目錄即可。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000011 &gt; /root/mon-incremental.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">這種方式的增量備份更好一些</span></span><br><span class="line">mysql</span><br><span class="line">use studb;</span><br><span class="line">INSERT INTO tutors (Tname) Values (‘stu123’);</span><br><span class="line">退出</span><br><span class="line">* 模擬刪除了數據庫，而不能刪二進制日志</span><br><span class="line">cp mysql-bin.000012 /root           </span><br><span class="line"><span class="meta">#</span><span class="bash">將二進制日志拷出去</span></span><br><span class="line">rm -rf ./*        </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除數據目錄中的所有文件</span></span><br><span class="line">service mysqld stop        </span><br><span class="line"><span class="meta">#</span><span class="bash">現在無法停止mysql</span></span><br><span class="line">killall mysqld              </span><br><span class="line"><span class="meta">#</span><span class="bash">殺死mysql進程</span></span><br><span class="line">cd /usr/local/mysql/            </span><br><span class="line"><span class="meta">#</span><span class="bash">到此目錄初始化mysql</span></span><br><span class="line">scripts/mysql_install_db --user=mysql --datadir=/mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">初始化，这是编译安装的。如果是yum安装的可以直接启动，就会初始化</span></span><br><span class="line">service mysqld start        </span><br><span class="line"><span class="meta">#</span><span class="bash">啟動mysql</span></span><br><span class="line">mysql</span><br><span class="line">UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';</span><br><span class="line"><span class="meta">#</span><span class="bash">设置root的密码</span></span><br><span class="line">mysql -uroot -p &lt; alldatabases.sql            </span><br><span class="line"><span class="meta">#</span><span class="bash">還原完全備份</span></span><br><span class="line">mysql</span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">退出             </span><br><span class="line"><span class="meta">#</span><span class="bash">這一過程是為了驗證增量備份恢復後的變化</span></span><br><span class="line">mysql -uroot -p &lt; mon-incremental.sql          </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復增量備份</span></span><br><span class="line">mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">進入</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;             </span><br><span class="line"><span class="meta">#</span><span class="bash">查看證明有變化</span></span><br><span class="line">退出</span><br><span class="line">mysqlbinlog mysql-bin.000012 &gt; temp.sql    </span><br><span class="line"><span class="meta">#</span><span class="bash">把日志文件導出為.sql文件</span></span><br><span class="line">mysql -uroot -p &lt; temp.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">即時點還原。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000012 | mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">這樣一條命令即可實現即時點還原</span></span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">上面這樣的試驗只適合在數據量小的時候，如果大的話，mysqldump備份會很慢。視頻中要求寫一個mysql完全備份腳本，增量備份寫成另一個腳本，盡量使用變量定義保存位置，使用日期保存備份的文件名稱。還可用腳本還原</span></span><br></pre></td></tr></table></figure>
-<h1 id="xtrabackup"><a href="#xtrabackup" class="headerlink" title="xtrabackup"></a>xtrabackup</h1><h2 id="完全备份与恢复"><a href="#完全备份与恢复" class="headerlink" title="完全备份与恢复"></a>完全备份与恢复</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line">* 安装</span><br><span class="line">wget https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-2.4.9/binary/redhat/7/x86_64/Percona-XtraBackup-2.4.9-ra467167cdd4-el7-x86_64-bundle.tar</span><br><span class="line">＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝</span><br><span class="line">* rpm包安装</span><br><span class="line">	* CentOS6</span><br><span class="line">yum install http://www.percona.com/downloads/percona-release/redhat/0.1-4/percona-release-0.1-4.noarch.rpm</span><br><span class="line">yum list|grep percona</span><br><span class="line">yum install percona-xtrabackup</span><br><span class="line">	* CentOS7</span><br><span class="line">yum install http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm</span><br><span class="line">yum list|grep percona</span><br><span class="line">yum install percona-xtrabackup-24</span><br><span class="line"><span class="meta">#</span><span class="bash">阿里云建议MySQL5.6及之前的版本需要安装 Percona XtraBackup 2.3。MySQL5.7版本需要安装 Percona XtraBackup 2.4。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Percona XtraBackup 2.3地址：https://www.percona.com/doc/percona-xtrabackup/2.3/installation/yum_repo.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Percona XtraBackup 2.4地址：https://www.percona.com/doc/percona-xtrabackup/2.4/installation/yum_repo.html</span></span><br><span class="line">=======================================================================================</span><br><span class="line">innobackupex --help</span><br><span class="line">innobackupex --user=DBUSER --password=DBUSERPASS /path/to/BACKUP-DIR/(保存位置)</span><br><span class="line"><span class="meta">#</span><span class="bash">完全備份。innobackupex是一個腳本，在裡面封裝了一些命令行工具，--user=DBUSER --password=DBUSERPASS是連接服務器要用的帳號密碼。服務器可指定，如--host=localhost，這裡被省略了，因為一般都是在本機上進行備份。/path/to/BACKUP-DIR/指要保存的位置。備份的用戶要有權限，如果要使用一個最小權限的用戶進行備份，則可基於如下命令創建此類用戶。可以創建一個專門備份的用戶，或用管理員也可以</span></span><br><span class="line">=======================================================================================</span><br><span class="line">* 授权</span><br><span class="line">mysql</span><br><span class="line">MariaDB [(none)]&gt; CREATE USER 'bkpuser'@'localhost' IDENTIFIED BY 'centos';</span><br><span class="line"><span class="meta">#</span><span class="bash">创建用户</span></span><br><span class="line">MariaDB [(none)]&gt; REVOKE ALL PRIVILEGES,GRANT OPTION FROM 'bkpuser'@'localhost';</span><br><span class="line"><span class="meta">#</span><span class="bash">取消用户所有权限与授权权限</span></span><br><span class="line">MariaDB [(none)]&gt; GRANT RELOAD,LOCK TABLES,REPLICATION CLIENT ON *.* TO 'bkpuser'@'localhost';</span><br><span class="line"><span class="meta">#</span><span class="bash">只需要RELOAD, LOCK TABLES, REPLICATION CLIENT這三個權限就可備份了</span></span><br><span class="line">MariaDB [(none)]&gt; FLUSH PRIVILEGES;</span><br><span class="line">MariaDB [(none)]&gt; SHOW GRANTS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看当前用户的授权</span></span><br><span class="line">MariaDB [(none)]&gt; SHOW GRANTS FOR bkpuser@localhost;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看指定用户的授权</span></span><br><span class="line">* 备份</span><br><span class="line">innobackupex --user=root /backup          </span><br><span class="line"><span class="meta">#</span><span class="bash">備份數據庫，自動完成的。這裡的密碼是空，所以省略了，服務器是本機。另外，備份時需要mysql服務器是啟動狀態。備份好後在/backup下有一個以當前時間命名的目錄。使用上面的bkpuser用户备份时会提示有授权问题，也就是缺少某些权限，待解决</span></span><br><span class="line">cd /backup/2016-12-09_22-17-27           </span><br><span class="line"><span class="meta">#</span><span class="bash">目錄中的內容如下:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">jiaowu、mysql、<span class="built_in">test</span>、mydb等是數據庫，ibdata1是表空間文件，backup-my.cnf是服務器的配置文件， 備份好以後可以看到備份好的文件中有一個xtrabackup_binlog_info文件，這是二進制日志信息的文件，可用cat打開，裏面是備份這一刻的二進制文件名與相應的號碼。xtrabackup_binary中有在備份時使用了哪個命令進行的備份的信息，視頻中顯示的是xtrabackup 55。xtrabackup_logfile文件是data數據文件，不能用cat打開；xtrabackup_checkpoints文件裡有備份類型及從哪個邏輯版本號開始的備份，其中to_lsn指的是InnoDB的每一個數據塊InnoDB存儲引擎的數據要存儲在磁盤上，它是存儲數據塊的，每一個數據塊都有一個日志序列號，InnoDB會在內部維持着當前每一數據塊的日志序列號，如果這個塊上的數據發生了改變，這個號碼會加1,下一次可以根據這個號碼做增量備份。如果某一個塊的號碼發生了改變，可以將某一個塊備份一下。這就是可以對InnoDB存儲引擎做增量備份的原因；這裏的信息顯示從0號開始，到1637454結束，下一次就從1637454開始</span></span><br><span class="line"><span class="meta">#</span><span class="bash">這些備份的數據備份完以後是不能直接恢復的，因為備份的數據中有些事務可能只提交了一半，為了避免mysql啟動的修復過程，我們要對備份出來的文件做一些准備工作，然後才能恢復。准備工作包括：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    2.將尚未提交的事務做回滾</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    用--apply-log選項可完成上面的兩項</span></span><br><span class="line"><span class="meta">#</span><span class="bash">innobackupex --apply-log /backup/*****         </span></span><br><span class="line"><span class="meta">#</span><span class="bash">最後的路徑是我們備份的數據的路徑。這樣就會完成上面提到的兩項工作，不做這項工作的話恢復後mysql是啟動不了的</span></span><br><span class="line">* 测试恢复</span><br><span class="line">mysql</span><br><span class="line">MariaDB [(none)]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0005');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0006');</span><br><span class="line"><span class="meta">#</span><span class="bash">插入两条数据</span></span><br><span class="line">MariaDB [jiaowu]&gt; FLUSH LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">做這步是因為備份當前使用的二進制日志會報錯，所以才滾動一次</span></span><br><span class="line">cp /var/lib/mysql/mysql_bin.000003 /root</span><br><span class="line"><span class="meta">#</span><span class="bash">复制滚动前的日志到其他路径，以备数据恢复时使用</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf rm -rf /var/lib/mysql/*</span><br><span class="line">innobackupex --copy-back /backup/2018-09-19_11-06-30</span><br><span class="line"><span class="meta">#</span><span class="bash">恢复数据。/恢復時用--copy-back選項，這樣就可以了。這時的數據文件存儲位置（/var/lib/mysql/）一定要是空的，不然會報錯</span></span><br><span class="line">cd /var/lib/mysql/</span><br><span class="line">chown -R mysql.mysql /var/lib/mysql/</span><br><span class="line"><span class="meta">#</span><span class="bash">修改数据目录中文件的属主属组为mysql</span></span><br><span class="line">systemctl start mariadb</span><br><span class="line"><span class="meta">#</span><span class="bash">启动报错，无法启动。提示：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:48 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:48 [Note] /usr/libexec/mysqld (mysqld 5.5.60-MariaDB) starting as process 8893 ..</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: The InnoDB memory heap is disabled</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Mutexes and rw_locks use GCC atomic builtins</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Compressed tables use zlib 1.2.7</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Using Linux native AIO</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Initializing buffer pool, size = 2.0G</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:50 InnoDB: Completed initialization of buffer pool</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:51 InnoDB: highest supported file format is Barracuda.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: No valid checkpoint found.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If you are attempting downgrade from MySQL 5.7.9 or later,</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: please refer to http://dev.mysql.com/doc/refman/5.5/en/upgrading-downgrading.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If this error appears when you are creating an InnoDB database,</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: the problem may be that during an earlier attempt you managed</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: to create the InnoDB data files, but <span class="built_in">log</span> file creation failed.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If that is the <span class="keyword">case</span>, please refer to</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: http://dev.mysql.com/doc/refman/5.5/en/error-creating-innodb.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Plugin <span class="string">'InnoDB'</span> init <span class="keyword">function</span> returned error.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Plugin <span class="string">'InnoDB'</span> registration as a STORAGE ENGINE failed.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [Note] Plugin <span class="string">'FEEDBACK'</span> is disabled.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Unknown/unsupported storage engine: InnoDB</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Aborting</span></span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">	[mysqld]</span><br><span class="line">	innodb_force_recovery=6</span><br><span class="line">	log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">加入上面一行后，就可以启动了。启动后可以取消这个选项。也可能是没有开启二进制日志的原因，所以可以加入log_bin = mysql_bin。测试发现，加入开启二进制日志后，就不需要innodb_force_recovery选项了，另外，使用innodb_force_recovery启动后，进入数据库是不能操作的，需要将innodb_force_recovery注释后，再重启才能操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">innodb_force_recovery可以设置为1-6,大的数字包含前面所有数字的影响。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">1. (SRV_FORCE_IGNORE_CORRUPT):忽略检查到的corrupt页。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">2. (SRV_FORCE_NO_BACKGROUND):阻止主线程的运行，如主线程需要执行full purge操作，会导致crash。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">3. (SRV_FORCE_NO_TRX_UNDO):不执行事务回滚操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">4. (SRV_FORCE_NO_IBUF_MERGE):不执行插入缓冲的合并操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">5. (SRV_FORCE_NO_UNDO_LOG_SCAN):不查看重做日志，InnoDB存储引擎会将未提交的事务视为已提交。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">6. (SRV_FORCE_NO_LOG_REDO):不执行前滚的操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">参考：https://www.jb51.net/article/66951.htm</span></span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; SHOW DATABASES;</span><br><span class="line">MariaDB [jiaowu]&gt; USE jiaowu;</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">這時是沒有後來加的00006和000005的，要把剛才備份的二進制日志導入即可</span></span><br><span class="line">mysqlbinlog /root/mysql-bin.000003 &gt; /tmp/abc.sql</span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; SET sql_log_bin=0;</span><br><span class="line"><span class="meta">#</span><span class="bash">临时关闭二进制日志</span></span><br><span class="line">MariaDB [jiaowu]&gt; SOURCE /tmp/abc.sql;</span><br><span class="line"><span class="meta">#</span><span class="bash">导入滚动后的二进制日志生成的sql文件，因为stu00005和00006是在完全备份后加入的</span></span><br><span class="line">MariaDB [jiaowu]&gt; SET sql_log_bin=1;</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">MariaDB [jiaowu]&gt; USE jiaowu;</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">现在有刚加入的00006和000005的信息了</span></span><br></pre></td></tr></table></figure>
-<h2 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h2><p>xtrabackup支持對innodb做增量備份，對MyISAM不支持，對MyISAM如果有就做完全備份；MyISAM適合讀多寫少的情況</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0007');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0008');</span><br><span class="line"><span class="meta">#</span><span class="bash">加入两条数据</span></span><br><span class="line">innobackupex --user=root /backup    </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復過一次後必須再重新做一次完全備份，因爲當前的數據庫沒有完全備份</span></span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0009');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00010');</span><br><span class="line">innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-04-31/</span><br><span class="line"><span class="meta">#</span><span class="bash">先要指定增量備份的保存位置/backup，--incremental-basedir是指定完全備份的保存位置，它會針對完全備份以後的數據做備份，備份後保存在/backup目錄下。這是第一次增量備份。如果是再一次增量備份時，--incremental-basedir應該指向上一次的增量備份所在的目錄；如果數據庫再次損壞且沒有數據增長，用完全和增量備份就能恢復，如果有數據增長就要再加上二進制日志才能恢復。</span></span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00011');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00012');</span><br><span class="line">innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-05-33/</span><br><span class="line"><span class="meta">#</span><span class="bash">最後指定的是上一次的增量備份位置,2018-09-19_16-05-33是上一次備份後的目錄。如果之前未做過增量備份，就要指向完全備份</span></span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/</span><br><span class="line"><span class="meta">#</span><span class="bash">/如果有增量備份，這裡一定要指定--redo-only選項；2018-09-19_16-04-34是第一次完全備份；有增量備份的時候我們在實現提交的情況時，只執行redo不要執行endo。这里一定要用--apply-log选项，实现1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件；2.將尚未提交的事務做回滾。不然下面的命令是不能执行的。</span></span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-05-33/</span><br><span class="line"><span class="meta">#</span><span class="bash">在准備第一次增量備份時要將完全備份寫在前面，還要將增量備份位置寫在最後，用</span></span><br><span class="line">--incremental-dir選項。这是将第一次增量备份合并到完全备份</span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-06-15</span><br><span class="line"><span class="meta">#</span><span class="bash">這是第二次增量備份，還是前面寫完全備份位置，後面是第二次增量備份的位置</span></span><br><span class="line"><span class="meta">#</span><span class="bash">之後的還原只需要還原完全備份即可，因為此時所有的提交操作都已合並到完全備份上去了，所以在還原時兩個增量備份就用不上了</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf /var/lib/mysql/*</span><br><span class="line">innobackupex --copy-back /backup/2018-09-19_16-04-34/</span><br><span class="line">chown -R mysql.mysql /var/lib/mysql/</span><br><span class="line">systemctl start mariadb</span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">这里有上面插入的所有数据</span></span><br></pre></td></tr></table></figure>
-<h2 id="導入或導出單張表，前提是每表一個表空間才可以"><a href="#導入或導出單張表，前提是每表一個表空間才可以" class="headerlink" title="導入或導出單張表，前提是每表一個表空間才可以"></a>導入或導出單張表，前提是每表一個表空間才可以</h2><p>&emsp;&emsp;默認情況下，InnoDB表不能通過直接復制表文件的方式在mysql服務器之間進行移植，即便使用了innodb_file_per_table選項。而使用xtrabackup工具可以實現此種功能，不過，此時需要導出表的mysql服務器啟用了innodb_file_per_table選項（嚴格來說，是要導出的表在其創建之前，mysql服務器就啟用了innodb_file_per_table選項），並且導入表的服務器同時啟用了innodb_file_per_table和innodb_expand_import選項</p>
-<ol>
-<li>導出表</li>
-</ol>
-<p>導出表是在備份的prepare階段進行的，因此，一旦完全備份完成，就可以在prepare過程中通過–export選項將某表導出了：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">innobackupex --apply-log --export /path/to/backup</span><br><span class="line"><span class="meta">#</span><span class="bash">此命令會為每個innodb表的表空間創建一個以.exp結尾的文件，這些以.exp結尾的文件則可以用於導入至其它服務器。</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>導入表</li>
-</ol>
-<p>要在mysql服務器上導入來自於其它服務器的某innodb表，需要先在當前服務器上創建一個跟原表表結構一致的表，而後才能實現將表導入</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash">CREATE TABLE mytable (…) ENGINE=InnoDB;</span></span><br></pre></td></tr></table></figure>
-<p>然後將此表的表空間刪除</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash">ALTER TABLE mydatabase.mytable DISCARD TABLESPACE;</span></span><br></pre></td></tr></table></figure>
-<p>接下來，將來自於導出表的服務器的mytable表的mytable.ibd和mytable.exp文件復制到當前服務器的數據目錄，然後使用如下命令將其導入</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER TABLE mydatabase.mytable IMPORT TABLESPACE;</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2353,7 +2325,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">43</span>
+                    <span class="site-state-item-count">45</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2481,7 +2453,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">32</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">34</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
