@@ -319,6 +319,199 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/阿里云Redis设置公网地址/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/13/阿里云Redis设置公网地址/" itemprop="url">
+                  阿里云Redis设置公网地址
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-13 17:01:09" itemprop="dateCreated datePublished" datetime="2018-09-13T17:01:09+08:00">2018-09-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-21 10:55:05" itemprop="dateModified" datetime="2018-11-21T10:55:05+08:00">2018-11-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h1><ol>
+<li>在云服务器 ECS Linux 中安装 rinetd</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget http://www.boutell.com/rinetd/http/rinetd.tar.gz&amp;&amp;tar -xvf rinetd.tar.gz&amp;&amp;cd rinetd</span><br><span class="line">sed -i 's/65536/65535/g' rinetd.c</span><br><span class="line"><span class="meta">#</span><span class="bash">修改端口范围</span></span><br><span class="line">mkdir /usr/man&amp;&amp;make&amp;&amp;make install</span><br><span class="line"><span class="meta">#</span><span class="bash">安装</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>创建配置文件 rinetd.conf</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/rinetd.conf</span><br><span class="line">	0.0.0.0 6379  r-ab.redis.rds.aliyuncs.com 6379</span><br><span class="line">	logfile /var/log/rinetd.log</span><br><span class="line"><span class="meta">#</span><span class="bash">第一条前半部分是本机监听的地址与端口，后半部分是阿里云Redis的地址与端口</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>启动</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rinetd</span><br><span class="line">echo rinetd &gt;&gt;/etc/rc.local</span><br><span class="line"><span class="meta">#</span><span class="bash">设置开机启动</span></span><br><span class="line">chmod +x /etc/rc.d/rc.local</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>在阿里云安全组中开放端口</li>
+<li>将ESC主机加入阿里云的白名单</li>
+<li>连接测试</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h IP</span><br><span class="line">telnet IP port</span><br><span class="line"><span class="meta">#</span><span class="bash">两种方法都可以，使用telnet连接上之后，使用quit应该可以退出。</span></span><br></pre></td></tr></table></figure>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><blockquote>
+<p>rinetd是为在一个Unix和Linux操作系统中为重定向传输控制协议(TCP)连接的一个工具。rinetd是单一过程的服务器，它处理任何数量的连接到在配置文件etc/rinetd中指定的地址/端口对。尽管rinetd使用非闭锁I/O运行作为一个单一过程，它可能重定向很多连接而不对这台机器增加额外的负担。</p>
+<p>使用iptables 很容易将TCP 和UDP 端口从<a href="https://baike.baidu.com/item/%E9%98%B2%E7%81%AB%E5%A2%99" target="_blank" rel="noopener">防火墙</a>转发到内部主机上。但是如果您需要将流量从专用地址转发到甚至不在您当前网络上的机器上，又该怎么办呢？可尝试另一个应用层<a href="https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener">端口转发</a>程序，如rinetd。</p>
+<p>这些代码有点古老，但很短小、高效，对于解决这种问题来说是非常完美的。</p>
+<p>参考：<a href="https://baike.baidu.com/item/rinted/2590570" target="_blank" rel="noopener">https://baike.baidu.com/item/rinted/2590570</a></p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx功能测试一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2850,203 +3043,11 @@ tasks：任务列表
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/22/Create-VPN/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/22/Create-VPN/" itemprop="url">
-                  Create VPN
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-06-22 08:24:07" itemprop="dateCreated datePublished" datetime="2018-06-22T08:24:07+08:00">2018-06-22</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-10-29 09:03:53" itemprop="dateModified" datetime="2018-10-29T09:03:53+08:00">2018-10-29</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络/" itemprop="url" rel="index"><span itemprop="name">网络</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="查看系统是否支持PPP"><a href="#查看系统是否支持PPP" class="headerlink" title="查看系统是否支持PPP"></a>查看系统是否支持PPP</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat <span class="meta-keyword">/dev/</span>ppp</span><br><span class="line"><span class="symbol">	cat:</span> <span class="meta-keyword">/dev/</span>ppp: No such device or address</span><br><span class="line"><span class="comment">//如果出现以上提示则说明ppp是开启的，可以正常架设pptp服务，若出现Permission denied等其他提示，你需要先去VPS面板里看看有没有enable ppp的功能开关，如果没有则需要发个消息给你的提供商，让他们帮你开通，否则就不必要看下去了，100%无法成功配置PPTP。如果没有此包，可能通过yum安装</span></span><br></pre></td></tr></table></figure>
-<h3 id="设置内核转发"><a href="#设置内核转发" class="headerlink" title="设置内核转发"></a>设置内核转发</h3><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">* CentOS6</span><br><span class="line">echo <span class="number">1</span> &gt; <span class="regexp">/proc/sys</span><span class="regexp">/net/ipv</span>4/ip_forward</span><br><span class="line">sed -i <span class="string">'s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#g'</span> /etc/sysctl.conf</span><br><span class="line">sysctl -p</span><br><span class="line">* CentOS7</span><br><span class="line">echo <span class="number">1</span> &gt; <span class="regexp">/proc/sys</span><span class="regexp">/net/ipv</span>4/ip_forward</span><br><span class="line">sed -i <span class="string">'s#net.ipv4.ip_forward = 0#net.ipv4.ip_forward = 1#g'</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">sysctl</span>.<span class="title">d</span>/50-<span class="title">default</span>.<span class="title">conf</span></span></span><br><span class="line">/<span class="regexp">/CentOS7在/usr</span><span class="regexp">/lib/sysctl</span>.d/<span class="number">50</span>-default.conf中设置，/etc/sysctl.conf是没有设置的</span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure>
-<h3 id="安装PPTP"><a href="#安装PPTP" class="headerlink" title="安装PPTP"></a>安装PPTP</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> epel-<span class="keyword">release</span></span><br><span class="line">yum -y <span class="keyword">install</span> pptpd</span><br></pre></td></tr></table></figure>
-<h3 id="配置PPTP"><a href="#配置PPTP" class="headerlink" title="配置PPTP"></a>配置PPTP</h3><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/pptpd.conf</span><br><span class="line">localip <span class="number">10.5</span><span class="number">.5</span><span class="number">.70</span></span><br><span class="line">remoteip <span class="number">192.168</span><span class="number">.2</span><span class="number">.200</span><span class="number">-210</span></span><br><span class="line"># 添加本机公网IP（localip）,这里因为没有公网IP，所以添加的也是内网IP，分配VPN用户的内网网段（remoteip）。</span><br></pre></td></tr></table></figure>
-<h3 id="设置用户名和密码"><a href="#设置用户名和密码" class="headerlink" title="设置用户名和密码"></a>设置用户名和密码</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim <span class="meta-keyword">/etc/</span>ppp/chap-secrets</span><br><span class="line">	<span class="meta"># client	server	secret	IP addresses</span></span><br><span class="line">        ccjd	*	CCjd1rj.com	*</span><br><span class="line"><span class="comment">//配置有四段，第二段与第四段为星号</span></span><br></pre></td></tr></table></figure>
-<h3 id="启动pptp服务"><a href="#启动pptp服务" class="headerlink" title="启动pptp服务"></a>启动pptp服务</h3><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">start</span> pptpd</span><br><span class="line">netstat -tlnp</span><br><span class="line">//服务监听在TCP的<span class="number">1723</span>端口</span><br></pre></td></tr></table></figure>
-<h3 id="端口映射"><a href="#端口映射" class="headerlink" title="端口映射"></a>端口映射</h3><p><strong>将公网的1723端口映射到内网的1723端口</strong></p>
-<h3 id="windows客户端设置"><a href="#windows客户端设置" class="headerlink" title="windows客户端设置"></a>windows客户端设置</h3><p><strong>创建客户端</strong></p>
-<p><img src="/images/Creat-VPN/vpn1.png"></p>
-<p><img src="/images/Creat-VPN/vpn2.png" alt=""></p>
-<p><img src="/images/Creat-VPN/vpn3.png"><br><img src="/images/Creat-VPN/vpn4.png"><br><img src="/images/Creat-VPN/vpn5.png"><br><img src="/images/Creat-VPN/vpn6.png"><br><img src="/images/Creat-VPN/vpn7.png"></p>
-<h3 id="故障解决及使用技巧"><a href="#故障解决及使用技巧" class="headerlink" title="故障解决及使用技巧"></a>故障解决及使用技巧</h3><ul>
-<li>现象：连接VPN后无法连接外网；解决：查看问题在于网关，网上有建议取消“在远程网络上使用默认网关”。测试此法可行**</li>
-</ul>
-<p><img src="/images/Creat-VPN/vpn8.png"></p>
-<p><img src="/images/Creat-VPN/vpn9.png"></p>
-<p><img src="/images/Creat-VPN/vpn10.png"></p>
-<p><img src="/images/Creat-VPN/vpn11.png"></p>
-<p><img src="/images/Creat-VPN/vpn12.png"></p>
-<ul>
-<li>查看vpn在线用户</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@1 ~]# last|grep still|grep ppp</span><br><span class="line">ccjd     ppp1         106.38.36.98     Tue Oct  9 09:53   still logged in   </span><br><span class="line">ccjd     ppp0         106.38.36.98     Tue Oct  9 00:09   still logged in</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -3089,7 +3090,7 @@ tasks：任务列表
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">50</span>
+                    <span class="site-state-item-count">51</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
