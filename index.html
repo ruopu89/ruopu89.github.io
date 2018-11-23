@@ -319,6 +319,373 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/23/docker学习六：数据管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/23/docker学习六：数据管理/" itemprop="url">
+                  docker学习六：数据管理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-23 09:40:22 / 修改時間：11:44:42" itemprop="dateCreated datePublished" datetime="2018-11-23T09:40:22+08:00">2018-11-23</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h3><h4 id="数据卷-Volumes"><a href="#数据卷-Volumes" class="headerlink" title="数据卷(Volumes)"></a>数据卷(Volumes)</h4><blockquote>
+<p>数据卷是一个可供一个或多个容器使用的特殊目录，它绕过UFS，可以提供很多有用的特性：</p>
+<ul>
+<li>数据卷可以在容器之间共享和重用</li>
+<li>对数据卷的修改会立即生效</li>
+<li>对数据卷的更新，不会影响镜像</li>
+<li>数据卷默认会一直存在，即使容器被删除</li>
+</ul>
+<p>数据卷的使用，类似于Linux下对目录或文件进行mount，镜像中的被指定为挂载点的目录中的文件会隐藏掉，能显示看的是挂载的数据卷</p>
+</blockquote>
+<h5 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">ruopu@ruopu:~$ docker volume  create my-vol</span><br><span class="line">my-vol</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个叫my-vol的卷</span></span><br><span class="line">ruopu@ruopu:~$ docker volume ls  </span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               my-vol</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看所有的数据卷</span></span><br><span class="line">ruopu@ruopu:~$ docker volume inspect my-vol </span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "CreatedAt": "2018-11-23T01:46:21Z",</span><br><span class="line">        "Driver": "local",</span><br><span class="line">        "Labels": &#123;&#125;,</span><br><span class="line">        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">        "Name": "my-vol",</span><br><span class="line">        "Options": &#123;&#125;,</span><br><span class="line">        "Scope": "local"</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看指定数据卷的信息。inspect[<span class="keyword">in</span>ˈspekt]:检查；point[pɔint]：点；mountpoint：挂载点；scope[skəup]：范围</span></span><br><span class="line">root@ruopu:~# ll -h /var/lib/docker/volumes/</span><br><span class="line">total 36K</span><br><span class="line">drwx------  3 root root 4.0K Nov 23 01:46 ./</span><br><span class="line">drwx--x--x 14 root root 4.0K Nov 21 03:40 ../</span><br><span class="line">-rw-------  1 root root  32K Nov 23 01:46 metadata.db</span><br><span class="line">drwxr-xr-x  3 root root 4.0K Nov 23 01:46 my-vol/</span><br></pre></td></tr></table></figure>
+<h5 id="启动一个挂载数据卷的容器"><a href="#启动一个挂载数据卷的容器" class="headerlink" title="启动一个挂载数据卷的容器"></a>启动一个挂载数据卷的容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">ruopu@ruopu:~$ docker run -d -P --name web --mount source=my-vol,target=/webapp nginx </span><br><span class="line">cb192c96fc3232d42e6a33440945e152cd3dd3a20fce95e0a12440b489a822fe</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建容器，-P选项表示让Docker随机映射一个 49000~49900 的端口到内部容器开放的网络端口。<span class="built_in">source</span>指定为外部的数据卷名，target指定容器内的路径，如果容器内没有这个路径，在创建时会自动创建。之后指定从哪个镜像创建。</span></span><br><span class="line">root@ruopu:~# docker exec -it web1 bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入容器</span></span><br><span class="line">root@fc042722e238:/# ls -l /     </span><br><span class="line">total 72</span><br><span class="line">.......</span><br><span class="line">drwxr-xr-x   1 root root 4096 Nov 12 00:00 usr</span><br><span class="line">drwxr-xr-x   1 root root 4096 Nov 12 00:00 var</span><br><span class="line">drwxr-xr-x   2 root root 4096 Nov 23 01:46 webapp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到容器内根下的webapp目录</span></span><br><span class="line">root@ruopu:~# cp /etc/fstab /var/lib/docker/volumes/my-vol/_data</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在数据卷中还有一个_data目录，要将文件放在这个目录中，这样在容器内的挂载点上就能看到这个文件了。这里将fstab文件放到了_data目录中。</span></span><br><span class="line">root@fc042722e238:/# ls /webapp/</span><br><span class="line">fstab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在容器内也可以看到这个文件了</span></span><br><span class="line">root@ruopu:~# docker inspect web</span><br><span class="line">...</span><br><span class="line">"Mounts": [</span><br><span class="line">            &#123;</span><br><span class="line">                "Type": "volume",</span><br><span class="line">                "Name": "my-vol",</span><br><span class="line">                "Source": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">                "Destination": "/webapp",</span><br><span class="line">                "Driver": "local",</span><br><span class="line">                "Mode": "z",</span><br><span class="line">                "RW": true,</span><br><span class="line">                "Propagation": ""</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用inspect命令检查web容器的信息，在输出中的Mounts中有数据卷的信息</span></span><br></pre></td></tr></table></figure>
+<h5 id="删除数据卷"><a href="#删除数据卷" class="headerlink" title="删除数据卷"></a>删除数据卷</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker volume rm my-vol </span><br><span class="line">Error response from daemon: remove my-vol: volume is in use - [cb192c96fc3232d42e6a33440945e152cd3dd3a20fce95e0a12440b489a822fe, fc042722e2380b62651271fe36a7d4388a50cff2ea2321550ad2953ea46cf4b0]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接删除数据卷会有一个错误提示，告知数据卷正在被哪些容器使用，也就是后面中括号中的容器ID。不删除容器，是不能删除数据卷的</span></span><br><span class="line">root@ruopu:~# docker container stop web1</span><br><span class="line">web1</span><br><span class="line">root@ruopu:~# docker container rm web1</span><br><span class="line">web1</span><br><span class="line">root@ruopu:~# docker container rm web</span><br><span class="line">web</span><br><span class="line">root@ruopu:~# docker volume rm my-vol </span><br><span class="line">my-vol</span><br><span class="line">root@ruopu:~# ls /var/lib/docker/volumes/</span><br><span class="line">metadata.db</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除这样占用数据卷的容器后再删除数据卷就没问题了，再查看本地的相应位置也没有数据卷了</span></span><br><span class="line">root@ruopu:~# docker -v</span><br><span class="line">Docker version 18.09.0, build 4d60db4</span><br><span class="line">root@ruopu:~# docker rm -v web</span><br><span class="line">web</span><br><span class="line">root@ruopu:~# ls /var/lib/docker/volumes/m</span><br><span class="line">metadata.db  my-vol/ </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在18.09.0版本中测试发现，使用<span class="string">"docker rm -v 容器ID"</span>命令并不会删除数据卷。</span></span><br><span class="line"></span><br><span class="line">* 删除无主的数据卷</span><br><span class="line">root@ruopu:~# docker volume create my-vol</span><br><span class="line">my-vol</span><br><span class="line">root@ruopu:~# docker volume inspect my-vol </span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "CreatedAt": "2018-11-23T03:36:38Z",</span><br><span class="line">        "Driver": "local",</span><br><span class="line">        "Labels": &#123;&#125;,</span><br><span class="line">        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">        "Name": "my-vol",</span><br><span class="line">        "Options": &#123;&#125;,</span><br><span class="line">        "Scope": "local"</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line">root@ruopu:~# docker volume prune</span><br><span class="line">WARNING! This will remove all local volumes not used by at least one container.</span><br><span class="line">Are you sure you want to continue? [y/N] y</span><br><span class="line">Deleted Volumes:</span><br><span class="line">my-vol</span><br><span class="line"></span><br><span class="line">Total reclaimed space: 0B</span><br><span class="line">root@ruopu:~# docker volume ls </span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先创建一个数据卷，再删除</span></span><br></pre></td></tr></table></figure>
+<h4 id="挂载主机目录-Bind-mounts"><a href="#挂载主机目录-Bind-mounts" class="headerlink" title="挂载主机目录(Bind mounts)"></a>挂载主机目录(Bind mounts)</h4>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/22/docker学习五：访问Docker仓库/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/22/docker学习五：访问Docker仓库/" itemprop="url">
+                  docker学习五：访问Docker仓库
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-22 16:52:20" itemprop="dateCreated datePublished" datetime="2018-11-22T16:52:20+08:00">2018-11-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-23 08:55:25" itemprop="dateModified" datetime="2018-11-23T08:55:25+08:00">2018-11-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="访问仓库"><a href="#访问仓库" class="headerlink" title="访问仓库"></a>访问仓库</h3><blockquote>
+<p>仓库(Repository)是集中存放镜像的地方。<br>一个容易混淆的概念是注册服务器(Registry)。实际上注册服务器是管理仓库的具体服务器,每个服务器上可以有多个仓库,而每个仓库下面有多个镜像。从这方面来说,仓库可以被认为是一个具体的项目或目录。例如对于仓库地址 dl.dockerpool.com/ubuntu来说, dl.dockerpool.com是注册服务器地址，ubuntu是仓库名。</p>
+<p>大部分时候,并不需要严格区分这两者的概念。</p>
+</blockquote>
+<h4 id="Docker-Hub"><a href="#Docker-Hub" class="headerlink" title="Docker Hub"></a>Docker Hub</h4><h5 id="注册"><a href="#注册" class="headerlink" title="注册"></a>注册</h5><blockquote>
+<p>你可以在 <a href="https://cloud.docker.com" target="_blank" rel="noopener">https://cloud.docker.com</a> 免费注册一个 Docker 账号</p>
+</blockquote>
+<h5 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h5><blockquote>
+<p>可以通过执行docker login命令交互式的输入用户名及密码来完成在命令行界面登录Docker Hub</p>
+</blockquote>
+<h5 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker search centos</span><br><span class="line">NAME                               DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED</span><br><span class="line">centos                             The official build of CentOS.                   4939                [OK]                </span><br><span class="line">ansible/centos7-ansible            Ansible on Centos7                              119                                     [OK]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用search搜索镜像。可以看到返回了很多包含关键字的镜像,其中包括镜像名字、描述、收藏数(表示该镜像的受关注程度)、是否官方创建、是否自动创建。官方的镜像说明是官方项目组创建和维护的,automated 资源允许用户验证镜像的来源和内容。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 根据是否是官方提供,可将镜像资源分为两类。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一种是类似centos这样的镜像,被称为基础镜像或根镜像。这些基础镜像由 Docker 公司创建、验证、支持、提供。这样的镜像往往使用单个单词作为名字。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 还有一种类型,比如ansible/centos7-ansible镜像,它是由 Docker 的用户创建并维护的,往往带有用户名称前缀。可以通过前缀username/来指定使用某个用户提供的镜像,比如 ansible 用户。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外,在查找的时候通过--filter=stars=N参数可以指定仅显示收藏数量为N以上的镜像。</span></span><br><span class="line">root@ruopu:~# docker pull centos</span><br><span class="line">Using default tag: latest</span><br><span class="line">latest: Pulling from library/centos</span><br><span class="line">aeb7866da422: Pull complete </span><br><span class="line">Digest: sha256:67dad89757a55bfdfabec8abd0e22f8c7c12a1856514726470228063ed86593b</span><br><span class="line">Status: Downloaded newer image for centos:latest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用pull命令下载镜像</span></span><br></pre></td></tr></table></figure>
+<h5 id="推送镜像"><a href="#推送镜像" class="headerlink" title="推送镜像"></a>推送镜像</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker login </span><br><span class="line">Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.</span><br><span class="line">Username: yaozheng64</span><br><span class="line">Password: </span><br><span class="line">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.</span><br><span class="line">Configure a credential helper to remove this warning. See</span><br><span class="line">https://docs.docker.com/engine/reference/commandline/login/#credentials-store</span><br><span class="line"></span><br><span class="line">Login Succeeded</span><br><span class="line"><span class="meta">#</span><span class="bash"> 登录docker</span></span><br><span class="line">root@ruopu:~# docker tag ubuntu:14.04 yaozheng64/ubuntu:14.04</span><br><span class="line"><span class="meta">#</span><span class="bash"> 准备要推送的镜像，一定要写为自己docker的username</span></span><br><span class="line">root@ruopu:~# docker image ls</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">yaozheng64/ubuntu   14.04               f17b6a61de28        2 days ago          188MB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看在本地有了要推送的镜像</span></span><br><span class="line">root@ruopu:~# docker push yaozheng64/ubuntu:14.04</span><br><span class="line">The push refers to repository [docker.io/yaozheng64/ubuntu]</span><br><span class="line">85a0d9a0e38e: Mounted from library/ubuntu </span><br><span class="line">fe72fc94fa1a: Mounted from library/ubuntu </span><br><span class="line">ea213108ab36: Mounted from library/ubuntu </span><br><span class="line">960c7c5516b2: Mounted from library/ubuntu </span><br><span class="line">14.04: digest: sha256:296c2904734ac0f13f3ab7265eeafb2efc33f085eeb87c875d28c360cec18700 size: 1152</span><br><span class="line"><span class="meta">#</span><span class="bash"> 推送镜像</span></span><br><span class="line">ruopu@ruopu:~$ docker search yaozheng64</span><br><span class="line">NAME                DESCRIPTION         STARS               OFFICIAL            AUTOMATED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询自己上传的镜像，没有结果。可能是因为上传的镜像与已有镜像是一样的，所以不会上传，并且再次上传时提示文件已存在。</span></span><br></pre></td></tr></table></figure>
+<h5 id="自动创建"><a href="#自动创建" class="headerlink" title="自动创建"></a>自动创建</h5><blockquote>
+<p> 自动创建(Automated Builds)功能对于需要经常升级镜像内程序来说,十分方便。<br> 有时候,用户创建了镜像,安装了某个软件,如果软件发布新版本则需要手动更新镜像。而自动创建允许用户通过 Docker Hub 指定跟踪一个目标网站(目前支持 GitHub 或BitBucket)上的项目,一旦项目发生新的提交或者创建新的标签(tag),Docker Hub 会自动构建镜像并推送到 Docker Hub 中。<br> 要配置自动创建,包括如下的步骤:</p>
+<ul>
+<li><p>创建并登录 Docker Hub,以及目标网站;</p>
+</li>
+<li><p>在目标网站中连接帐户到 Docker Hub;</p>
+</li>
+<li><p>在 Docker Hub 中 配置一个自动创建;</p>
+</li>
+<li><p>选取一个目标网站中的项目(需要含Dockerfile)和分支;</p>
+</li>
+<li><p>指定Dockerfile的位置,并提交创建。</p>
+</li>
+</ul>
+<p>之后,可以在 Docker Hub 的 自动创建页面中跟踪每次创建的状态。</p>
+</blockquote>
+<h4 id="私有仓库"><a href="#私有仓库" class="headerlink" title="私有仓库"></a>私有仓库</h4><h4 id="私有仓库高级配置"><a href="#私有仓库高级配置" class="headerlink" title="私有仓库高级配置"></a>私有仓库高级配置</h4><h4 id="Nexus3"><a href="#Nexus3" class="headerlink" title="Nexus3"></a>Nexus3</h4>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/22/dns配置使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -365,12 +732,24 @@
                 
               
 
-              <time title="創建時間：2018-11-22 10:08:10 / 修改時間：13:58:02" itemprop="dateCreated datePublished" datetime="2018-11-22T10:08:10+08:00">2018-11-22</time>
+              <time title="創建時間：2018-11-22 10:08:10" itemprop="dateCreated datePublished" datetime="2018-11-22T10:08:10+08:00">2018-11-22</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-23 09:24:01" itemprop="dateModified" datetime="2018-11-23T09:24:01+08:00">2018-11-23</time>
               
             
           </span>
@@ -512,7 +891,7 @@
 <h4 id="域和區域"><a href="#域和區域" class="headerlink" title="域和區域"></a>域和區域</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">域：Domain，邏輯概念</span><br><span class="line">區域：Zone，物理概念</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解析有正向與反向，使用不同的數據庫，這就有了正向區域與反向區域，兩個區域在一起組成了域，域不是存儲的，區域才是。區域與域沒有必然的包含關系，一個域中包含區域，但域的授權又是來自上級的區域所以沒法分清，但正反向的授權是從上級不同的區域而來。</span></span><br><span class="line"></span><br><span class="line">* 例:以magedu.com.    192.168.0.0/24為例</span><br><span class="line">.com                                         # 舉例在.com中已得到授權，下面兩條是授權記錄</span><br><span class="line">magedu.com.            IN          NS         ns.magedu.com.</span><br><span class="line">ns.magedu.com.         IN          A          192.168.0.10</span><br><span class="line"> </span><br><span class="line">www                   192.168.0.1             # 這是要在DNS服務器上做的記錄</span><br><span class="line">mail                  192.168.0.2         MX</span><br><span class="line"> </span><br><span class="line">* 建立兩個區域文件：按規化手動寫入</span><br><span class="line">* 正向區域文件（主機名可寫成@）</span><br><span class="line">	magedu.com. (@)      	IN          SOA             # 無論正反向第一條都要是此條</span><br><span class="line">	www.magedu.com.         IN          A           192.168.0.1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以簡寫為(簡寫主機名不加點，全寫一定要加點)</span></span><br><span class="line">	www                          IN          A           192.168.0.1</span><br><span class="line">	</span><br><span class="line">* 反向區域文件</span><br><span class="line">	0.168.192.in-addr.arpa.（這裡要寫網段地址，反寫，後面是特定後綴）IN       SOA</span><br><span class="line">                            0.168.192.in-addr.arpa.最後的點不能少</span><br><span class="line">                            </span><br><span class="line">* PTR記錄格式</span><br><span class="line">	1. 0.168.192.in-addr.arpa.        IN          PTR              www.magedu.com.(這個主機名不能簡寫，因爲簡寫時補的是區域名，這裏的區域名是0.168.192.in-addr.arpa.)</span><br><span class="line">	1            IN                 PTR                            www.magedu.com.  (這是上一條的簡寫，因為1後面沒有點，所以會補全上面0.168.192開頭的格式)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 正反向的格式除了區域名稱外，都是相同的</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MX記錄只定義在正向區域中，反向不需要；NS記錄正反向都要；A記錄只能定義在正向；PTR只能定義在反向</span></span><br></pre></td></tr></table></figure>
 <h3 id="安装与使用"><a href="#安装与使用" class="headerlink" title="安装与使用"></a>安装与使用</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br></pre></td><td class="code"><pre><span class="line">* 例：測試</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">有域magedu.com.                   172.16.100.0/24</span><br><span class="line">有如下服務器</span><br><span class="line">ns    172.16.100.1   # ns指的就是DNS服務器</span><br><span class="line">www     172.16.100.1, 172.16.100.3</span><br><span class="line">mail              172.16.100.2</span><br><span class="line">ftp是www主機的別名</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line"> </span><br><span class="line">DNS軟件:BIND Berkeley（博客利） Internet Name Domain，互聯網上用的最多的DNS軟件</span><br><span class="line">www.isc.org 互聯網系統協會，在此下載BIND軟件，是一個源碼包，紅帽上也有rpm包</span><br><span class="line"> </span><br><span class="line">bind-libs包是庫文件包，軟件需要依賴此包運行；bind-utils包是工具包，一般要用utils包就需要libs包。bind-utils中有dig host nslookup nsupdate等常用工具</span><br><span class="line"> </span><br><span class="line">A. bind97(服務器版)</span><br><span class="line">1. bind主配置文件/etc/named.conf，主要用於定義BIND進程的工作屬性，區域的定義；</span><br><span class="line"> </span><br><span class="line">2. /etc/rndc.key（rndc: Remote Name Domain Controller）這是遠程名稱服務控制器，是遠程控制DNS服務器進程可以啟動、關閉、重新裝載等功能的常用命令，rndc.key是讓rndc可以遠程工作的密鑰文件，bind用的是/etc/rndc.conf文件；key中只是密鑰，而conf中還有配置信息，.key和.conf文件一般有一個就可以工作。</span><br><span class="line"> </span><br><span class="line">3. 還要有區域數據文件，用來查詢主機名與IP之間轉換的規則。默認是自己創建的，在/var/named下，名字自己定義</span><br><span class="line"> </span><br><span class="line">4. 還有一個服務腳本</span><br><span class="line">/etc/rc.d/init.d/named &#123;start|stop|restart|status|reload|configtest&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> reload 重讀配置文件和數據文件但不用重啟服務；configtest測試語法錯誤，97版本不支持</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">bind</span>的二進制程序（启动脚本）叫named，只是軟件包的名字叫<span class="built_in">bind</span></span></span><br><span class="line"> </span><br><span class="line">5. devel包是在創建開發環境時使用，一般運維不需要安裝，除非創建開發環境。可以不裝</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用yum info bind97-devel查看此軟件包的信息。</span></span><br><span class="line"> </span><br><span class="line">6. bind-chroot包：</span><br><span class="line">	默認情況bind運行在根/下，有人劫持服務器named進程時，任何運行這個進程的用戶的權限攻擊者都可獲取。運行此進程的用戶是named組也是named，這個用戶和組雖不能登陸系統，但這個用戶named能到達的位置，攻擊者也能到達了。這很不安全。</span><br><span class="line">	這可以把運行named依賴的文件搬到一個假的根下，這樣就可防止上述問題了。如下，很多服務都可以通過這種方式提高安全性，但之後的路徑都要以/var/named/chroot/為根，配置會復雜一些，在這裡不要輕易使用chroot,建議不要裝此包，因爲不熟悉，會改變目錄結構</span><br><span class="line">	/var/named/chroot/           </span><br><span class="line">		etc/named.conf</span><br><span class="line">		etc/rdnc.key</span><br><span class="line">		sbin/named</span><br><span class="line">		var/named   </span><br><span class="line"> </span><br><span class="line">7. caching-nameserver包，能讓DNS成為緩存DNS服務器，這是一個快速建立緩存服務器的工具。這裏不安裝。</span><br><span class="line"></span><br><span class="line">8. 配置DNS服務器過程：</span><br><span class="line">先配置成緩存服務器 --&gt; 然後是主服務器 --&gt; 從服務器</span><br><span class="line"></span><br><span class="line">B、安裝配置過程</span><br><span class="line">1. 安裝bind97</span><br><span class="line">rpm -ql bind97</span><br><span class="line">/etc/rc.d/init.d/named			# 服務腳本</span><br><span class="line">/etc/rndc.conf					# rndc的配置文件</span><br><span class="line">/etc/rndc.key</span><br><span class="line">	/etc/sysconfig/named</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 服務腳本的配置文件，這裏還有很多服務腳本配置文件，gen表示generation，生成之意</span></span><br><span class="line">/usr/sbin/named					# 主程序</span><br><span class="line">	/usr/sbin/named-checkconf	# 檢查配置文件中的語法錯誤</span><br><span class="line">	/usr/sbin/named-checkzone	# 檢查區域文件中的語法錯誤</span><br><span class="line">	/usr/sbin/named-compilezone     	# 編譯區域文件</span><br><span class="line">/usr/sbin/rndc 					# 遠程控制工具</span><br><span class="line">	/usr/sbin/rndc-confgen</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 幫助生成/etc/rndc.conf配置文件的，gen表示生成</span></span><br><span class="line">/var/named/named.ca				# 這些是var下的區域數據文件</span><br><span class="line">/var/named/named.empty</span><br><span class="line">/var/named/named.localhost</span><br><span class="line">/var/named/named.loopback</span><br><span class="line"> </span><br><span class="line">C. 配置文件</span><br><span class="line">1. /etc/named.conf中的內容，這是官方的示例</span><br><span class="line">	options</span><br><span class="line">    # 全局選項，對下面的設置都生效</span><br><span class="line">    logging </span><br><span class="line">    # 定義如何生成與保存日志</span><br><span class="line">    zone             </span><br><span class="line">    # 定義區域</span><br><span class="line">    include </span><br><span class="line">    # 把其他文件包含進來，這意味著這個文件分成片了，而且還有文件在/etc/named.rfc1912.zones中，這個文件中都是區域的定義，這些定議可以與named.conf寫在一個文件中，需要用include包含進去</span><br><span class="line"> </span><br><span class="line">2. /var/named/named.ca中定義了根服務器的地址13個，有些主機有多個地址，如果沒有這個文件也可自己生成，用dig (Domain information gropher)命令，用dig -t NS .命令查找根域的NS記錄，也就是根域的所有DNS服務器，這時的前提是可以訪問互聯網或可以修改/etc/resolv.conf中的nameserver爲內網中可上網的DNS服務器。-t是指定資源記錄類型，並指明通過哪個服務器來查詢就能得到結果。還可以dig -t NS . @a.root-servers.net，指明通過哪台主機來找，這表示不借助本地服務器，而是通過根服務器來找，但也要可以聯網。</span><br><span class="line"></span><br><span class="line">3. /var/named/named.localhost是本地主機，將localhost解析成127.0.0.1的，為了必免DNS服務器配置錯誤，將localhost解析成一個正常地址，使每個主機可以通過localhost訪問本機，這是特別定義的。</span><br><span class="line"></span><br><span class="line">4. /var/named/named.loopback用於將127.0.0.1解析成localhost</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上述兩配置文件是本地主機名的正反向解析。</span></span><br><span class="line"> </span><br><span class="line">5. service named start            # 啓動</span><br><span class="line"></span><br><span class="line">6. DNS監聽的協議及端口：53/udp,53/tcp。除同步數據時用tcp傳輸，默認查詢時都通過UDP的53號端口，速度快。 953/tcp是rndc監聽的</span><br><span class="line"> </span><br><span class="line">7. 配置文件</span><br><span class="line">/etc/named.conf</span><br><span class="line">    options &#123;</span><br><span class="line">		listen-on port 53 &#123; 127.0.0.1; &#125;;                 </span><br><span class="line">    	# 監聽在哪個地址的哪個端口，這裏監聽的是127.0.0.1，所以不能接受遠程主機的查詢請求</span><br><span class="line">		listen-on-v6 port 53 &#123; ::1; &#125;;               </span><br><span class="line">        # 是否監聽IPv6端口</span><br><span class="line">        directory       "/var/named";          </span><br><span class="line">        # 數據文件位置</span><br><span class="line">        dump-file       "/var/named/data/cache_dump.db";</span><br><span class="line">        statistics-file "/var/named/data/named_stats.txt";</span><br><span class="line">        memstatistics-file "/var/named/data/named_mem_stats.txt";</span><br><span class="line">        allow-query     &#123; localhost; &#125;;</span><br><span class="line">        # 只允許誰來查詢</span><br><span class="line">        recursion yes;          </span><br><span class="line">        # 是否遞歸</span><br><span class="line"></span><br><span class="line">        dnssec-enable yes;</span><br><span class="line">        dnssec-validation yes;</span><br><span class="line">        dnssec-lookaside auto;</span><br><span class="line"></span><br><span class="line">        /* Path to ISC DLV key */</span><br><span class="line">        bindkeys-file "/etc/named.iscdlv.key";</span><br><span class="line">    &#125;;</span><br><span class="line"> </span><br><span class="line">8. SOCKET：套接字就是IP加端口號   IP:PORT</span><br><span class="line">	套接字的主要目的就是通過此機制讓位於兩個主機上的不同進程能夠通信的。很多軟件是C/S架框的，套接字就是讓客戶端知道到哪去請求服務器端服務的，因此每個服務器只要想讓位於兩個不同主機端可以通訊，服務器端就要監聽在某個位置，這個位置就是套接字，服務器端監聽在套接字上作為訪問入口。127.0.0.1:53是回環地址，如果監聽在此套接字上，訪問的只能是127的地址，也就是本機。要監聽在外網的地址上才能接受來自其他主機的請求，端口如果沒有監聽是不能響應的。如果有多個地址也可以把每個地址與端口寫清或用0.0.0.0:53代表所有IP的53號端口，或可以不寫地址。這是named.conf文件中options中listen-on中指定的監聽的IP，options中的內容是bind服務器配置文件中選項中可使用的指令加對應的值，或參數和對應值。zone會受其控制，全局選項中最重要的是directory一項，它定義了數據文件目錄，只要告訴DNS服務器到哪找數據即可，其他都可不定義。這裡我們自己建一個。此文件權限是640</span><br><span class="line"> </span><br><span class="line">D. 創建配置文件</span><br><span class="line">1. mv /etc/named.conf /etc/named.conf.orig</span><br><span class="line"></span><br><span class="line">2. vim /etc/named.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此文件的語法是每一個完整的語句要用分號結尾，花括號前後要有空格，只要不在同一行中，如果花括號後沒有內容或為分號沒關系</span></span><br><span class="line">		options &#123;                                        </span><br><span class="line">			directory              “/var/named”;</span><br><span class="line">		&#125;；</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 區域的定義方法：任何時候DNS服務器只要能夠解析除了自己權威的或負責的區域以外的其他區域，都必須能夠提交給根的；解析其他區域要給根；<span class="built_in">type</span>指區域類型，指明是什麼區域</span></span><br><span class="line"> </span><br><span class="line">		zone “ZONE NAME” IN &#123;</span><br><span class="line">       		type &#123;master主|slave從|hint根|forward轉發&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"> </span><br><span class="line">a、主區域</span><br><span class="line">如果是主區域還要定義路徑</span><br><span class="line">       file “區域數據文件”</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用file定義區域文件位置，可以使用相對路徑，是相對上面定義的directory的路徑而言</span></span><br><span class="line"> </span><br><span class="line">b. 從區域</span><br><span class="line">如果是從區域還要定義路徑，只是數據文件是同步來的，不用建立</span><br><span class="line">	   file “區域數據文件”；          </span><br><span class="line">       masters &#123; master1_ip; &#125;； </span><br><span class="line"><span class="meta">#</span><span class="bash"> 定義主DNS服務器地址，最後要加分號，外面結尾要加分號，master1_ip指主DNS服務器地址，可以是多個</span></span><br><span class="line"> </span><br><span class="line">c. 根區域</span><br><span class="line">根區域與主區域一樣，只是類型是hint</span><br><span class="line"> </span><br><span class="line">        zone “.” IN &#123;</span><br><span class="line">               type hint;</span><br><span class="line">               file “named.ca”; 			# 這個文件是自動生成的</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone “localhost” IN &#123;</span><br><span class="line">               type master;</span><br><span class="line">               file “named.localhost”;		# 本地正向</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone “0.0.127.in-addr.arpa” IN &#123;</span><br><span class="line">               type master;</span><br><span class="line">               file “named.loopback”;		# 本地反向</span><br><span class="line">        &#125;</span><br><span class="line">        注：上述內容就可創建一個緩存服務器了</span><br><span class="line"> </span><br><span class="line">3. chown root.named /etc/named.conf              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 改變所屬用戶與所屬組</span></span><br><span class="line"></span><br><span class="line">4. chmod 640 /etc/named.conf                  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 改權限</span></span><br><span class="line"></span><br><span class="line">5. named-checkconf       </span><br><span class="line"><span class="meta">#</span><span class="bash"> 檢查主配置文件語法，不報信息表示沒問題</span></span><br><span class="line"></span><br><span class="line">6. named-checkzone "." /var/named/named.ca</span><br><span class="line"><span class="meta">#</span><span class="bash"> 檢查區域文件是否有問題，在命令後指定區域是根，再指明根區域的配置文件路徑。結果提示zone ./IN: not loaded due to errors.也沒有問題</span></span><br><span class="line"></span><br><span class="line">7. named-checkzone "localhost" /var/named/named.localhost</span><br><span class="line"></span><br><span class="line">8. named-checkzone "0.0.127.in-addr.arpa" /var/named/named.loopback</span><br><span class="line"><span class="meta">#</span><span class="bash"> 或可用service named configtest代替上面的三條命令，在bind97中沒有此命令</span></span><br><span class="line"></span><br><span class="line">9. service named start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 啓動</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以查看/var/<span class="built_in">log</span>/messages文件，看一下服務器啟動的日志</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外要確保selinux不要啓動</span></span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">在mint8安裝並配置了bind9成緩存服務器，運行正常</span><br><span class="line">1. apt install bind9</span><br><span class="line"></span><br><span class="line">2. vim /etc/bind/named.***          </span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件都在這裏，但是分幾個文件寫的</span></span><br><span class="line"></span><br><span class="line">3. /etc/init.d/bind9 start          </span><br><span class="line"><span class="meta">#</span><span class="bash"> 啓動bind9</span></span><br><span class="line">4. vim /etc/bind/named.conf.options</span><br><span class="line">	allow-recursion &#123;192.168.1.0/24;  192.168.5.2; &#125;;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打開全局設置，加入上面一行，表示可以給1.0網絡遞歸，這時1.0網段主機就可用此DNS緩存服務器了。如果要給本機遞歸，要加上自己所在的網段或給127.0.0.1放行，但這裏測試127網段失敗）</span></span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">10. /etc/init.d/bind9 reload</span><br><span class="line">	 </span><br><span class="line">11. netstat -tlunp             </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看是否有53號端口被監聽</span></span><br><span class="line"></span><br><span class="line">12. 測試上面建立的緩存服務器</span><br><span class="line"><span class="meta">#</span><span class="bash"> 將DNS改成本服務器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 啟動DNS服務器</span></span><br><span class="line">	dig -t NS . @a.root-servers.net.             </span><br><span class="line"><span class="meta">	#</span><span class="bash"> 測試能否找到根</span></span><br><span class="line">	</span><br><span class="line">13. chkconfig --list named</span><br><span class="line"></span><br><span class="line">14. chkconfig named on</span><br></pre></td></tr></table></figure>
 <h4 id="配置文件与正向区域配置"><a href="#配置文件与正向区域配置" class="headerlink" title="配置文件与正向区域配置"></a>配置文件与正向区域配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">* 實現互聯網上的DNS服務器功能</span><br><span class="line">1. vim /etc/named.conf</span><br><span class="line">        options &#123;</span><br><span class="line">                directory       "/var/named";</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone "." IN &#123;</span><br><span class="line">                type hint;</span><br><span class="line">                file "named.ca";</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone "localhost" IN &#123;</span><br><span class="line">                type master;</span><br><span class="line">                file "named.localhost";</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone "0.0.127.in-addr.arpa" IN &#123;</span><br><span class="line">                type master;</span><br><span class="line">                file "named.loopback";</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        zone "mageedu.com" IN &#123;</span><br><span class="line">                type master;</span><br><span class="line">                file "mageedu.com.zone";             </span><br><span class="line">                # 自定义文件mageedu.com.zone</span><br><span class="line">        &#125;;                 </span><br><span class="line">        # &#125;與；間沒有空格</span><br><span class="line"></span><br><span class="line">named-checkconf       </span><br><span class="line"><span class="meta">#</span><span class="bash"> 此命令只能檢查語法錯誤，不能查邏輯錯誤</span></span><br><span class="line"> </span><br><span class="line">2. vim /var/named/mageedu.com.zone</span><br><span class="line"><span class="meta">	$</span><span class="bash">TTL    600           </span></span><br><span class="line"><span class="meta">	#</span><span class="bash"> 因為是定義全局的值所以要加$號</span></span><br><span class="line">	mageedu.com.    IN    SOA     ns1.mageedu.com.  admin.mageedu.com. (</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 上面的域名可用@代替，因爲在主配置文件中已定義了；主DNS服務器的名字是ns1.mageedu.com. 一個IP可以有多個主機名，一個主機名也可有多個IP</span></span><br><span class="line">						  2016061301</span><br><span class="line">          				  1H</span><br><span class="line">                          5M</span><br><span class="line">                          2D</span><br><span class="line">                          6H)</span><br><span class="line">mageedu.com.    IN      NS      ns1 		# 第一個區域名稱如果與上面一樣可不寫</span><br><span class="line">                IN      MX  10  mail</span><br><span class="line">ns1             IN      A       192.168.5.4</span><br><span class="line">mail            IN      A       192.168.5.5</span><br><span class="line">www             IN      A       192.168.5.4</span><br><span class="line">www             IN      A       192.168.5.6</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這裏只寫www，是因爲省略了域名</span></span><br><span class="line">ftp             IN      CNAME   www                </span><br><span class="line"><span class="meta">#</span><span class="bash"> 別名這裏指的一定是名字，而不是地址</span></span><br><span class="line"> </span><br><span class="line">3. chmod 640 mageedu.com.zone</span><br><span class="line"></span><br><span class="line">4. chown root:named mageedu.com.zone</span><br><span class="line"></span><br><span class="line">5. named-checkzone “mageedu.com” /var/named/mageedu.com.zone</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将DNS改为当前的主机，vim /etc/resolv.conf --&gt; nameserver 192.168.1.107</span></span><br></pre></td></tr></table></figure>
-<h4 id="dig命令"><a href="#dig命令" class="headerlink" title="dig命令"></a>dig命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">1. 用dig命令測試</span><br><span class="line">* 语法：</span><br><span class="line">dig -t RT NAME </span><br><span class="line"><span class="meta">#</span><span class="bash"> NAME與RT要配合起來，這是根據RT的類型找NAME對應的值</span></span><br><span class="line">dig -x IP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 根據IP查FQDN（主機名）</span></span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">dig -t A www.mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 找A記錄，對應的就是相應類型如A記錄一行中的IP的值，這就是根據屬性的名稱找對應的值，也就是取IP地址的</span></span><br><span class="line">dig -t NS mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查這個域的DNS服務器是誰的，最後一定是一個名稱，而不能是IP地址</span></span><br><span class="line">dig -t RT NAME @IP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加@表示直接到DNS服務器上查找，@IP就是指明DNS服務器地址的</span></span><br><span class="line"> </span><br><span class="line">2. dig命令返回的結果</span><br><span class="line">dig -t A www.mageedu.com返回結果如下：</span><br><span class="line">    QUESTION SECTION:         </span><br><span class="line">    # 提出的問題是什麼</span><br><span class="line">    ANSWER SECTION:            </span><br><span class="line">    # 答案</span><br><span class="line">    AUTHORITY SECTION</span><br><span class="line">    # 誰是提出問題的主機名的權威服務器</span><br><span class="line">    ADDITIONAL SECTION     </span><br><span class="line">    # 補充段，與上一項（權威服務器）NS記錄對應的A記錄</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因爲給web服務配置了兩個地址，所以返回的兩個值每次都會對調，這就是負載均衡了</span></span><br><span class="line">dig -t CNAME ftp.mageedu.com                               </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查別名</span></span><br><span class="line">dig -t NS mageedu.com                                              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查NS記錄</span></span><br><span class="line">dig -t MX mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面是正向解析的方法；</span></span><br><span class="line">dig -t SOA mageedu.com</span><br></pre></td></tr></table></figure>
+<h4 id="dig命令"><a href="#dig命令" class="headerlink" title="dig命令"></a>dig命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">1. 用dig命令測試</span><br><span class="line">* 语法：</span><br><span class="line">dig -t RT NAME </span><br><span class="line"><span class="meta">#</span><span class="bash"> NAME與RT要配合起來，這是根據RT的類型找NAME對應的值</span></span><br><span class="line">dig -x IP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 根據IP查FQDN（主機名）</span></span><br><span class="line"></span><br><span class="line">* 例：</span><br><span class="line">dig -t A www.mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 找A記錄，對應的就是相應類型如A記錄一行中的IP的值，這就是根據屬性的名稱找對應的值，也就是取IP地址的</span></span><br><span class="line">dig -t NS mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查這個域的DNS服務器是誰的，最後一定是一個名稱，而不能是IP地址</span></span><br><span class="line">dig -t RT NAME @IP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加@表示直接到DNS服務器上查找，@IP就是指明DNS服務器地址的</span></span><br><span class="line"> </span><br><span class="line">2. dig命令返回的結果</span><br><span class="line">dig -t A www.mageedu.com返回結果如下：</span><br><span class="line">    QUESTION SECTION:         </span><br><span class="line">    # 提出的問題是什麼</span><br><span class="line">    ANSWER SECTION:            </span><br><span class="line">    # 答案</span><br><span class="line">    AUTHORITY SECTION</span><br><span class="line">    # 誰是提出問題的主機名的權威服務器</span><br><span class="line">    ADDITIONAL SECTION     </span><br><span class="line">    # 補充段，與上一項（權威服務器）NS記錄對應的A記錄</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因爲給web服務配置了兩個地址，所以返回的兩個值每次都會對調，這就是負載均衡了</span></span><br><span class="line">dig -t CNAME ftp.mageedu.com                               </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查別名</span></span><br><span class="line">dig -t NS mageedu.com                                              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查NS記錄</span></span><br><span class="line">dig -t MX mageedu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面是正向解析的方法；</span></span><br><span class="line">dig -t SOA mageedu.com</span><br><span class="line"></span><br><span class="line">3. 跟踪</span><br><span class="line">vim /etc/resolv.conf</span><br><span class="line">	nameserver 114.114.114.114</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里一定要改为公网的DNS，默认这里是127.0.0.53,虽然也可以访问公网，但使用下面命令时就不行了，因为dig会不断访问公网的DNS询问答案。</span></span><br><span class="line">dig +trace www.sina.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> dig会一直询问公网DNS，之后再到根域，一级域，二级域不断询问要查找的地址。</span></span><br></pre></td></tr></table></figure>
 <h4 id="host命令"><a href="#host命令" class="headerlink" title="host命令"></a>host命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">* 语法：</span><br><span class="line">host -t RT NAME     </span><br><span class="line"><span class="meta">#</span><span class="bash"> 用-t指定資源類型；查詢名稱的解析結果，但不能用@</span></span><br><span class="line">host -t A www.mageedu.com</span><br><span class="line">host -t MX mageedu.com</span><br><span class="line">host -t SOA mageedu.com</span><br></pre></td></tr></table></figure>
 <h4 id="nslookup命令"><a href="#nslookup命令" class="headerlink" title="nslookup命令"></a>nslookup命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> nslookup：交互式命令，也可工作在命令行模式下；這裏只介紹交互式模式，用window測試</span></span><br><span class="line">nslookup</span><br><span class="line"><span class="meta">nslookup&gt;</span><span class="bash"> server 192.168.5.4       </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在windows中操作，切換DNS；通過server命令指明用5.4DNS服務器來查詢，如果不指或指的服務器不是負責的域，會給出非權威答案</span></span><br><span class="line"><span class="meta">nslookup&gt;</span><span class="bash"> <span class="built_in">set</span> q=A            </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 用<span class="built_in">set</span> q=命令設定資源類型</span></span><br><span class="line"><span class="meta">nslookup&gt;</span><span class="bash"> NAME            </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 要查的域名，如www.mageedu.com</span></span><br><span class="line">set q=NS</span><br><span class="line">mageedu.com</span><br></pre></td></tr></table></figure>
 <h4 id="反向区域配置"><a href="#反向区域配置" class="headerlink" title="反向区域配置"></a>反向区域配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">* 反向區域的配置</span><br><span class="line">1. vim /etc/named.conf</span><br><span class="line">        zone "100.16.172.in-addr.arpa" IN &#123;</span><br><span class="line">            type master;</span><br><span class="line">            file "172.16.100.zone";</span><br><span class="line">        &#125;;</span><br><span class="line"> </span><br><span class="line">2. cp mageedu.com.zone 172.16.100.zone -p                           </span><br><span class="line"><span class="meta">#</span><span class="bash"> 包括權限完全復制</span></span><br><span class="line"></span><br><span class="line">3. vim 172.16.100.zone</span><br><span class="line"><span class="meta">		$</span><span class="bash">TTL    600</span></span><br><span class="line">		@       IN      SOA     ns1.mageedu.com.  admin.mageedu.com. (   </span><br><span class="line">        # 這裡的DNS主機名不可簡寫      </span><br><span class="line">                        2016061301</span><br><span class="line">                        1H</span><br><span class="line">                        5M</span><br><span class="line">                        2D</span><br><span class="line">   						6H)</span><br><span class="line">                IN      NS      ns1.mageedu.com.  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 反向區域裡DNS域名必須寫完整</span></span><br><span class="line">        1       IN      PTR     ns1.mageedu.com.</span><br><span class="line">        1       IN      PTR     www.mageedu.com.</span><br><span class="line">        2       IN      PTR     mail.mageedu.com.</span><br><span class="line">        3       IN      PTR     www.mageedu.com.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 反向配置文件中不需要A記錄</span></span><br><span class="line"> </span><br><span class="line">4. named-chechconf</span><br><span class="line"></span><br><span class="line">5. named-chechzone “5.168.192.in-addr.arpa” 192.168.5.zone         </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在/var/named目錄中執行此條</span></span><br><span class="line"></span><br><span class="line">6. service named restart</span><br><span class="line"></span><br><span class="line">7. windows測試</span><br><span class="line">        set q=PTR</span><br><span class="line">        192.168.5.2</span><br><span class="line"></span><br><span class="line">        set q=NS</span><br><span class="line">        5.168.192.in-addr.arpa</span><br><span class="line">8. dig -x 192.168.5.4          </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在linux中解析IP，-x選項是解析，將DNS指向自建的DNS後才可使用此命令</span></span><br></pre></td></tr></table></figure>
@@ -1763,395 +2142,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/阿里云调整/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/15/阿里云调整/" itemprop="url">
-                  阿里云调整
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-15 13:04:26" itemprop="dateCreated datePublished" datetime="2018-11-15T13:04:26+08:00">2018-11-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-11-21 10:56:24" itemprop="dateModified" datetime="2018-11-21T10:56:24+08:00">2018-11-21</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="报警"><a href="#报警" class="headerlink" title="报警"></a>报警</h3><p>可以先创建报警人组与报警人，这里只是对硬件的资源的基本监控。</p>
-<p><img src="/images/alichange/监控报警1.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警2.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警3.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警4.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警5.jpg" alt=""></p>
-<p><img src="/images/alichange/报警人1.jpg" alt=""></p>
-<p><img src="/images/alichange/报警人2.jpg" alt=""></p>
-<h3 id="创建交换机"><a href="#创建交换机" class="headerlink" title="创建交换机"></a>创建交换机</h3><p>建议将所有ECS虚拟机放在一个交换机中，这样便于管理，也可以避免不同交换机间通信需要进行一次路由的问题。</p>
-<p><img src="/images/alichange/vpc1.jpg" alt=""></p>
-<p><img src="/images/alichange/vpc2.jpg" alt=""></p>
-<p><img src="/images/alichange/vpc3.jpg" alt=""></p>
-<h3 id="共享带宽"><a href="#共享带宽" class="headerlink" title="共享带宽"></a>共享带宽</h3><p>购买NAT网关，设置DNAT，将需要外网访问的内网地址加入DNAT。SNAT中要匹配现有的所有交换机</p>
-<p><img src="/images/alichange/NAT1.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT2.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT3.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT4.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT5.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT6.jpg" alt=""></p>
-<h3 id="内网负载均衡"><a href="#内网负载均衡" class="headerlink" title="内网负载均衡"></a>内网负载均衡</h3><p>主要为RabbitMQ使用。在监听中定义要监听的端口，在默认服务器组中加入两台服务器，这样就会监听两个服务器的这些定义了的端口</p>
-<p><img src="/images/alichange/balance1.jpg" alt=""></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/KVM使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/15/KVM使用/" itemprop="url">
-                  KVM使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-15 09:28:28" itemprop="dateCreated datePublished" datetime="2018-11-15T09:28:28+08:00">2018-11-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-11-21 10:57:16" itemprop="dateModified" datetime="2018-11-21T10:57:16+08:00">2018-11-21</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/虚拟化/" itemprop="url" rel="index"><span itemprop="name">虚拟化</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="KVM安装"><a href="#KVM安装" class="headerlink" title="KVM安装"></a>KVM安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">安装环境在CentOS6.6_x64</span><br><span class="line">* 方法一</span><br><span class="line">1. 查看是否支持虚拟化</span><br><span class="line">egrep '(vmx|svm)' /proc/cpuinfo</span><br><span class="line">2. 关闭SELinux和防火墙</span><br><span class="line">setenforce 0</span><br><span class="line">getenforce</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl disable firewalld</span><br><span class="line">3. 加载kvm模块</span><br><span class="line">modprobe kvm</span><br><span class="line">4. 查看是否加载kvm</span><br><span class="line">lsmod | grep kvm</span><br><span class="line">5. 安装KVM软件</span><br><span class="line">yum -y install qemu-kvm qemu-kvm-tools</span><br><span class="line">6. 因为安装后qemu-kvm命令不在环境变量中，所以要添加</span><br><span class="line">ln -sv /usr/libexec/qemu-kvm /usr/sbin</span><br><span class="line">7. qemu-kvm查看帮助、支持模拟的PC、可模拟的CPU架构</span><br><span class="line">qemu-kvm -h</span><br><span class="line">qemu-kvm -M ?</span><br><span class="line">qemu-kvm -cpu ?</span><br><span class="line">8. 安装VNC服务端</span><br><span class="line">yum -y install tigervnc-server</span><br><span class="line">9. 将系统镜像文件复制到服务器</span><br><span class="line">10. 创建虚拟机的镜像文件目录并创建镜像文件</span><br><span class="line">mkdir /images/vm1 -pv</span><br><span class="line">qemu-img create -f qcow2 -o size=100G /images/vm1/ubuntu.qcow2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟机前，需要先有一个虚拟磁盘文件，不然无法创建虚拟机</span></span><br><span class="line">11. 创建虚拟机</span><br><span class="line">qemu-kvm -name "ubuntu10" -m 1024 -smp 2 -hda /images/vm1/ubuntu.qcow2 -cdrom ubuntu-10.01.***.iso -vnc :0 -boot order=dc</span><br><span class="line"><span class="meta">#</span><span class="bash"> -name是取一个虚拟机的名字；-m指定内存大小；-smp指定CPU的颗数，但不要超过物理核心数；-hda是指定磁盘镜像，因为是本地第一个分区所以用-hda；-cdrom是指定光盘镜像；-boot是指定启动次序，这里的d指使用一次；-net nic是指定网卡的，指定nic会向某个接口进行桥连接，如果不能连接会报错，所以这里不用此选项；-vnc :0是为了避免vnc连接失败。启动后提示在5900上启动了vnc</span></span><br><span class="line">12. 在CentOS上安装vnc客户端测试</span><br><span class="line">yum -y install tigervnc</span><br><span class="line">13. 连接VNC服务器进行安装</span><br><span class="line">vncviewer :5900</span><br><span class="line">14. windows上安装VNC-viewer软件，连接时输入IP:5900，NAME输入在qemu-kvm创建时用-name创建的虚拟机名字</span><br><span class="line">15. 安装xp系统</span><br><span class="line">qemu-img create -f qcow2 -o size=100G /images/vm1/xp.qcow2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟磁盘</span></span><br><span class="line">qemu-kvm -name "winxp" -m 768 -smp 4 -drive file=/images/vm1/xp.qcow2,if=ide,index=0,media=disk,format=qcow2 -drive file=/root/winxp_ghost.iso,media=cdrom,index=1 -vnc :0 -boot order=dc</span><br><span class="line"><span class="meta">#</span><span class="bash"> -drive中的第一個file指定磁盤映像文件，<span class="keyword">if</span>指定磁盤接口類型，index表示爲第幾個設備，0爲第一個設備，從0開始編號，media=disk表示是一個磁盤設備，format=qcow2是指定映像文件的格式。第二個file指定光盤映像文件，media=cdrom是指明是一個光盤。啓動成功。</span></span><br><span class="line">16. 安装openSUSE</span><br><span class="line">qemu-kvm -m 2048 -name opensuse -drive file=/home/ruopu/private1/VirtaulOS/openSUSE/openSUSE.qcow2,media=disk,format=qcow2,if=ide -net nic -boot c</span><br><span class="line"></span><br><span class="line">* 方法二</span><br><span class="line">1. 查看是否支持虚拟化</span><br><span class="line">egrep '(vmx|svm)' /proc/cpuinfo</span><br><span class="line">2. 关闭SELinux和防火墙</span><br><span class="line">setenforce 0</span><br><span class="line">getenforce</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl disable firewalld</span><br><span class="line">3. 加载kvm模块</span><br><span class="line">modprobe kvm</span><br><span class="line">4. 查看是否加载kvm</span><br><span class="line">lsmod | grep kvm</span><br><span class="line">5. 安装依赖软件</span><br><span class="line">yum install -y qemu-kvm libvirt virt-install bridge-utils tigervnc tigervnc-server virt-manager</span><br><span class="line"><span class="meta">#</span><span class="bash"> virt-manager是一个图形管理页面</span></span><br><span class="line">6. 开启kvm服务，并且设置其开机自动启动</span><br><span class="line">systemctl start libvirtd</span><br><span class="line">systemctl enable libvirtd</span><br><span class="line">systemctl status libvirtd</span><br><span class="line">systemctl is-enabled libvirtd</span><br><span class="line">7. 配置网桥模式。配置好之后会有br0和virbr0两个网卡</span><br><span class="line">cd /etc/sysconfig/network-scripts</span><br><span class="line">cp ifcfg-eno16777736 ifcfg-eno16777736.bak</span><br><span class="line">vim ifcfg-br0</span><br><span class="line">    BOOTPROTO=static</span><br><span class="line">    DEVICE=br0</span><br><span class="line">    TYPE=Bridge</span><br><span class="line">    NM_CONTROLLED=no</span><br><span class="line">    IPADDR=192.168.1.90</span><br><span class="line">    NETMASK=255.255.255.0</span><br><span class="line">    GATEWAY=192.168.1.1</span><br><span class="line">    DNS1=192.168.1.1</span><br><span class="line">vim ifcfg-eno16777736</span><br><span class="line">    BOOTPROTO=none</span><br><span class="line">    DEVICE=enp0s25</span><br><span class="line">    NM_CONTROLLED=no</span><br><span class="line">    ONBOOT=yes</span><br><span class="line">    BRIDGE=br0</span><br><span class="line">systemctl restart network</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可按此方法配置多个网桥设备</span></span><br><span class="line">8. 复制系统镜像文件到服务器</span><br><span class="line">9. 创建虚拟磁盘，这里创建的镜像文件格式建议用.img格式。</span><br><span class="line">qemu-img create -f qcow2 -o size=50G centos7.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 需要事先创建磁盘文件，不然下面的命令会报错“ERROR Format cannot be specified <span class="keyword">for</span> unmanaged storage.”，这应该是virt-manager 没有找到存储池的问题</span></span><br><span class="line">qemu-img create -f qcow2 -opreallocation=metadata RHEL7.img 40G</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样创建磁盘也可以，重要的是-opreallocation=metadata选项，可以预分配磁盘，硬盘空间不会立即分配出去</span></span><br><span class="line">10. 创建虚拟机 </span><br><span class="line">virt-install -n xp -r 1024 --vcpus 2 --disk /images/xp.img,format=qcow2,size=50 --network bridge=br0 --os-type=windows --cdrom /images/vm1/xp.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate</span><br><span class="line">virt-install -n centos6 -r 1024 --vcpus 2 --disk /images/centos.img,format=qcow2,size=30 --network bridge=br0 --network bridge=br1 --os-type=linux --cdrom /images/vm1/centos6.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate </span><br><span class="line"><span class="meta">#</span><span class="bash"> --accelerate表示KVM或KQEMU内核加速,这个选项是推荐最好加上。如果KVM和KQEMU都支持，KVM加速器优先使用。--vncport指定端口，--vnclisten很重要，0.0.0.0表示监听在所有端口，不指定的话会监听在本地回环地址，用vncviewer是不能连接的。另外，不能两个VNC软件同时连接虚拟机；--disk /images/centos.img,format=qcow2,size=30是一定要定义的，这与上面创建的磁盘大小没有关系，如果这里不指定磁盘大小，在安装时会显示磁盘大小是0</span></span><br></pre></td></tr></table></figure>
-<h3 id="查看虚拟机状态"><a href="#查看虚拟机状态" class="headerlink" title="查看虚拟机状态"></a>查看虚拟机状态</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh list --all</span><br></pre></td></tr></table></figure>
-<h3 id="虚拟机的启动、停止与删除"><a href="#虚拟机的启动、停止与删除" class="headerlink" title="虚拟机的启动、停止与删除"></a>虚拟机的启动、停止与删除</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">* 启动</span><br><span class="line">virsh start xp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动虚拟机</span></span><br><span class="line">virsh create /etc/libvirt/qemu/C7.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过配置文件启动虚拟机</span></span><br><span class="line">virsh autostart RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置开机自启动虚拟机</span></span><br><span class="line"></span><br><span class="line">* 关闭</span><br><span class="line">virsh shutdown xp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭虚拟机</span></span><br><span class="line">systemctl start acpid</span><br><span class="line">systemctl enable acpid</span><br><span class="line">virsh shutdown RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认情况下virsh工具不能对linux虚拟机进行关机操作，linux操作系统需要开启与启动acpid服务。在安装KVM linux虚拟机必须配置此服务。</span></span><br><span class="line">virsh destroy RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 强制关闭虚拟机RHEL</span></span><br><span class="line"></span><br><span class="line">* 删除</span><br><span class="line">virsh undefine RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机，前提条件是这个虚拟机没有快照文件，如果有就不要先删除快照再删除虚拟机。该命令只是删除RHEL虚拟机的配置文件，并不删除虚拟磁盘文件。</span></span><br><span class="line"></span><br><span class="line">* 挂起服务器</span><br><span class="line">virsh suspend RHEL</span><br><span class="line"></span><br><span class="line">* 恢复服务器</span><br><span class="line">virsh  resume RHEL</span><br><span class="line"></span><br><span class="line">* 导出KVM虚拟机配置文件</span><br><span class="line">virsh dumpxml RHEL &gt; /etc/libvirt/qemu/wintest02.xml</span><br><span class="line"></span><br><span class="line">*  重新定义虚拟机配置文件</span><br><span class="line">mv /etc/libvirt/qemu/C7_1.xml /etc/libvirt/qemu/C7.xml</span><br><span class="line">virsh define /etc/libvirt/qemu/C7.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过导出备份的配置文件恢复原KVM虚拟机的定义，并重新定义虚拟机。</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改现有虚拟机配置"><a href="#修改现有虚拟机配置" class="headerlink" title="修改现有虚拟机配置"></a>修改现有虚拟机配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">virsh edit RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这会打开虚拟机的配置文件，在虚拟机关机状态下修改后保存并启动虚拟机就会生效。如果用vim修改/etc/libvirt/qemu/目录中的虚拟机的xml文件是不能生效的</span></span><br><span class="line">virsh dominfo RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改完以后用此命令查看现在的虚拟机的配置</span></span><br></pre></td></tr></table></figure>
-<h3 id="添加、删除网卡"><a href="#添加、删除网卡" class="headerlink" title="添加、删除网卡"></a>添加、删除网卡</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看网卡信息</span></span><br><span class="line">[root@ccjd shaosong]# virsh attach-interface SScentos7 --type bridge --source br1</span><br><span class="line">Interface attached successfully</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给SScentos7虚拟机临时添加一块叫br1的网卡</span></span><br><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line">vnet1      bridge     br1        -           52:54:00:b9:a1:e2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再查看时已多了一块网卡，在虚拟机中也可以看到此网卡，并且可以使用。</span></span><br><span class="line">[root@ccjd shaosong]# virsh attach-interface SScentos7 --type bridge --source br1 --config</span><br><span class="line"><span class="meta">#</span><span class="bash"> 永久添加网卡，使用--config选项</span></span><br><span class="line">Interface attached successfully</span><br><span class="line">[root@ccjd shaosong]# virsh edit SScentos7</span><br><span class="line">Domain SScentos7 XML configuration not changed.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看虚拟机的配置文件，可以看到多了一个新网卡的配置信息</span></span><br><span class="line"> &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;mac address='52:54:00:7e:7b:7e'/&gt;</span><br><span class="line">      &lt;source bridge='br0'/&gt;</span><br><span class="line">      &lt;address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;mac address='52:54:00:5a:89:15'/&gt;</span><br><span class="line">      &lt;source bridge='br1'/&gt;</span><br><span class="line">      &lt;address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">[root@ccjd shaosong]# virsh shutdown SScentos7</span><br><span class="line">Domain SScentos7 is being shutdown</span><br><span class="line">[root@ccjd shaosong]# virsh start SScentos7</span><br><span class="line">Domain SScentos7 started</span><br><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line">vnet1      bridge     br1        -           52:54:00:5a:89:15</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启虚拟机可以看到网卡被永久添加上了</span></span><br><span class="line">[root@ccjd shaosong]# virsh detach-interface SScentos7 --type bridge --mac 52:54:00:5a:89:15 --config</span><br><span class="line">Interface attached successfully</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机网卡</span></span><br></pre></td></tr></table></figure>
-<h3 id="克隆虚拟机"><a href="#克隆虚拟机" class="headerlink" title="克隆虚拟机"></a>克隆虚拟机</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">virt-clone -o C7 -n C7-1 -f /data/c7_1.img -f /data/c7_2.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> C7是现有的域名(虚拟机名)，C7-1是要创建的域名，c7_1.img是要创建的镜像文件，这里不需要事先创建虚拟磁盘。这条命令是说将C7域克隆一个叫C7-1的域，创建的镜像文件在/data目录下，叫c7_1.img。克隆时要关闭虚拟机。如果有多个磁盘，要用多个-f选项指定</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 克隆的问题是都会使用同样的VNC端口，这样就不能将所有克隆虚拟机都启动，需要使用<span class="string">"virsh edit 虚拟机名"</span>，打开虚拟机的配置文件，找到VNC的端口号并修改。之后保存退出才能启动。</span></span><br></pre></td></tr></table></figure>
-<h3 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">* 创建</span><br><span class="line">virsh snapshot-create C7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建域名叫C7的快照；快照配置文件在/var/lib/libvirt/qemu/snapshot/虚拟机名称/下</span></span><br><span class="line">virsh snapshot-list C7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看C7域的快照</span></span><br><span class="line">virsh snapshot-current</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前虚拟机镜像快照的版本</span></span><br><span class="line"></span><br><span class="line">* 恢复虚拟机快照</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复虚拟机快照必须关闭虚拟机。</span></span><br><span class="line">virsh domstate winxp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认虚拟机状态</span></span><br><span class="line">virsh snapshot-revert winxp 1515577720</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复快照。1515577720是winxp快照的名字，如果有多个快照，要先用virsh snapshot-list winxp查看快照名字</span></span><br><span class="line">qemu-img info winxp.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看镜像的快照名字，可能有多个</span></span><br><span class="line"></span><br><span class="line">* 删除</span><br><span class="line">virsh snapshot-delete winxp 1515577720</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除winxp的叫1515577720的快照</span></span><br></pre></td></tr></table></figure>
-<h3 id="重命名虚拟机"><a href="#重命名虚拟机" class="headerlink" title="重命名虚拟机"></a>重命名虚拟机</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">1. 关闭虚拟机</span><br><span class="line">2. 导出虚拟机配置文件</span><br><span class="line">cd /etc/libvirt/qemu/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到虚拟机配置文件目录</span></span><br><span class="line">virsh dumpxml Ytest &gt; openvpn.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 导出配置文件，叫openvpn.xml</span></span><br><span class="line">virsh snapshot-delete Ytest 1540542652</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先删除之前的虚拟机快照，如果不删除快照是不能删除虚拟机的</span></span><br><span class="line">virsh undefine Ytest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机</span></span><br><span class="line">vim openvpn.xml</span><br><span class="line">    &lt;domain type='kvm'&gt;</span><br><span class="line">      &lt;name&gt;openvpn&lt;/name&gt;	# 修改虚拟机的名字</span><br><span class="line">    .......</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">          &lt;driver name='qemu' type='qcow2' cache='none'/&gt;</span><br><span class="line">          &lt;source file='/home/IOS/openvpn/openvpn.img'/&gt;	# 修改虚拟机磁盘的路径</span><br><span class="line">cd /home/IOS</span><br><span class="line">mv Ytest/ openvpn</span><br><span class="line">mv Ytest.img openvpn.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改之前的虚拟机的目录名称与磁盘文件名称</span></span><br><span class="line">virsh define openvpn.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再加载新命名的虚拟机的配置文件</span></span><br><span class="line">virsh list --all</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看是否有新命名的虚拟机</span></span><br><span class="line">virsh start openvpn</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动新命名的虚拟机</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改虚拟机硬件配置"><a href="#修改虚拟机硬件配置" class="headerlink" title="修改虚拟机硬件配置"></a>修改虚拟机硬件配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ccjd qemu]# virsh edit gitlab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改虚拟机配置文件</span></span><br><span class="line">    &lt;domain type='kvm'&gt;</span><br><span class="line">      &lt;name&gt;gitlab&lt;/name&gt;</span><br><span class="line">      &lt;uuid&gt;77890890-312b-bfed-83ed-c53665cf86d1&lt;/uuid&gt;</span><br><span class="line">      &lt;memory unit='KiB'&gt;8192000&lt;/memory&gt;</span><br><span class="line">      &lt;currentMemory unit='KiB'&gt;8192000&lt;/currentMemory&gt;</span><br><span class="line">      &lt;vcpu placement='static'&gt;4&lt;/vcpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 8192000为内存大小，4为CPU核心数。修改后保存，再启动虚拟机即可。</span></span><br></pre></td></tr></table></figure>
-<h3 id="给KVM虚拟机添加磁盘"><a href="#给KVM虚拟机添加磁盘" class="headerlink" title="给KVM虚拟机添加磁盘"></a>给KVM虚拟机添加磁盘</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">1. cd /home/IOS/RHEL7</span><br><span class="line">2. qemu-img create -f raw RHEL7_1.img 10G</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个磁盘，格式是raw</span></span><br><span class="line">3. virsh edit RHEL7</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/home/IOS/RHEL/RHEL7_1.img'/&gt;</span><br><span class="line">      &lt;target dev='sda' bus='scsi'/&gt;</span><br><span class="line">      &lt;address type='drive' controller='0' bus='0' target='0' unit='0'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/home/IOS/RHEL/RHEL7_2.img'/&gt;</span><br><span class="line">      &lt;target dev='hda' bus='ide'/&gt;</span><br><span class="line">      &lt;address type='drive' controller='0' bus='0' target='0' unit='1'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 原来的硬盘是hda，bus是ide，如果新磁盘与原磁盘一样是ide的，那么要改下面的unit的数字，不一样就可以，不然无法启动。如果磁盘类型不一样，可以直接改类型即可，如上面的类型就是 &lt;target dev=<span class="string">'sda'</span> bus=<span class="string">'scsi'</span>/&gt;，unit是按类型向下编号的，不一样就可以。</span></span><br><span class="line">4. tail -100 /var/log/libvirt/qemu/RHEL7.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不能启动，可以查看此日志，寻找原因。日志是以虚拟机名命名的。</span></span><br></pre></td></tr></table></figure>
-<h3 id="kvm开启虚拟化"><a href="#kvm开启虚拟化" class="headerlink" title="kvm开启虚拟化"></a>kvm开启虚拟化</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 先检查 KVM host（宿主机/母机）上的kvm_intel模块是否打开了嵌套虚拟机功能（默认是开启的）：</span></span><br><span class="line">1. modinfo kvm_intel | grep nested</span><br><span class="line">      parm: nested:bool</span><br><span class="line">2. cat /sys/module/kvm_intel/parameters/nested</span><br><span class="line">      Y</span><br><span class="line">3. 如果上面的显示结果不是 Y 的话需要开启 nested：</span><br><span class="line">modprobe -r kvm-intel</span><br><span class="line">modprobe kvm-intel nested=1</span><br><span class="line">cat /sys/module/kvm_intel/parameters/nested</span><br><span class="line">    Y</span><br><span class="line">4. 如果使用libvirt管理虚拟机,需要修改虚拟机xml文件中CPU的定义,下面定义方法都可以:</span><br><span class="line">* 方法一</span><br><span class="line">virsh edit debian9.3</span><br><span class="line">  &lt;cpu mode='custom' match='exact'&gt;</span><br><span class="line">    &lt;model fallback='allow'&gt;core2duo&lt;/model&gt;</span><br><span class="line">    &lt;feature policy='require' name='vmx'/&gt;	# 添加这一行</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash">这种方式为虚拟机定义需要模拟的CPU类型<span class="string">"core2duo"</span>,并且为虚拟机添加<span class="string">"vmx"</span>特性</span></span><br><span class="line"></span><br><span class="line">* 方法二</span><br><span class="line">  &lt;cpu mode='host-model'&gt;</span><br><span class="line">    &lt;model fallback='allow'/&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：https://www.cnblogs.com/chimeiwangliang/p/7862229.html</span></span><br></pre></td></tr></table></figure>
-<h3 id="虚拟机静态迁移"><a href="#虚拟机静态迁移" class="headerlink" title="虚拟机静态迁移"></a>虚拟机静态迁移</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">* 静态迁移就是虚拟机在关机状态下，拷贝虚拟机虚拟磁盘文件与配置文件到目标虚拟主机中，实现的迁移。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 虚拟主机各自使用本地存储存放虚拟机磁盘文件。本文实现基于本地磁盘存储虚拟机磁盘文件的迁移方式。虚拟主机之间使用共享存储存放虚拟机磁盘文件，该方式只是在目标虚拟主机上重新定义虚拟机就可以了。</span></span><br><span class="line">1. 先确定虚拟机关机</span><br><span class="line">virsh list --all</span><br><span class="line">2. 准备迁移winxp虚拟机，查看此虚拟机配置的磁盘文件</span><br><span class="line">virsh domblklist winxp</span><br><span class="line">3. 导出虚拟机配置文件</span><br><span class="line">virsh dumpxml winxp &gt; /root/winxp.xml</span><br><span class="line">4. 拷贝配置文件到目标虚拟主机上</span><br><span class="line">scp /root/winxp.xml root@192.168.1.11:/etc/libvirt/qemu/</span><br><span class="line">5. 拷贝虚拟机磁盘文件到目标虚拟机</span><br><span class="line">scp winxp.img root@192.168.1.11:/data</span><br><span class="line">6. 到目标主机上查看。目标主机的目录结构要与源虚拟主机一致</span><br><span class="line">7. 定义注册虚拟主机</span><br><span class="line">virsh define /etc/libvirt/qemu/winxp.xml</span><br><span class="line">8. 启动虚拟机</span><br><span class="line">virsh start winxp</span><br></pre></td></tr></table></figure>
-<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/etc/libvirt</span><br><span class="line"><span class="meta">#</span><span class="bash"> qemu配置文件位置 </span></span><br><span class="line">/etc/libvirt/qemu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 虚拟机配置文件位置</span></span><br></pre></td></tr></table></figure>
-<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><h4 id="VNC软件无法正常连接"><a href="#VNC软件无法正常连接" class="headerlink" title="VNC软件无法正常连接"></a>VNC软件无法正常连接</h4><ol>
-<li>在windows主机上安装VNC Viewer，使用此软件打开虚拟机。另外，用此工具连接后可能会有错误提示“ZlibInStream:Inflate Failed”，并且不断刷新页面，无法正常进入。如下：</li>
-</ol>
-<p><img src="/images/KVM/winconnect1.jpg" alt=""></p>
-<ol start="2">
-<li>设置图像，从高到低试，测试时选择High就可以正常连接了。</li>
-</ol>
-<p><img src="/images/KVM/winconnect2.jpg" alt=""></p>
-<p><img src="/images/KVM/winconnect3.jpg" alt=""></p>
-<h4 id="virt-manager键盘输入错乱"><a href="#virt-manager键盘输入错乱" class="headerlink" title="virt-manager键盘输入错乱"></a>virt-manager键盘输入错乱</h4><ol>
-<li>需要在Details中的VNC中选择en-us</li>
-</ol>
-<p><img src="/images/KVM/vncconnect1.jpg" alt=""></p>
-<h4 id="从远程打开KVM的图形管理页面"><a href="#从远程打开KVM的图形管理页面" class="headerlink" title="从远程打开KVM的图形管理页面"></a>从远程打开KVM的图形管理页面</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">* CentOS6.6系统</span><br><span class="line">yum groupinstall "X 窗口系统"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 远程连接服务器，使用ssh -X IP</span></span><br><span class="line">virt-manager</span><br><span class="line">错误提示：</span><br><span class="line">    ”process 63345: D-Bus library appears to be incorrectly set up; failed to read machine uuid: Failed to open "/var/lib/dbus/machine-id": 没有那个文件或目录</span><br><span class="line">    See the manual page for dbus-uuidgen to correct this issue.</span><br><span class="line">      D-Bus not built with -rdynamic so unable to print a backtrace“</span><br></pre></td></tr></table></figure>
-<p><img src="/images/KVM/openkvm.jpg" alt=""></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">解决办法：</span><br><span class="line">dbus-uuidgen &gt; /var/lib/dbus/machine-id</span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行此命令后就可以远程打开virt-manager了，但是乱码</span></span><br><span class="line"></span><br><span class="line">yum groupinstall "中文支持"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装完中文后，乱码就解决了。</span></span><br></pre></td></tr></table></figure>
-<h4 id="报错error-unsupported-configuration-Unable-to-find-security-driver-for-label-selinux"><a href="#报错error-unsupported-configuration-Unable-to-find-security-driver-for-label-selinux" class="headerlink" title="报错error: unsupported configuration: Unable to find security driver for label selinux"></a>报错error: unsupported configuration: Unable to find security driver for label selinux</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virsh edit 虚拟机名</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除最后有selinux的行，再启动就没问题了。</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2199,7 +2189,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">48</span>
+                    <span class="site-state-item-count">50</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>

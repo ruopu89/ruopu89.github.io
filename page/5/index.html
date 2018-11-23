@@ -319,6 +319,353 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx功能测试一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/13/nginx功能测试一/" itemprop="url">
+                  nginx功能测试一
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-13 14:55:07" itemprop="dateCreated datePublished" datetime="2018-09-13T14:55:07+08:00">2018-09-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-09-29 16:25:42" itemprop="dateModified" datetime="2018-09-29T16:25:42+08:00">2018-09-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="CPU绑定"><a href="#CPU绑定" class="headerlink" title="CPU绑定"></a>CPU绑定</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ps axo user,comm,pid,psr,pcpu | grep nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">查看进程运行在哪个CPU上，显示的最后一个数字就是指第几颗CPU上。这个命令是查看进程的名称、PID以及CPU的占用率。psr表示绑定内核线程的处理器（如果有）的逻辑处理器号。 对一个进程来说，如果它的线程全都绑定到同一处理器上，那么显示该字段。pcpu表示CPU的占用率。comm表示进程名称。pid表示进程的ID号</span></span><br><span class="line">watch -n.5 'ps axo comm,pid,psr | grep nginx'</span><br><span class="line">yum install httpd-tools</span><br><span class="line">ab -n 100000 -c 100 http://IP/index.html</span><br><span class="line"><span class="meta">#</span><span class="bash">这时可以看到上面监测的绑定CPU数字在变化，因为CPU与进程没有绑定</span></span><br><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line"><span class="meta">#</span><span class="bash">这时在配置文件中加入绑定设置，定义在全局段</span></span><br><span class="line">	worker_cpu_affinity auto;</span><br><span class="line"><span class="meta">	#</span><span class="bash">自动绑定CPU</span></span><br><span class="line">	worker_rlimit_nofile 65536;</span><br><span class="line"><span class="meta">	#</span><span class="bash">如果不加入worker打开文件数量的上限，检查语法时会有报错，提示最多打开1024。定义在全局段</span></span><br><span class="line">	worker_priority -5;</span><br><span class="line"><span class="meta">	#</span><span class="bash">调整优先级</span></span><br><span class="line">watch -n.5 'ps axo comm,pid,psr,ni | grep nginx'</span><br><span class="line"><span class="meta">#</span><span class="bash">可以看到优先级改为了-5</span></span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">vim /etc/hosts</span><br><span class="line">	192.168.1.15 www.ruopu.com</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">setenforce 0</span><br><span class="line">ab -n 100000 -c 100 http://IP/index.html</span><br><span class="line"><span class="meta">#</span><span class="bash">这时监测页面的CPU数字是不会变化的，因为已经绑定了，显示的内容中第一个是主控进程，只看后四个即可</span></span><br><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line">    worker_cpu_affinity 1000 0100 0010 0001;</span><br><span class="line">    #绑定第0到3颗CPU，因为CPU是四核的。这时监测页面显示绑定在0－3的CPU上</span><br><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line">    worker_processes 2;</span><br><span class="line">    worker_cpu_affinity 1000 0100;</span><br><span class="line">nginx -s reload</span><br><span class="line"><span class="meta">#</span><span class="bash">再查看监测页面，这里只绑定在2颗CPU上</span></span><br></pre></td></tr></table></figure>
+<h1 id="设置访问权限"><a href="#设置访问权限" class="headerlink" title="设置访问权限"></a>设置访问权限</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">	server &#123;</span><br><span class="line">		listen 80;</span><br><span class="line">		server_name www.ruopu.com;</span><br><span class="line">		root /data/nginx/vhost1;</span><br><span class="line">		location / &#123;</span><br><span class="line">			deny 192.168.1.22;</span><br><span class="line">			allow all;</span><br><span class="line"><span class="meta">#</span><span class="bash">location定义对根及以下的路径的访问拒绝22地址访问，allow也一样，可以用一个地址或一个网段/24或all</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">nginx -s reload</span><br><span class="line">访问IP</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">	server &#123;</span><br><span class="line">		listen 80;</span><br><span class="line">		server_name www.ruopu.com;</span><br><span class="line">		root /data/nginx/vhost1;</span><br><span class="line">		location ~* \.(jpg|png) &#123;</span><br><span class="line">			deny 192.168.1.22;</span><br><span class="line">			allow all;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">//对目录中的jpg或png文件，拒绝22地址访问。location中定义的地址是在root定义的地址的下面的路径</span><br><span class="line">nginx -s reload</span><br><span class="line">find /usr/share -iname "*.jpg" -exec cp &#123;&#125; /data/nginx/vhost1 \;</span><br><span class="line">访问测试,www.ruopu.com/morning.jpg</span><br><span class="line">如果location中定义了root，那么以location中的root为准</span><br><span class="line">=====================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">在一个server中location配置段可存在多个，用于实现从uri到文件系统的路径映射；ngnix会根据用户请求的URI来检查定义的所有location，并找出一个最佳匹配，而后应用其配置；</span></span><br><span class="line"></span><br><span class="line">location [ = | ~ | ~* | ^~ ] uri &#123; ... &#125;</span><br><span class="line">Sets configuration depending on a request URI.</span><br><span class="line">	=：对URI做精确匹配；例如, http://www.magedu.com/, http://www.magedu.com/index.html，如果等于根，那么就只有根被匹配，如果没有等号，那么从根以下的所有路径都匹配。</span><br><span class="line">	location  =  / &#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">    ~：对URI做正则表达式模式匹配，区分字符大小写；</span><br><span class="line">    ~*：对URI做正则表达式模式匹配，不区分字符大小写；</span><br><span class="line">    ^~：对URI的左半部分做匹配检查，不区分字符大小写；也就是以什么开头</span><br><span class="line">    不带符号：匹配起始于此uri的所有的url；</span><br><span class="line">    匹配优先级：=, ^~, ～/～*，不带符号；</span><br></pre></td></tr></table></figure>
+<h1 id="定义别名"><a href="#定义别名" class="headerlink" title="定义别名"></a>定义别名</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">mkdir /data/pictures</span><br><span class="line">cp fish.jpg /data/pictures</span><br><span class="line">vim conf.d/vhost1.conf</span><br><span class="line">	location ^~ /images/ &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash">^~是指以其后设定的内容开头的，但这里没有什么用</span></span><br><span class="line">		root /data/pictures；</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">这时访问www.ruopu.com/images/fish.jpg提示404，上面定义的应该是在pictures中找images目录，然后再找文件。/data/pictures就相当于根，在根下再打开images目录</span></span><br><span class="line">mkdir /data/pictures/images</span><br><span class="line">mv /data/pictures/*.jpg /data/pictures/images</span><br><span class="line">访问www.ruopu.com/images/flower.jpg</span><br><span class="line">vim conf.d/vhost1.conf</span><br><span class="line">    location ^~ /images/ &#123;</span><br><span class="line">	    alias /data/pictures/；</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">将root改为<span class="built_in">alias</span>。别名中的pictures右边的斜线是相对于images右侧的斜线来说的。所以，上面别名/data/pictures/最右边的斜线一定不能少，不然就不能访问到。</span></span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/images/fish.jpg才有，flower.jpg是访问不到的。因为在pictures中只有fish.jpg文件，没有flower.jpg文件。root是对于左侧的斜线，alias是对于最右侧的斜线来说的。</span><br></pre></td></tr></table></figure>
+<h1 id="自定义错误页"><a href="#自定义错误页" class="headerlink" title="自定义错误页"></a>自定义错误页</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       location ~* \.(jpg|png) &#123;</span><br><span class="line">       error_page 404 =200 /notfound.html;</span><br><span class="line"><span class="meta">#</span><span class="bash">notfound.html是URL的地址，它的位置是root定义的，因为加了等于200，所以这改变了状态码，在浏览器中按F12时可以看到是200了。测试使用等于200的设置会提示错误的值，原因是在200与其前面的等号中间加了空格，去掉空格就正常了。notfound.html应该是自定义的名字，但定义的名字与location指定的名字，与root定义的目录中的*.html文件的名字，这三个名字要一致，不然访问不了。error_page定义一次即可，这里只是展现了两种方法。</span></span><br><span class="line">       error_page 404 /notfound.html;</span><br><span class="line">       location = /notfound.html &#123;</span><br><span class="line">            root /data/nginx/error_pages;</span><br><span class="line">       &#125;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">mkdir /data/nginx/error_pages</span><br><span class="line">vim /data/nginx/error_pages/notfound.html</span><br><span class="line">	404</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/test.html，这是一个不存在的页面</span><br></pre></td></tr></table></figure>
+<h1 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">yum install httpd-tools</span><br><span class="line">htpasswd -c -m /etc/nginx/.ngxpasswd tom</span><br><span class="line">htpasswd -m /etc/nginx/.ngxpasswd jerry</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       error_page 404 /notfound.html;</span><br><span class="line">       location = /notfound.html &#123;</span><br><span class="line">            root /data/nginx/error_pages;</span><br><span class="line">       &#125;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* ^/(admin|login) &#123;</span><br><span class="line">       #~*做正则表达式模式匹配，如果以admin或login开头，就进行认证。当然，这也要求在vhost1中有这个目录才行。</span><br><span class="line">            auth_basic "admin area or login url";</span><br><span class="line">            #使用ngx_http_auth_basic_module模块实现基于用户的访问控制，使用basic机制进行用户认证；"admin area or login url"是一段自定义提示信息。</span><br><span class="line">            auth_basic_user_file /etc/nginx/.ngxpasswd;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">mkdir /data/nginx/vhost1/admin</span><br><span class="line">vim /data/nginx/vhost1/admin/index.html</span><br><span class="line">	admin aera</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/admin，如果访问的是www.ruopu.com/login就会失败，因为在vhost1中没有login目录。</span><br></pre></td></tr></table></figure>
+<h1 id="状态页"><a href="#状态页" class="headerlink" title="状态页"></a>状态页</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    location /ngxstatus &#123;</span><br><span class="line">    #这里的ngxstatus也是自定义的名称，定义什么名字，访问时就用什么名字</span><br><span class="line">        stub_status;</span><br><span class="line">        #stub_status是一个系统变量</span><br><span class="line">    &#125;</span><br><span class="line">    #ngxstatus是自定义名称，还可以在其中加认证或allow、deny。location后面定义的是URL名，也是路径名</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/ngxstatus。</span><br><span class="line">curl --silent http://www.ruopu.com/ngxstatus | awk '^Active/&#123;print $3&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash">测试此条命令后的awk用法有问题，在^Active上。</span></span><br></pre></td></tr></table></figure>
+<h1 id="压缩功能"><a href="#压缩功能" class="headerlink" title="压缩功能"></a><strong>压缩功能</strong></h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf    </span><br><span class="line">    http &#123;</span><br><span class="line">        gzip on;</span><br><span class="line">        gzip_min_length 1k;</span><br><span class="line">        #不压缩临界值，大于1K的才压缩，一般不用改</span><br><span class="line">        gzip_buffers 4 16k;</span><br><span class="line">        #支持实现压缩功能时为其配置的缓冲区数量及每个缓存区的大小；</span><br><span class="line">        gzip_comp_level 6;</span><br><span class="line">        #压缩级别，1-10，数字越大压缩的越好，时间也越长</span><br><span class="line">        gzip_types text/plain application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;</span><br><span class="line">        #进行压缩的文件类型，缺啥补啥就行了，JavaScript有两种写法，最好都写上吧，总有人抱怨js文件没有压缩，其实多写一种格式就行了</span><br><span class="line">        gzip_disable "MSIE [1-6]\.";</span><br><span class="line">        #IE6对Gzip不怎么友好，不给它Gzip了</span><br><span class="line">    &#125;                    </span><br><span class="line">nginx -s reload</span><br><span class="line">cp nginx.conf /data/nginx/vhost1/nginx.html</span><br><span class="line">chmod +r /data/nginx/vhost1/nginx.html</span><br><span class="line">curl -I -H "Accept-Encoding: gzip, deflate" "http://www.ruopu.com/images/morning.jpg"</span><br><span class="line"><span class="meta">#</span><span class="bash">如果对访问的内容进行了压缩，在结果中会有Content-Encoding: gzip的字样。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx安装/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/13/nginx安装/" itemprop="url">
+                  nginx安装
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-13 14:44:16" itemprop="dateCreated datePublished" datetime="2018-09-13T14:44:16+08:00">2018-09-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-10-12 10:45:50" itemprop="dateModified" datetime="2018-10-12T10:45:50+08:00">2018-10-12</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="rpm包安装"><a href="#rpm包安装" class="headerlink" title="rpm包安装"></a>rpm包安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/yum.repos.d/nginx.repo</span><br><span class="line">    [nginx]</span><br><span class="line">    name=nginx repository</span><br><span class="line">    baseurl=http://nginx.org/packages/centos/7/$basearch/</span><br><span class="line">    gpgcheck=0</span><br><span class="line">    enabled=1</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##自建repo文件或用以下命令；如果是CentOS6上安装nginx，就将上面源地址中的7改为6就可以了。也可以下载安装http://http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm。另外，在CentOS6上如果要安装nginx，还要将openssl升级到1.0.2版本以上。到https://www.openssl.org/source/openssl-1.0.2h.tar.gz下载，之后编译安装</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##如果提示需要公钥验证，需要执行此命令rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7</span></span></span><br><span class="line">rpm -ivh https://mirrors.ustc.edu.cn/epel/epel-release-latest-7.noarch.rpm</span><br><span class="line">------------------------------------------------------------------------------------</span><br><span class="line">rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm</span><br><span class="line">//此命令安装后也会自建一个叫nginx.repo的源</span><br><span class="line">yum repolist</span><br><span class="line">yum info nginx</span><br><span class="line">yum install nginx</span><br><span class="line">------------------------------------------------------------------------------------</span><br><span class="line">yum install epel-release -y</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##也可以用yum安装epel-release包得到epel仓库。也可以安装epel库来安装nginx，这样安装nginx后会自动配置配色方案</span></span></span><br><span class="line"></span><br><span class="line">注：nginx配置文件默认没有配色，使用下面方法解决</span><br><span class="line">mkdir -pv ~/.vim/syntax</span><br><span class="line">cd ~/.vim/syntax</span><br><span class="line">wget http://www.vim.org/scripts/download_script.php?src_id=14376 -O nginx.vim</span><br><span class="line">vim ~/.vim/filetype.vim</span><br><span class="line">	au BufRead,BufNewFile /etc/nginx/* set ft=nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##其中路径为你的nginx.conf文件路径</span></span></span><br></pre></td></tr></table></figure>
+<h1 id="源码安装"><a href="#源码安装" class="headerlink" title="源码安装"></a>源码安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">yum install zlib-devel pcre-devel</span><br><span class="line">yum groupinstall "开发工具"</span><br><span class="line">tar nginx-1.12.2.tar.gz</span><br><span class="line">cd nginx-1.12.2</span><br><span class="line">./configure --with-pcre --with-zlib</span><br><span class="line">/usr/local/nginx/sbin/nginx     </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##启动</span></span></span><br><span class="line">/usr/local/nginx/sbin/nginx -s reload    </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##重启</span></span></span><br><span class="line">/usr/local/nginx/sbin/nginx -s stop    </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##关闭</span></span></span><br><span class="line">vim /usr/lib/systemd/system/nginx.service</span><br><span class="line">    [Unit]</span><br><span class="line">        Description=Nginx Service</span><br><span class="line">    [Service]</span><br><span class="line">        Type=forking</span><br><span class="line">        PIDFile=/usr/local/nginx/logs/nginx.pid</span><br><span class="line">        ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf</span><br><span class="line">        ExecReload=/usr/local/nginx/sbin/nginx -s reload</span><br><span class="line">        ExecStop=/usr/local/nginx/sbin/nginx -s stop</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##实现systemd管理nginx</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##这里一定要注意PIDFile的路径，在/usr/local/nginx/conf/nginx.conf配置文件中，默认pid文件放在/usr/local/nginx/logs中，如果写错路径，nginx是无法启动的，报错为：PID file /run/nginx.pid not readable (yet?) after start.</span></span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/13/nginx配置文件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2742,7 +3089,7 @@ tasks：任务列表
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">48</span>
+                    <span class="site-state-item-count">50</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
