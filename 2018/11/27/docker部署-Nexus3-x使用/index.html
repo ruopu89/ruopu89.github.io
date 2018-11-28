@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="安装12345root@ccjd:~# docker run -d --name nexus3 --restart=always -p 8081:8081 -p 8082:8082 --mount src=nexus-data,target=/nexus-data sonatype/nexus3# 在后台运行容器，名字叫nexus3，运行了一个restart策略为always的nexus3容器，暴">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker部署-Nexus3.x使用">
+<meta property="og:url" content="http://yoursite.com/2018/11/27/docker部署-Nexus3-x使用/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="安装12345root@ccjd:~# docker run -d --name nexus3 --restart=always -p 8081:8081 -p 8082:8082 --mount src=nexus-data,target=/nexus-data sonatype/nexus3# 在后台运行容器，名字叫nexus3，运行了一个restart策略为always的nexus3容器，暴">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerblock.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerhosted1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerhosted2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerproxy1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerproxy2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockerproxy3.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockergroup1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/dockergroup2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/yumblock.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/yumRepositories.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/yumproxy1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/yumproxy2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/nexus3/yumgroup.jpg">
+<meta property="og:updated_time" content="2018-11-28T06:37:42.490Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker部署-Nexus3.x使用">
+<meta name="twitter:description" content="安装12345root@ccjd:~# docker run -d --name nexus3 --restart=always -p 8081:8081 -p 8082:8082 --mount src=nexus-data,target=/nexus-data sonatype/nexus3# 在后台运行容器，名字叫nexus3，运行了一个restart策略为always的nexus3容器，暴">
+<meta name="twitter:image" content="http://yoursite.com/images/nexus3/dockerblock.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/27/docker部署-Nexus3-x使用/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>docker部署-Nexus3.x使用 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/27/docker部署-Nexus3-x使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">docker部署-Nexus3.x使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-27 08:48:11" itemprop="dateCreated datePublished" datetime="2018-11-27T08:48:11+08:00">2018-11-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-28 14:37:42" itemprop="dateModified" datetime="2018-11-28T14:37:42+08:00">2018-11-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ccjd:~# docker run -d --name nexus3 --restart=always -p 8081:8081 -p 8082:8082 --mount src=nexus-data,target=/nexus-data sonatype/nexus3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在后台运行容器，名字叫nexus3，运行了一个restart策略为always的nexus3容器，暴露docker的8081端口为服务器的8081端口，挂载本地的nexus-data目录到容器的/nexus-data目录（这会在本地的/var/lib/docker/volumes中自动创建一个nexus-data目录，在容器中自动创建/nexus-data目录），镜像使用sonatype/nexus3。</span></span><br><span class="line">root@ccjd:~# docker inspect --format '&#123;&#123; .NetworkSettings.IPAddress &#125;&#125;' 48b7fb09c1f8</span><br><span class="line">172.17.0.2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令获取docker的IP地址</span></span><br></pre></td></tr></table></figure>
+<h3 id="docker命令的–restart选项"><a href="#docker命令的–restart选项" class="headerlink" title="docker命令的–restart选项"></a>docker命令的–restart选项</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 运行容器时使用--restart参数可以指定一个restart策略，来指示在退出时容器应该如何重启或不应该重启。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当容器启用restart策略时，将会在docker ps显示Up或者Restarting状态。也可以使用docker events命令来生效restart策略。</span></span><br><span class="line">docker支持如下restart策略：</span><br><span class="line"></span><br><span class="line">* no – 容器退出时不要自动重启。这个是默认值。</span><br><span class="line">* on-failure[:max-retries] – 只在容器以非0状态码退出时重启。可选的，可以退出docker daemon尝试重启容器的次数。</span><br><span class="line">* always – 不管退出状态码是什么始终重启容器。当指定always时，docker daemon将无限次数地重启容器。容器也会在daemon启动时尝试重启，不管容器当时的状态如何。</span><br><span class="line">* unless-stopped – 不管退出状态码是什么始终重启容器，不过当daemon启动时，如果容器之前已经为停止状态，不要尝试启动它。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在每次重启容器之前，不断地增加重启延迟[上一次重启的双倍延迟，从100毫秒开始]来防止影响服务器。这意味着daemon将等待100ms,然后200 ms, 400, 800, 1600等等，直到超过on-failure限制，或执行docker stop或docker rm -f。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果容器重启成功[容器启动后并运行至少10秒]，然后delay重置为默认的100ms。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 你可以使用on-failure策略指定docker尝试重启容器的最大次数。默认下docker将无限次数重启容器。可以通过docker inspect来查看已经尝试重启容器了多少次。例如，获取容器“my-container”的重启次数:</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">"&#123;&#123; .RestartCount &#125;&#125;"</span> my-container</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2</span></span><br><span class="line"></span><br><span class="line">或者获取上一次容器重启时间：</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">"&#123;&#123; .State.StartedAt &#125;&#125;"</span> my-container</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2015-03-04T23:47:07.691840179Z</span></span><br><span class="line"></span><br><span class="line">* 示例</span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --restart=always redis</span></span><br><span class="line">这运行了一个restart策略为always的redis容器，以使得容器退出时,docker将重启它。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --restart=on-failure:10 redis</span></span><br><span class="line">这个运行了一个restart策略为on-failure,最大重启次数为10的redis容器。如果redis以非0状态退出连续退出超过10次，那么docker将中断尝试重启这个容器。只有on-failure策略支持设置最大重启次数限制。</span><br></pre></td></tr></table></figure>
+<h3 id="配置docker仓库"><a href="#配置docker仓库" class="headerlink" title="配置docker仓库"></a>配置docker仓库</h3><blockquote>
+<p>Nexus3 提供了的3种类型的Docker仓库，前两者都可以创建多个仓库，最后一个则可以将他们全部聚合到一个URL来访问。</p>
+<ul>
+<li>docker (hosted): 自托管</li>
+<li>docker (proxy): 代理</li>
+<li>docker (group): 聚合</li>
+</ul>
+</blockquote>
+<h4 id="hosted类型"><a href="#hosted类型" class="headerlink" title="hosted类型"></a>hosted类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 用浏览器打开192.168.0.198:8081--&gt;点击右上角登录--&gt;点击页面上方的齿轮标志--&gt;点击左侧的Repository中的Bolb Stores创建一个存储块--&gt;点击左侧Repositories--&gt;Create repository--&gt;docker(hosted)--&gt;输入名称；勾选Online，这个开关可以设置这个Docker repo是在线还是离线；选择HTTP并设置创建时用到的8082端口，这是在命令行连接时要用到的端口；勾选Force basic authentication，这样的话就不允许匿名访问了，执行docker pull或 docker push之前，都要先登录：docker login；勾选Docker Registry API Support，Docker registry默认使用的是API v2, 但是为了兼容性，我们可以勾选启用API v1。Storage选择之前创建的存储块设备；Hosted使用默认的Allow redeploy；选择左侧的Security中的Realms，将Docker Bearer Token Realm加入到右侧的Active框中</span><br><span class="line">2. 使用本机的ubuntu16.04测试</span><br><span class="line">root@ccjd:~# vim /lib/systemd/system/docker.service</span><br><span class="line">	[Service]</span><br><span class="line">	...</span><br><span class="line">	ExecStart=/usr/bin/dockerd --insecure-registry 192.168.0.198:8082 -H unix://</span><br><span class="line">	...</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 加入--insecure-registry 192.168.0.198:8082，这里加入的地址必须是宿主机的地址，测试发现如果添加的是docker容器的172地址，在认证时还是会提示<span class="string">"Error response from daemon: Get https://172.17.0.2:8082/v2/: http: server gave HTTP response to HTTPS client"</span></span></span><br><span class="line">root@ccjd:~# systemctl daemon-reload </span><br><span class="line">root@ccjd:~# systemctl restart docker</span><br><span class="line">root@ccjd:~# docker login 192.168.0.198:8082 -u admin -p admin123</span><br><span class="line">WARNING! Using --password via the CLI is insecure. Use --password-stdin.</span><br><span class="line">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.</span><br><span class="line">Configure a credential helper to remove this warning. See</span><br><span class="line">https://docs.docker.com/engine/reference/commandline/login/#credentials-store</span><br><span class="line"></span><br><span class="line">Login Succeeded</span><br><span class="line"><span class="meta">#</span><span class="bash"> 出现Login Succeeded就表示成功了</span></span><br><span class="line">root@ccjd:~# docker tag centos 192.168.0.198:8082/centos</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给现有的centos镜像打一个标签叫192.168.0.198:8082/centos</span></span><br><span class="line">root@ccjd:~# docker image ls</span><br><span class="line">REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.0.198:8082/centos   latest              75835a67d134        6 weeks ago         200MB</span><br><span class="line">centos                      latest              75835a67d134        6 weeks ago         200MB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看已有了新的镜像</span></span><br><span class="line">root@ccjd:~# docker push 192.168.0.198:8082/centos</span><br><span class="line">The push refers to repository [192.168.0.198:8082/centos]</span><br><span class="line">f972d139738d: Pushed </span><br><span class="line">latest: digest: sha256:dc29e2bcceac52af0f01300402f5e756cc8c44a310867f6b94f5f7271d4f3fec size: 529</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将镜像推送到本地仓库</span></span><br></pre></td></tr></table></figure>
+<h4 id="proxy类型"><a href="#proxy类型" class="headerlink" title="proxy类型"></a>proxy类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. 用浏览器打开192.168.0.198:8081--&gt;点击右上角登录--&gt;点击页面上方的齿轮标志--&gt;点击左侧的Repository中的Bolb Stores创建一个存储块。</span><br><span class="line">2. 打开左侧的Repositories--&gt;Create replsitory--&gt;docker(proxy)--&gt;自定义Name；勾选Online；设置http端口；不勾选Force basic authentication；勾选Docker Registry API Support；Remote Storage使用阿里云的加速器地址；Docker Index使用Use proxy registry(specified above)；Storage使用创建的存储块</span><br><span class="line"><span class="meta">#</span><span class="bash"> 勾选Force basic authentication后，proxy仓库的状态会显示在线-正在连接。但下载镜像后状态也不会改变。如果不勾选，下载镜像后会显示在线-远程可用</span></span><br><span class="line">3. 配置</span><br><span class="line">root@ccjd:~# vim /etc/docker/daemon.json</span><br><span class="line">    &#123;</span><br><span class="line">            "registry-mirrors":[</span><br><span class="line">                    "http://192.168.0.198:8083"</span><br><span class="line">            ]</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 改为内部仓库的地址</span></span><br><span class="line">4. 测试</span><br><span class="line">root@ccjd:~# docker pull debian</span><br><span class="line">5. 用浏览器打开192.168.0.198:8081后，点击上面的盒子图标，在左侧的Browse中选择创建的proxy存储块，可以看到我们下载的镜像，这是将镜像持久化存储在块中了。之后如果下载相同的镜像，可以从私有仓库中直接下载。</span><br></pre></td></tr></table></figure>
+<h4 id="group类型"><a href="#group类型" class="headerlink" title="group类型"></a>group类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1. 创建存储块--&gt;创建group类型库</span><br><span class="line">2. 这里需要注意，在三种类型中都不再选择"Docker Registry API支持"，并修改配置文件，如下：</span><br><span class="line">root@ccjd:~# vim /etc/docker/daemon.json </span><br><span class="line">    &#123;</span><br><span class="line">            "registry-mirrors":["http://192.168.0.130:8083"],</span><br><span class="line">            "insecure-registries":["192.168.0.130:8083","192.168.0.130:8082"],</span><br><span class="line">            "disable-legacy-registry":true</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里第一行定义了group类型的仓库，第二行定义了两个地址为安全地址，可以不用https连接，最后一行定义了关闭<span class="string">"Docker v1 API"</span>，这样就不用在定义三种类型时选择启用Docker v1 API了。</span></span><br><span class="line">3. 测试发现，如果在group类型中一次性加入hosted和proxy类型的两个存储库，那么pull镜像时，proxy类型的库中就不会有反应，去除了hosted类型的库后就可以了。之后再将hosted类型的库加上也没有问题。</span><br><span class="line">4. 官方推荐配置两个Connectors端口，一个配置在docker(group)用来访问所有库，搜索和下载images(group下包含proxy，所以创建proxy仓库的时候可以不设置Connectors-https端口)，另一个配置在docker(hosted)用来push自己的images，使用docker(group)实现搜索和下载images。</span><br><span class="line">The recommended minimal configuration requires one port for a Docker repository group used for read access to all repositories and one port for each hosted Docker repository that will receive push events from your users.</span><br><span class="line">5. 测试</span><br><span class="line">docker login 192.168.0.130:8083 -u admin -p admin123</span><br><span class="line">docker pull centos</span><br><span class="line">再次查看nexus3页面时，在proxy存储块中应该有centos镜像，之后再下载时就可以从私有库中下载了。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面为三种类型库的配置截图</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/nexus3/dockerblock.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerhosted1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerhosted2.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy2.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy3.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockergroup1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockergroup2.jpg" alt=""></p>
+<h3 id="配置yum仓库"><a href="#配置yum仓库" class="headerlink" title="配置yum仓库"></a>配置yum仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">使用nexus3来管理yum仓库相对简单，首先创建存储块，这里共创建了6个，有5个是给每个不同的库使用的，1个是给组用的。之后创建5个不同的proxy类型库，每个库都指向不同的yum源，最后创建一个组来管理这5个库。yum源地址如下：</span><br><span class="line">http://mirrors.aliyun.com/centos/7/os/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/updates/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/extras/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/centosplus/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/contrib/x86_64</span><br></pre></td></tr></table></figure>
+<p><img src="/images/nexus3/yumblock.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumRepositories.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumproxy1.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumproxy2.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumgroup.jpg" alt=""></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/26/ubuntu16-04配置IP地址/" rel="next" title="ubuntu16.04配置IP地址">
+                <i class="fa fa-chevron-left"></i> ubuntu16.04配置IP地址
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker命令的–restart选项"><span class="nav-number">2.</span> <span class="nav-text">docker命令的–restart选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置docker仓库"><span class="nav-number">3.</span> <span class="nav-text">配置docker仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#hosted类型"><span class="nav-number">3.1.</span> <span class="nav-text">hosted类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#proxy类型"><span class="nav-number">3.2.</span> <span class="nav-text">proxy类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#group类型"><span class="nav-number">3.3.</span> <span class="nav-text">group类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置yum仓库"><span class="nav-number">4.</span> <span class="nav-text">配置yum仓库</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
