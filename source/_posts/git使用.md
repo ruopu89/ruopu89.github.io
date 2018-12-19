@@ -416,44 +416,6 @@ git push -u origin master
 # 由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。
 git push origin master
 # 之后在本地提交后，可以把本地master分支的最新修改推送至GitHub
-
-测试：github个人博客多电脑使用
-cd /home/GitHub/ruopu.github.io
-ssh-keygen -t rsa -C "ruopu19@hotmail.com"
-# -C后的是一些描述信息
-cat .ssh/id_rsa.pub
-# 将密钥复制到github上
-ssh -T git@github.com
-# 测试与github连接是否成功
-git config --global user.name "ruopu1989"
-git config --global user.email "ruopu1989@hotmail.com"
-# 自报家门
-git init
-给源文件目录初始化git，虽然目录中已有内容，但这也不会报错的
-git remote add origin https://github.com/abc/abc.github.io.git
-# 与远程的origin分支关联，最后的地址是github上项目的地址
-git checkout -b source
-# 创建并切换分支，使用-b选择就是为了创建并切换。这与git branch source && git checkout source两条命令的执行结果是一样的。
-git branch
-# 现在本地只有一个source分支，这也就是主分支
-git add .
-# 添加所有内容到暂存区
-git commit -m 'add source'
-# 提交
-git push origin source
-# 将本地的source分支推送到远程的origin分支上
-在github上将source设置为主分支，这样之后clone的就都是这个source分支上的内容了。
-** 上传中会有一个问题，就是theme目录中的主题文件上传后可能是灰色的，这是因为获得主题文件时就是从另一个库clone来的，所以主题文件目录中也有.git文件。如果上传了目录，解决方法如下：
-1. 将主题文件目录剪切到另一个不相干的目录中
-2. git add .
-3. git commit -m 'delete theme'
-4. git push
-# 以上几步是为了将没有主题文件目录的信息再次提交，之后推送到远程库，也就删除了远程库上的主题文件目录
-5. 将主题文件目录中的.git、.gitignore、.gitattributes三个文件删除，之后将主题文件目录再剪切回github的theme目录中
-6. git add .
-7. git commit -m 'new theme'
-8. git push
-# 再次将没有.git文件的主题推送到远程库就没有问题了。
 ```
 
 
@@ -1042,6 +1004,71 @@ git push origin :refs/tags/v1.1
 3. 忽略你自己的带有敏感信息的配置文件，比如存放口令的配置文件。
 git add -f abc.txt
 # 使用-f选项可以强制添加文件
+```
+
+
+
+### github个人博客多电脑使用
+
+```shell
+cd /home/GitHub/ruopu.github.io
+ssh-keygen -t rsa -C "ruopu19@hotmail.com"
+# -C后的是一些描述信息
+cat .ssh/id_rsa.pub
+# 将密钥复制到github上
+ssh -T git@github.com
+# 测试与github连接是否成功
+git config --global user.name "ruopu1989"
+git config --global user.email "ruopu1989@hotmail.com"
+# 自报家门
+git init
+给源文件目录初始化git，虽然目录中已有内容，但这也不会报错的
+git remote add origin https://github.com/abc/abc.github.io.git
+# 与远程的origin分支关联，最后的地址是github上项目的地址。使用git push时如果提示需要输入用户名和密码，可以删除远程地址，再试。命令：git remote remove origin。另外，这里也可以使用git@github.com:abc/abc.github.io.git地址。
+git checkout -b source
+# 创建并切换分支，使用-b选择就是为了创建并切换。这与git branch source && git checkout source两条命令的执行结果是一样的。
+git branch
+# 现在本地只有一个source分支，这也就是主分支
+git add .
+# 添加所有内容到暂存区
+git commit -m 'add source'
+# 提交
+git push origin source
+# 将本地的source分支推送到远程的origin分支上
+在github上将source设置为主分支，这样之后clone的就都是这个source分支上的内容了。
+** 上传中会有一个问题，就是theme目录中的主题文件上传后可能是灰色的，这是因为获得主题文件时就是从另一个库clone来的，所以主题文件目录中也有.git文件。如果上传了目录，解决方法如下：
+1. 将主题文件目录剪切到另一个不相干的目录中
+2. git add .
+3. git commit -m 'delete theme'
+4. git push
+# 以上几步是为了将没有主题文件目录的信息再次提交，之后推送到远程库，也就删除了远程库上的主题文件目录
+5. 将主题文件目录中的.git、.gitignore、.gitattributes三个文件删除，之后将主题文件目录再剪切回github的theme目录中
+6. git add .
+7. git commit -m 'new theme'
+8. git push
+# 再次将没有.git文件的主题推送到远程库就没有问题了。
+==============================================================================================
+推送时出现问题，原因是想将本地的文件推送到远程，但与远程有很多不同。可以使用下面命令强行推送。但本地的文件可能丢失。推送前将文件备份，推送后将丢失的文再复制到相应目录，再推送就可以了。
+git push -f origin source
+
+另外还涉及一些常用命令
+git branch
+# 查看当前分支
+git checkout master
+# 切换分支。加-b选项是创建并切换分支
+git merge source
+# 将source分支内容合并到当前分支
+git add .
+git commit -m "abc"
+git push origin source
+git diff
+git status
+git log
+git remote add origin https://github.com/abc/rab.github.io.git
+git reset --hard HEAD^
+# 回退到上一个版本
+git reflog
+# 查看提交与回退历史
 ```
 
 
