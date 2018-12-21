@@ -169,5 +169,12 @@ e1298469a665        23.74%              15.81 MiB / 976.3 MiB   1.62%           
 d8d44395f9fc        41.86%              15.81 MiB / 976.3 MiB   1.62%               1.94 kB / 648 B     0 B / 0 B           9
 6b08823bff45        47.71%              15.84 MiB / 976.3 MiB   1.62%               2.59 kB / 648 B     0 B / 0 B           9
 # CPU被分成了九份
+
+* 测试
+root@ccjd:~/jdycbintest# docker volume create jdycbin
+root@ccjd:~/jdycbintest# docker run --name jdycbin --cpus 2 -m 2048m -p 80:80 --mount source=jdycbin,target=/usr/share/nginx/html/ nginx 
+WARNING: Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap.
+# 创建容器，使用2核CPU，2G内存，暴露80端口，挂载本地数据卷
+root@ccjd:~/jdycbintest# cp Project_2G.bin /var/lib/docker/volumes/jdycbin/_data/
 ```
 
