@@ -319,6 +319,177 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/19/docker资源限制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/19/docker资源限制/" itemprop="url">
+                  docker资源限制
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-12-19 16:09:47" itemprop="dateCreated datePublished" datetime="2018-12-19T16:09:47+08:00">2018-12-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-12-21 15:27:32" itemprop="dateModified" datetime="2018-12-21T15:27:32+08:00">2018-12-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# yum install -y epel-release</span><br><span class="line">[root@test ~]# yum install -y docker</span><br><span class="line">[root@test ~]# vim /etc/docker/daemon.json</span><br><span class="line">        &#123;</span><br><span class="line">                "registry-mirrors":["http://192.168.0.130:8083"],</span><br><span class="line">                "insecure-registries":["192.168.0.130:8083","192.168.0.130:8082"],</span><br><span class="line">                "disable-legacy-registry":true</span><br><span class="line">        &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> registry-mirrors表示使用本地仓库，insecure-registries表示可以不使用https协议，<span class="built_in">disable</span>-legacy-registry定义了关闭<span class="string">"Docker v1 API"</span>，这样就不用在定义nexus3仓库的三种类型时选择启用Docker v1 API了。</span></span><br><span class="line">[root@test ~]# systemctl start docker</span><br></pre></td></tr></table></figure>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line">* 压测内存</span><br><span class="line">[root@test ~]# docker pull lorel/docker-stress-ng</span><br><span class="line">Using default tag: latest</span><br><span class="line">Trying to pull repository docker.io/lorel/docker-stress-ng ... </span><br><span class="line">latest: Pulling from docker.io/lorel/docker-stress-ng</span><br><span class="line">c52e3ed763ff: Pull complete </span><br><span class="line">a3ed95caeb02: Pull complete </span><br><span class="line">7f831269c70e: Pull complete </span><br><span class="line">Digest: sha256:c8776b750869e274b340f8e8eb9a7d8fb2472edd5b25ff5b7d55728bca681322</span><br><span class="line">Status: Downloaded newer image for docker.io/lorel/docker-stress-ng:latest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载压测镜像stress</span></span><br><span class="line">[root@test ~]# docker image ls</span><br><span class="line">REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">docker.io/lorel/docker-stress-ng   latest              1ae56ccafe55        2 years ago         8.1 MB</span><br><span class="line">[root@test ~]# docker run --name stress -it --rm lorel/docker-stress-ng --help</span><br><span class="line">stress-ng, version 0.03.11</span><br><span class="line">... ...</span><br><span class="line">Example: stress-ng --cpu 8 --io 4 --vm 2 --vm-bytes 128M --fork 4 --timeout 10s</span><br><span class="line"></span><br><span class="line">Note: Sizes can be suffixed with B,K,M,G and times with s,m,h,d,y</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看使用帮助</span></span><br><span class="line">[root@test ~]# docker run --name stress -it --rm -m 256m lorel/docker-stress-ng --vm 2</span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 2 vm</span><br><span class="line"><span class="meta">#</span><span class="bash"> -m表示给这个容器使用多少内存。--vm表示启动几个进程对内存进行压测，--vm-bytes表示每个进程可以使用的内存数，默认是256m，这里使用默认值，所以没有设置。</span></span><br><span class="line">[root@test ~]# docker top stress</span><br><span class="line">UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD</span><br><span class="line">root                2389                2375                0                   16:21               pts/1               00:00:00            /usr/bin/stress-ng --vm 2</span><br><span class="line">root                2413                2389                0                   16:21               pts/1               00:00:00            /usr/bin/stress-ng --vm 2</span><br><span class="line">root                2415                2389                0                   16:21               pts/1               00:00:00            /usr/bin/stress-ng --vm 2</span><br><span class="line">root                2440                2415                99                  16:21               pts/1               00:00:02            /usr/bin/stress-ng --vm 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打开另一终端查看容器启动的进程</span></span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">d07a7a5544ca        6.19%               255.9 MiB / 256 MiB   99.96%              648 B / 648 B       17.1 GB / 49.3 GB   5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看容器的实时使用情况，因为设置了容器可用的内存数，所以不会超过256M。</span></span><br><span class="line"></span><br><span class="line">* 压测CPU</span><br><span class="line">[root@test ~]# docker run --name stress -it --rm lorel/docker-stress-ng stress --cpu 8</span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--cpu选项设置启动8个进程，因没有其他对CPU的设置，所以容器会使用全部CPU</span></span><br><span class="line">[root@test ~]# docker top stress</span><br><span class="line">UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD</span><br><span class="line">root                2724                2709                0                   16:27               pts/1               00:00:00            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2745                2724                24                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2746                2724                25                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2747                2724                25                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2748                2724                24                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2749                2724                24                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2750                2724                25                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2751                2724                25                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2752                2724                25                  16:27               pts/1               00:00:14            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">bab5b7de1a68        2.72%               21.23 MiB / 976.3 MiB   2.18%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">bab5b7de1a68        198.59%             21.23 MiB / 976.3 MiB   2.18%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为是双核CPU，所以容器使用CPU的比例会一直接近200%。</span></span><br><span class="line"></span><br><span class="line">* 设置容器可使用的CPU核心数</span><br><span class="line">[root@test ~]# docker run --name stress -it --rm --cpus 1 lorel/docker-stress-ng stress --cpu 8 </span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--cpus限制最多使用2核，--cpu表示启用8个进程</span></span><br><span class="line">[root@test ~]# docker top stress</span><br><span class="line">UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD</span><br><span class="line">root                2854                2840                0                   16:30               pts/1               00:00:00            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2877                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2878                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2879                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2880                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2881                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2882                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2883                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2884                2854                12                  16:30               pts/1               00:00:06            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">c21d92bb4bc7        1.33%               25.54 MiB / 976.3 MiB   2.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">c21d92bb4bc7        107.44%             25.54 MiB / 976.3 MiB   2.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为限制了容器可用CPU的核心数为1，所以容器使用CPU的比例在100%</span></span><br><span class="line"></span><br><span class="line">* 限制容器在指定的CPU核心上运行</span><br><span class="line">[root@test ~]# docker run --name stress -it --rm --cpuset-cpus 0 lorel/docker-stress-ng stress --cpu 8</span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--cpuset-cpus选项让容器只能在指定的核心上运行。如果有多个核心，可以使用0,2或0-3这样的表达方式</span></span><br><span class="line">[root@test ~]# docker top stress   </span><br><span class="line">UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD</span><br><span class="line">root                2970                2956                0                   16:33               pts/1               00:00:00            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2994                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2995                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2996                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2997                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2998                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                2999                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                3000                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">root                3001                2970                12                  16:33               pts/1               00:00:13            /usr/bin/stress-ng stress --cpu 8</span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">4ebe403ca83c        2.07%               22.63 MiB / 976.3 MiB   2.32%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">4ebe403ca83c        100.61%             22.63 MiB / 976.3 MiB   2.32%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line"></span><br><span class="line">* 使用权重</span><br><span class="line">[root@test ~]# docker run --name stress -it --rm --cpu-shares 1024 lorel/docker-stress-ng stress --cpu 8         </span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--cpu-shares选项为容器指定权重</span></span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">6b08823bff45        1.57%               15.84 MiB / 976.3 MiB   1.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">6b08823bff45        194.23%             15.84 MiB / 976.3 MiB   1.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时容器会使用全部CPU，所以比例为200%</span></span><br><span class="line">[root@test ~]# docker run --name stress2 -it --rm --cpu-shares 1024 lorel/docker-stress-ng stress --cpu 8 </span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动一个容器，并分配相同的权重</span></span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">d8d44395f9fc        100.10%             15.81 MiB / 976.3 MiB   1.62%               578 B / 578 B       0 B / 0 B           9</span><br><span class="line">6b08823bff45        96.45%              15.84 MiB / 976.3 MiB   1.62%               1.23 kB / 648 B     0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到两个容器使用CPU的比例相似</span></span><br><span class="line">[root@test ~]# docker run --name stress3 -it --cpu-shares 512 lorel/docker-stress-ng stress --cpu 8 </span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动第三个容器</span></span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">e1298469a665        39.36%              15.81 MiB / 976.3 MiB   1.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">d8d44395f9fc        79.19%              15.81 MiB / 976.3 MiB   1.62%               1.3 kB / 648 B      0 B / 0 B           9</span><br><span class="line">6b08823bff45        77.88%              15.84 MiB / 976.3 MiB   1.62%               1.94 kB / 648 B     0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> CPU被分成了五份，因为是双核，所以一共是200%，一份是40%</span></span><br><span class="line">[root@test ~]# docker run --name stress4 -it --cpu-shares 2048 lorel/docker-stress-ng stress --cpu 8 </span><br><span class="line">stress-ng: info: [1] defaulting to a 86400 second run per stressor</span><br><span class="line">stress-ng: info: [1] dispatching hogs: 8 cpu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动第四个容器</span></span><br><span class="line">[root@test ~]# docker stats</span><br><span class="line">CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS</span><br><span class="line">20d81511c4ad        93.90%              15.81 MiB / 976.3 MiB   1.62%               648 B / 648 B       0 B / 0 B           9</span><br><span class="line">e1298469a665        23.74%              15.81 MiB / 976.3 MiB   1.62%               1.3 kB / 648 B      0 B / 0 B           9</span><br><span class="line">d8d44395f9fc        41.86%              15.81 MiB / 976.3 MiB   1.62%               1.94 kB / 648 B     0 B / 0 B           9</span><br><span class="line">6b08823bff45        47.71%              15.84 MiB / 976.3 MiB   1.62%               2.59 kB / 648 B     0 B / 0 B           9</span><br><span class="line"><span class="meta">#</span><span class="bash"> CPU被分成了九份</span></span><br><span class="line"></span><br><span class="line">* 测试</span><br><span class="line">root@ccjd:~/jdycbintest# docker volume create jdycbin</span><br><span class="line">root@ccjd:~/jdycbintest# docker run --name jdycbin --cpus 2 -m 2048m -p 80:80 --mount source=jdycbin,target=/usr/share/nginx/html/ nginx </span><br><span class="line">WARNING: Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建容器，使用2核CPU，2G内存，暴露80端口，挂载本地数据卷</span></span><br><span class="line">root@ccjd:~/jdycbintest# cp Project_2G.bin /var/lib/docker/volumes/jdycbin/_data/</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/18/conky简单配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1993,312 +2164,6 @@
         
           
             <h3 id="配置IP"><a href="#配置IP" class="headerlink" title="配置IP"></a>配置IP</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/network/interfaces</span><br><span class="line">    auto eno1</span><br><span class="line">    iface eno1 inet static</span><br><span class="line">    address 10.5.5.198/24</span><br><span class="line"></span><br><span class="line">    auto eno2</span><br><span class="line">    iface eno2 inet static</span><br><span class="line">    address 192.168.0.198/24</span><br><span class="line">    gateway 192.168.0.1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置网卡时，如果有两块网卡，只指定一个网关，不然重启网卡时会报错:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> RTNETLINK answers: File exists</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Failed to bring up eth2.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果两块网卡都是dhcp获得地址，就不会有报错的问题</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> auto enp7s0 // 使用的网络接口，之前查询接口是为了这里</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> iface enp7s0 inet static // enp7s0这个接口，使用静态ip设置</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> address 10.0.208.222 // 设置ip地址</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> netmask 255.255.240.0 // 设置子网掩码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> gateway 10.0.208.1 // 设置网关</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> dns-nameservers 10.0.208.1 // 设置dns服务器地址。nameserver也可以写在resolve.conf文件中</span></span><br><span class="line">/etc/init.d/networking restart</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启网卡生效</span></span><br><span class="line">ip addr flush dev eno2 &amp;&amp; /etc/init.d/networking restart</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果重启网卡不能生效，需要使用ip addr flush清除一下网卡的配置，再重启网卡就没问题了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：https://my.oschina.net/zhaomengit/blog/375360</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：https://www.jianshu.com/p/d69a95aa1ed7</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/23/docker学习七：网络/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/23/docker学习七：网络/" itemprop="url">
-                  docker学习七：网络
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-23 12:40:12" itemprop="dateCreated datePublished" datetime="2018-11-23T12:40:12+08:00">2018-11-23</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-11-27 09:37:17" itemprop="dateModified" datetime="2018-11-27T09:37:17+08:00">2018-11-27</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="网络功能介绍"><a href="#网络功能介绍" class="headerlink" title="网络功能介绍"></a>网络功能介绍</h3><blockquote>
-<p>Docker 允许通过外部访问容器或容器互联的方式来提供网络服务。</p>
-</blockquote>
-<h4 id="外部访问容器"><a href="#外部访问容器" class="headerlink" title="外部访问容器"></a>外部访问容器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker run -d -P --name web1 nginx</span><br><span class="line">e962c7424359a76bb7c185de8acd401616f1854fee9a7768596a020b214aeebf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-P选项可以随机选择一个端口映射到容器中的打开的端口</span></span><br><span class="line">root@ruopu:~# docker container ls -l</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES</span><br><span class="line">58ef89a43297        nginx               "nginx -g 'daemon of…"   About an hour ago   Up About an hour    0.0.0.0:32778-&gt;80/tcp   web1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-l选项只会显示最上面一条运行的容器的信息。可以看到，本地主机的32778端口被映射到了容器的80端口，此时访问本机的32778端口即可访问容器内的80端口</span></span><br><span class="line"></span><br><span class="line">root@ruopu:~# docker logs -f web</span><br><span class="line">192.168.0.89 - - [23/Nov/2018:04:51:29 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36" "-"</span><br><span class="line">192.168.0.89 - - [23/Nov/2018:04:51:29 +0000] "GET /favicon.ico HTTP/1.1" 404 555 "http://192.168.0.132:32778/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36" "-"</span><br><span class="line">2018/11/23 04:51:29 [error] 8#8: *1 open() "/usr/share/nginx/html/favicon.ico" failed (2: No such file or directory), client: 192.168.0.89, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "192.168.0.132:32778", referrer: "http://192.168.0.132:32778/"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令后，会监听容器的<span class="built_in">log</span>日志，如果有人访问本机的32778端口，日志就会有显示</span></span><br><span class="line"></span><br><span class="line">* 映射所有接口地址</span><br><span class="line">root@ruopu:~# docker run -d -p 5000:5000 nginx</span><br><span class="line">74a78539f3ae4befc1a272a92432f547ab0476b7a3bcf1800451be292c7ba690</span><br><span class="line">root@ruopu:~# docker container ls</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                            NAMES</span><br><span class="line">74a78539f3ae        nginx               "nginx -g 'daemon of…"   51 seconds ago      Up 51 seconds       80/tcp, 0.0.0.0:5000-&gt;5000/tcp   hungry_leakey</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-p选项，可以指定本地的某端口映射到容器中的某个端口，上面就是映射了本地的5000端口到容器的5000端口。这样定义会监听本地的所有地址。</span></span><br><span class="line"></span><br><span class="line">* 映射到指定地址的指定端口</span><br><span class="line">root@ruopu:~# docker run -d -p 127.0.0.1:6000:5000 nginx </span><br><span class="line">13221c9107420a3c71a04ae2c6d4bcba8e4ea4c6616863ab085712c38b4821d6</span><br><span class="line">root@ruopu:~# docker container ls</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES</span><br><span class="line">13221c910742        nginx               "nginx -g 'daemon of…"   5 seconds ago       Up 5 seconds        80/tcp, 127.0.0.1:6000-&gt;5000/tcp   frosty_agnesi</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将本地的回环地址的6000端口映射到容器的5000端口</span></span><br><span class="line"></span><br><span class="line">* 映射到指定地址的任意端口</span><br><span class="line">root@ruopu:~# docker run -d -p 127.0.0.1::5000 nginx</span><br><span class="line">762d1752599817dc0052080ecdb29543522a0f321bdaaee4ee2495516f92bfe2</span><br><span class="line">root@ruopu:~# docker container ls</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES</span><br><span class="line">762d17525998        nginx               "nginx -g 'daemon of…"   25 seconds ago      Up 25 seconds       80/tcp, 127.0.0.1:32768-&gt;5000/tcp   loving_borg</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将本地的任意端口映射到容器的5000端口，可以看到本地的端口用了32768</span></span><br><span class="line"></span><br><span class="line">* 映射UDP端口</span><br><span class="line">root@ruopu:~# docker run -d -p 127.0.0.1:4000:5000/udp nginx</span><br><span class="line">1258d3b29d3de4aa8cdf4cced7c2575855d04dc5c53edd6c894bd5670f336e75</span><br><span class="line">root@ruopu:~# docker container ls</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES</span><br><span class="line">1258d3b29d3d        nginx               "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        80/tcp, 127.0.0.1:4000-&gt;5000/udp    infallible_aryabhata</span><br><span class="line"></span><br><span class="line">* 查看映射端口配置</span><br><span class="line">root@ruopu:~# docker port web1 80</span><br><span class="line">0.0.0.0:32783</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用port指令可以查看容器内的端口映射到了本地的哪个地址和端口</span></span><br><span class="line">root@ruopu:~# docker inspect web1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用inspect指令可以获取容器所有的变量</span></span><br><span class="line"></span><br><span class="line">* 绑定多个端口</span><br><span class="line">root@ruopu:~# docker run -d -p 5001:5000 -p 5002:80 nginx</span><br><span class="line">85ef456480e7bcc0180a07e705a0d8d48c4f4d618ed7fffa5c7474a322dbee98</span><br><span class="line">root@ruopu:~# docker container ls -l</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                          NAMES</span><br><span class="line">85ef456480e7        nginx               "nginx -g 'daemon of…"   9 seconds ago       Up 8 seconds        0.0.0.0:5002-&gt;80/tcp, 0.0.0.0:5001-&gt;5000/tcp   affectionate_bell</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以多次使用-p选项来绑定多个端口</span></span><br></pre></td></tr></table></figure>
-<h4 id="容器互联"><a href="#容器互联" class="headerlink" title="容器互联"></a>容器互联</h4><h5 id="新建网络"><a href="#新建网络" class="headerlink" title="新建网络"></a>新建网络</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker network create -d bridge my-net</span><br><span class="line">c2bf630de56e2dc260eef74f0b9afc1e913f97fcef36d37d61025970a081c891</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-d参数指定docker网络类型，有bridge和overlay。其中overlay网络类型用于swarm mode</span></span><br></pre></td></tr></table></figure>
-<h5 id="连接容器"><a href="#连接容器" class="headerlink" title="连接容器"></a>连接容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker run -it --rm --name busybox1 --network my-net busybox sh</span><br><span class="line">Unable to find image 'busybox:latest' locally</span><br><span class="line">latest: Pulling from library/busybox</span><br><span class="line">90e01955edcd: Pull complete </span><br><span class="line">Digest: sha256:2a03a6059f21e150ae84b0973863609494aad70f0a80eaeb64bddd8d92465812</span><br><span class="line">Status: Downloaded newer image for busybox:latest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 运行一个容器连接到新建的my-net网络</span></span><br><span class="line">ruopu@ruopu:~$ docker run -it --rm --name busybox2 --network my-net busybox sh</span><br><span class="line">/ # </span><br><span class="line"><span class="meta">#</span><span class="bash"> 打开一个新终端再创建一个连接my-net网络的容器</span></span><br><span class="line">root@ruopu:~# docker container ls</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                          NAMES</span><br><span class="line">5097ae5dbbc2        busybox             "sh"                     About a minute ago   Up About a minute                                                  busybox2</span><br><span class="line">c71c2f7646a6        busybox             "sh"                     2 minutes ago        Up 2 minutes                                                       busybox1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打开一个新终端查看容器信息</span></span><br><span class="line"></span><br><span class="line">* busybox1</span><br><span class="line">/ # ping busybox2</span><br><span class="line">PING busybox2 (172.18.0.3): 56 data bytes</span><br><span class="line">64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.068 ms</span><br><span class="line">64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.074 ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在busybox1上ping busybox2，可以ping通，并可以看到busybox2的IP地址</span></span><br><span class="line"></span><br><span class="line">* busybox2</span><br><span class="line">/ # ping busybox1</span><br><span class="line">PING busybox1 (172.18.0.2): 56 data bytes</span><br><span class="line">64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.048 ms</span><br><span class="line">64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.029 ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在busybox2上ping busybox1，可以ping通，并可以看到busybox1的IP地址</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样,busybox1容器和busybox2容器建立了互联关系。</span></span><br></pre></td></tr></table></figure>
-<h5 id="Docker-Compose"><a href="#Docker-Compose" class="headerlink" title="Docker Compose"></a>Docker Compose</h5><blockquote>
-<p>如果你有多个容器之间需要互相连接，推荐使用Docker Compose</p>
-</blockquote>
-<h4 id="配置DNS"><a href="#配置DNS" class="headerlink" title="配置DNS"></a>配置DNS</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/ # mount</span><br><span class="line">...</span><br><span class="line">/dev/mapper/ubuntu--vg-ubuntu--lv on /etc/resolv.conf type ext4 (rw,relatime,data=ordered)</span><br><span class="line">/dev/mapper/ubuntu--vg-ubuntu--lv on /etc/hostname type ext4 (rw,relatime,data=ordered)</span><br><span class="line">/dev/mapper/ubuntu--vg-ubuntu--lv on /etc/hosts type ext4 (rw,relatime,data=ordered)</span><br><span class="line">...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在容器中使用mount命令可以查看到挂载信息，其中有上面三条，挂载了宿主机的三个文件到容器，当宿主机信息发生改变时，所有Docker容器的配置通过这些文件也随之改变。</span></span><br></pre></td></tr></table></figure>
-<h3 id="高级网络配置"><a href="#高级网络配置" class="headerlink" title="高级网络配置"></a>高级网络配置</h3><blockquote>
-<p>当 Docker 启动时,会自动在主机上创建一个docker0虚拟网桥,实际上是 Linux 的一个bridge,可以理解为一个软件交换机。它会在挂载到它的网口之间进行转发。<br>同时,Docker 随机分配一个本地未占用的私有网段(在 RFC1918 中定义)中的一个地址给docker0接口。比如典型的172.17.42.1,掩码为255.255.0.0。此后启动的容器内的网口也会自动分配一个同一网段(172.17.0.0/16)的地址。<br>当创建一个 Docker 容器的时候,同时会创建了一对veth pair接口(当数据包发送到一个接口时,另外一个接口也可以收到相同的数据包)。这对接口一端在容器内,即eth0;另一端在本地并被挂载到docker0网桥,名称以veth开头(例如vethAQI2QT)。通过这种方式,主机可以跟容器通信,容器之间也可以相互通信。Docker 就创建了在主机和所有容器之间一个虚拟共享网络。</p>
-</blockquote>
-<p><img src="/images/docker/dockernet1.jpg" alt=""></p>
-<h4 id="快速配置"><a href="#快速配置" class="headerlink" title="快速配置"></a>快速配置</h4><blockquote>
-<p>下面是一个跟 Docker 网络相关的命令列表。<br>其中有些命令选项只有在 Docker 服务启动的时候才能配置,而且不能马上生效。</p>
-<ul>
-<li><p>-b BRIDGE 或 –bridge=BRIDGE 指定容器挂载的网桥</p>
-</li>
-<li><p>–bip=CIDR 定制 docker0 的掩码</p>
-</li>
-<li><p>-H SOCKET… 或 –host=SOCKET… Docker 服务端接收命令的通道</p>
-</li>
-<li><p>–icc=true|false 是否支持容器之间进行通信</p>
-</li>
-<li><p>–ip-forward=true|false 请看下文容器之间的通信</p>
-</li>
-<li><p>–iptables=true|false 是否允许 Docker 添加 iptables 规则</p>
-</li>
-<li><p>–mtu=BYTES 容器网络中的 MTU</p>
-</li>
-</ul>
-<p>下面2个命令选项既可以在启动服务时指定,也可以在启动容器时指定。在 Docker 服务启动的时候指定则会成为默认值,后面执行 docker run 时可以覆盖设置的默认值。</p>
-<ul>
-<li><p>–dns=IP_ADDRESS… 使用指定的DNS服务器</p>
-</li>
-<li><p>–dns-search=DOMAIN…  指定DNS搜索域</p>
-</li>
-</ul>
-<p>最后这些选项只有在 docker run 执行时使用,因为它是针对容器的特性内容。</p>
-<ul>
-<li>-h HOSTNAME 或 –hostname=HOSTNAME 配置容器主机名</li>
-<li>–link=CONTAINER_NAME:ALIAS 添加到另一个容器的连接</li>
-<li>–net=bridge|none|container:NAME_or_ID|host 配置容器的桥接模式</li>
-<li>-p SPEC 或 –publish=SPEC 映射容器端口到宿主主机</li>
-<li>-P or –publish-all=true|false 映射容器所有端口到宿主主机</li>
-</ul>
-</blockquote>
-<h4 id="容器访问控制"><a href="#容器访问控制" class="headerlink" title="容器访问控制"></a>容器访问控制</h4><blockquote>
-<p>容器的访问控制,主要通过 Linux 上的iptables防火墙来进行管理和实现。iptables是Linux 上默认的防火墙软件,在大部分发行版中都自带。</p>
-</blockquote>
-<h5 id="容器访问外部网络"><a href="#容器访问外部网络" class="headerlink" title="容器访问外部网络"></a>容器访问外部网络</h5><blockquote>
-<p>容器要想访问外部网络,需要本地系统的转发支持。在Linux 系统中,检查转发是否打开。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">sysctl net.ipv4.ip_forward</span></span><br><span class="line">net.ipv4.ip_forward = 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果为 0,说明没有开启转发,则需要手动打开。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">sysctl -w net.ipv4.ip_forward=1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果在启动 Docker 服务的时候设定ip_forward, Docker 就会自动设定系统的--ip-forward=<span class="literal">true</span>参数为 1。</span></span><br></pre></td></tr></table></figure>
-<h5 id="容器之间访问"><a href="#容器之间访问" class="headerlink" title="容器之间访问"></a>容器之间访问</h5><blockquote>
-<p>容器之间相互访问,需要两方面的支持。</p>
-<ul>
-<li>容器的网络拓扑是否已经互联。默认情况下,所有容器都会被连接到docker0网桥上。</li>
-<li>本地系统的防火墙软件 – iptables是否允许通过。</li>
-</ul>
-</blockquote>
-<h5 id="访问所有端口"><a href="#访问所有端口" class="headerlink" title="访问所有端口"></a>访问所有端口</h5><blockquote>
-<p>当启动 Docker 服务时候,默认会添加一条转发策略到 iptables 的 FORWARD 链上。策略为通过(ACCEPT)还是禁止(DROP)取决于配置 –icc=true (缺省值)还是 –icc=false。当然,如果手动指定 –iptables=false 则不会添加iptables规则。<br>可见,默认情况下,不同容器之间是允许网络互通的。如果为了安全考虑,可以在 /etc/default/docker 文件中配置 DOCKER_OPTS=–icc=false 来禁止它。</p>
-</blockquote>
-<h5 id="访问指定端口"><a href="#访问指定端口" class="headerlink" title="访问指定端口"></a>访问指定端口</h5><blockquote>
-<p>在通过 -icc=false 关闭网络访问后,还可以通过 –link=CONTAINER_NAME:ALIAS 选项来访问容器的开放端口。</p>
-<p>例如,在启动 Docker 服务时,可以同时使用 icc=false –iptables=true 参数来关闭允许相互的网络访问,并让 Docker 可以修改系统中的 iptables 规则。<br>此时,系统中的 iptables 规则可能是类似</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo iptables -nL</span></span><br><span class="line">...</span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">target prot opt source destination</span><br><span class="line">DROP all 0.0.0.0/0</span><br><span class="line">--</span><br><span class="line">0.0.0.0/0</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>之后,启动容器( docker run )时使用 –link=CONTAINER_NAME:ALIAS 选项。Docker 会在 iptable 中为两个容器分别添加一条 ACCEPT 规则,允许相互访问开放的端口(取决于 Dockerfile 中的 EXPOSE 指令)。<br>当添加了 –link=CONTAINER_NAME:ALIAS 选项后,添加了 iptables 规则。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo iptables -nL</span></span><br><span class="line">...</span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">target prot opt source destination ACCEPT tcp -- 172.17.0.2 172.17.0.3 tcp spt:80</span><br><span class="line">ACCEPT tcp -- 172.17.0.3 172.17.0.2 tcp dpt:80</span><br><span class="line">DROP all -- 0.0.0.0/0 0.0.0.0/0</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意: –link=CONTAINER_NAME:ALIAS 中的 CONTAINER_NAME 目前必须是 Docker 分配的名字, 或使用 –name 参数指定的名字。主机名则不会被识别。</p>
-</blockquote>
-<h5 id="映射容器端口到宿主主机的实现"><a href="#映射容器端口到宿主主机的实现" class="headerlink" title="映射容器端口到宿主主机的实现"></a>映射容器端口到宿主主机的实现</h5><blockquote>
-<p>默认情况下,容器可以主动访问到外部网络的连接,但是外部网络无法访问到容器。</p>
-</blockquote>
-<h4 id="容器访问外部实现"><a href="#容器访问外部实现" class="headerlink" title="容器访问外部实现"></a>容器访问外部实现</h4><blockquote>
-<p>容器所有到外部网络的连接,源地址都会被 NAT 成本地系统的 IP 地址。这是使用 iptables 的源地址伪装操作实现的。<br>查看主机的 NAT 规则。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo iptables -t nat -nL</span></span><br><span class="line">...</span><br><span class="line">Chain POSTROUTING (policy ACCEPT)</span><br><span class="line">target			prot opt source				destination</span><br><span class="line">MASQUERADE		all	--	172.17.0.0/16		!172.17.0.0/16</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>其中,上述规则将所有源地址在 172.17.0.0/16 网段,目标地址为其他网段(外部网络)的流量动态伪装为从系统网卡发出。MASQUERADE 跟传统 SNAT 的好处是它能动态从网卡获取地址。</p>
-</blockquote>
-<h5 id="外部访问容器实现"><a href="#外部访问容器实现" class="headerlink" title="外部访问容器实现"></a>外部访问容器实现</h5><blockquote>
-<p>容器允许外部访问,可以在 docker run 时候通过 -p 或 -P    参数来启用。<br>不管用那种办法,其实也是在本地的 iptable 的 nat 表中添加相应的规则。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">* 使用 -P 时:</span><br><span class="line"><span class="meta">$</span><span class="bash"> iptables -t nat -nL</span></span><br><span class="line">...</span><br><span class="line">Chain DOCKER (2 references)</span><br><span class="line">target 			prot opt source 			destination</span><br><span class="line">DNAT 			tcp --	0.0.0.0/0			0.0.0.0/0		tcp dpt:49153 to:172.17.</span><br><span class="line">0.2:80</span><br><span class="line"></span><br><span class="line">* 使用 -p 80:80 时:</span><br><span class="line"><span class="meta">$</span><span class="bash"> iptables -t nat -nL</span></span><br><span class="line">Chain DOCKER (2 references)</span><br><span class="line">target 			prot opt source 			destination</span><br><span class="line">DNAT 			tcp -- 0.0.0.0/0			0.0.0.0/0		tcp dpt:80 to:172.17.0.2</span><br><span class="line">:80</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意:</p>
-<ul>
-<li>这里的规则映射了 0.0.0.0 ,意味着将接受主机来自所有接口的流量。用户可以通过 -p IP:host_port:container_port 或 -p IP::port 来指定允许访问容器的主机上的 IP、接口等,以制定更严格的规则。</li>
-<li>如果希望永久绑定到某个固定的 IP 地址,可以在 Docker 配置文件 /etc/docker/daemon.json 中添加如下内容。<br>{<br>“ip”: “0.0.0.0”<br>}</li>
-</ul>
-</blockquote>
-<h4 id="配置-docker0-网桥"><a href="#配置-docker0-网桥" class="headerlink" title="配置 docker0 网桥"></a>配置 docker0 网桥</h4><blockquote>
-<p>Docker 服务默认会创建一个 docker0 网桥(其上有一个 docker0 内部接口),它在内核层连通了其他的物理或虚拟网卡,这就将所有容器和本地主机都放到同一个物理网络。<br>Docker 默认指定了 docker0 接口 的 IP 地址和子网掩码,让主机和容器之间可以通过网桥相互通信,它还给出了 MTU(接口允许接收的最大传输单元),通常是 1500 Bytes,或宿主主机网络路由上支持的默认值。这些值都可以在服务启动的时候进行配置。</p>
-<ul>
-<li><p>–bip=CIDR    IP 地址加掩码格式,例如 192.168.1.5/24</p>
-</li>
-<li><p>–mtu=BYTES  覆盖默认的 Docker mtu 配置</p>
-</li>
-</ul>
-<p>也可以在配置文件中配置 DOCKER_OPTS,然后重启服务。</p>
-<p>由于目前 Docker 网桥是 Linux 网桥,用户可以使用 brctl show 来查看网桥和端口连接信息。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo brctl show</span></span><br><span class="line">bridge name 	bridge id 			STP enabled 	interfaces</span><br><span class="line">docker0 		8000.3a1d7362b4ee 	no 				veth65f9</span><br><span class="line">										vethdda6</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>*注: brctl 命令在 Debian、Ubuntu 中可以使用 sudo apt-get install bridge-utils 来安装。<br>每次创建一个新容器的时候,Docker 从可用的地址段中选择一个空闲的 IP 地址分配给容器的 eth0 端口。使用本地主机上 docker0 接口的 IP 作为所有容器的默认网关。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo docker run -i -t --rm base /bin/bash</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ip addr show eth0</span></span><br><span class="line">24: eth0: &lt;BROADCAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qle</span><br><span class="line">n 1000</span><br><span class="line">    link/ether 32:6f:e0:35:57:91 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 172.17.0.3/16 scope global eth0</span><br><span class="line">    valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 fe80::306f:e0ff:fe35:5791/64 scope link</span><br><span class="line">    valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">$</span><span class="bash"> ip route</span></span><br><span class="line">default via 172.17.42.1 dev eth0</span><br><span class="line">172.17.0.0/16 dev eth0 proto kernel scope link src 172.17.0.3</span><br></pre></td></tr></table></figure>
-<h4 id="自定义网桥"><a href="#自定义网桥" class="headerlink" title="自定义网桥"></a>自定义网桥</h4><blockquote>
-<p>除了默认的 docker0 网桥,用户也可以指定网桥来连接各个容器。<br>在启动 Docker 服务的时候,使用 -b BRIDGE 或 –bridge=BRIDGE 来指定使用的网桥。<br>如果服务已经运行,那需要先停止服务,并删除旧的网桥。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl stop docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip link <span class="built_in">set</span> dev docker0 down</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo brctl delbr docker0</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后创建一个网桥bridge0。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo brctl addbr bridge0</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip addr add 192.168.5.1/24 dev bridge0</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip link <span class="built_in">set</span> dev bridge0 up</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看确认网桥创建并启动。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ip addr show bridge0</span></span><br><span class="line">4: bridge0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state UP group default</span><br><span class="line">    link/ether 66:38:d0:0d:76:18 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.5.1/24 scope global bridge0</span><br><span class="line">		valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在 Docker 配置文件 /etc/docker/daemon.json 中添加如下内容,即可将 Docker 默认桥接到创建的网桥上。</span></span><br><span class="line">&#123;</span><br><span class="line">"bridge": "bridge0",</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>启动 Docker 服务。<br>新建一个容器,可以看到它已经桥接到了 bridge0 上。<br>可以继续用 brctl show 命令查看桥接的信息。另外,在容器中可以使用 ip addr 和 ip route 命令来查看 IP 地址配置和路由信息。</p>
-</blockquote>
-<h4 id="工具和示例"><a href="#工具和示例" class="headerlink" title="工具和示例"></a>工具和示例</h4><blockquote>
-<p>在介绍自定义网络拓扑之前,你可能会对一些外部工具和例子感兴趣:</p>
-</blockquote>
-<h5 id="pipework"><a href="#pipework" class="headerlink" title="pipework"></a>pipework</h5><blockquote>
-<p>Jérôme Petazzoni 编写了一个叫 pipework 的 shell 脚本,可以帮助用户在比较复杂的场景中完成容器的连接。</p>
-</blockquote>
-<h5 id="playground"><a href="#playground" class="headerlink" title="playground"></a>playground</h5><blockquote>
-<p>Brandon Rhodes 创建了一个提供完整的 Docker 容器网络拓扑管理的 Python库,包括路由、NAT 防火墙;以及一些提供 HTTP, SMTP, POP, IMAP, Telnet, SSH, FTP 的服务器。</p>
-</blockquote>
-<h4 id="编辑网络配置文件"><a href="#编辑网络配置文件" class="headerlink" title="编辑网络配置文件"></a>编辑网络配置文件</h4><blockquote>
-<p>Docker 1.2.0 开始支持在运行中的容器里编辑 /etc/hosts , /etc/hostname 和 /etc/resolv.conf文件。<br>但是这些修改是临时的,只在运行的容器中保留,容器终止或重启后并不会被保存下来,也不会被docker commit提交。</p>
-</blockquote>
-<h4 id="示例-创建一个点到点连接"><a href="#示例-创建一个点到点连接" class="headerlink" title="示例:创建一个点到点连接"></a>示例:创建一个点到点连接</h4><blockquote>
-<p>默认情况下,Docker 会将所有容器连接到由<br>docker0<br>提供的虚拟子网中。<br>用户有时候需要两个容器之间可以直连通信,而不用通过主机网桥进行桥接。<br>解决办法很简单:创建一对<br>接口,分别放到两个容器中,配置成点到点链路类型即<br>peer<br>可。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">* 首先启动 2 个容器:</span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -i -t --rm --net=none base /bin/bash</span></span><br><span class="line">root@1f1f4c1f931a:/#</span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run -i -t --rm --net=none base /bin/bash</span></span><br><span class="line">root@12e343489d2f:/#</span><br><span class="line"><span class="meta">#</span><span class="bash"> 找到进程号,然后创建网络命名空间的跟踪文件。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">'&#123;&#123;.State.Pid&#125;&#125;'</span> 1f1f4c1f931a</span></span><br><span class="line">2989</span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">'&#123;&#123;.State.Pid&#125;&#125;'</span> 12e343489d2f</span></span><br><span class="line">3004</span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo mkdir -p /var/run/netns</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ln -s /proc/2989/ns/net /var/run/netns/2989</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ln -s /proc/3004/ns/net /var/run/netns/3004</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一对 peer 接口,然后配置路由</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip link add A <span class="built_in">type</span> veth peer name B</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip link <span class="built_in">set</span> A netns 2989</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 2989 ip addr add 10.1.1.1/32 dev A</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 2989 ip link <span class="built_in">set</span> A up</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 2989 ip route add 10.1.1.2/32 dev A</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip link <span class="built_in">set</span> B netns 3004</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 3004 ip addr add 10.1.1.2/32 dev B</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 3004 ip link <span class="built_in">set</span> B up</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo ip netns <span class="built_in">exec</span> 3004 ip route add 10.1.1.1/32 dev B</span></span><br></pre></td></tr></table></figure>
 
           
         
