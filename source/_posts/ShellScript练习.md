@@ -54,3 +54,28 @@ vim netty.sh
         done
 ```
 
+
+
+### 备份日志
+
+```shell
+生产服务器
+ssh-keygen -t rsa -P ''
+# 生成密钥
+ssh-copy-id -i ~/.ssh/id_rsa.pub '-p 39999 ccjd@126.38.38.85'
+# 传输公钥到远程备份服务器。如果不是默认的端口，要用单引号括起远程的端口与地址，端口使用-p选项指定。
+ssh ccjd@106.38.38.85 -p 39999
+# 连接测试
+vim logbackup.sh 
+    #!/bin/bash
+    #
+    cd /usr/local/logs/
+    tar -zcf netty.log-`date -d "yesterday" +"%F"`.log.tar.gz ./netty.log-`date -d "yesterday" +"%F"`.*.log
+    # 使用date -d "yesterday" +"%F"获取昨天的日期
+    scp -P 39999 netty.log-`date -d "yesterday" +"%F"`.log.tar.gz ccjd@106.38.38.85:/home/logsbackup/ 
+    # 这里指定端口使用-P选项且要将选项放在前面。
+    rm -rf netty.log-`date -d "yesterday" +"%F"`.*.log netty.log-`date -d "yesterday" +"%F"`.log.tar.gz
+```
+
+
+

@@ -171,6 +171,7 @@ d8d44395f9fc        41.86%              15.81 MiB / 976.3 MiB   1.62%           
 # CPU被分成了九份
 
 * 测试
+# 创建一个可以下载文件的web服务器
 root@ccjd:~/jdycbintest# docker volume create jdycbin
 root@ccjd:~/jdycbintest# docker run --name jdycbin --cpus 2 -m 2048m -p 80:80 --mount source=jdycbin,target=/usr/share/nginx/html/ nginx 
 WARNING: Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap.
