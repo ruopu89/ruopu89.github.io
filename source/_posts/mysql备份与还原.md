@@ -1,7 +1,7 @@
 ---
 title: mysql备份与还原
 date: 2018-09-17 14:08:03
-tags: 备份
+tags: mysql备份
 categories: MySQL
 ---
 
