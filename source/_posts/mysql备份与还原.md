@@ -12,6 +12,7 @@ categories: MySQL
 ## mysqldump备份恢复
 
 ```shell
+备份
 vim /etc/my.cnf.d/server.cnf
     [mysqld]
     log_bin = mysql_bin
@@ -38,6 +39,13 @@ UNLOCK TABLES;
 #備份完成後立即釋放鎖
 SHOW BINARY LOGS;
 #查看二进制日志位置，只取滾動後新建的日志
+
+恢复
+DROP DATABASE jiaowu;
+# 刪除jiaowu庫
+CREATE DATABASE studb;
+mysql studb < /tmp/jiaowu.sql
+# 将数据库导入
 ```
 
 ## mysqldump命令选项
@@ -94,16 +102,19 @@ mysqldump
 13. 将最新的日志文件转为sql文件并导入，实现即时点还原。
 14. 这里全量备份不存在对应的二进制日志，因为被删除了。删除后仅剩一个二进制日志，这个日志就是增量备份的日志。之后做其他操作后又滚动过一次日志，也就是最新的日志。这个过程涉及两个日志和一个全量备份的sql文件。
 
+* 完全备份
 mysqldump -uroot -p --master-data=2 --flush-logs --all-databases --lock-all-tables > /root/alldatabases.sql
 mysql
 #建議在刪除備份前的二進制日志前先將其備份一份，可能以後有用。
 less /root/ alldatabases.sql
-PURGE BINARY LOGS TO 'mysql_bin.000011';             
-#刪除二進制文件，這是為了避免空間被佔滿，这是删除mysql_bin.000011之前的所有二进制日志
+SHOW BINARY LOGS;
+PURGE BINARY LOGS TO 'mysql_bin.000011'; 
+#purge[pə:dʒ]：清除。刪除二進制文件，這是為了避免空間被佔滿，这是删除最后的mysql_bin.000011之前的所有二进制日志
 use studb;
 SELECT * FROM tutors;
 DELETE FROM tutors WHERE Age>80;            
-#刪除一些行
+#刪除一些数据
+
 * 下面做增量備份
 mysql
 FLUSH LOGS;         
@@ -132,13 +143,13 @@ killall mysqld
 #殺死mysql進程
 cd /usr/local/mysql/            
 #到此目錄初始化mysql
-scripts/mysql_install_db --user=mysql --datadir=/mydata/data              
+scripts/mysql_install_db --user=mysql --datadir=/mydata/data         
 #初始化，这是编译安装的。如果是yum安装的可以直接启动，就会初始化
 service mysqld start        
 #啟動mysql
 mysql
 UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';
-#设置root的密码
+#设置root的密码。或执行mysql_secure_installation
 mysql -uroot -p < alldatabases.sql            
 #還原完全備份
 mysql
@@ -190,11 +201,11 @@ yum install percona-xtrabackup-24
 #阿里云建议MySQL5.6及之前的版本需要安装 Percona XtraBackup 2.3。MySQL5.7版本需要安装 Percona XtraBackup 2.4。
 #Percona XtraBackup 2.3地址：https://www.percona.com/doc/percona-xtrabackup/2.3/installation/yum_repo.html
 #Percona XtraBackup 2.4地址：https://www.percona.com/doc/percona-xtrabackup/2.4/installation/yum_repo.html
-=======================================================================================
+========================================================
 innobackupex --help
 innobackupex --user=DBUSER --password=DBUSERPASS /path/to/BACKUP-DIR/(保存位置)
 #完全備份。innobackupex是一個腳本，在裡面封裝了一些命令行工具，--user=DBUSER --password=DBUSERPASS是連接服務器要用的帳號密碼。服務器可指定，如--host=localhost，這裡被省略了，因為一般都是在本機上進行備份。/path/to/BACKUP-DIR/指要保存的位置。備份的用戶要有權限，如果要使用一個最小權限的用戶進行備份，則可基於如下命令創建此類用戶。可以創建一個專門備份的用戶，或用管理員也可以
-=======================================================================================
+========================================================
 * 授权
 mysql
 MariaDB [(none)]> CREATE USER 'bkpuser'@'localhost' IDENTIFIED BY 'centos';
@@ -205,21 +216,21 @@ MariaDB [(none)]> GRANT RELOAD,LOCK TABLES,REPLICATION CLIENT ON *.* TO 'bkpuser
 #只需要RELOAD, LOCK TABLES, REPLICATION CLIENT這三個權限就可備份了
 MariaDB [(none)]> FLUSH PRIVILEGES;
 MariaDB [(none)]> SHOW GRANTS;
-#查看当前用户的授权
+#查看当前用户的授权。grant[grɑ:nt]：授权。
 MariaDB [(none)]> SHOW GRANTS FOR bkpuser@localhost;
 #查看指定用户的授权
 * 备份
 innobackupex --user=root /backup          
-#備份數據庫，自動完成的。這裡的密碼是空，所以省略了，服務器是本機。另外，備份時需要mysql服務器是啟動狀態。備份好後在/backup下有一個以當前時間命名的目錄。使用上面的bkpuser用户备份时会提示有授权问题，也就是缺少某些权限，待解决
+#備份數據庫，backup目录是自动创建的。因为在/root/.my.cnf文件中写明了用户名和密码，所以这里的密碼是空，所以省略了，服務器是本機。另外，備份時需要mysql服務器是啟動狀態。備份好後在/backup下有一個以當前時間命名的目錄。使用上面的bkpuser用户备份时会提示有授权问题，也就是缺少某些权限，待解决
 cd /backup/2016-12-09_22-17-27           
-#目錄中的內容如下:
-#jiaowu、mysql、test、mydb等是數據庫，ibdata1是表空間文件，backup-my.cnf是服務器的配置文件， 備份好以後可以看到備份好的文件中有一個xtrabackup_binlog_info文件，這是二進制日志信息的文件，可用cat打開，裏面是備份這一刻的二進制文件名與相應的號碼。xtrabackup_binary中有在備份時使用了哪個命令進行的備份的信息，視頻中顯示的是xtrabackup 55。xtrabackup_logfile文件是data數據文件，不能用cat打開；xtrabackup_checkpoints文件裡有備份類型及從哪個邏輯版本號開始的備份，其中to_lsn指的是InnoDB的每一個數據塊InnoDB存儲引擎的數據要存儲在磁盤上，它是存儲數據塊的，每一個數據塊都有一個日志序列號，InnoDB會在內部維持着當前每一數據塊的日志序列號，如果這個塊上的數據發生了改變，這個號碼會加1,下一次可以根據這個號碼做增量備份。如果某一個塊的號碼發生了改變，可以將某一個塊備份一下。這就是可以對InnoDB存儲引擎做增量備份的原因；這裏的信息顯示從0號開始，到1637454結束，下一次就從1637454開始
-#這些備份的數據備份完以後是不能直接恢復的，因為備份的數據中有些事務可能只提交了一半，為了避免mysql啟動的修復過程，我們要對備份出來的文件做一些准備工作，然後才能恢復。准備工作包括：
+# 目錄中的內容如下:
+# jiaowu、mysql、test、mydb等是數據庫，ibdata1是表空間文件，backup-my.cnf是服務器的配置文件， 備份好以後可以看到備份好的文件中有一個xtrabackup_binlog_info文件，這是二進制日志信息的文件，可用cat打開，裏面是備份這一刻的二進制文件名與相應的號碼。xtrabackup_binary中有在備份時使用了哪個命令進行的備份的信息，視頻中顯示的是xtrabackup 55，测试时没有这个文件。xtrabackup_logfile文件是data數據文件，不能用cat打開；xtrabackup_checkpoints文件裡有備份類型及從哪個邏輯版本號開始的備份，其中to_lsn指的是InnoDB的每一個數據塊InnoDB存儲引擎的數據要存儲在磁盤上，它是存儲數據塊的，每一個數據塊都有一個日志序列號，InnoDB會在內部維持着當前每一數據塊的日志序列號，如果這個塊上的數據發生了改變，這個號碼會加1,下一次可以根據這個號碼做增量備份。如果某一個塊的號碼發生了改變，可以將某一個塊備份一下。這就是可以對InnoDB存儲引擎做增量備份的原因；這裏的信息顯示從0號開始，到1637454結束，下一次就從1637454開始
+# 這些備份的數據備份完以後是不能直接恢復的，因為備份的數據中有些事務可能只提交了一半，為了避免mysql啟動的修復過程，我們要對備份出來的文件做一些准備工作，然後才能恢復。准備工作包括：
 #    1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件
 #    2.將尚未提交的事務做回滾
 #    用--apply-log選項可完成上面的兩項
-#innobackupex --apply-log /backup/*****         
-#最後的路徑是我們備份的數據的路徑。這樣就會完成上面提到的兩項工作，不做這項工作的話恢復後mysql是啟動不了的
+# innobackupex --apply-log /backup/*****         
+# 最後的路徑是我們備份的數據的路徑。這樣就會完成上面提到的兩項工作，不做這項工作的話恢復後mysql是啟動不了的
 * 测试恢复
 mysql
 MariaDB [(none)]> use jiaowu
@@ -231,7 +242,7 @@ MariaDB [jiaowu]> FLUSH LOGS;
 cp /var/lib/mysql/mysql_bin.000003 /root
 #复制滚动前的日志到其他路径，以备数据恢复时使用
 systemctl stop mariadb
-rm -rf rm -rf /var/lib/mysql/*
+rm -rf /var/lib/mysql/*
 innobackupex --copy-back /backup/2018-09-19_11-06-30
 #恢复数据。/恢復時用--copy-back選項，這樣就可以了。這時的數據文件存儲位置（/var/lib/mysql/）一定要是空的，不然會報錯
 cd /var/lib/mysql/
@@ -310,6 +321,7 @@ MariaDB [jiaowu]> INSERT INTO tutors (Tname) VALUES ('stu00010');
 innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-04-31/
 #先要指定增量備份的保存位置/backup，--incremental-basedir是指定完全備份的保存位置，它會針對完全備份以後的數據做備份，備份後保存在/backup目錄下。這是第一次增量備份。如果是再一次增量備份時，--incremental-basedir應該指向上一次的增量備份所在的目錄；如果數據庫再次損壞且沒有數據增長，用完全和增量備份就能恢復，如果有數據增長就要再加上二進制日志才能恢復。
 mysql
+use jiaowu
 MariaDB [jiaowu]> INSERT INTO tutors (Tname) VALUES ('stu00011');
 MariaDB [jiaowu]> INSERT INTO tutors (Tname) VALUES ('stu00012');
 innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-05-33/
@@ -317,8 +329,7 @@ innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-0
 innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/
 #/如果有增量備份，這裡一定要指定--redo-only選項；2018-09-19_16-04-34是第一次完全備份；有增量備份的時候我們在實現提交的情況時，只執行redo不要執行endo。这里一定要用--apply-log选项，实现1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件；2.將尚未提交的事務做回滾。不然下面的命令是不能执行的。
 innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-05-33/
-#在准備第一次增量備份時要將完全備份寫在前面，還要將增量備份位置寫在最後，用
---incremental-dir選項。这是将第一次增量备份合并到完全备份
+#在准備第一次增量備份時要將完全備份寫在前面，還要將增量備份位置寫在最後，用--incremental-dir選項。这是将第一次增量备份合并到完全备份
 innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-06-15
 #這是第二次增量備份，還是前面寫完全備份位置，後面是第二次增量備份的位置
 #之後的還原只需要還原完全備份即可，因為此時所有的提交操作都已合並到完全備份上去了，所以在還原時兩個增量備份就用不上了

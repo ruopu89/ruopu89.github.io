@@ -126,6 +126,80 @@ Warning: Using a password on the command line interface can be insecure.
 
 
 
+#### 创建用户
+
+```shell
+方法一
+CREATE USER username@host [IDENTIFIED BY ‘password’]
+
+mysql> CREATE USER cactiuser@'%' IDENTIFIED BY 'cactiuser';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SHOW GRANTS FOR cactiuser@'%';
++----------------------------------------------------------------------------------------------------------+
+| Grants for cactiuser@%                                                                                   |
++----------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'cactiuser'@'%' IDENTIFIED BY PASSWORD '*43DD7940383044FBDE5B177730FAD3405BC6DAD7' |
++----------------------------------------------------------------------------------------------------------+
+# 查看用戶權限授權信息
+[root@test ~]# mysql -ucactiuser -p
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
++--------------------+
+mysql> CREATE DATABASE cactiuser;
+ERROR 1044 (42000): Access denied for user 'cactiuser'@'%' to database 'cactiuser'
+# 要用root用户才能创建此库或给cactiuser一个创建的权限
+
+方法二
+GRANT ALL PRIVILEGES ON db.* TO username@'%' WITH_OPTION;
+GRANT EXECUTE ON FUNCTION db.abc TO username@'%';
+with_option：
+        GRANT OPTION    
+        # 可以將自己獲得的權限給別人
+        MAX_QUERIES_PER_HOUR count             
+        # 每小時最多允許發起多少次查詢
+        MAX_UPDATES_PER_HOUR count            
+        # 每小時只允許使用幾次UPDATES
+        MAX_CONNECTIONS_PER_HOUR count 
+        # 每小時只允許發起幾個連接請求
+        MAX_USER_CONNECTIONS count            
+        # 同一帳號最多連接多少次
+
+mysql> GRANT CREATE ON cactidb.* TO 'cactiuser'@'%' WITH GRANT OPTION;
+# 給用戶cactiuser創建cactidb庫及在cactidb庫中創建表的權限；CREATE的權限是建庫、表、索引等
+
+mysql> GRANT INSERT ON cactidb.* TO 'cactiuser'@'%';
+# 給用戶插入權限，INSERT權限既可以在表級別也可以用在字段級別，這樣寫是用在表級別的，給予此類權限後要重新登陸才能生效，FLUSH PRIVILEGES;是沒有用的，因爲cactiuser沒有此權限。
+
+mysql> GRANT SELECT ON cactidb.* TO 'cactiuser'@'%';
+# 给cactiuser@%用户SELECT查询权限
+
+mysql> GRANT SELECT,INSERT,CREATE ON cactidb.* TO 'cactiuser'@'%' IDENTIFIED BY 'centos';
+# 用一个命令给上面三个权限，并设置密码
+
+mysql> SHOW GRANTS FOR 'cactiuser'@'%';
+# 查看用戶都有哪些權限
+
+mysql> GRANT ALTER ON cactidb.* TO 'cactiuser'@'%';
+# 給用戶ALTER權限，重新登陸生效
+
+mysql> REVOKE SELECT ON cactidb.* FROM 'cactiuser'@'%';
+# 取消某個權限
+
+mysql> RENAME USER cactiuser TO cactiu;
+# 給用戶重命名
+
+方法三
+INSERT INTO mysql.user
+mysql>FLUSH PRIVILEGES;            
+# 這條必須執行
+```
+
+
+
 #### 删除用户
 
 ```shell
