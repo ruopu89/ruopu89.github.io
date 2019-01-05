@@ -707,7 +707,7 @@ MariaDB [(none)]> SHOW TABLES FROM mydb;
 
 
 
-### 读写分离器
+### 读写分离器 proxysql
 
 ```shell
 # 准备一个集群，有一个master主机，地址192.168.1.14，两个从节点，地址一个192.168.1.15，一个192.168.1.13。再准备一个读写分离器，地址是192.168.1.10。请求都到192.168.1.10，写到192.168.1.14，读到192.168.1.15和192.168.1.13。以上面的主从复制为基础
@@ -1042,5 +1042,167 @@ MySQL [monitor]> select * from mysql_servers;
 +--------------+--------------+------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
 MySQL [monitor]> UPDATE mysql_servers SET hostgroup_id=0 WHERE hostname='192.168.1.13';
 # 其他库也支持运行时修改
+```
+
+
+
+### MHA
+
+```shell
+# 当主节点故障时，将从节点提升为主节点
+# 以上面四台主机为基础，在分离器上安装MHA，一台主节点，两台从节点
+
+* 主节点192.168.1.14
+[root@test ~]# vim /etc/my.cnf
+[mysqld]
+innodb_file_per_table=ON
+skip_name_resolve=ON
+server_id=1
+log-bin=master-log
+relay_log=relay-log
+[root@test ~]# systemctl start mariadb
+
+* 两个从节点192.168.1.13、192.168.1.15
+[root@test ~]# vim /etc/my.cnf
+[mysqld]
+innodb_file_per_table=ON
+skip_name_resolve=ON
+server_id=11
+log-bin=master-log
+relay_log=relay-log
+relay_log_purge=0
+read_only=ON
+[root@test ~]# systemctl start mariadb
+
+* 主节点192.168.1.14
+[root@test ~]# ssh-keygen -t rsa -P ''
+[root@test ~]# ssh-copy-id -i .ssh/id_rsa.pub root@192.168.1.10
+[root@test ~]# ssh-copy-id -i .ssh/id_rsa.pub root@192.168.1.13
+[root@test ~]# ssh-copy-id -i .ssh/id_rsa.pub root@192.168.1.14
+[root@test ~]# ssh-copy-id -i .ssh/id_rsa.pub root@192.168.1.15
+[root@test ~]# scp -p .ssh/* 192.168.1.10:/root/.ssh
+[root@test ~]# scp -p .ssh/* 192.168.1.13:/root/.ssh
+[root@test ~]# scp -p .ssh/* 192.168.1.15:/root/.ssh
+
+* 分离器192.168.1.10
+下载mha4mysql-manager-0.56.0.el6.noarch.rpm mha4mysql-node-0.56-0.el6.noarch.rpm
+[root@test ~]# yum install mha4mysql-manager-0.56-0.el6.noarch.rpm mha4mysql-node-0.56-0.el6.noarch.rpm
+[root@test ~]# scp mha4mysql-node-0.56-0.el6.noarch.rpm 192.168.1.13:/root
+[root@test ~]# scp mha4mysql-node-0.56-0.el6.noarch.rpm 192.168.1.14:/root
+[root@test ~]# scp mha4mysql-node-0.56-0.el6.noarch.rpm 192.168.1.15:/root
+
+* 三个节点192.168.1.13、192.168.1.14、192.168.1.15
+[root@test ~]# yum install -y mha4mysql-node-0.56-0.el6.noarch.rpm
+
+* 主节点192.168.1.14
+GRANT ALL ON *.* TO 'mhaadmin'@'172.16.0.%' IDENTIFIED BY 'mhapass';
+# 创建一个mha连接mysql的用户，用上面主从复制中创建的用户也可以
+FLUSH PRIVILEGES;
+
+* 分离器192.168.1.10
+[root@test ~]# mkdir /etc/masterha
+[root@test ~]# vim /etc/masterha/app1.cnf
+[server default]
+user=mhaadmin
+password=mhapass
+manager_workdir=/data/masterha/app1
+manager_log=/data/masterha/app1/manager.log
+remote_workdir=/data/masterha/app1
+ssh_user=root
+repl_user=repladmin
+# 有复制权限的用户名和密码
+repl_password=replpass
+ping_interval=1
+
+[server1]
+hostname=192.168.1.14
+candidate_master=1
+# 是否可以被选为主节点，1为可以
+[server2]
+hostname=192.168.1.15
+candidate_master=1
+
+[server3]
+hostname=192.168.1.13
+candidate_master=1
+[root@test ~]# masterha_check_ssh --conf=/etc/masterha/app1.cnf
+# 测试基于密钥认证是否可以连接主机，后面指明配置文件。如果没问题会显示OK
+[root@test ~]# masterha_check_repl --conf=/etc/masterha/app1.cnf
+# 检测主节点和从节点是否正常，这里提示从节点没有repladmin用户，如果提升为主节点会有问题。所以复制时最好看一下主节点(SHOW MASTER STATUS;)日志状态，再创建用户，之后从节点从创建用户之前的日志位置开始复制，就没问题了。
+
+* 主节点192.168.1.14
+GRANT REPLICATION CLIENT,REPLICATION SLAVE ON *.* TO 'repladmin'@'172.16.0.%' IDENTIFIED BY 'replpass';
+FLUSH PRIVILEGES;
+
+* 分离器192.168.1.10
+[root@test ~]# masterha_check_repl --conf=/etc/masterha/app1.cnf
+# 再检查就OK了。
+[root@test ~]# nohup masterha_manager --conf=/etc/masterha/app1.cnf &>> /data/masterha/app1/manager.log &
+# 启动监控，如果主节点故障就切换，切换后这个进程会关闭，需手动启动
+[root@test ~]# ps aux
+# 有perl /usr/bin/masterha_manager --conf=/etc/masterha/app1.cnf一条
+[root@test ~]# masterha_check_status --conf=/etc/masterha/app1.cnf
+app1 (pid:2793) is running(0:PING_OK), master:192.168.1.14
+# //检查集群是否有问题，提示主节点是192.168.1.14
+
+* 主节点192.168.1.14
+[root@test ~]# systemctl stop mariadb
+# 关闭mariadb服务。测试从节点是否会提升为主节点
+
+* 分离器192.168.1.10
+[root@test ~]# ps aux
+# 上面的nohup启动的masterha_manager进程没有了，完成切换这个进程就会终止。显示：
+#“[1]+  完成                  nohup masterha_manager --conf=/etc/masterha/app1.cnf &>/data/masterha/app1/manager.log”
+[root@test ~]# less /data/masterha/app1/manager.log
+# 查看日志，最后有Failover Report故障转移报告，提示主节点已改为192.168.1.15，并修改了从服务器的配置
+
+* 节点192.168.1.15
+[root@test ~]# mysqldump -uroot -x -R -E --triggers --master-data=2 --all-databases -p > alldb.sql
+# 完全备份
+[root@test ~]# scp alldb.sql 192.168.1.14:/root
+
+* 节点192.168.1.14
+[root@test ~]# rm -rf /var/lib/mysql/* 
+[root@test ~]# vim /etc/my.cnf
+[msyqld]
+innodb_file_per_table=ON
+skip_name_resolve=ON
+server_id=1
+relay_log_purge=0
+read_only=1
+log-bin=master-log
+relay_log=relay-log
+# 加入两条配置
+[root@test ~]# systemctl start mariadb
+[root@test ~]# mysql < alldb.sql
+[root@test ~]# head -30 alldb.sql
+# 查看CHANGE MASTER TO一行master-log的文件名和位置
+[root@test ~]# mysql
+# 因为是重新初始化的mariadb，所以没有密码，与主节点同步后就会有密码了
+CHANGE MASTER TO MASTER_HOST='192.168.1.15',MASTER_USER='repladmin',MASTER_PASSWORD='replpass',MASTER_LOG_FILE='master-log.000001',MASTER_LOG_POS=633;
+START SLAVE;
+# 启动线程，这样就修复好了。
+SHOW SLAVE STATUS\G
+# 查看时有报错，提示"Slave_SQL_Running:No"。解决方法如下：
+=======================================================================================
+方法一
+mysql> stop slave ;
+mysql> set GLOBAL SQL_SLAVE_SKIP_COUNTER=1;
+# 在主从库维护中，有时候需要跳过某个无法执行的命令，需要在slave处于stop状态下，执行 set global sql_slave_skip_counter=N以跳过命令。常用的且不易用错的是N=1的情况
+mysql> start slave ;
+mysql> SHOW SLAVE STATUS\G
+
+方法二
+mysql> stop slave ;
+到主服务器上查看主机状态，记录File和Position对应的值
+mysql> CHANGE MASTER TO MASTER_HOST='192.168.1.15',MASTER_USER='repladmin',MASTER_PASSWORD='replpass',MASTER_LOG_FILE='master-log.000001',MASTER_LOG_POS=633;
+mysql> start slave ;
+mysql> SHOW SLAVE STATUS\G
+=======================================================================================
+
+* 分离器192.168.1.10
+[root@test ~]# masterha_check_repl --conf=/etc/masterha/app1.cnf
+[root@test ~]# nohup masterha_manager --conf=/etc/masterha/app1.cnf &>> /data/masterha/app1/manager.log &
+# 地址转移后，这个进程就会关闭，需要手动再启动
 ```
 
