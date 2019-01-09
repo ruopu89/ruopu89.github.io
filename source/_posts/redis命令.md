@@ -629,3 +629,258 @@ repl_backlog_histlen:196
 # 在从节点上是不可以设置数据的，有错误提示
 ```
 
+
+
+### redis-sentinel
+
+```shell
+# 准备三台主机，node1：192.168.1.14，node2：192.168.1.15，node3：192.168.1.13
+
+* 三台主机
+[root@node1 ~]# vim /etc/sudoers
+	# Defaults requiretty
+# 如果有此项就注释掉
+[root@node1 ~]# vim /etc/sudoers.d/redis
+	redis ALL=(ALL) NOPASSWD:/sbin/ip,NOPASSWD:/sbin/arping
+# 这是为了让redis用户使用sudo命令时不用密码也可执行ip和arping命令。因为redis-sentinel进程是以redis身份运行的，所以执行脚本时也是redis用户，但redis用户是没有权限设置本机地址的，所以要给它权限。
+[root@node1 ~]# vim /opt/notify_mymaster.sh
+#!/bin/bash
+#
+MASTER_IP=${6}
+LOCAL_IP='192.168.1.14'
+# 设置为每台主机的本地地址
+VIP='192.168.1.10'
+# 虚拟IP地址不能变
+NETMASK='24'
+INTERFACE='ens33'
+# 本地地址所在的网卡
+if [ ${MASTER_IP} = ${LOCAL_IP} ];then
+    sudo /usr/sbin/ip addr add ${VIP}/${NETMASK} dev ${INTERFACE}
+    sudo /usr/sbin/arping -q -c 3 -A ${VIP} -I ${INTERFACE}
+    exit 0
+else
+   sudo /usr/sbin/ip addr del ${VIP}/${NETMASK} dev ${INTERFACE}
+   exit 0
+fi
+exit 1
+[root@node1 ~]# chmod  777 /opt/notify_mymaster.sh
+# 脚本一定要有执行权限，不然sentinel服务无法启动
+
+* node1
+[root@node1 ~]# /etc/redis.conf
+	bind 0.0.0.0
+[root@node1 ~]# systemctl start redis
+[root@test ~]# redis-cli
+127.0.0.1:6379> CONFIG SET requirepass redisqwer1234
+OK
+127.0.0.1:6379> CONFIG SET masterauth redisqwer1234
+OK
+127.0.0.1:6379> CONFIG REWRITE
+OK
+
+* node2&3
+[root@node1 ~]# /etc/redis.conf
+	bind 0.0.0.0
+[root@node1 ~]# systemctl start redis
+127.0.0.1:6379> slaveof 192.168.1.14 6379
+OK Already connected to specified master
+127.0.0.1:6379> CONFIG SET masterauth redisqwer1234
+OK
+127.0.0.1:6379> CONFIG SET requirepass redisqwer1234
+OK
+127.0.0.1:6379> CONFIG REWRITE
+OK
+# 这里的三个节点都应该设置masterauth和requirepass的值，requirepass的值是自己作为主节点时，别人请求要用的认证密码。masterauth是与主节点通信时要用到的认证密码。也就是说，masterauth指向的密码就是requirepass设置的密码。因为三个节点都可以做主节点，所以都要设置。如果只设置一个，那么在主节点查看从节点信息时，有可能只显示一个。可在从节点查看/var/log/redis/redis.conf日志，日志中会显示不能加入集群的信息
+
+* node1
+127.0.0.1:6379> INFO replication
+# Replication
+role:master
+connected_slaves:2
+slave0:ip=192.168.1.15,port=6379,state=online,offset=351,lag=0
+slave1:ip=192.168.1.13,port=6379,state=online,offset=351,lag=1
+master_repl_offset:351
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:2
+repl_backlog_histlen:350
+[root@node1 ~]# vim /etc/redis-sentinel.conf
+port 26379
+bind 0.0.0.0
+dir "/tmp"
+sentinel myid 8da3fbcd01dafcbb9558f1ac5b52406a3afd00de
+sentinel monitor mymaster 192.168.1.14 6379 2
+# sentinel监听主节点的地址和端口，2表示至少有几个sentinel进行选举才能通过
+sentinel down-after-milliseconds mymaster 5000
+# 多久连接不到主节点就认为它宕机了，这是主观宕机。这里默认是30秒，可改为5000
+sentinel failover-timeout mymaster 60000
+# 故障转移多久完成不了，就进行新的转移。这个时间不要太短。这里是3分钟
+sentinel parallel-syncs 1
+# 一次只给几个从节点同步。并行同步的数量
+sentinel auth-pass mymaster redisqwer1234
+# 认证mymaster的主节点的密码，建议用随机字符串。如果不写此项就无法用sentinel slaves mymaster命令查看到从节点的信息
+sentinel config-epoch mymaster 0
+sentinel client-reconfig-script mymaster /opt/notify_mymaster.sh
+# 故障转移时执行notify_mymaster.sh脚本。加入这一行，sentinel的client-reconfig-script在每次执行时会传递出7个参数，第6个就是主redis的地址，所以脚本中定义了MASTER_IP=${6}
+logfile "/var/log/redis/sentinel.log"
+supervised systemd
+sentinel leader-epoch mymaster 0
+sentinel known-slave mymaster 192.168.1.13 6379
+sentinel known-slave mymaster 192.168.1.15 6379
+sentinel current-epoch 0
+# 上面五行是启动sentinel后自动添加的
+[root@test ~]# scp /etc/redis-sentinel.conf 192.168.1.13:/etc
+[root@test ~]# scp /etc/redis-sentinel.conf 192.168.1.15:/etc
+# 将配置文件复制到另两个节点
+[root@test ~]# systemctl start redis-sentinel
+# 从主节点启动三个节点的服务
+[root@test ~]# redis-cli -h 192.168.1.14 -p 26379
+# 在主节点连接
+192.168.1.14:26379> SENTINEL master mymaster
+ 1) "name"
+ 2) "mymaster"
+ 3) "ip"
+ 4) "192.168.1.14"
+ 5) "port"
+ 6) "6379"
+ 7) "runid"
+ 8) "84336d6f7ef4fddbc8d21622fabfedd6e3354817"
+ 9) "flags"
+10) "master"
+11) "link-pending-commands"
+12) "0"
+13) "link-refcount"
+14) "1"
+15) "last-ping-sent"
+16) "0"
+17) "last-ok-ping-reply"
+18) "963"
+19) "last-ping-reply"
+20) "963"
+21) "down-after-milliseconds"
+22) "5000"
+23) "info-refresh"
+24) "3142"
+25) "role-reported"
+26) "master"
+27) "role-reported-time"
+28) "1177509"
+29) "config-epoch"
+30) "0"
+31) "num-slaves"
+32) "2"		# 可以看到从节点的数量
+33) "num-other-sentinels"
+34) "0"
+35) "quorum"
+36) "2"
+37) "failover-timeout"
+38) "60000"
+39) "parallel-syncs"
+40) "1"
+41) "client-reconfig-script"
+42) "/opt/notify_mymaster.sh"
+192.168.1.14:26379> SENTINEL slaves mymaster
+1)  1) "name"
+    2) "192.168.1.13:6379"
+    3) "ip"
+    4) "192.168.1.13"
+    5) "port"
+    6) "6379"
+    7) "runid"
+    8) "80bc33312e088d2238d455269493e1cb22e78576"
+    9) "flags"
+   10) "slave"
+   11) "link-pending-commands"
+   12) "0"
+   13) "link-refcount"
+   14) "1"
+   15) "last-ping-sent"
+   16) "0"
+   17) "last-ok-ping-reply"
+   18) "6"
+   19) "last-ping-reply"
+   20) "6"
+   21) "down-after-milliseconds"
+   22) "5000"
+   23) "info-refresh"
+   24) "5510"
+   25) "role-reported"
+   26) "slave"
+   27) "role-reported-time"
+   28) "1260331"
+   29) "master-link-down-time"
+   30) "0"
+   31) "master-link-status"
+   32) "ok"			# 这里的状态应该显示OK
+   33) "master-host"
+   34) "192.168.1.14"
+   35) "master-port"
+   36) "6379"
+   37) "slave-priority"
+   38) "100"
+   39) "slave-repl-offset"
+   40) "311944"
+2)  1) "name"
+    2) "192.168.1.15:6379"
+    3) "ip"
+    4) "192.168.1.15"
+    5) "port"
+    6) "6379"
+    7) "runid"
+    8) "524e2a7f1c021b610272b7d5a71629617279238d"
+    9) "flags"
+   10) "slave"
+   11) "link-pending-commands"
+   12) "0"
+   13) "link-refcount"
+   14) "1"
+   15) "last-ping-sent"
+   16) "0"
+   17) "last-ok-ping-reply"
+   18) "6"
+   19) "last-ping-reply"
+   20) "6"
+   21) "down-after-milliseconds"
+   22) "5000"
+   23) "info-refresh"
+   24) "5663"
+   25) "role-reported"
+   26) "slave"
+   27) "role-reported-time"
+   28) "1260331"
+   29) "master-link-down-time"
+   30) "0"
+   31) "master-link-status"
+   32) "ok"		# 这里的状态应该显示OK
+   33) "master-host"
+   34) "192.168.1.14"
+   35) "master-port"
+   36) "6379"
+   37) "slave-priority"
+   38) "100"
+   39) "slave-repl-offset"
+   40) "311805"
+   [root@test ~]# ip addr add 192.168.1.111/24 dev ens33
+   # 第一次启动需要手动配置VIP地址
+   [root@test opt]# redis-cli -p 26379
+   127.0.0.1:26379> sentinel failover mymaster
+OK
+# 这样可以切换主节点
+127.0.0.1:26379> sentinel master mymaster
+# 可以查看切换后的主节点
+# 之后可以在切换到的主节点上执行sentinel failover mymaster命令，看一下切换的结果
+   
+=======================================================================================
+配置方法：
+1. 所有节点设置同样的requirepass和masterauth，最后要写入配置文件
+2. 配置redis可以设置IP地址的权限
+3. 配置监控脚本
+4. 设置sentinel脚本，将sentinel脚本复制到所有节点
+5. 按顺序启动主节点与从节点的sentinel服务
+
+排错方法：
+按配置方法设置好并启动后，在主节点的sentinel中看不到从节点的信息。可以查看各节点的/var/log/redis/sentinel.log、/var/log/redis/redis.log、/var/log/messages三个日志文件，停止三个节点的sentinel服务，按顺序从主节点启动sentinel日志，再查看日志文件中的报错。
+=======================================================================================
+
+```
+

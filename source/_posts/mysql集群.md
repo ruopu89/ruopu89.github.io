@@ -362,6 +362,245 @@ mysql> select * from tbl1;
 
 
 
+### mysql+keeyalived
+
+```shell
+准备两台主机，node1：192.168.1.14，node2：192.168.1.15
+
+* 两台主机
+[root@test ~]# yum install -y keepalived
+
+* node1
+[root@test ~]# cp -p /etc/keepalived/keepalived.conf{,.bak}
+[root@test ~]# vim /etc/keepalived/keepalived.conf
+! Configuration File for keepalived
+
+global_defs {
+   notification_email {
+     root@localhost
+   }
+   notification_email_from keepalived@localhost
+   smtp_server 127.0.0.1
+   smtp_connect_timeout 30
+   router_id node1
+   vrrp_mcast_group4 224.1.101.120
+}
+
+vrrp_script chk_mysql_port {
+    script "/etc/keepalived/chk_mysql.sh"
+    interval 2
+    weight -5
+    fall 2
+    rise 1
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.101/24 dev ens33 label ens33:1
+    }
+
+    track_script {
+        chk_mysql_port
+    }
+}
+[root@test ~]# yum install -y mailx
+[root@test ~]# vim /etc/mail.rc
+set from=budongchan@ccgoldenet.com
+set smtp=imap.exmail.qq.com
+set smtp-auth-user=budongchan@ccgoldenet.com
+set smtp-auth-password=CCjd1rj.com
+set smtp-auth=login
+# /加入上面的内容。以便下面实现邮件报警功能
+[root@test ~]# vim /etc/keepalived/chk_mysql.sh
+#!/bin/bash
+#
+counter=$(netstat -na|grep "LISTEN"|grep "3306"|wc -l)
+if [ "${counter}" -eq 0 ]; then
+   /usr/bin/systemctl start mysqld || /usr/bin/systemctl stop keepalived && ech
+o "MysqlError" | mailx -s "MysqlError" budongchan@ccgoldenet.com
+fi
+# 设置keepalived的监控脚本
+[root@test ~]# chmod +x /etc/keepalived/chk_mysql.sh
+[root@test ~]# scp /etc/keepalived/keepalived.conf 192.168.1.15:/etc/keepalived/
+[root@test ~]# scp /etc/keepalived/chk_mysql.sh 192.168.1.15:/etc/keepalived/
+[root@test ~]# scp /etc/mail.rc 192.168.1.15:/etc/
+[root@test ~]# systemctl start keepalived
+
+* node2
+ [root@test ~]# vim /etc/keepalived/keepalived.conf 
+! Configuration File for keepalived
+
+global_defs {
+   notification_email {
+     root@localhost
+   }
+   notification_email_from keepalived@localhost
+   smtp_server 127.0.0.1
+   router_id node2
+
+vrrp_script chk_mysql_port {
+    script "/etc/keepalived/chk_mysql.sh"
+    interval 2
+    weight -5
+    fall 2 
+    rise 1 
+}   
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 51
+    priority 96
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }   
+    virtual_ipaddress {
+        192.168.1.101/24 dev ens33 label ens33:1
+    }   
+    
+    track_script {
+        chk_mysql_port
+    }   
+}
+[root@test ~]# systemctl start keepalived
+[root@test ~]# tcpdump -i ens33 -nn -vv host 224.1.101.120
+# 测试，可以看到心跳包
+
+* 两个节点
+[root@test ~]# rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+[root@test ~]# yum -y install mysql-community-server
+
+* node1
+[root@test ~]# vim /etc/my.cnf
+[client]
+default-character-set = utf8mb4
+[mysql]
+default-character-set = utf8mb4
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+symbolic-links=0
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+innodb_file_per_table=ON
+skip_name_resolve=ON
+server_id=1
+# 另一个节点server_id要改为2，如果一样，在启动后会有问题
+log-bin=master-log
+relay_log=relay-log
+auto_increment_offset=1
+# 另一节点这里要改为2，表示以双数输入
+auto_increment_increment=2
+symbolic-links=0
+sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES 
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+[root@test ~]# systemctl start mysql
+[root@test ~]# scp /etc/my.cnf 192.168.1.15:/etc
+# 启动时，/var/lib/mysql数据目录中的performance_schema目录和一些文件的属主属组可能不是mysql，需要chown -R mysql.mysql /var/lib/mysql，不然无法启动
+[root@test ~]# mysql_secure_installation
+# 设置mysql密码等信息
+[root@test ~]# mysql -uroot -p
+mysql> GRANT REPLICATION CLIENT,REPLICATION SLAVE ON *.* TO 'repluser'@'192.168.1.15' IDENTIFIED BY 'replpass';
+mysql> SHOW MASTER STATUS;
++-------------------+----------+--------------+------------------+-------------------+
+| File              | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++-------------------+----------+--------------+------------------+-------------------+
+| master-log.000003 |     2674 |              |                  |                   |
++-------------------+----------+--------------+------------------+-------------------+
+mysql> FLUSH PRIVILEGES;
+mysql> CHANGE MASTER TO MASTER_HOST='192.168.1.15',MASTER_USER='repluser',MASTER_PASSWORD='replpass',MASTER
+mysql> CHANGE MASTER TO MASTER_HOST='192.168.1.15',MASTER_USER='repluser',MASTER_PASSWORD='replpass',MASTER_PORT=3306,MASTER_LOG_FILE='master-log.000003',MASTER_LOG_POS=2436;
+
+* node2
+mysql> GRANT REPLICATION CLIENT,REPLICATION SLAVE ON *.* TO 'repluser'@'192.168.1.14' IDENTIFIED BY 'replpass'; 
+mysql> SHOW MASTER STATUS;
++-------------------+----------+--------------+------------------+-------------------+
+| File              | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++-------------------+----------+--------------+------------------+-------------------+
+| master-log.000003 |     2674 |              |                  |                   |
++-------------------+----------+--------------+------------------+-------------------+
+mysql> FLUSH PRIVILEGES;
+mysql> CHANGE MASTER TO MASTER_HOST='192.168.1.14',MASTER_USER='repluser',MASTER_PASSWORD='replpass',MASTER_PORT=3306,MASTER_LOG_FILE='master-log.000003',MASTER_LOG_POS=2758;
+# 指定MASTER_LOG_POS最好看一下，可能有变化
+mysql> SHOW SLAVE STATUS\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.1.14
+                  Master_User: repluser
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: master-log.000003
+          Read_Master_Log_Pos: 2758
+               Relay_Log_File: relay-log.000002
+                Relay_Log_Pos: 284
+        Relay_Master_Log_File: master-log.000003
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+# 在两个节点都查看一下
+
+* node1
+mysql> CREATE DATABASE mydb;
+
+* node2
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mydb               |
+# 在node1上创建的库，在node2上可以看到
+mysql> CREATE TABLE tbl1(id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,Name CHAR(30));
+# 在node2上创建表
+
+* node1
+mysql> USE mydb
+mysql> INSERT INTO tbl1(Name) VALUES ('stu1'),('stu2');
+# 在node1上可以向表中插入数据
+
+* node2
+mysql> USE mydb
+mysql> INSERT INTO tbl1(Name) VALUES ('stu1'),('stu2');
+mysql> SELECT * FROM tbl1;
++----+------+
+| id | Name |
++----+------+
+|  1 | stu1 |
+|  3 | stu2 |
+|  4 | stu1 |
+|  6 | stu2 |
++----+------+
+# 在node2上插入数据后可以看到id号是node1插入单数，node2插入双数
+
+* node1
+[root@test ~]# systemctl stop mysql
+Job for mysqld.service canceled.
+[root@test ~]# ss -tln
+State       Recv-Q Send-Q Local Address:Port               Peer Address:Port              
+LISTEN      0      128         *:26379                   *:*                  
+LISTEN      0      128         *:6379                    *:*                  
+LISTEN      0      128         *:22                      *:*                  
+LISTEN      0      100    127.0.0.1:25                      *:*                  
+LISTEN      0      128        :::22                     :::*                  
+LISTEN      0      100       ::1:25                     :::*                  
+LISTEN      0      80         :::3306
+# 可以看到，停止了mysql服务，会被重新启动
+```
+
+
+
 ### 半同步
 
 ```shell
