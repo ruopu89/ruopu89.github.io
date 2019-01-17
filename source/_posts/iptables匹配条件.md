@@ -30,17 +30,18 @@ num      pkts      bytes target     prot opt in     out     source              
 
 * 对条件取反
 [root@bogon ~]# iptables -A INPUT ! -s 10.5.5.25 -j ACCEPT
-# 使用"! -s 10.5.5.25"表示对 -s 10.5.5.25这个匹配条件取反， -s 10.5.5.25表示报文源IP地址为10.5.5.25即可满足匹配条件，使用 "!" 取反后则表示，报文源地址IP只要不为10.5.5.25即满足条件，那么，上例中规则表达的意思就是，只要发往本机的报文的源地址不是10.5.5.25，就接受报文。但10.5.5.25还是可以ping通这台主机，因为filter表的INPUT链中只有一条规则，这条规则要表达的意思就是：只要报文的源IP不是10.5.5.25，那么就接受此报文，但并不能代表，报文的源IP是10.5.5.25时，会被拒绝。因为并没有任何一条规则指明源IP是10.5.5.25时，该执行怎样的动作，所以，当来自10.5.5.25的报文经过INPUT链时，并不能匹配上例中的规则，于是，此报文就继续匹配后面的规则，因为只有一条规则，于是，此报文就会去匹配当前链的默认动作(默认策略)，因为默认策略是ACCEPT，所以10.5.5.25还可以ping通这台主机。
+# 使用"! -s 10.5.5.25"表示对 -s 10.5.5.25这个匹配条件取反， -s 10.5.5.25表示报文源IP地址为10.5.5.25即可满足匹配条件，使用 "!" 取反后则表示，报文源地址IP只要不为10.5.5.25即满足条件，那么，上例中规则表达的意思就是，只要发往本机的报文的源地址不是10.5.5.25，就接受报文。但10.5.5.25还是可以ping通这台主机，因为filter表的INPUT链中只有一条规则，这条规则要表达的意思就是：只要报文的源IP不是10.5.5.25，那么就接受此报文，但并不能代表，报文的源IP是10.5.5.25时，会被拒绝。因为并没有任何一条规则指明源IP是10.5.5.25时，该执行怎样的动作，所以，当来自10.5.5.25的报文经过INPUT链时，并不能按上例中的规则处理报文，这时报文被两条规则匹配，一是拒绝10.5.5.25的报文，一是默认允许所有报文通过的规则。于是，此报文就继续匹配后面的规则，因为只有一条规则，于是，此报文就会去匹配当前链的默认动作(默认策略)，因为默认策略是ACCEPT，所以10.5.5.25还可以ping通这台主机。
 [root@bogon ~]# iptables --line -vnxL INPUT
-Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+Chain INPUT (policy ACCEPT 287 packets, 24108 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         
 1         159    12226 ACCEPT     all  --  *      *      !10.5.5.25            0.0.0.0/0 
 
 * 指定目标地址
 [root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -d 10.5.5.22 -j DROP
+# 这条规则就可以实现上面的禁止10.5.5.249访问本机10.5.5.22
 # 使用-d选项指定目标地址。如果我们不指定任何目标地址，则目标地址默认为0.0.0.0/0，同理，如果我们不指定源地址，源地址默认为0.0.0.0/0。-d选项也可以使用"叹号"进行取反，也能够同时指定多个IP地址，使用"逗号"隔开即可。
 # 但是请注意，不管是-s选项还是-d选项，取反操作与同时指定多个IP的操作不能同时使用。
-# 当一条规则中有多个匹配条件时，这多个匹配条件之间，默认存在"与"的关系。如上面规则表示源地址与目标地址必须同时能被这两个条件匹配，才算作被当前规则匹配
+# 当一条规则中有多个匹配条件时，那么多个匹配条件之间，默认存在"与"的关系。如上面规则表示源地址与目标地址必须同时能被这两个条件匹配，才算作被当前规则匹配
 [root@bogon ~]# iptables --line -nvxL INPUT
 Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         
@@ -93,7 +94,7 @@ num      pkts      bytes target     prot opt in     out     source              
 ```shell
 * 目标端口
 [root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m tcp --dport 22 -j REJECT
-# 使用-m选项来指定扩展模块，如果想要使用--dport这个扩展匹配条件，则必须依靠某个扩折模块完成，上例中，这个扩展模块就是tcp扩展模块。 -m tcp表示使用tcp扩展模块，--dport表示tcp扩展模块中的一个扩展匹配条件，可用于匹配报文的目标端口。-p tcp与 -m tcp并不冲突，-p用于匹配报文的协议，-m 用于指定扩展模块的名称，正好，这个扩展模块也叫tcp。
+# 使用-m选项来指定扩展模块，如果想要使用--dport这个扩展匹配条件，则必须依靠某个扩折模块完成，上例中，这个扩展模块就是tcp扩展模块。 -m tcp表示使用tcp扩展模块，--dport表示tcp扩展模块中的一个扩展匹配条件，可用于匹配报文的目标端口。-p tcp与 -m tcp并不冲突，-p用于匹配报文的协议，-m 用于指定扩展模块的名称，正好这个扩展模块也叫tcp。
 # 基本匹配条件我们可以直接使用，而如果想要使用扩展匹配条件，则需要依赖一些扩展模块
 # 扩展匹配条件是可以取反的，同样是使用"!"进行取反，比如 "! --dport 22"，表示目标端口不是22的报文将会被匹配到。
 [root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport 22 -j REJECT
@@ -171,7 +172,7 @@ num      pkts      bytes target     prot opt in     out     source              
 <img src="/images/iptables/icmp.png"/>
 
 ```shell
-# 从上图可以看出，所有表示"目标不可达"的icmp报文的type码为3，而"目标不可达"又可以细分为多种情况，是网络不可达呢？还是主机不可达呢？再或者是端口不可达呢？所以，为了更加细化的区分它们，icmp对每种type又细分了对应的code，用不同的code对应具体的场景，  所以，我们可以使用type/code去匹配具体类型的ICMP报文，比如可以使用"3/1"表示主机不可达的icmp报文。
+# 从上图可以看出，所有表示"目标不可达"的icmp报文的type码为3，而"目标不可达"又可以细分为多种情况，是网络不可达呢？还是主机不可达呢？再或者是端口不可达呢？所以，为了更加细化的区分它们，icmp对每种type又细分了对应的code，用不同的code对应具体的场景，所以，我们可以使用type/code去匹配具体类型的ICMP报文，比如可以使用"3/1"表示主机不可达的icmp报文。
 # 上图中的第一行就表示ping回应报文，它的type为0，code也为0，从上图可以看出，ping回应报文属于查询类（query）的ICMP报文，从大类上分，ICMP报文还能分为查询类与错误类两大类，目标不可达类的icmp报文则属于错误类报文。
 # 而我们发出的ping请求报文对应的type为8，code为0。
 
@@ -183,6 +184,8 @@ num      pkts      bytes target     prot opt in     out     source              
 # "-m icmp"表示使用icmp扩展，因为上例中使用了"-p icmp"，所以"-m icmp"可以省略，使用"--icmp-type"选项表示根据具体的type与code去匹配对应的icmp报文，而上图中的"--icmp-type 8/0"表示icmp报文的type为8，code为0才会被匹配到，也就是只有ping请求类型的报文才能被匹配到，所以，别人对我们发起的ping请求将会被拒绝通过防火墙，而我们之所以能够ping通别人，是因为别人回应我们的报文的icmp type为0，code也为0，所以无法被上述规则匹配到，所以我们可以看到别人回应我们的信息。
 [root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type 8 -j REJECT
 # 因为type为8的类型下只有一个code为0的类型，所以我们可以省略对应的code
+[root@test ~]# iptables -I OUTPUT -p icmp --icmp-type 8 -j REJECT
+# 如果这样设置，那么我们的主机就无法ping通外部主机了，因为我们ping外部主机发出的是类型8的报文，设置在OUTPUT链上，就无法出去了。我们ping外部主机出去的是类型8进来的是类型0的报文，外部主机ping我们的主机，进来的是类型8出去的是类型0的报文。
 [root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type "echo-request" -j REJECT
 # 我们可以用icmp报文的描述名称去匹配对应类型的报文。使用 --icmp-type "echo-request"与 --icmp-type 8/0的效果完全相同
 # 名称中的"空格"需要替换为"-"，如echo request要命令中要写为echo-request
@@ -240,6 +243,7 @@ num      pkts      bytes target     prot opt in     out     source              
 	OOXX
 [root@test html]# vim /var/www/html/index1.html
 	Hello World
+[root@test ~]# systemctl start httpd
 # 下面到10.5.5.22主机访问
 [root@bogon ~]# curl 10.5.5.249
 OOXX
@@ -248,6 +252,7 @@ Hello World
 # 在249主机上安装httpd，提供两个网页，内容分别为OOXX和Hello World。此时在另一台主机可以正常访问
 [root@bogon ~]# iptables -I INPUT -m string --algo bm --string "OOXX" -j REJECT
 # 如果报文中包含"OOXX"字符，我们就拒绝报文进入本机。'-m string'表示使用string模块，'--algo bm'表示使用bm算法去匹配指定的字符串，' --string "OOXX" '则表示我们想要匹配的字符串为"OOXX"
+# 这是设置返回的信息中如果有OOXX就拒绝进入本机
 [root@bogon ~]# iptables --line -nvxL INPUT
 Chain INPUT (policy ACCEPT 51 packets, 3603 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         
@@ -262,7 +267,7 @@ Hello World
 #### time扩展模块
 
 ```shell
-# 可以通过time扩展模块，根据时间段区匹配报文，如果报文到达的时间在指定的时间范围以内，则符合匹配条件。
+# 可以通过time扩展模块，根据时间段匹配报文，如果报文到达的时间在指定的时间范围以内，则符合匹配条件。
 # --monthdays与--weekdays可以使用"!"取反，其他选项不能取反。
 
 * 指定时间
@@ -305,7 +310,7 @@ num      pkts      bytes target     prot opt in     out     source              
 # 超过两个连接就拒绝。使用"-m connlimit"指定使用connlimit扩展，使用"--connlimit-above 2"表示限制每个IP的链接数量上限为2，再配合-p tcp --dport 22，即表示限制每个客户端IP的ssh并发链接数量不能超过(above)2。
 # centos6中，我们可以对--connlimit-above选项进行取反
 [root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit ! --connlimit-above 2 -j ACCEPT
-# 每个客户端IP的ssh链接数量只要不超过两个，则允许链接。但上例的规则并不能表示：每个客户端IP的ssh链接数量超过两个则拒绝链接。因为匹配不到时要匹配默认规则，如果默认规则是ACCEPT,那么依然可以连接
+# 每个客户端IP的ssh链接数量只要不超过两个，则允许链接。但上例的规则并不能表示：每个客户端IP的ssh链接数量超过两个则拒绝链接。因为匹配不到时要匹配默认规则，如果默认规则是ACCEPT，那么依然可以连接
 # 即使我们配置了上例中的规则，也不能达到"限制"的目的，所以我们通常并不会对此选项取反，因为既然使用了此选项，我们的目的通常就是"限制"连接数量。
 # centos7中iptables为我们提供了一个新的选项，--connlimit-upto，这个选项的含义与"! --commlimit-above"的含义相同，即链接数量未达到指定的连接数量之意，所以综上所述，--connlimit-upto选项也不常用。
 
@@ -363,7 +368,7 @@ From 10.5.5.22 icmp_seq=15 Destination Port Unreachable
 # "--limit"选项就是用于指定"多长时间生成一个新令牌的"，"--limit-burst"选项就是用于指定"木桶中最多存放几个令牌的"
 
 [root@bogon ~]# iptables -I INPUT -p icmp -m limit --limit-burst 1 --limit 10/minute -j ACCEPT
-# 使用"--limit"选项时，可以选择的时间单位有多种，如：/second、/minute、/hour、/day。比如，3/second表示每秒生成3个"令牌"，30/minute表示没分钟生成30个"令牌"。
+# 使用"--limit"选项时，可以选择的时间单位有多种，如：/second、/minute、/hour、/day。比如，3/second表示每秒生成3个"令牌"，30/minute表示每分钟生成30个"令牌"。
 
 [root@bogon ~]# iptables --line -nvxL INPUT
 Chain INPUT (policy ACCEPT 174 packets, 11316 bytes)
@@ -382,7 +387,7 @@ num      pkts      bytes target     prot opt in     out     source              
 # RELATED：从字面上理解RELATED译为关系、相关的，但是这样仍然不容易理解，我们举个例子。比如FTP服务，FTP服务端会建立两个进程，一个命令进程，一个数据进程。命令进程负责服务端与客户端之间的命令传输（我们可以把这个传输过程理解成state中所谓的一个"连接"，暂称为"命令连接"）。数据进程负责服务端与客户端之间的数据传输 ( 我们把这个过程暂称为"数据连接" )。但是具体传输哪些数据，是由命令去控制的，所以，"数据连接"中的报文与"命令连接"是有"关系"的。那么，"数据连接"中的报文可能就是RELATED状态，因为这些报文与"命令连接"中的报文有关系。
 ## (注：如果想要对ftp进行连接追踪，需要单独加载对应的内核模块nf_conntrack_ftp，如果想要自动加载，可以配置/etc/sysconfig/iptables-config文件)
 # INVALID：如果一个包没有办法被识别，或者这个包没有任何状态，那么这个包的状态就是INVALID，我们可以主动屏蔽状态为INVALID的报文。
-# UNTRACKED：报文的状态为untracked时，表示报文未被追踪，当报文的状态为Untracked时通常表示无法找到相关的连接。
+# UNTRACKED：报文的状态为UNTRACKED时，表示报文未被追踪，当报文的状态为UNTRACKED时通常表示无法找到相关的连接。
 
 [root@bogon ~]# iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 [root@bogon ~]# iptables -A INPUT -j REJECT

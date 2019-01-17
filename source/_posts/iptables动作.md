@@ -21,6 +21,7 @@ categories: 防火墙
 # icmp-admin-prohibited
 # 当不设置任何值时，默认值为icmp-port-unreachable。
 
+[root@test ~]# iptables -I INPUT -p tcp -m tcp --dport 22 -j ACCEPT
 [root@localhost ~]# iptables -I INPUT -j REJECT
 # 拒绝所有主机访问本机
 [root@localhost ~]# ping 10.5.5.90
@@ -112,7 +113,7 @@ num      pkts      bytes target     prot opt in     out     source              
 18:41:22.375035 IP 10.5.5.91 > 10.5.5.90: ICMP echo request, id 14189, seq 17, length 64
 18:41:22.375090 IP 10.5.5.90 > 10.5.5.91: ICMP echo reply, id 14189, seq 17, length 64
 # 这时在主机A上抓包，用C主机ping主机A，可以看到是10.5.5.91发来的数据。在主机C上也可以看到是主机A返回的信息。在C主机上抓包也可以看到是外网主机返回的信息
-# 在A主机上不要添加到内网的路由，这样，在防火墙没有添加SNAT规则时，内外网是不能ping通的，当添加了SNAT规则后，内网主机就可以ping通外网了
+# 在A主机上不要添加到内网的路由，这样，在防火墙没有添加SNAT规则时，内网是不能ping通外网的，当添加了SNAT规则后，内网主机就可以ping通外网了
 ```
 
 ##### DNAT
@@ -157,5 +158,7 @@ num      pkts      bytes target     prot opt in     out     source              
 # 使用REDIRECT动作可以在本机上进行端口映射
 [root@localhost ~]# iptables -t nat -A PREROUTING -p tcp --dport 19000 -j REDIRECT --to-ports 22
 # 将本机的22端口映射到本机的19000端口上。REDIRECT规则只能定义在PREROUTING链或者OUTPUT链中。
+[root@template network-scripts]# ssh 192.168.1.14 -p 19000
+# 在另一台主机连接测试
 ```
 

@@ -41,7 +41,7 @@ num      pkts      bytes target     prot opt in     out     source              
 # 自定义链中已经有了一条规则，但是目前，这条规则无法匹配到任何报文，因为我们并没有在任何默认链中引用它。
 
 * 引用自定义链
-[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -j IN_WEB
+[root@bogon ~]# iptables -I INPUT -p tcp --dport 80 -j IN_WEB
 # 在INPUT链中添加了一条规则，访问本机80端口的tcp报文将会被这条规则匹配到，而上述规则中的"-j IN_WEB"表示：访问80端口的tcp报文将由自定义链"IN_WEB"中的规则进行处理。此处，我们将"动作"替换为了"自定义链"，当"-j"对应的值为一个自定义链时，就表示被当前规则匹配到的报文将交由对应的自定义链处理。当IN_WEB自定义链被INPUT链引用以后，可以发现，IN_WEB链的引用计数已经变为1，表示这条自定义链已经被引用了1次，自定义链还可以引用其他的自定义链
 [root@bogon ~]# iptables --line -nvxL
 Chain INPUT (policy ACCEPT 0 packets, 0 bytes)

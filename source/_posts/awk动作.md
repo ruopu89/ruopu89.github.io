@@ -56,7 +56,7 @@ abc 345 ssd asdf lkj;l
 [root@bogon ~]# awk '{if(NR == 1){print $1;print $2}}' test
 abc
 345
-# 如果行号是1，就打印第一列和第二列
+# 如果行号是1，就打印第一列再打印第二列
 [root@bogon ~]# awk '{if(NR == 1)print $1}' test
 abc
 # 如果if后的动作只有一个，那么也可以不写{}
@@ -162,7 +162,7 @@ postfix 系统用户
 sshd 系统用户
 openvpn 系统用户
 ruopu 普通用户
-# 使用"if...else"结构，对usertype变量进行了赋值，如果用户的UID小于1000，则对usertype变量赋值为"系统用户",否则赋值usertype变量为"普通用户"，最后打印出用户名所在的列与usertype变量的值。
+# 使用"if...else"结构，对usertype变量进行了赋值，如果用户的UID小于1000，则对usertype变量赋值为"系统用户"，否则赋值usertype变量为"普通用户"，最后打印出用户名所在的列与usertype变量的值。
 [root@bogon ~]# awk -F: '{usertype=$3<1000?"系统用户":"普通用户";print $1,usertype}' /etc/passwd
 root 系统用户
 bin 系统用户

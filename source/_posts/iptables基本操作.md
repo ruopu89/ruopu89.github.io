@@ -36,7 +36,7 @@ Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
 # 使用-v选项可以显示更多信息。字段含义如下：
 # pkts:对应规则匹配到的报文的个数。
 # bytes:对应匹配到的报文包的大小总和。
-# target:规则对应的target，往往表示规则对应的"动作"，即规则匹配成功后需要采取的措施。
+# target:规则对应的target（目标），往往表示规则对应的"动作"，即规则匹配成功后需要采取的措施。
 # prot:表示规则对应的协议，是否只针对某些协议应用此规则。
 # opt:表示规则对应的选项。
 # in:表示数据包由哪个接口(网卡)流入，我们可以设置通过哪块网卡流入的报文需要匹配当前规则。
@@ -79,9 +79,9 @@ num      pkts      bytes target     prot opt in     out     source              
 Chain INPUT (policy ACCEPT 519 packets, 33559 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         
 1         193    16212 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0
-# 有193个包被对应的规则匹配到，总计大小33359bytes。
+# 有193个包被对应的规则匹配到，总计大小16212bytes。
 [root@bogon ~]# iptables -A INPUT -s 10.5.5.249 -j ACCEPT
-# -A为append之意，表示追加一条规则到末尾，
+# -A为append之意，表示追加一条规则到末尾
 [root@bogon ~]# iptables --line -nvxL INPUT
 Chain INPUT (policy ACCEPT 86 packets, 6164 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         

@@ -80,9 +80,6 @@ abc 345 423
 [root@bogon ~]# awk '{print "diyilie:" $1,"diyilie:" $2}' test
 diyilie:abc diyilie:345
 diyilie:123 diyilie:klj
-[root@bogon ~]# awk '{print "diyilie:"$1,"diyilie:"$2}' test
-diyilie:abc diyilie:345
-diyilie:123 diyilie:klj
 [root@bogon ~]# awk '{print "diyilie:"$1,"534","diyilie:"$2}' test
 diyilie:abc 534 diyilie:345
 diyilie:123 534 diyilie:klj
@@ -92,6 +89,7 @@ abc
 [root@bogon ~]# cat test | awk '{print "$1"}'
 $1
 $1
+# 变量不能加引号
 [root@bogon ~]# cat test | awk '{print "firstF:"$1}'
 firstF:abc
 firstF:123
@@ -150,14 +148,15 @@ ccc ddd
 [root@bogon ~]# cat test1
 aaa#dfa#123#jkl;
 aiew#adkf#alkdjf#asdjfj
-[root@bogon ~]# awk -F# '{print $1,$2}' test
-abc 345 ssd asdf lkj;l 
-123 klj adf daff adeills adsfei 
+
+[root@test ~]# awk -F# '{print $1,$2}' test1
+aaa dfa
+aiew adkf
 # 指定默认分隔符为#号，对文本进行分隔
 
-[root@bogon ~]# awk -v FS='#' '{print $1,$2}' test
-abc 345 ssd asdf lkj;l 
-123 klj adf daff adeills adsfei
+[root@test ~]# awk -v FS=# '{print $1,$2}' test1   
+aaa dfa
+aiew adkf
 # 还能够通过设置内部变量的方式，指定awk的输入分隔符，awk内置变量FS可以用于指定输入分隔符，但是在使用变量时，需要使用-v选项，用于指定对应的变量
 ```
 
@@ -185,6 +184,7 @@ aiew---adkf
 [root@bogon ~]# awk '{print $1,$2}' test
 abc 345
 123 klj
+# 分开显示要使用逗号分隔两个变量
 [root@bogon ~]# awk '{print $1 $2}' test
 abc345
 123klj
@@ -201,7 +201,7 @@ abc345
 ##### 内置变量NR
 
 ```shell
-# 在awk中，只有在引用$0、$1等内置变量的值的时候才会用到"$",引用其他变量时，不管是内置变量，还是自定义变量，都不使用"$",而是直接使用变量名。
+# 在awk中，只有在引用$0、$1等内置变量的值的时候才会用到"$"，引用其他变量时，不管是内置变量，还是自定义变量，都不使用"$"，而是直接使用变量名。
 
 [root@bogon ~]# cat test
 abc 345 ssd asdf lkj;l
@@ -286,7 +286,7 @@ test1 2 aiew#adkf#alkdjf#asdjfj
 aaa test
 [root@bogon ~]# awk 'BEGIN{print "aaa",ARGV[1],ARGV[2]}' test test1
 aaa test test1
-# ARGV内置变量表示的是一个数组.数组的索引都是从0开始的，所以，ARGV[1]表示引用ARGV数组中的第二个元素的值。命令后的文件名组成了这个数组，使用ARGV调用数组中的元素值，ARGV[1]对应的值为test，ARGV[2]对应的值为test1，ARGV[0]对应的值为awk
+# ARGV内置变量表示的是一个数组。数组的索引都是从0开始的，所以，ARGV[1]表示引用ARGV数组中的第二个元素的值。命令后的文件名组成了这个数组，使用ARGV调用数组中的元素值，ARGV[1]对应的值为test，ARGV[2]对应的值为test1，ARGV[0]对应的值为awk
 [root@bogon ~]# awk 'BEGIN{print "aaa",ARGV[0]}' test
 aaa awk
 
@@ -376,6 +376,7 @@ dfj
 # %x 不带正负号的十六进制值，使用a至f表示10至15
 # %X 不带正负号的十六进制值，使用A至F表示10至15
 # %% 表示"%"本身
+
 * printf常用的转义符
 # \a 警告字符，通常为ASCII的BEL字符
 # \b 后退
@@ -392,9 +393,9 @@ dfj
 [root@bogon ~]# printf "( %s ) " 1 23 234 23423;echo ""
 ( 1 ) ( 23 ) ( 234 ) ( 23423 )
 # 为每个传入的参数添加一对"括号"，并且括号内侧需要有空格。最后的echo命令是为了换行
-[root@bogon ~]# printf "%s\t" 1 23 234 23423;echo ""
+[root@bogon ~]# printf "%s\t" 1 23 234 23423;echo
 1	23	234	23423
-# 使用"制表符"隔开每个参数
+# 使用"制表符"隔开每个参数，echo后不加引号也可以
 
 [root@bogon ~]# printf "%s %s\n" a b df ad e r
 a b
