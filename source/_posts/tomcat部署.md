@@ -717,7 +717,7 @@ server {
 
 * tomcat1 & tomcat 2
 下载commons-pool2-2.0.jar、jedis-2.7.2.jar、tomcat-redis-session-manager1.2.jar到/usr/share/java/tomcat中
-# 试过上面三个包的其他版本，tomcat启动时均有报错，用上面三个版本没有问题
+# 试过上面三个包的其他版本，tomcat启动时均有报错，用上面三个版本没有问题。可以个人百度网盘下载。参考：https://my.oschina.net/xshuai/blog/916122
 [root@test tomcat]# vim /etc/tomcat/context.xml
 <Valve className="com.orangefunction.tomcat.redissessions.RedisSessionHandlerValve" />
     <Manager className="com.orangefunction.tomcat.redissessions.RedisSessionManager"
