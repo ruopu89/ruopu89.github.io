@@ -7,15 +7,22 @@ categories: git
 
 ### git管理
 
+#### 安装配置
+
 ```shell
 yum install -y git
 # 安装
-git config --golbal user.name "Your Name"
-git config --golbal user.email "email@example.com"
+git config --global user.name "Your Name"
+git config --global user.email "email@example.com"
 # 每个机器都必须自报家门：你的名字和Email地址。
 # git config命令的--global参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，也可以对某个仓库指定不同的用户名和Email地址。
+```
 
-测试：添加文件并提交
+
+
+#### 添加文件并提交
+
+```shell
 mkdir learngit
 cd learngit
 git init
@@ -32,8 +39,13 @@ git commit -m "wrote a readme file"
          1 file changed, 2 insertions(+)
          create mode 100644 readme.txt
 # 提交，-m后面输入的是本次提交的说明，最好将说明写清楚，方便之后查看。1 file changed：1个文件被改动（我们新添加的readme.txt文件）；2 insertions(+)：插入了两行内容（readme.txt有两行内容）
+```
 
-测试：修改提交
+
+
+#### 修改提交
+
+```shell
 vim readme.txt
         git is a distributed version control system.                                                                                                                     
         git is free software
@@ -72,8 +84,13 @@ git status
         # On branch master
         nothing to commit, working directory clean
 # Git告诉我们当前没有需要提交的修改，而且，工作目录是干净（working tree clean）的。
+```
 
-测试：版本回退
+
+
+#### 版本回退
+
+```shell
 vim readme.txt
         git is a distributed version control system.
         git is free software distributed under the GPL.
@@ -108,7 +125,7 @@ git log
 # 如果嫌输出信息太多，可以试试加上--pretty=oneline参数。9976125...是commit id（版本号）。
 git reset --hard HEAD^
 		HEAD is now at 5e363b3 add distributed
-# 在Git中，用HEAD表示当前版本，也就是最新的提交8f5d63...，上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+# 在Git中，用HEAD表示当前版本，也就是最新的提交9976125...，上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
 # 使用git reset命令回退到上一个版本
 cat readme.txt 
         git is a distributed version control system.
@@ -144,10 +161,17 @@ git reflog
         5e363b3 HEAD@{4}: commit: add distributed
         8f5d632 HEAD@{5}: commit (initial): wrote a readme file
 # git reflog用来记录你的每一次提交与回退。可以看到提交append GPL的版本号是9976125，这样就算不知道版本号，也可以这样查找了。当你 (在一个仓库下) 工作时，Git 会在你每次修改了 HEAD 时悄悄地将改动记录下来。当你提交或修改分支时，reflog 就会更新。git update-ref 命令也可以更新 reflog，任何时间运行 git reflog 命令可以查看当前的状态。运行 git log -g 会输出 reflog 的正常日志，从而显示更多有用信息
+```
 
-测试：工作区与暂存区
+
+
+#### 工作区与暂存区
+
+![](/images/git/版本库.png)
+
+```shell
 ===========================================================================================
-工作区（Working Directory）：就是你在电脑里能看到的目录，比如我的learngit文件夹就是一个工作区
+工作区（Working Directory）：就是你在电脑里能看到的目录，比如我的learngit目录就是一个工作区
 版本库（Repository）：工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。
 把文件往Git版本库里添加的时候，是分两步执行的：
 第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区；
@@ -184,7 +208,12 @@ git status
         #
         #       new file:   LICENSE
         #       modified:   readme.txt
-# 提交两个文件后，查看状态，两个文件被放入了暂存区。git add命令实际上就是把要提交的所有修改放到暂存区（Stage），然后，执行git commit就可以一次性把暂存区的所有修改提交到分支
+# 添加两个文件后，查看状态，两个文件被放入了暂存区。git add命令实际上就是把要提交的所有修改放到暂存区（Stage），然后，执行git commit就可以一次性把暂存区的所有修改提交到分支
+```
+
+![](/images/git/版本库1.png)
+
+```shell
 git commit -m "understand how stage works"
         [master f21dbee] understand how stage works
          2 files changed, 2 insertions(+)
@@ -194,9 +223,16 @@ git status
         # On branch master
         nothing to commit, working directory clean
 # 将暂存区的文件提交到主分支，如果你又没有对工作区做任何修改，那么工作区就是“干净”的
-# 工作区中包含版本库，版本库中包括暂存区与分支。在工作区中修改的内容会被添加到暂存区，提交是将暂存区中的内容提交到分支
+# 工作区目录中包含版本库，版本库中包括暂存区与分支。在工作区中修改的内容会被添加到暂存区，提交是将暂存区中的内容提交到分支
+```
 
-测试：管理修改
+![](/images/git/版本库2.png)
+
+
+
+#### 管理修改
+
+```shell
 vim readme.txt
         git is a distributed version control system.
         git is free software distributed under the GPL.
@@ -242,7 +278,7 @@ git diff HEAD -- readme.txt
          git has a mutable index called stage.
         -git tracks changes.
         +git tracks changes of files.
-# 查看工作区和版本库里面最新版本的区别，-git tracks changes.是现在工作区中的内容， +git tracks changes of files.是版本库中修改后的内容。
+# 查看工作区和版本库里面最新版本的区别，-git tracks changes.是现在版本库中的内容， +git tracks changes of files.是工作区中的内容。
 # 第一次修改 -> git add -> 第二次修改 -> git add -> git commit
 git add readme.txt 
 git commit -m "add of files."     
@@ -252,8 +288,13 @@ git status
         # On branch master
         nothing to commit, working directory clean
 # 添加并提交第二次修改
+```
 
-测试：撤销修改
+
+
+#### 撤销修改
+
+```shell
 1. 修改了内容，但未放入暂存区
 vim readme.txt 
         git is a distributed version control system.
@@ -324,16 +365,21 @@ cat readme.txt
         git is free software distributed under the GPL.
         git has a mutable index called stage.
         git tracks changes of files.
-# 将工作区的内容撤销
+# 将工作区的内容撤销了
 # 提交到暂存区后，如果想撤销，就需要两步，先回退到工作区，再将工作区的修改撤销。如果只是在工作区修改了，那么只要撤销工作区的修改即可。
 
-===========================================================================================
+==============================================================================================
 场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- file。
 场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD <file>，就回到了场景1，第二步按场景1操作。
-场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，使用命令"git reset --hard HEAD^|commit id"回退到上个版本或指定版本号，不过前提是没有推送到远程库。
-===========================================================================================
+场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，使用命令"git reset --hard HEAD^ commit id"回退到上个版本或指定版本号，不过前提是没有推送到远程库。
+==============================================================================================
+```
 
-测试：删除文件
+
+
+#### 删除文件
+
+```shell
 1. 从git中删除文件
 touch test.txt
 echo "add test.txt" > test.txt
@@ -422,10 +468,13 @@ git push origin master
 
 ### 分支管理
 
-在git中，开始只有一个master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。开始master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点。每次提交，master分支都会向前移动一步，这样，随着你不断提交，master分支的线也越来越长。当我们创建新的分支，例如dev时，Git新建了一个指针叫dev，指向master相同的提交，再把HEAD指向dev，就表示当前分支在dev上。从现在开始，对工作区的修改和提交就是针对dev分支了，比如新提交一次后，dev指针往前移动一步，而master指针不变。假如我们在dev上的工作完成了，就可以把dev合并到master上。Git怎么合并呢？最简单的方法，就是直接把master指向dev的当前提交，就完成了合并。合并完分支后，甚至可以删除dev分支。删除dev分支就是把dev指针给删掉，删掉后，我们就剩下了一条master分支。
+> 在git中，开始只有一个master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。开始master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点。每次提交，master分支都会向前移动一步，这样，随着你不断提交，master分支的线也越来越长。当我们创建新的分支，例如dev时，Git新建了一个指针叫dev，指向master相同的提交，再把HEAD指向dev，就表示当前分支在dev上。从现在开始，对工作区的修改和提交就是针对dev分支了，比如新提交一次后，dev指针往前移动一步，而master指针不变。假如我们在dev上的工作完成了，就可以把dev合并到master上。Git怎么合并呢？最简单的方法，就是直接把master指向dev的当前提交，就完成了合并。合并完分支后，甚至可以删除dev分支。删除dev分支就是把dev指针给删掉，删掉后，我们就剩下了一条master分支。
+
+
+
+#### 分支创建与提交、合并
 
 ```shell
-测试：分支创建与提交、合并
 git checkout -b dev
 		Switched to a new branch 'dev'
 # git checkout命令加上-b参数表示创建并切换，相当于git branch dev && git checkout dev两条命令
@@ -462,8 +511,13 @@ git branch -d dev
 git branch
 		* master
 # 再查看，只有master分支了。
+```
 
-测试：解决冲突
+
+
+#### 解决冲突
+
+```shell
 git checkout -b featurel
 		witched to a new branch 'featurel'
 # 创建并切换分支
@@ -558,8 +612,13 @@ git branch -d featurel
 		Deleted branch featurel (was 5119ca1).
 # 删除分支
 # 当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再提交，合并完成。解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。
+```
 
-测试：bug分支
+
+
+#### Bug分支
+
+```shell
 # 软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，所以，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
 git checkout -b dev
 		Switched to a new branch 'dev'
@@ -604,7 +663,7 @@ git status
 git stash 
         Saved working directory and index state WIP on dev: c0051d2 conflict fixed
         HEAD is now at c0051d2 conflict fixed
-# 因为不想提交，所以使用stash命令把当前工作现场“储藏”起来，等以后恢复现场后继续工作
+# 因为不想提交，所以使用stash命令把当前dev分支的工作现场“储藏”起来，等以后恢复现场后继续工作
 git status 
         # On branch dev
         nothing to commit, working directory clean
@@ -641,7 +700,7 @@ git merge --no-ff -m "merged bug fix" issue
         Merge made by the 'recursive' strategy.
          readme.txt | 2 +-
          1 file changed, 1 insertion(+), 1 deletion(-)
-# 在issue分支添加并提交修改内容，之后回到master分支，并issue分支合并到master分支，--no-ff指的是强行关闭fast-forward方式，保留分支的commit历史
+# 在issue分支添加并提交修改内容，之后回到master分支，并将issue分支合并到master分支，--no-ff指的是强行关闭fast-forward方式，保留分支的commit历史
 git checkout dev 
 		Switched to branch 'dev'
 git status 
@@ -697,8 +756,13 @@ git stash drop stash@{0}
 git stash list
 # 再查看时就没有了
 # 修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+```
 
-测试：Feature分支
+
+
+#### Feature分支
+
+```shell
 # 软件开发中，总有无穷无尽的新的功能要不断添加进来。添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
 git checkout -b feature
 		Switched to a new branch 'feature'
@@ -726,8 +790,13 @@ git branch -d feature
 git branch -D feature  
 		Deleted branch feature (was f098cc4).
 # 使用-D选项强行删除分支成功。
+```
 
-测试：多人协作
+
+
+#### 多人协作
+
+```shell
 git remote
 		origin
 # 当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin
@@ -735,7 +804,7 @@ git remote
 多人协作的工作模式通常是这样：
 
 1. 首先，可以试图用git push origin <branch-name>推送自己的修改；
-2. 如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+2. 如果推送失败，则因为远程分支比你本地的内容更新，需要先用git pull试图合并；
 3. 如果合并有冲突，则解决冲突，并在本地提交；
 4. 没有冲突或者解决掉冲突后，再用git push origin <branch-name>推送就能成功！
 5. 如果git pull提示no tracking information，则说明本地分支和远程分支的链接关系没有创建，用命令git branch --set-upstream-to <branch-name> origin/<branch-name>。
@@ -890,8 +959,13 @@ git push origin dev
         To git@github.com:ruopu89/test.git
            afff0e7..59a0059  dev -> dev  
 # 修改文件后再添加、提交、推送就没问题了。
+```
 
-测试：变基
+
+
+#### 变基
+
+```shell
 git log --graph --pretty=oneline --abbrev-commit 
         *   59a0059 fix env
         |\  
@@ -994,10 +1068,12 @@ git push origin :refs/tags/v1.1
 # 从远程删除。 :refs/tags/v1.1是标签在.git目录中的路径
 ```
 
+
+
 ### 忽略特殊文件
 
 ```shell
-创建.gitignore文件可能忽略不想上传的文件，.gitignore文件不需要从头创建，可在https://github.com/github/gitignore下载。
+创建.gitignore文件可以忽略不想上传的文件，.gitignore文件不需要从头创建，可在https://github.com/github/gitignore下载。
 忽略文件的原则是：
 1. 忽略操作系统自动生成的文件，比如缩略图等；
 2. 忽略编译生成的中间文件、可执行文件等，也就是如果一个文件是通过另一个文件自动生成的，那自动生成的文件就没必要放进版本库，比如Java编译产生的.class文件；

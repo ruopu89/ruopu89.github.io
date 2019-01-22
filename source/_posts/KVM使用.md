@@ -87,7 +87,8 @@ vim ifcfg-br0
 vim ifcfg-eno16777736
     BOOTPROTO=none
     DEVICE=enp0s25
-    NM_CONTROLLED=no
+    NM_CONTROLLED=no	
+    # 此条必须配置。这是NetworkManager的参数，如果是yes，那么会实时生效，修改后无需要重启网卡立即生效。通常不使用NetworkManager管理网络
     ONBOOT=yes
     BRIDGE=br0
 systemctl restart network
@@ -100,6 +101,7 @@ qemu-img create -f qcow2 -opreallocation=metadata RHEL7.img 40G
 # 这样创建磁盘也可以，重要的是-opreallocation=metadata选项，可以预分配磁盘，硬盘空间不会立即分配出去
 10. 创建虚拟机 
 virt-install -n xp -r 1024 --vcpus 2 --disk /images/xp.img,format=qcow2,size=50 --network bridge=br0 --os-type=windows --cdrom /images/vm1/xp.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate
+
 virt-install -n centos6 -r 1024 --vcpus 2 --disk /images/centos.img,format=qcow2,size=30 --network bridge=br0 --network bridge=br1 --os-type=linux --cdrom /images/vm1/centos6.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate 
 # --accelerate表示KVM或KQEMU内核加速,这个选项是推荐最好加上。如果KVM和KQEMU都支持，KVM加速器优先使用。--vncport指定端口，--vnclisten很重要，0.0.0.0表示监听在所有端口，不指定的话会监听在本地回环地址，用vncviewer是不能连接的。另外，不能两个VNC软件同时连接虚拟机；--disk /images/centos.img,format=qcow2,size=30是一定要定义的，这与上面创建的磁盘大小没有关系，如果这里不指定磁盘大小，在安装时会显示磁盘大小是0
 ```
@@ -137,7 +139,7 @@ virsh destroy RHEL
 
 * 删除
 virsh undefine RHEL
-# 删除虚拟机，前提条件是这个虚拟机没有快照文件，如果有就不要先删除快照再删除虚拟机。该命令只是删除RHEL虚拟机的配置文件，并不删除虚拟磁盘文件。
+# 删除虚拟机，前提条件是这个虚拟机没有快照文件，如果有就要先删除快照再删除虚拟机。该命令只是删除RHEL虚拟机的配置文件，并不删除虚拟磁盘文件。
 
 * 挂起服务器
 virsh suspend RHEL
@@ -221,7 +223,7 @@ Interface attached successfully
 
 ```shell
 virt-clone -o C7 -n C7-1 -f /data/c7_1.img -f /data/c7_2.img
-# C7是现有的域名(虚拟机名)，C7-1是要创建的域名，c7_1.img是要创建的镜像文件，这里不需要事先创建虚拟磁盘。这条命令是说将C7域克隆一个叫C7-1的域，创建的镜像文件在/data目录下，叫c7_1.img。克隆时要关闭虚拟机。如果有多个磁盘，要用多个-f选项指定
+# C7是现有的域名(虚拟机名)，C7-1是要创建的域名，c7_1.img是要创建的镜像文件，这里不需要事先创建虚拟磁盘。这条命令是说将C7域克隆一个叫C7-1的域，创建的镜像文件在/data目录下，叫c7_1.img。克隆时要关闭虚拟机。如果有多个磁盘，要用多个-f选项指定。这里不需要指定原来的*.img镜像文件
 # 克隆的问题是都会使用同样的VNC端口，这样就不能将所有克隆虚拟机都启动，需要使用"virsh edit 虚拟机名"，打开虚拟机的配置文件，找到VNC的端口号并修改。之后保存退出才能启动。
 ```
 
@@ -235,7 +237,7 @@ virsh snapshot-create C7
 # 创建域名叫C7的快照；快照配置文件在/var/lib/libvirt/qemu/snapshot/虚拟机名称/下
 virsh snapshot-list C7
 # 查看C7域的快照
-virsh snapshot-current
+virsh snapshot-current C7
 # 查看当前虚拟机镜像快照的版本
 
 * 恢复虚拟机快照
@@ -262,7 +264,7 @@ virsh snapshot-delete winxp 1515577720
 cd /etc/libvirt/qemu/
 # 到虚拟机配置文件目录
 virsh dumpxml Ytest > openvpn.xml
-# 导出配置文件，叫openvpn.xml
+# 导出Ytest虚拟机的配置文件，叫openvpn.xml
 virsh snapshot-delete Ytest 1540542652
 # 先删除之前的虚拟机快照，如果不删除快照是不能删除虚拟机的
 virsh undefine Ytest

@@ -15,6 +15,46 @@ categories: zookeeper&kafka
 
 ### 概念
 
+#### 消息队列（Message Queue）
+
+> * 消息 Message
+>   网络中的两台计算机或者两个通讯设备之间传递的数据。例如说：文本、音乐、视频等内容。
+> * 队列 Queue
+>   一种特殊的线性表（数据元素首尾相接），特殊之处在于只允许在首部删除元素和在尾部追加元素。入队、出队。
+> * 消息队列 MQ
+>   消息+队列，保存消息的队列。消息的传输过程中的容器；主要提供生产、消费接口供外部调用做数据的存储和获取。
+
+
+
+#### MQ分类
+
+> MQ主要分为两类：点对点(p2p)、发布订阅(Pub/Sub)
+>
+> * 共同点：
+>   消息生产者生产消息发送到queue中，然后消息消费者从queue中读取并且消费消息。
+>
+> * 不同点：
+>   p2p模型包括：消息队列(Queue)、发送者(Sender)、接收者(Receiver)
+>   一个生产者生产的消息只有一个消费者(Consumer)(即一旦被消费，消息就不在消息队列中)。比如说打电话。
+>
+>   Pub/Sub包含：消息队列(Queue)、主题(Topic)、发布者(Publisher)、订阅者(Subscriber)
+>   每个消息可以有多个消费者，彼此互不影响。比如我发布一个微博：关注我的人都能够看到。
+>   那么在大数据领域呢，为了满足日益增长的数据量，也有一款可以满足百万级别消息的生成和消费，分布式、持久稳定的产品——Kafka。
+
+
+
+#### Kafka组件
+
+> * Topic：主题，Kafka处理的消息的不同分类。
+> * Broker：消息代理，Kafka集群中的一个kafka服务节点称为一个broker，主要存储消息数据。存在硬盘中。每个topic都是有分区的。
+> * Partition：Topic物理上的分组，一个topic在broker中被分为1个或者多个partition，分区在创建topic的时候指定。
+> * Message：消息，是通信的基本单位，每个消息都属于一个partition
+> * Producer：消息和数据的生产者，向Kafka的一个topic发布消息。
+> * Consumer：消息和数据的消费者，定于topic并处理其发布的消息。
+> * Zookeeper：协调kafka的正常运行。
+
+
+
 #### **Topics/logs** 
 
 >  一个Topic可以认为是一类消息，每个topic将被分成多个partition(分区)，每个partition在存储层面是append log文件。任何发布到此partition的消息都会被直接追加到log文件的尾部，每条消息在文件中的位置称为offset（偏移量），offset为一个long型数字，它唯一的标记一条消息。kafka并没有提供其他额外的索引机制来存储offset，因为在kafka中几乎不允许对消息进行“随机读写”。
@@ -31,7 +71,7 @@ categories: zookeeper&kafka
 
 
 
-### Distribution
+#### Distribution
 
 >  一个Topic的多个partitions，被分布在kafka集群中的多个server上；每个server(kafka实例)负责partitions中消息的读写操作；此外kafka还可以配置partitions需要备份的个数(replicas)，每个partition将会被备份到多台机器上，以提高可用性。
 >
