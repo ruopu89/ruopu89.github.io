@@ -147,7 +147,7 @@
 <meta property="og:image" content="http://yoursite.com/images/kafka/消费者.png">
 <meta property="og:image" content="http://yoursite.com/images/kafka/日志.png">
 <meta property="og:image" content="http://yoursite.com/images/kafka/分配.png">
-<meta property="og:updated_time" content="2019-01-21T01:07:11.820Z">
+<meta property="og:updated_time" content="2019-01-22T02:06:32.896Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka概念">
 <meta name="twitter:description" content="介紹  Kafka is a distributed，partitioned，replicated commit logservice。它提供了类似于JMS的特性，但是在设计实现上完全不同，此外它并不是JMS规范的实现。kafka对消息保存时根据Topic进行归类，发送消息者稱为Producer，消息接受者稱为Consumer，此外kafka集群由多个kafka实例组成，每个实例(server)稱">
@@ -371,12 +371,24 @@
                 
               
 
-              <time title="創建時間：2019-01-21 08:49:36 / 修改時間：09:07:11" itemprop="dateCreated datePublished" datetime="2019-01-21T08:49:36+08:00">2019-01-21</time>
+              <time title="創建時間：2019-01-21 08:49:36" itemprop="dateCreated datePublished" datetime="2019-01-21T08:49:36+08:00">2019-01-21</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-22 10:06:32" itemprop="dateModified" datetime="2019-01-22T10:06:32+08:00">2019-01-22</time>
               
             
           </span>
@@ -431,7 +443,35 @@
 <p> Kafka is a distributed，partitioned，replicated commit logservice。它提供了类似于JMS的特性，但是在设计实现上完全不同，此外它并不是JMS规范的实现。kafka对消息保存时根据Topic进行归类，发送消息者稱为Producer，消息接受者稱为Consumer，此外kafka集群由多个kafka实例组成，每个实例(server)稱为broker。无论是kafka集群，还是producer和consumer都依赖于zookeeper来保证系统可用性，zookeeper集群保存一些meta(元數據)信息。</p>
 </blockquote>
 <p><img src="/images/kafka/介绍.png" alt=""></p>
-<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="Topics-logs"><a href="#Topics-logs" class="headerlink" title="Topics/logs"></a><strong>Topics/logs</strong></h4><blockquote>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="消息队列（Message-Queue）"><a href="#消息队列（Message-Queue）" class="headerlink" title="消息队列（Message Queue）"></a>消息队列（Message Queue）</h4><blockquote>
+<ul>
+<li>消息 Message<br>网络中的两台计算机或者两个通讯设备之间传递的数据。例如说：文本、音乐、视频等内容。</li>
+<li>队列 Queue<br>一种特殊的线性表（数据元素首尾相接），特殊之处在于只允许在首部删除元素和在尾部追加元素。入队、出队。</li>
+<li>消息队列 MQ<br>消息+队列，保存消息的队列。消息的传输过程中的容器；主要提供生产、消费接口供外部调用做数据的存储和获取。</li>
+</ul>
+</blockquote>
+<h4 id="MQ分类"><a href="#MQ分类" class="headerlink" title="MQ分类"></a>MQ分类</h4><blockquote>
+<p>MQ主要分为两类：点对点(p2p)、发布订阅(Pub/Sub)</p>
+<ul>
+<li><p>共同点：<br>消息生产者生产消息发送到queue中，然后消息消费者从queue中读取并且消费消息。</p>
+</li>
+<li><p>不同点：<br>p2p模型包括：消息队列(Queue)、发送者(Sender)、接收者(Receiver)<br>一个生产者生产的消息只有一个消费者(Consumer)(即一旦被消费，消息就不在消息队列中)。比如说打电话。</p>
+<p>Pub/Sub包含：消息队列(Queue)、主题(Topic)、发布者(Publisher)、订阅者(Subscriber)<br>每个消息可以有多个消费者，彼此互不影响。比如我发布一个微博：关注我的人都能够看到。<br>那么在大数据领域呢，为了满足日益增长的数据量，也有一款可以满足百万级别消息的生成和消费，分布式、持久稳定的产品——Kafka。</p>
+</li>
+</ul>
+</blockquote>
+<h4 id="Kafka组件"><a href="#Kafka组件" class="headerlink" title="Kafka组件"></a>Kafka组件</h4><blockquote>
+<ul>
+<li>Topic：主题，Kafka处理的消息的不同分类。</li>
+<li>Broker：消息代理，Kafka集群中的一个kafka服务节点称为一个broker，主要存储消息数据。存在硬盘中。每个topic都是有分区的。</li>
+<li>Partition：Topic物理上的分组，一个topic在broker中被分为1个或者多个partition，分区在创建topic的时候指定。</li>
+<li>Message：消息，是通信的基本单位，每个消息都属于一个partition</li>
+<li>Producer：消息和数据的生产者，向Kafka的一个topic发布消息。</li>
+<li>Consumer：消息和数据的消费者，定于topic并处理其发布的消息。</li>
+<li>Zookeeper：协调kafka的正常运行。</li>
+</ul>
+</blockquote>
+<h4 id="Topics-logs"><a href="#Topics-logs" class="headerlink" title="Topics/logs"></a><strong>Topics/logs</strong></h4><blockquote>
 <p> 一个Topic可以认为是一类消息，每个topic将被分成多个partition(分区)，每个partition在存储层面是append log文件。任何发布到此partition的消息都会被直接追加到log文件的尾部，每条消息在文件中的位置称为offset（偏移量），offset为一个long型数字，它唯一的标记一条消息。kafka并没有提供其他额外的索引机制来存储offset，因为在kafka中几乎不允许对消息进行“随机读写”。</p>
 </blockquote>
 <p><img src="/images/kafka/topics_logs.png" alt=""></p>
@@ -441,7 +481,7 @@
 <p>kafka集群几乎不需要维护任何consumer和producer状态信息，这些信息由zookeeper保存；因此producer和consumer的客户端实现非常轻量级，它们可以随意离开，而不会对集群造成额外的影响。</p>
 <p>partitions的设计目的有多个。最根本原因是kafka基于文件存储。通过分区，可以将日志内容分散到多个server上，来避免文件尺寸达到单机磁盘的上限，每个partiton都会被当前server(kafka实例)保存；可以将一个topic切分為任意多个partitions，来提高消息保存/消费的效率。此外越多的partitions意味着可以容纳更多的consumer，有效提升并发消费的能力。</p>
 </blockquote>
-<h3 id="Distribution"><a href="#Distribution" class="headerlink" title="Distribution"></a>Distribution</h3><blockquote>
+<h4 id="Distribution"><a href="#Distribution" class="headerlink" title="Distribution"></a>Distribution</h4><blockquote>
 <p> 一个Topic的多个partitions，被分布在kafka集群中的多个server上；每个server(kafka实例)负责partitions中消息的读写操作；此外kafka还可以配置partitions需要备份的个数(replicas)，每个partition将会被备份到多台机器上，以提高可用性。</p>
 <p> 基于replicated方案，那么就意味着需要对多个备份进行调度；每个partition都有一个server为”leader”；leader负责所有的读写操作，如果leader失效，那么将会有其他follower来接管(成为新的leader)；follower只是单调的和leader跟进，同步消息即可。由此可见作为leader的server承载了全部的请求压力，因此从集群的整体考虑，有多少个partitions就意味着有多少个”leader”，kafka会将”leader”均衡的分散在每个实例上，来确保整体的性能稳定。</p>
 <ul>
@@ -596,6 +636,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/01/21/zookeeper-kafka部署/" rel="prev" title="zookeeper&kafka部署">
+                zookeeper&kafka部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -664,7 +708,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">79</span>
+                    <span class="site-state-item-count">80</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -848,7 +892,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">58</span>
+                      
+                    
+                    <span class="site-state-item-count">59</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
@@ -884,7 +930,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介紹"><span class="nav-number">1.</span> <span class="nav-text">介紹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Topics-logs"><span class="nav-number">2.1.</span> <span class="nav-text">Topics/logs</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Distribution"><span class="nav-number">3.</span> <span class="nav-text">Distribution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用场景"><span class="nav-number">4.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设计原理"><span class="nav-number">5.</span> <span class="nav-text">设计原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#持久性"><span class="nav-number">5.1.</span> <span class="nav-text">持久性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#性能"><span class="nav-number">5.2.</span> <span class="nav-text">性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生產者"><span class="nav-number">5.3.</span> <span class="nav-text">生產者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消費者"><span class="nav-number">5.4.</span> <span class="nav-text">消費者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息傳送機制"><span class="nav-number">5.5.</span> <span class="nav-text">消息傳送機制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#複製備份"><span class="nav-number">5.6.</span> <span class="nav-text">複製備份</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#日誌"><span class="nav-number">5.7.</span> <span class="nav-text">日誌</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分配"><span class="nav-number">5.8.</span> <span class="nav-text">分配</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介紹"><span class="nav-number">1.</span> <span class="nav-text">介紹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#消息队列（Message-Queue）"><span class="nav-number">2.1.</span> <span class="nav-text">消息队列（Message Queue）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MQ分类"><span class="nav-number">2.2.</span> <span class="nav-text">MQ分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Kafka组件"><span class="nav-number">2.3.</span> <span class="nav-text">Kafka组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Topics-logs"><span class="nav-number">2.4.</span> <span class="nav-text">Topics/logs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Distribution"><span class="nav-number">2.5.</span> <span class="nav-text">Distribution</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用场景"><span class="nav-number">3.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设计原理"><span class="nav-number">4.</span> <span class="nav-text">设计原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#持久性"><span class="nav-number">4.1.</span> <span class="nav-text">持久性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#性能"><span class="nav-number">4.2.</span> <span class="nav-text">性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生產者"><span class="nav-number">4.3.</span> <span class="nav-text">生產者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消費者"><span class="nav-number">4.4.</span> <span class="nav-text">消費者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息傳送機制"><span class="nav-number">4.5.</span> <span class="nav-text">消息傳送機制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#複製備份"><span class="nav-number">4.6.</span> <span class="nav-text">複製備份</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#日誌"><span class="nav-number">4.7.</span> <span class="nav-text">日誌</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分配"><span class="nav-number">4.8.</span> <span class="nav-text">分配</span></a></li></ol></li></ol></div>
             
 
           </div>

@@ -319,6 +319,432 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/22/Jenkins安装与部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/22/Jenkins安装与部署/" itemprop="url">
+                  Jenkins安装与部署
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-22 10:18:30" itemprop="dateCreated datePublished" datetime="2018-10-22T10:18:30+08:00">2018-10-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-10-29 17:37:00" itemprop="dateModified" datetime="2018-10-29T17:37:00+08:00">2018-10-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/持续集成与部署/" itemprop="url" rel="index"><span itemprop="name">持续集成与部署</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Jenkins依赖环境准备"><a href="#Jenkins依赖环境准备" class="headerlink" title="Jenkins依赖环境准备"></a>Jenkins依赖环境准备</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">* 安装java环境</span><br><span class="line">[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@jenkins ~]# vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">[root@jenkins ~]# . /etc/profile.d/java.sh</span><br><span class="line">[root@jenkins ~]# java -version</span><br><span class="line">openjdk version "1.8.0_181"</span><br><span class="line">OpenJDK Runtime Environment (build 1.8.0_181-b13)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 25.181-b13, mixed mode)</span><br><span class="line"></span><br><span class="line">* tomcat环境</span><br><span class="line">[root@jenkins ~]# tar xf apache-tomcat-8.5.33.tar.gz -C /usr/local/</span><br><span class="line">[root@jenkins ~]# cd /usr/local/</span><br><span class="line">[root@jenkins local]# ln -sv apache-tomcat-8.5.33/ tomcat</span><br><span class="line">'tomcat' -&gt; 'apache-tomcat-8.5.33/'</span><br><span class="line">[root@jenkins local]# cp /root/jenkins.war tomcat/webapps/</span><br><span class="line"><span class="meta">#</span> 上传Jenkins.war文件到tomcat服务器，放入webapps目录中</span><br><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">    &lt;Connector port="8080" protocol="HTTP/1.1"</span><br><span class="line">               connectionTimeout="20000"</span><br><span class="line">               redirectPort="8443" URIEncoding="UTF-8" /&gt;</span><br><span class="line"><span class="meta">#</span> 加入URIEncoding="UTF-8"地址的编码解码字符集</span><br><span class="line">[root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh</span><br><span class="line">[root@jenkins tomcat]# tail -f /usr/local/tomcat/logs/catalina.out</span><br><span class="line">[root@jenkins tomcat]# cat /root/.jenkins/secrets/initialAdminPassword </span><br><span class="line">2296380bbe5e4753bc970240aca8ae2d</span><br><span class="line"><span class="meta">#</span> 这是打开jenkins页面时要输入的密码，这也是Jenkins的admin管理员的登录密码</span><br><span class="line"></span><br><span class="line">* 安装git</span><br><span class="line">[root@jenkins ~]# yum install -y git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下面访问10.5.5.250:8080/jenkins</li>
+</ul>
+<p><img src="/images/jenkins/jenkins1.jpg" alt=""></p>
+<ul>
+<li>选择安装推荐的插件。如果有软件安装失败，可在安装完后点Retry，再次安装。安装成功进入jenkins后，还要重启一次jenkins服务才能正常访问</li>
+</ul>
+<p><img src="/images/jenkins/jenkins2.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins3.jpg" alt=""></p>
+<ul>
+<li>创建用户，或使用admin用户登录</li>
+</ul>
+<p><img src="/images/jenkins/jenkins4.jpg" alt=""></p>
+<ul>
+<li>确认</li>
+</ul>
+<p><img src="/images/jenkins/jenkins5.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins6.jpg" alt=""></p>
+<ul>
+<li>完成上述步骤后可以正常登录，但测试发现chrome浏览器访问时显示空白页面，使用firefox浏览器没有问题</li>
+</ul>
+<p><img src="/images/jenkins/jenkins7.jpg" alt=""></p>
+<ul>
+<li>更换火狐浏览器后可以到登录页面，但输入用户名和密码后还是空白页面。解决方法如下：</li>
+</ul>
+<p><img src="/images/jenkins/jenkins8.jpg" alt=""></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins tomcat]# tail -f /var/log/messages </span><br><span class="line">Oct 21 22:30:35 jenkins systemd: Stopped IPv4 firewall with iptables.</span><br><span class="line">Oct 21 22:30:35 jenkins systemd: Unit iptables.service entered failed state.</span><br><span class="line">Oct 21 22:30:35 jenkins systemd: iptables.service failed.</span><br><span class="line">Oct 21 22:43:01 jenkins systemd: Started Session 4057 of user root.</span><br><span class="line">Oct 21 22:43:01 jenkins systemd: Starting Session 4057 of user root.</span><br><span class="line">Oct 21 22:57:11 jenkins systemd: Stopping The Apache HTTP Server...</span><br><span class="line">Oct 21 22:57:13 jenkins systemd: Stopped The Apache HTTP Server.</span><br><span class="line">Oct 21 22:57:18 jenkins systemd: Reloading.</span><br><span class="line">Oct 21 22:57:18 jenkins systemd: [/usr/lib/systemd/system/vzfifo.service:19] Support for option SysVStartPriority= has been removed and it is ignored</span><br><span class="line">Oct 21 23:15:06 jenkins systemd: Configuration file /usr/lib/systemd/system/ebtables.service is marked executable. Please remove executable permission bits. Proceeding anyway.</span><br><span class="line"><span class="meta">#</span> 查看系统日志发现，要求取消/usr/lib/systemd/system/ebtables.service的可执行权限。</span><br><span class="line">[root@jenkins tomcat]# chmod 744 /usr/lib/systemd/system/ebtables.service</span><br><span class="line"><span class="meta">#</span> 取消属组和其他人的执行权限</span><br><span class="line">[root@jenkins tomcat]# lsof -i:8080</span><br><span class="line">[root@jenkins tomcat]# kill -9 1181</span><br><span class="line">[root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh</span><br><span class="line"><span class="meta">#</span> 关闭tomcat并重新启动</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以正常访问了，使用chrome浏览器也没有问题了。但因为chrome浏览器的语言的繁体中文，所以Jenkins登录后也是繁体中文</li>
+</ul>
+<p><img src="/images/jenkins/jenkins9.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins10.jpg" alt=""></p>
+<h3 id="配置JDK和Maven并安装Deploy插件"><a href="#配置JDK和Maven并安装Deploy插件" class="headerlink" title="配置JDK和Maven并安装Deploy插件"></a>配置JDK和Maven并安装Deploy插件</h3><ul>
+<li>登录Jenkins</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置1.jpg" alt=""></p>
+<ul>
+<li>选择全局安全配置</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置2.jpg" alt=""></p>
+<ul>
+<li>选择允许用户注册。授权策略可以先任何用户可以做任何事，方便测试使用。也可以是默认的登录用户可以做任何事。最后保存</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置3.jpg" alt=""></p>
+<ul>
+<li>选全局工具配置</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置4.jpg" alt=""></p>
+<ul>
+<li>上面两项都选择文件系统中的settings文件，之后需要输入maven的settings文件路径。JDK也一样要输入JAVA_HOME的路径，同时自定义一个别名。取消自动安装。下面的Git因为还没有，所以可以删除。Maven同JDK，需要自定义名称并输入MAVEN_HOME</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置5.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins配置6.jpg" alt=""></p>
+<ul>
+<li>Maven的安装</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">到http://mirrors.shu.edu.cn/apache//maven/maven-3/3.5.4/binaries/下载Maven的二进制包，保存到/root目录下</span><br><span class="line">[root@jenkins ~]# tar xf apache-maven-3.5.4-bin.tar.gz -C /usr/local/</span><br><span class="line">[root@jenkins ~]# vim /etc/profile.d/maven.sh</span><br><span class="line">	export PATH=$PATH:/usr/local/apache-maven-3.5.4/bin</span><br><span class="line">	export MAVEN_HOME=/usr/local/apache-maven-3.5.4</span><br><span class="line">[root@jenkins ~]# . /etc/profile.d/maven.sh</span><br><span class="line">[root@jenkins ~]# mvn -version</span><br><span class="line">Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T18:33:14Z)</span><br><span class="line">Maven home: /usr/local/apache-maven-3.5.4</span><br><span class="line">Java version: 1.8.0_181, vendor: Oracle Corporation, runtime: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.181-3.b13.el7_5.x86_64/jre</span><br><span class="line">Default locale: en_US, platform encoding: ANSI_X3.4-1968</span><br><span class="line">OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>选择插件管理</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置7.jpg" alt=""></p>
+<ul>
+<li>安装插件deploy to container</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置8.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins配置9.jpg" alt=""></p>
+<h3 id="gitlab安装"><a href="#gitlab安装" class="headerlink" title="gitlab安装"></a>gitlab安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">下载gitlab-ce-10.6.1-ce.0.el7.x86_64.rpm到/root目录</span><br><span class="line">[root@localhost ~]# yum install -y gitlab-ce-10.6.1-ce.0.el7.x86_64.rpm</span><br><span class="line">[root@localhost ~]# vim /etc/gitlab/gitlab.rb</span><br><span class="line">	external_url 'http://10.5.5.199'</span><br><span class="line">[root@localhost ~]# gitlab-ctl reconfigure</span><br><span class="line"><span class="meta">#</span> 这是一个初始化的过程</span><br><span class="line">访问IP，要求设置root密码，之后就可以正常登录了</span><br></pre></td></tr></table></figure>
+<h3 id="获取gitlab的token"><a href="#获取gitlab的token" class="headerlink" title="获取gitlab的token"></a>获取gitlab的token</h3><ul>
+<li>使用root用户登录</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken1.jpg" alt=""></p>
+<ul>
+<li>选择右侧的settings，并勾选最下方的“Allow requests to the local network from hooks and services”并保存。此项非常关键，如果不勾选此项，之后测试连接jenkins时会报500错误</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken2.jpg" alt=""></p>
+<ul>
+<li>登出root用户，重新注册一个新用户</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken3.jpg" alt=""></p>
+<ul>
+<li>选择用户的settings，并选择左侧的”Access Tokens”</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken4.jpg" alt=""></p>
+<ul>
+<li>创建Token</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken5.jpg" alt=""></p>
+<ul>
+<li>得到一个Token，这个很重要，需要记录，如果关闭此页面，之后就找不到这个Token了</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken6.jpg" alt=""></p>
+<h3 id="创建一个git项目"><a href="#创建一个git项目" class="headerlink" title="创建一个git项目"></a>创建一个git项目</h3><ul>
+<li>使用普通用户登录，到首页创建项目</li>
+</ul>
+<p><img src="/images/jenkins/gitlab项目1.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlab项目2.jpg" alt=""></p>
+<ul>
+<li>这两条命令在设置jenkins时有用</li>
+</ul>
+<p><img src="/images/jenkins/gitlab项目3.jpg" alt=""></p>
+<h3 id="生成访问Gitlab的ssh秘钥。"><a href="#生成访问Gitlab的ssh秘钥。" class="headerlink" title="生成访问Gitlab的ssh秘钥。"></a>生成访问Gitlab的ssh秘钥。</h3><blockquote>
+<p> <strong>从gitlab以SSH方式拉取或提交代码需要用到这个SSH 秘钥</strong>，哪台机器需要从gitlab上拉取代码，就在哪台机器上生成一次SHH Key，因此，在jenkins服务器上，以及你的开发PC上，都需要生成SSH密钥。</p>
+</blockquote>
+<p><img src="/images/jenkins/gitlabssh1.jpg" alt=""></p>
+<ul>
+<li>在jenkins与要部署代码的服务器上执行生成秘钥的命令</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins conf]# ssh-keygen -t rsa -P ''</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/root/.ssh/id_rsa): </span><br><span class="line">Created directory '/root/.ssh'.</span><br><span class="line">Your identification has been saved in /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">69:1e:73:2b:de:c8:e8:23:79:9a:0a:96:6f:e8:8a:b8 root@jenkins</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+--[ RSA 2048]----+</span><br><span class="line">|                 |</span><br><span class="line">|                 |</span><br><span class="line">|                 |</span><br><span class="line">|         .       |</span><br><span class="line">|        S .      |</span><br><span class="line">|  .    o + .     |</span><br><span class="line">|.o.  .  o .      |</span><br><span class="line">|+o..o.o+ +       |</span><br><span class="line">|Eoooo=o.+ .      |</span><br><span class="line">+-----------------+</span><br><span class="line">[root@jenkins conf]# cat /root/.ssh/id_rsa.pub </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lKvAYSdcmrRTYdWapsssJAzjWnA5Pa/u32n/OWKTZDq+qmV3IxlQwuOVI7AeB5TJTuawk90f/1fj7aN1963yOvlZthS8dRUvEcrq+HHpekmAH+mLDeQGYcZEoNsovl1Cvp3TVNDC/7sKds7yoYmHupknyn5d7tgGID8Up02DJlgUQK6V7ZvivjRxAaYAjsWSEktIZK0jv0uWqo6cSddC/rLERGL4spjdwqErFKDQ8SVhArD5zR7L5Lpf9McbxFLFpMMN0I2U+udCXa8n7vwbzHTyaFU+ZvUkX80ykDpMJIW5ot root@jenkins</span><br><span class="line"><span class="meta">#</span> 将此公钥放入gitlab中</span><br></pre></td></tr></table></figure>
+<p><img src="/images/jenkins/gitlabssh2.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlabssh3.jpg" alt=""></p>
+<h3 id="jenkins中安装gitlab插件"><a href="#jenkins中安装gitlab插件" class="headerlink" title="jenkins中安装gitlab插件"></a>jenkins中安装gitlab插件</h3><ul>
+<li><p>需要的插件：Gitlab Hook、Build Authorization Token Root、Publish Over SSH、Gitlab Authentication、Gitlab、Git Parameter</p>
+<p><img src="/images/jenkins/gitlabPlugin1.jpg" alt=""></p>
+</li>
+</ul>
+<p><img src="/images/jenkins/gitlabPlugin2.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlabPlugin3.jpg" alt=""></p>
+<h3 id="jenkins中设置token"><a href="#jenkins中设置token" class="headerlink" title="jenkins中设置token"></a>jenkins中设置token</h3><p><img src="/images/jenkins/jenkinsgitlabtoken1.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkinsgitlabtoken2.jpg" alt=""></p>
+<ul>
+<li><p>Connection name可以自定义；Gitlab host URL是gitlab的访问地址；最后设置Credentials</p>
+<p><img src="/images/jenkins/jenkinsgitlabtoken3.jpg" alt=""></p>
+</li>
+<li><p>在弹出的窗口中选择类型为GitLab API token，之后输入在gitlab中取得的项目的token，最后添加</p>
+</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsgitlabtoken4.jpg" alt=""></p>
+<ul>
+<li>选择刚创建的”GitLab API token”，然后点击”Test Connection”测试是否连接正常，如果没有问题就保存。这里的配置会在创建任务后的第一个General页面的”GitLab Connection”中自动引用</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsgitlabtoken5.jpg" alt=""></p>
+<h3 id="jenkins中设置Publish-over-SSH"><a href="#jenkins中设置Publish-over-SSH" class="headerlink" title="jenkins中设置Publish over SSH"></a>jenkins中设置Publish over SSH</h3><ul>
+<li>进入设置</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsSSH1.jpg" alt=""></p>
+<ul>
+<li>输入jenkins服务器的私钥，SSH Servers中设置自定义Name，Hostname是要部署代码的服务器地址，Username是登录用的用户名</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsSSH2.jpg" alt=""></p>
+<h3 id="配置git插件"><a href="#配置git插件" class="headerlink" title="配置git插件"></a>配置git插件</h3><ul>
+<li>打开系统管理中的系统设置</li>
+</ul>
+<p><img src="/images/jenkins/git插件1.jpg" alt=""></p>
+<ul>
+<li>选择Git plugin</li>
+</ul>
+<p><img src="/images/jenkins/git插件2.jpg" alt=""></p>
+<ul>
+<li>设置Git插件的全局配置，然后点击“apply”——“save”。全局配置就是上面“Gitlab创建项目”部分中的global setting ，在项目第一次commit前，这些信息都可以在GitLab的项目的首页里找到</li>
+</ul>
+<p><img src="/images/jenkins/git插件3.jpg" alt=""></p>
+<h3 id="创建一个Jenkins-Job"><a href="#创建一个Jenkins-Job" class="headerlink" title="创建一个Jenkins Job"></a>创建一个Jenkins Job</h3><blockquote>
+<p>在jenkins里，一个任务叫做一个job。一般我们的项目会有多个分支，比如开发分支和产品分支，我们可以对每一个分支都新建一个job，比如，我们对开发分支创建一个测试的job,每次有代码提交就自动运行一次测试，对产品分支创建一个打包的job，每次有代码提交就运行打包任务。</p>
+<p>在系统设置中设置的项就是为了可以在任务中得到引用。</p>
+</blockquote>
+<p><img src="/images/jenkins/创建jenkinsjob1.jpg" alt=""></p>
+<ul>
+<li>创建的job最好与gitlab中的项目名一致</li>
+</ul>
+<p><img src="/images/jenkins/创建jenkinsjob2.jpg" alt=""></p>
+<h3 id="配置Job"><a href="#配置Job" class="headerlink" title="配置Job"></a>配置Job</h3><ul>
+<li>在源码管理里，选择Git，并输入路径，路径可以在gitlab的项目首页上看到</li>
+</ul>
+<p><img src="/images/jenkins/配置job1.jpg" alt=""></p>
+<ul>
+<li>添加用户，类型选“SSH Username with private key”；Username填root；选择PrivateKey中的Enter directly，在下面的key中输入jenkins服务器的私钥，可以用命令<code>cat /root/.ssh/id_rsa</code>查看。</li>
+</ul>
+<p><img src="/images/jenkins/配置job2.jpg" alt=""></p>
+<blockquote>
+<p>在Repository URL下面的红字提示“Failed to connect to repository : Error performing command: git ls-remote -h <a href="mailto:git@10.5.5.11" target="_blank" rel="noopener">git@10.5.5.11</a>:test/ccjdtest.git HEAD”是因为jenkins服务器上没有安装git，安装后解决。</p>
+</blockquote>
+<p><img src="/images/jenkins/配置job3.jpg" alt=""></p>
+<blockquote>
+<p>jenkins job默认对master分支进行构建，你也可以自定义分支。这要求你的Gitlab代码仓库中要存在这个分支，一般来说，就是要向代码仓库提交一次更改，请 <strong>自行完成</strong>（Gitlab项目刚创建时是空的，一个分支也没有，这样的话，自动构建时会出错）</p>
+</blockquote>
+<p><img src="/images/jenkins/配置job4.jpg" alt=""></p>
+<ul>
+<li>配置构建触发器，选择Build一行，后面的地址就是jenkins上放项目的路径，再选择下面的高级</li>
+</ul>
+<p><img src="/images/jenkins/配置job5.jpg" alt=""></p>
+<ul>
+<li>选择Filter branches by regex，表示要触发自动部署的分支，在下面的Target Branch Regex中输入”.*master”，这是正则表达式，表示分支名。最后点击Generate，生成gitlab webhook的安全令牌，在配置gitlab时有用。</li>
+</ul>
+<p><img src="/images/jenkins/配置job6.jpg" alt=""></p>
+<ul>
+<li>构建，选择新增中的send files or … over SSH</li>
+</ul>
+<p><img src="/images/jenkins/配置job7.jpg" alt=""></p>
+<ul>
+<li>这里的Name中会有在Jenkins的设置中设置的Publish over SSH的服务器名字，下面的Source files中输入“**/**”，Remote directory中要部署到远程服务器的路径，Exec command是在远程服务器部署完代码后要执行的命令</li>
+</ul>
+<h3 id="gitlab上设置webhook"><a href="#gitlab上设置webhook" class="headerlink" title="gitlab上设置webhook"></a>gitlab上设置webhook</h3><ul>
+<li>到gitlab的项目中设置集成</li>
+</ul>
+<p><img src="/images/jenkins/webhook1.jpg" alt=""></p>
+<ul>
+<li>URL与Secret Token都是在Jenkins中的项目配置中取得的，取消SSL的勾选，最后添加</li>
+</ul>
+<p><img src="/images/jenkins/webhook2.jpg" alt=""></p>
+<ul>
+<li>添加后在下面的Webhooks中就会有添加的项，点Test中的Push events测试。这里一定要在gitlab的项目中有一个文件，如果没有，测试时会提示“Hook execution failed: Ensure the project has at least one commit.”</li>
+</ul>
+<p><img src="/images/jenkins/webhook3.jpg" alt=""></p>
+<ul>
+<li>如果测试正常，在页面最上方会有HTTP 200的提示</li>
+</ul>
+<p><img src="/images/jenkins/webhook4.jpg" alt=""></p>
+<ul>
+<li>webhook就是为了在有人上传代码时，就会触发上面设置的地址，只要触发这个地址，jenkins就会自动部署</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><ul>
+<li>到要部署代码的服务器上，安装nginx。</li>
+<li>到jenkins服务器上安装git，准备拉取代码</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub 10.5.5.22</span><br><span class="line"><span class="meta">#</span> 要与部署代码的服务器实现密钥通讯</span><br><span class="line">git clone git@10.5.5.11:test/ccjdtest.git</span><br><span class="line">cd ccjdtest/</span><br><span class="line">echo "test Jenkins" &gt; index.html</span><br><span class="line"><span class="meta">#</span> 创建一个文件</span><br><span class="line">git config --global user.email "test@ccjd.com"</span><br><span class="line">git config --global user.name "test"</span><br><span class="line"><span class="meta">#</span> 这两项是在gitlab中创建项目时设置的</span><br><span class="line">git add .</span><br><span class="line">git commit -m 'add index.html'</span><br><span class="line">git push</span><br><span class="line"><span class="meta">#</span> 推送到gitlab服务器</span><br></pre></td></tr></table></figure>
+<ul>
+<li>到jenkins中查看项目情况，如果配置正确，推送代码到gitlab后，这里会有提示</li>
+</ul>
+<p><img src="/images/jenkins/测试1.jpg" alt=""></p>
+<ul>
+<li>到部署代码的服务器上查看，index.html文件已放入了/usr/share/nginx/html目录中，并且服务已重新启动。访问页面变成了我们设置的内容。</li>
+</ul>
+<h2 id="测试maven手动部署"><a href="#测试maven手动部署" class="headerlink" title="测试maven手动部署"></a>测试maven手动部署</h2><h3 id="部署流程"><a href="#部署流程" class="headerlink" title="部署流程"></a>部署流程</h3><ol>
+<li>注册gitlab帐号</li>
+<li>创建git项目</li>
+<li>将上传代码的主机、Jenkins服务器、与部署代码的服务器的公钥上传到gitlab</li>
+<li>将项目clone到本地</li>
+<li>将本地代码push到gitlab</li>
+<li>在Jenkins中创建Job</li>
+<li>设置Job中的git地址，Jenkins登录git的用户名与私钥。新建构建“调用顶层Maven目标”</li>
+<li>第一次构建，要到Job中点击“立即构建”</li>
+<li>构建后操作</li>
+</ol>
+<h3 id="设置Job"><a href="#设置Job" class="headerlink" title="设置Job"></a>设置Job</h3><ul>
+<li>设置Job，输入git地址，设置jenkins服务器登录gitlib时用的用户名与私钥，这样私钥与jenkins上传到gitlab上的公钥就可以配对了</li>
+</ul>
+<p><img src="/images/jenkins/设置job1.jpg" alt=""></p>
+<ul>
+<li>设置构建，选择调用顶层Maven目标</li>
+</ul>
+<p><img src="/images/jenkins/设置job2.jpg" alt=""></p>
+<ul>
+<li>Maven版本是在jenkins设置中设置好的，目标是一条Maven命令：“clean install -Dmaven.test.skip=true”</li>
+</ul>
+<p><img src="/images/jenkins/设置job3.jpg" alt=""></p>
+<ul>
+<li>设置构建后操作。WAR/EAR files是一个相对路径，相对/root/.jenkins/workspace/echarging/而言，echarging是项目的名称，项目下的target中有war文件，这里输入c-rest/target表示在项目目录下还有一层。Context path是访问的名称，之后就可以使用IP:8080/rest访问了。再选择下面的Containers为Tomcat8.x，这要根据实际情况选择，然后添加一个可以访问tomcat的manager_webapp页面的用户名和密码，这是在部署代码的tomcat中设置的。下面就是Tomcat的访问地址。都输入正确后保存即可。这样，在Maven处理完代码后，就会自动部署到部署代码的tomcat服务器上了。</li>
+</ul>
+<p><img src="/images/jenkins/设置job4.jpg" alt=""></p>
+<ul>
+<li>在部署代码的服务器上设置tomcat</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon local]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@bogon ~]# vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">[root@bogon tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@bogon tomcat]# vim webapps/manager/META-INF/context.xml</span><br><span class="line">	&lt;Context antiResourceLocking="false" privileged="true" &gt;</span><br><span class="line">  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"</span><br><span class="line">         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|10.5.5.90|10.5.5.9" /&gt;</span><br><span class="line"><span class="meta">#</span> 这里加入两个地址，一个是本地的地址，为了测试页面是否可以打开。一个是jenkins的地址。如果不加jenkins的地址，jenkins的部署会报错。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>到Job中，点击立即构建</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/19/RabbitMQ基本命令与配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2361,182 +2787,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/15/iptables网络防火墙/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/15/iptables网络防火墙/" itemprop="url">
-                  iptables网络防火墙
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-10-15 14:32:53" itemprop="dateCreated datePublished" datetime="2018-10-15T14:32:53+08:00">2018-10-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-15 13:12:06" itemprop="dateModified" datetime="2019-01-15T13:12:06+08:00">2019-01-15</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
-<li><p>网络防火墙往往处于网络的入口或者边缘</p>
-</li>
-<li><p>网络防火墙的职责就是”过滤并转发”。要想”过滤”，只能在INPUT、OUTPUT、FORWARD三条链中实现，要想”转发”，报文则只会经过FORWARD链（发往本机的报文才会经过INPUT链），所以，iptables的角色变为”网络防火墙”时，规则只能定义在FORWARD链中。</p>
-</li>
-</ul>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 准备三台linux主机，一台为外网主机，一台为内网主机，一台允当防火墙</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> A外网主机IP：10.5.5.90</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> B内网主机IP：192.168.116.130</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> C网络防火墙IP：192.168.116.129、10.5.5.91</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将虚拟机C的第二块网卡和B的网卡设置为仅主机</span></span><br><span class="line">* B</span><br><span class="line">[root@localhost ~]# vim /etc/sysconfig/network-scripts/ifcfg-eno16777736</span><br><span class="line">    IPADDR=192.168.116.130</span><br><span class="line">    NETMASK=255.255.255.0</span><br><span class="line">    GATEWAY=192.168.116.129</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将B主机的网关指向C（防火墙）主机的内网地址192.168.116.129</span></span><br><span class="line"></span><br><span class="line">* A</span><br><span class="line">[root@localhost ~]#route add -net 192.168.116.0/24 gw 10.5.5.91</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给外网主机加一条路由，让外网主机知道如何到内网主机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在外网与内网主机还不能互相ping通，因为防火墙没有路由数据包</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为在CentOS中，IP地址属于主机，所以内外网的主机都可以ping通防火墙的外网地址</span></span><br><span class="line"></span><br><span class="line">* C</span><br><span class="line">[root@localhost ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启防火墙路由功能</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时内外网可以互相ping通了。</span></span><br><span class="line">[root@localhost ~]# iptables -A FORWARD -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝所有数据转发。这时内外网又不能互相ping通了。</span></span><br><span class="line"></span><br><span class="line">* A</span><br><span class="line">[root@localhost ~]# vim /var/www/html/index.html</span><br><span class="line">	10.5.5.90</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加默认主页</span></span><br><span class="line">[root@localhost ~]# systemctl start httpd</span><br><span class="line"></span><br><span class="line">* B</span><br><span class="line">[root@localhost ~]# vim /var/www/html/index.html</span><br><span class="line">	192.168.116.130</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加默认主页</span></span><br><span class="line">[root@localhost ~]# systemctl start httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动两台主机的httpd服务</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时两台主机是不能互相访问的</span></span><br><span class="line"></span><br><span class="line">* C</span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -s 192.168.116.0/24 -p tcp --dport 80 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让源地址是192.168.116.0网段的主机可以访问外部的80端口。只加入这一条还不行，这只是数据流出的规则，还要加数据流入的规则</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -d 192.168.116.0/24 -p tcp --sport 80 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此条后，192.168.116.0网段的主机就可以访问外部的80端口了。</span></span><br><span class="line">[root@localhost ~]# iptables -D FORWARD 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除FORWARD中的第一条规则</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入这一条就可以将绝大多数响应报文放行了。配置完上述规则后，我们只要考虑请求报文的方向就行了，而回应报文，上述一条规则就能搞定，这样配置，即使以后有更多服务的响应报文需要放行，我们也不用再去针对响应报文设置规则了</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -s 192.168.116.0/24 -p tcp --dport 22 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入这一条就可以实现内网主机使用ssh连接外部主机了</span></span><br><span class="line">[root@test ~]# iptables -I FORWARD -p icmp -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行内外网间的ping请求</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2584,7 +2834,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">79</span>
+                    <span class="site-state-item-count">80</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2768,7 +3018,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">58</span>
+                      
+                    
+                    <span class="site-state-item-count">59</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
