@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="配置文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939495969798991001011">
+<meta name="keywords" content="haproxy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="haproxy部署">
+<meta property="og:url" content="http://yoursite.com/2019/01/29/haproxy部署/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="配置文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939495969798991001011">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2019-01-29T07:11:40.172Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="haproxy部署">
+<meta name="twitter:description" content="配置文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939495969798991001011">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/29/haproxy部署/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>haproxy部署 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/29/haproxy部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">haproxy部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-01-29 07:29:34 / 修改時間：15:11:40" itemprop="dateCreated datePublished" datetime="2019-01-29T07:29:34+08:00">2019-01-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/balance/" itemprop="url" rel="index"><span itemprop="name">balance</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">haproxy配置段分为两段，一为全局配置段，一为代理配置段。代理配置段又分为三段，第一段是frontend，用来定义接收以及从何处接收请求。第二段是backend，定义接收到请求后代理至哪些主机，以及如何进行代理。第三段是listen，定义直接匹配的前端和后端，没有分开定义。这三段如果使用同一个值，用defaults定义。</span><br><span class="line">==============================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Example configuration <span class="keyword">for</span> a possible web application.  See the</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> full configuration options online.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash">   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Global settings</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line">global		# 全局配置段</span><br><span class="line">    # to have these messages end up in /var/log/haproxy.log you will</span><br><span class="line">    # need to:</span><br><span class="line">    #</span><br><span class="line">    # 1) configure syslog to accept network log events.  This is done</span><br><span class="line">    #    by adding the '-r' option to the SYSLOGD_OPTIONS in</span><br><span class="line">    #    /etc/sysconfig/syslog</span><br><span class="line">    #</span><br><span class="line">    # 2) configure local2 events to go to the /var/log/haproxy.log</span><br><span class="line">    #   file. A line like the following can be added to</span><br><span class="line">    #   /etc/sysconfig/syslog</span><br><span class="line">    #</span><br><span class="line">    #    local2.*                       /var/log/haproxy.log</span><br><span class="line">    #</span><br><span class="line">    log         127.0.0.1 local2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义全局日志配置，日志级别为info。127.0.0.1是定义日志输出的地址，local2是日志设备。也就是使用127上的rsyslog来记录日志。这样定义，日志会输出到messages中</span></span><br><span class="line">    chroot      /var/lib/haproxy</span><br><span class="line">    pidfile     /var/run/haproxy.pid</span><br><span class="line"><span class="meta">#</span><span class="bash"> pid存放路径</span></span><br><span class="line">    maxconn     4000</span><br><span class="line"><span class="meta">#</span><span class="bash"> haproxy的最大头连接数，与linux的最大打开的文件数有关。一般小于最大打开文件数</span></span><br><span class="line">    user        haproxy</span><br><span class="line">    group       haproxy</span><br><span class="line">    nbproc		1</span><br><span class="line"><span class="meta">#</span><span class="bash"> haproxy启动时创建的进程数，不要超时CPU的核数</span></span><br><span class="line">    daemon</span><br><span class="line"><span class="meta">#</span><span class="bash"> 做守护进程</span></span><br><span class="line">    # turn on stats unix socket</span><br><span class="line">    stats socket /var/lib/haproxy/stats</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> common defaults that all the <span class="string">'listen'</span> and <span class="string">'backend'</span> sections will</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> use <span class="keyword">if</span> not designated <span class="keyword">in</span> their block</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line">defaults</span><br><span class="line">    mode                    http</span><br><span class="line"><span class="meta">#</span><span class="bash"> haproxy实例的运行模式，一般是tcp或http。http就表示工作在七层</span></span><br><span class="line">    log                     global</span><br><span class="line">    option                  httplog</span><br><span class="line">    option                  dontlognull</span><br><span class="line">    option http-server-close</span><br><span class="line">    option forwardfor       except 127.0.0.0/8</span><br><span class="line">    option                  redispatch</span><br><span class="line">    retries                 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接后端服务器失败重试的次数，如果超过这个值就标记为不可用</span></span><br><span class="line">    timeout http-request    10s</span><br><span class="line">    timeout queue           1m</span><br><span class="line">    timeout connect         10s</span><br><span class="line"><span class="meta">#</span><span class="bash"> 成功连接服务器的最长等待时间，没有单位是毫秒</span></span><br><span class="line">    timeout client          1m</span><br><span class="line"><span class="meta">#</span><span class="bash"> 客户端发送数据最长等待时间</span></span><br><span class="line">    timeout server          1m</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务器端回应客户端的最长等待时间</span></span><br><span class="line">    timeout http-keep-alive 10s</span><br><span class="line">    timeout check           10s</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置检查后端服务器的超时时间，如果超过这个值就标记不可用</span></span><br><span class="line">    maxconn                 3000</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> main frontend <span class="built_in">which</span> proxys to the backends</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line">frontend  main *:5000</span><br><span class="line"><span class="meta">#</span><span class="bash"> main是名称，可自定义名称。*:5000表示监听在所有地址的5000端口</span></span><br><span class="line">    mode	http</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定负载均衡的工作模式</span></span><br><span class="line">	option	httplog</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置haproxy记录http请求的日志记录。建议打开</span></span><br><span class="line">	option	forwardfor</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让后端服务器获取客户端的真实地址</span></span><br><span class="line">	option	httpclose</span><br><span class="line"><span class="meta">#</span><span class="bash"> 客户端与服务器完成一次连接后，服务器主动关闭这个连接</span></span><br><span class="line">	log		global</span><br><span class="line"><span class="meta">#</span><span class="bash"> 引用全局的日志配置</span></span><br><span class="line">    acl url_static       path_beg       -i /static /images /javascript /styleshe</span><br><span class="line">ets</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以-i后定义的内容开头的信息的名称为url_static</span></span><br><span class="line">    acl url_static       path_end       -i .jpg .gif .png .css .js</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以-i后定义的内容结尾的信息的名称为url_static</span></span><br><span class="line">    use_backend static          if url_static</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果是acl中定义了url_static条件的话，就给后端的static池中定义的主机</span></span><br><span class="line">    default_backend             app</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认给app池中定义的主机，也就是不符合给static池的请求都给app</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> static backend <span class="keyword">for</span> serving up images, stylesheets and such</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line">backend static</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一组后端服务器，static是自取名</span></span><br><span class="line">	mode 		http</span><br><span class="line">	option		redispatch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用于会话保持</span></span><br><span class="line">	option		abortonclose</span><br><span class="line"><span class="meta">#</span><span class="bash"> 自动结束处理较长的连接</span></span><br><span class="line">    balance     roundrobin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置调度算法</span></span><br><span class="line">	cookie		SERVERID</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定cookie的ID值，表示允许向cookie插入一个serverID。serverID在下面配置。如果是<span class="built_in">source</span>算法，就不用设置	cookie。因为使用cookie就是为了会话保持</span></span><br><span class="line">	option		httpchk GET /index.jsp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 探测后端服务器状态，健康检测，如果长时间无效应，会将后端服务器剔除。haproxy会访问下面sever中定义的每一个后端主机的IP/index.jsp来探测主机是否正常</span></span><br><span class="line">    server      static 127.0.0.1:4331 cookie server1 weight 6 check inter 2000 rise 2 fall 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> static是主机名，自定义的。之后是地址和端口。cookie server1就是定义上面的cookie   SERVERID的。每个server的SERVERID是不一样的。weight是权重。check表示启用对后端服务器的检查，inter是检查的时间间隔，默认单位是毫秒，rise表示连续检查几次标记为正常，fall表示连续检查几次标记为失败</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> round robin balancing between the various backends</span></span><br><span class="line"><span class="meta">#</span><span class="bash">---------------------------------------------------------------------</span></span><br><span class="line">backend app</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server  app1 127.0.0.1:5001 check</span><br><span class="line">    server  app2 127.0.0.1:5002 check</span><br><span class="line">    server  app3 127.0.0.1:5003 check</span><br><span class="line">    server  app4 127.0.0.1:5004 check</span><br><span class="line">    </span><br><span class="line">listen admin_stats</span><br><span class="line"><span class="meta">#</span><span class="bash"> listen可以同时拥前端和后端，将前端与后端绑定在一起。主要配置与监控相关的信息。admin_stats是自定义名称</span></span><br><span class="line">	bind 0.0.0.0:9188</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置状态页地址和端口</span></span><br><span class="line">	mode http</span><br><span class="line">	log 127.0.0.1  local0 err</span><br><span class="line">	stats refresh 20s</span><br><span class="line"><span class="meta">#</span><span class="bash"> 刷新的时间间隔</span></span><br><span class="line">	stats uri /haproxy-status</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态页的地址</span></span><br><span class="line">	stats realm welcome login\ Haproxy</span><br><span class="line"><span class="meta">#</span><span class="bash"> 欢迎信息</span></span><br><span class="line">	status auth admin:admin123</span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证信息，用户名:密码</span></span><br><span class="line">	stats hide-version</span><br><span class="line"><span class="meta">#</span><span class="bash"> 隐藏版本号</span></span><br><span class="line">	stats admin if TRUE</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启管理后端服务器功能</span></span><br><span class="line"></span><br><span class="line">==============================================================================================</span><br><span class="line">算法</span><br><span class="line">1. roundrobin：Each server is used in turns, according to their weights.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置高度算法为轮询，这里的轮询是加权轮询，这取决于下面的server中是否设定了权重。roundrobin是动态算法，支持权重的运行时调整，调整完不用重启服务。另外支持慢启动，慢启动指当后端加入一台新服务器时，调度器会将请求慢慢地分配到新加入的服务器上，如果马上全部分配到新加入的服务器上，对服务器的压力很大。roundrobin对后端主机的数量是有限制的。最多支持4095个。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> server options： weight <span class="comment">#</span></span></span><br><span class="line">2. static-rr</span><br><span class="line"><span class="meta">#</span><span class="bash"> 静态算法：不支持权重的运行时调整及慢启动；后端主机数量无上限；</span></span><br><span class="line">3. leastconn</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加权最少连接，最少连接的接收请求，这个算法也是动态的。建议使用在支持长连接的会话中。例如MySQL、LDAP等；</span></span><br><span class="line">4.  first：</span><br><span class="line"><span class="meta">#</span><span class="bash"> 根据服务器在列表中的位置，自上而下进行调度；前面服务器的连接数达到上限，新请求才会分配给下一台服务。如果后端有三台服务器，这个算法会依次将后端服务器请求打满，第一台打满后再给第二台服务器</span></span><br><span class="line">5. source</span><br><span class="line"><span class="meta">#</span><span class="bash"> 源地址<span class="built_in">hash</span>，相当于nginx中的IPhash，LVS的HS。如果<span class="built_in">hash</span>取决于hast-type，如果是map-based就是取模法，取模法就是把所有服务器按权重虚拟成节点，如果是权重是2就虚拟成两个节点。对数组元素数量取模，等于几就映射给索引为几的服务器，但服务器变动，<span class="built_in">hash</span>值会影响全局。如果是consistent就是一致性<span class="built_in">hash</span></span></span><br><span class="line">6. uri</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将请求同一个uri的主机代理到后端同一台主机，取决与<span class="built_in">hash</span>-type</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 对URI的左半部分做<span class="built_in">hash</span>计算，并由服务器总权重相除以后派发至某挑出的服务器；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> &lt;scheme&gt;://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;<span class="comment">#&lt;frag&gt;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 左半部分：/&lt;path&gt;;&lt;params&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 整个uri：/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;<span class="comment">#&lt;frag&gt;</span></span></span><br><span class="line">7. url_param</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调度时以某个特定的值调度到后端同一主机，用处不大。动态还是静态取决于<span class="built_in">hash</span>-type</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 对用户请求的uri&lt;params&gt;部分中的参数的值作<span class="built_in">hash</span>计算，并由服务器总权重相除以后派发至某挑出的服务器；通常用于追踪用户，以确保来自同一个用户的请求始终发往同一个Backend Server；</span></span><br><span class="line">8. hdr(&lt;name&gt;)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 请求报文的首部，对对应首部的值做<span class="built_in">hash</span>，一样的就给同一主机。可以对浏览器调度</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 对于每个http请求，此处由&lt;name&gt;指定的http首部将会被取出做<span class="built_in">hash</span>计算； 并由服务器总权重相除以后派发至某挑出的服务器；没有有效值的会被轮询调度；根据HTTP请求头来锁定每一次HTTP请求 </span></span><br><span class="line">9. rdp-cookie(&lt;name&gt;)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 远程桌面协议</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 表示根据cookie(name)来锁定并哈希第一次TCP请求</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> uri向下的四种算法为七层算法，用的不多</span></span><br><span class="line"></span><br><span class="line">常用的负载均衡算法</span><br><span class="line">1.轮询算法：roundrobin</span><br><span class="line">2. 根据请求源IP算法：source</span><br><span class="line">3. 最少连接者先处理算法：leastconn</span><br><span class="line">==============================================================================================</span><br></pre></td></tr></table></figure>
+<h3 id="测试轮询"><a href="#测试轮询" class="headerlink" title="测试轮询"></a>测试轮询</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">环境</span><br><span class="line">准备三台主机</span><br><span class="line">haproxy：外网地址：192.168.1.25；内网地址：172.16.106.143</span><br><span class="line">httpd1：内网地址：172.16.106.145</span><br><span class="line">httpd2：内网地址：172.16.106.144</span><br><span class="line">==============================================================================================</span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  httpd1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@httpd1 ~]# yum install -y httpd</span><br><span class="line">[root@httpd1 ~]# systemctl start chronyd</span><br><span class="line">[root@httpd1 ~]# systemctl enable chronyd</span><br><span class="line">[root@httpd1 ~]# chronyc</span><br><span class="line">chrony version 3.1</span><br><span class="line">Copyright (C) 1997-2003, 2007, 2009-2017 Richard P. Curnow and others</span><br><span class="line">chrony comes with ABSOLUTELY NO WARRANTY.  This is free software, and</span><br><span class="line">you are welcome to redistribute it under certain conditions.  See the</span><br><span class="line">GNU General Public License version 2 for details.</span><br><span class="line"></span><br><span class="line"><span class="meta">chronyc&gt;</span><span class="bash"> waitsync </span></span><br><span class="line">try: 1, refid: 771CCEC1, correction: 0.000001078, skew: 32.010</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@httpd1 ~]# vim /var/www/html/index.html</span><br><span class="line">Backend Server 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给两台服务器提供一个主面，另一台服务器的内容是Backend Server 2</span></span><br><span class="line">[root@httpd1 ~]# systemctl start httpd</span><br><span class="line">[root@httpd2 ~]# curl 172.16.106.144</span><br><span class="line">Backend Server 2</span><br><span class="line">[root@httpd2 ~]# curl 172.16.106.145</span><br><span class="line">Backend Server 1</span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim /etc/rsyslog.conf</span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imudp		<span class="comment"># 基于UDP收集日志</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash">UDPServerRun 514		<span class="comment"># 监听端口</span></span></span><br><span class="line">local2.*                                                /var/log/haproxy.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此行，设置haproxy的日志路径</span></span><br><span class="line">[root@haproxy haproxy]# systemctl restart rsyslog</span><br><span class="line">[root@haproxy ~]# cd /etc/haproxy/</span><br><span class="line">[root@haproxy haproxy]# cp haproxy.cfg&#123;,.bak&#125;</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">global</span><br><span class="line">   log         127.0.0.1 local2</span><br><span class="line">    chroot      /var/lib/haproxy</span><br><span class="line">    pidfile     /var/run/haproxy.pid</span><br><span class="line">    maxconn     4000</span><br><span class="line">    user        haproxy</span><br><span class="line">    group       haproxy</span><br><span class="line">    daemon</span><br><span class="line">    stats socket /var/lib/haproxy/stats</span><br><span class="line">defaults</span><br><span class="line">    mode                    http</span><br><span class="line">    log                     global</span><br><span class="line">    option                  httplog</span><br><span class="line">    option                  dontlognull</span><br><span class="line">    option http-server-close</span><br><span class="line">    option forwardfor       except 127.0.0.0/8</span><br><span class="line">    option                  redispatch</span><br><span class="line">    retries                 3</span><br><span class="line">    timeout http-request    10s</span><br><span class="line">    timeout queue           1m</span><br><span class="line">    timeout connect         10s</span><br><span class="line">    timeout client          1m</span><br><span class="line">    timeout server          1m</span><br><span class="line">    timeout http-keep-alive 10s</span><br><span class="line">    timeout check           10s</span><br><span class="line">    maxconn                 3000</span><br><span class="line">frontend  myweb		# 定义前端主机，取名叫myweb</span><br><span class="line">    bind *:80		# 定义haproxy的监听端口</span><br><span class="line">    default_backend             websrvs		# 定义默认使用的后端主机是websrvs</span><br><span class="line">backend websrvs			# 定义后端主机组叫websrvs</span><br><span class="line">    balance     roundrobin		# 使用轮询的方式</span><br><span class="line">    server      srv1 172.16.106.145:80 check</span><br><span class="line">    server      srv2 172.16.106.144:80 check</span><br><span class="line"><span class="meta">#</span><span class="bash"> 后端主机信息，使用server定义，srv1是haproxy内部引用的ID号，自定义的。它是服务器在haproxy上的内部名称；出现在日志及警告信息；check是对主机的健康检测，如果不加，那么会被认为是始终在线的。这是四层检测，发TCP请求，如果响应就表示在线</span></span><br><span class="line">[root@haproxy haproxy]# systemctl start haproxy</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl 192.168.1.25;done</span><br><span class="line">Backend Server 1</span><br><span class="line">Backend Server 2</span><br></pre></td></tr></table></figure>
+<h3 id="first算法"><a href="#first算法" class="headerlink" title="first算法"></a>first算法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">根据服务器在列表中的位置，自上而下进行调度；前面服务器的连接数达到上限，新请求才会分配给下一台服务；</span><br><span class="line">==============================================================================================</span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     first</span><br><span class="line">    server      srv1 172.16.106.145:80 check maxconn 3		# maxconn指定最大并发连接数</span><br><span class="line">    server      srv2 172.16.106.144:80 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service </span><br><span class="line">[root@haproxy haproxy]# yum install -y httpd-tools</span><br><span class="line">[root@haproxy haproxy]# ab -n 100000 -c 10 http://192.168.1.25/index.html</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd2</span><br><span class="line">------------</span><br><span class="line">[root@httpd2 ~]# tail -f /var/log/httpd/access_log </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在第二台web服务器上查看日志，如果有请求日志，就说明第一台web服务器打满了</span></span><br></pre></td></tr></table></figure>
+<h3 id="uri算法"><a href="#uri算法" class="headerlink" title="uri算法"></a>uri算法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">对URI的左半部分做hash计算，并由服务器总权重相除以后派发至某挑出的服务器；只要访问的是同一页面，不管是哪台主机，都发往同一台服务器</span><br><span class="line">==============================================================================================</span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     uri</span><br><span class="line">    server      srv1 172.16.106.145:80 check maxconn 3		# maxconn指定最大并发连接数</span><br><span class="line">    server      srv2 172.16.106.144:80 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service </span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  httpd1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@httpd2 ~]# for i in &#123;1..10&#125;;do echo "Test Page $i @BES 1" &gt; /var/www/html/test$i.html;done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在两台主机上分别添加主页</span></span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl http://192.168.1.25/test1.html;done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示的内容是一样的，因为请求被发到了同一台主机。另外可以换其他主机再访问，结果应该和这里一样，因为访问的都是同一页面</span></span><br></pre></td></tr></table></figure>
+<h3 id="hdr算法"><a href="#hdr算法" class="headerlink" title="hdr算法"></a>hdr算法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">hdr(&lt;name&gt;)：对于每个http请求，此处由&lt;name&gt;指定的http首部将会被取出做hash计算，并由服务器总权重相除以后派发至某挑出的服务器，没有有效值的会被轮询调度。</span><br><span class="line">==============================================================================================</span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     hdr(User-Agent)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 对客户端浏览器进行<span class="built_in">hash</span>计算并调度，如果浏览器一样就发往后端同一主机</span></span><br><span class="line">    server      srv1 172.16.106.145:80 check maxconn 3		# maxconn指定最大并发连接数</span><br><span class="line">    server      srv2 172.16.106.144:80 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl http://192.168.1.25/test1.html;done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时不管访问哪个页面，都会被发到同一台服务器处理，到哪台后端服务器是不能预测的</span></span><br></pre></td></tr></table></figure>
+<h3 id="压缩测试"><a href="#压缩测试" class="headerlink" title="压缩测试"></a>压缩测试</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check maxconn 3</span><br><span class="line">    server      srv2 172.16.106.144:80 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# cp /var/log/httpd/access_log /var/www/html/log.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 找一个大一些的文件做压缩测试</span></span><br><span class="line">[root@httpd1 ~]# rsync -e ssh -arzv --progress /var/www/html/log.txt 172.16.106.144:/var/www/html/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将文件复制到另一台web服务器上</span></span><br><span class="line"></span><br><span class="line">用firefox访问192.168.1.77/log.txt，按F12，这时Response headers(响应头)中会有Content-Encoding gzip的显示</span><br></pre></td></tr></table></figure>
+<h3 id="备用主机"><a href="#备用主机" class="headerlink" title="备用主机"></a>备用主机</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check </span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line"><span class="meta">#</span><span class="bash"> backup指备用主机，也就是sorryserver.</span></span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl http://192.168.1.25/index.html;done</span><br><span class="line">Backend Server 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时请求只会发到第一台web服务器上</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# systemctl stop httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止web服务</span></span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl http://192.168.1.25/index.html;done</span><br><span class="line">Backend Server 2</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# systemctl start httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动web服务后，所有的请求又都会发到httpd1上了</span></span><br></pre></td></tr></table></figure>
+<h3 id="七层反向代理"><a href="#七层反向代理" class="headerlink" title="七层反向代理"></a>七层反向代理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    option httpchk</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2</span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 反向代理在四层还是七层取决于mode设置的是tcp还是http</span></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# tail -f /var/log/httpd/access_log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时这里会不停显示<span class="string">"172.16.106.143 - - [29/Jan/2019:09:54:16 +0800] "</span>OPTIONS / HTTP/1.0<span class="string">" 200 - "</span>-<span class="string">" "</span>-<span class="string">""</span>，这表示haproxy发出的健康检测请求，但这会产生大量无效日志</span></span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    option httpchk GET /index.html HTTP/1.0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定使用GET方法，对/index.html检测，协议是HTTP/1.0</span></span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> inter是每隔多久检测一次，单位是毫秒；rise是检测几次就上线，fall检测几次就下线</span></span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# tail -f /var/log/httpd/access_log</span><br><span class="line">172.16.106.143 - - [29/Jan/2019:09:57:45 +0800] "GET /index.html HTTP/1.0" 200 17 "-" "-"</span><br></pre></td></tr></table></figure>
+<h3 id="重定向"><a href="#重定向" class="headerlink" title="重定向"></a>重定向</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    option httpchk GET /index.html HTTP/1.0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定使用GET方法，对/index.html检测，协议是HTTP/1.0</span></span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 redir http://www.baidu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> redir &lt;prefix&gt;：将发往此server的所有GET和HEAD类的请求重定向至指定的URL</span></span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">访问192.168.1.25时会被转到百度首页</span><br></pre></td></tr></table></figure>
+<h3 id="权重"><a href="#权重" class="headerlink" title="权重"></a>权重</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用weight定义权重</span></span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]# for i in `seq 10`;do curl http://192.168.1.25/index.html;done</span><br><span class="line">Backend Server 1</span><br><span class="line">Backend Server 1</span><br><span class="line">Backend Server 2</span><br></pre></td></tr></table></figure>
+<h3 id="状态页"><a href="#状态页" class="headerlink" title="状态页"></a>状态页</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    stats enable</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 </span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">访问192.168.1.25/haproxy?stats，如果设置中没有用stats uri指定页面地址，/haproxy?stats是默认的页面。页面中会用颜色标记后端主机，配置文件中的第二个server是backup，不同状态主机用不同颜色标识。停掉第一台web服务器的服务，颜色也会改变</span><br></pre></td></tr></table></figure>
+<h3 id="自定义状态页uri"><a href="#自定义状态页uri" class="headerlink" title="自定义状态页uri"></a>自定义状态页uri</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin		# 自定义状态页uri</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 </span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">访问http://192.168.1.25/myproxy?admin</span><br></pre></td></tr></table></figure>
+<h3 id="登录状态页认证"><a href="#登录状态页认证" class="headerlink" title="登录状态页认证"></a>登录状态页认证</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin		# 自定义状态页uri</span><br><span class="line">    stats realm "HAProxy Stats Page"		# 设置登录认证时弹出的信息。测试中此项未起作用</span><br><span class="line">    stats auth admin:centos		# 设置认证的用户名和密码</span><br><span class="line">    stats admin if TRUE		# 启用页面的管理功能，if TRUE表示一直为真，总是可以访问，生产中不能这样使用</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 </span><br><span class="line">    server      srv2 172.16.106.144:80 check backup</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">访问http://192.168.1.25/myproxy?admin，打开页面的管理功能后，可以页面进行一些简单操作</span><br></pre></td></tr></table></figure>
+<h3 id="自定义状态页面的端口"><a href="#自定义状态页面的端口" class="headerlink" title="自定义状态页面的端口"></a>自定义状态页面的端口</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2</span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1</span><br><span class="line">listen stats		# listen可以同时拥前端和后端，将前端与后端绑定在一起。主要配置与监控相关的信息。</span><br><span class="line">    bind *:9099</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在这里定义listen，名字叫stats，之后用<span class="built_in">bind</span>指定状态页的端口，打开相应功能。与上面一样实现了状态页功能，只是这里又定义了状态页的端口</span></span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">访问http://192.168.1.25:9099/myproxy?admin</span><br></pre></td></tr></table></figure>
+<h3 id="代理ssh"><a href="#代理ssh" class="headerlink" title="代理ssh"></a>代理ssh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2</span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1</span><br><span class="line">listen stats</span><br><span class="line">    bind *:9099</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line">listen sshsrvs</span><br><span class="line">    mode tcp</span><br><span class="line">    bind *:22322</span><br><span class="line">    balance leastconn</span><br><span class="line">    server sshsrv1 172.16.106.145:22 check</span><br><span class="line">    server sshsrv2 172.16.106.144:22 check</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再添加一个listen，用mode指定在tcp层(四层)实现代理。监听在22322端口，leastconn算法表示加权最少连接，最少连接的接收请求，建议使用在支持长连接的会话中。这个算法也是动态的</span></span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]#ssh 192.168.1.25 -p 22322</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接了两次，分别连接到了两台httpd上</span></span><br></pre></td></tr></table></figure>
+<h3 id="cookie粘性绑定"><a href="#cookie粘性绑定" class="headerlink" title="cookie粘性绑定"></a>cookie粘性绑定</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">	cookie SRV insert indirect nocache</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2 cookie srv1</span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1 cookie srv1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入cookie的键名，server最后的cookie是其值，cookie的值最好和server的名字一致。当用户访问时，如果被调度到第一台web服务器上，用户的cookie中会加入cookie的键和值在开头，这里就是SRV=srv1，当用户再次访问时，这个cookie的键和值也会到haproxy服务器，这时haproxy就知道上次这个用户的请求被调度到哪台服务器上，这次还会调度到同一台服务器上。insert表示信息数据的插入方式，上面表示仅对indirect和nocache这样的数据拷入cookie</span></span><br><span class="line">listen stats</span><br><span class="line">    bind *:9099</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line">listen sshsrvs</span><br><span class="line">    mode tcp</span><br><span class="line">    bind *:22322</span><br><span class="line">    balance leastconn</span><br><span class="line">    server sshsrv1 172.16.106.145:22 check</span><br><span class="line">    server sshsrv2 172.16.106.144:22 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">用浏览器访问192.168.1.25，访问多次也不会有变化</span><br></pre></td></tr></table></figure>
+<h3 id="让后端主机收到的请求地址是源地址"><a href="#让后端主机收到的请求地址是源地址" class="headerlink" title="让后端主机收到的请求地址是源地址"></a>让后端主机收到的请求地址是源地址</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">defaults</span><br><span class="line">    option forwardfor       except 127.0.0.0/8 if-none</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此项是原本就有的，forwardfor表示对请求加入一个首部，得到后端服务器真正的请求地址。except表示除了，这里表示除了本机127地址发出的请求，其他请求都加入首部。<span class="keyword">if</span>-none表示如果没有首部才添加</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# vim /etc/httpd/conf/httpd.conf</span><br><span class="line">LogFormat "%&#123;X-Forwarded-For&#125;i %h %l %u %t \"%r\" %&gt;s %b \"%&#123;Referer&#125;i\" \"%&#123;Use</span><br><span class="line">r-Agent&#125;i\"" combined</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将%h改为%&#123;X-Forwarded-For&#125;i，X-Forwarded-For是haproxy中forwardfor默认的格式</span></span><br><span class="line">[root@httpd1 ~]# systemctl restart httpd</span><br><span class="line">[root@httpd1 ~]# tail -f /var/log/httpd/access_log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再次访问192.168.1.25时，查看web服务器日志，可以看到客户端的请求IP地址，而不再是haproxy的内网地址了。</span></span><br></pre></td></tr></table></figure>
+<h3 id="添加首部"><a href="#添加首部" class="headerlink" title="添加首部"></a>添加首部</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    reqadd X-Proxy-By:\ HAProxy</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加请求报文首部，\是转义符，转义后面的空格。X-Proxy-By:\ HAProxy都是自定义的名称，表示这个服务器是由Haproxy代理的</span></span><br><span class="line">    rspadd X-Proxy-By:\ HAProxy-1.5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加响应首部</span></span><br><span class="line">    rspidel ^Server:.*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除响应报文中Server开头的所有内容</span></span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">	cookie SRV insert indirect nocache</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2 cookie srv1</span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1 cookie srv1</span><br><span class="line">listen stats</span><br><span class="line">    bind *:9099</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line">listen sshsrvs</span><br><span class="line">    mode tcp</span><br><span class="line">    bind *:22322</span><br><span class="line">    balance leastconn</span><br><span class="line">    server sshsrv1 172.16.106.145:22 check</span><br><span class="line">    server sshsrv2 172.16.106.144:22 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 ~]# vim /etc/httpd/conf/httpd.conf</span><br><span class="line">LogFormat "%&#123;X-Forwarded-For&#125;i %l %u %t \"%r\" %&gt;s %b \"%&#123;Referer&#125;i\" \"%&#123;User-A</span><br><span class="line">gent&#125;i %&#123;X-Proxy-By&#125;i\"" combined</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将请求首部加到最后</span></span><br><span class="line">[root@httpd1 ~]# systemctl restart httpd</span><br><span class="line">[root@httpd1 ~]# tail -f /var/log/httpd/access_log</span><br><span class="line">192.168.1.9 - - [29/Jan/2019:11:13:52 +0800] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0 HAProxy"</span><br><span class="line">访问192.168.1.25，并查看日志，可以看到请求首部HAProxy</span><br><span class="line">在浏览器上按F12可以看到响应首部，在Response headers中有X-Proxy-By: HAProxy-1.5</span><br></pre></td></tr></table></figure>
+<h3 id="acl访问控制"><a href="#acl访问控制" class="headerlink" title="acl访问控制"></a>acl访问控制</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    reqadd X-Proxy-By:\ HAProxy</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加请求报文首部，\是转义符，转义后面的空格。X-Proxy-By:\ HAProxy都是自定义的名称，表示这个服务器是由Haproxy代理的</span></span><br><span class="line">    rspadd X-Proxy-By:\ HAProxy-1.5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加响应首部</span></span><br><span class="line">    rspidel ^Server:.*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除响应报文中Server开头的所有内容</span></span><br><span class="line">    default_backend             websrvs</span><br><span class="line">backend websrvs</span><br><span class="line">	cookie SRV insert indirect nocache</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2 cookie srv1</span><br><span class="line">    server      srv2 172.16.106.144:80 check weight 1 cookie srv1</span><br><span class="line">listen stats</span><br><span class="line">    bind *:9099</span><br><span class="line">    acl allowstats src 192.168.1.9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义acl名字是allowstats，只允许源地址是192.168.1.64的地址来访问</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> acl all src 0.0.0.0/0.0.0.0表示设置acl为所有主机地址</span></span><br><span class="line">    block if ! allowstats</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义除allowstats以外的任何主机不能访问，!是取反的。如果没有!号，表示除了allowstats外的主机都能访问。block是阻塞之意。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> http-request allow <span class="keyword">if</span> allowstats表示允许allowstats的主机访问，这样所有主机都能访问了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> http-request deny <span class="keyword">if</span> all：不允许除allowstats外的其他主机访问</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 先要自定义一个acl，之后用http-request指定，这样可以实现除了allowstats外的其他主机都不能访问</span></span><br><span class="line">==============================================================================================</span><br><span class="line">	acl allowstats src 192.168.1.9</span><br><span class="line">    http-request allow if allowstats</span><br><span class="line">    errorfile 403 /etc/haproxy/errorfiles/403forbid.http</span><br><span class="line">    acl all src 0.0.0.0/0.0.0.0</span><br><span class="line">    http-request deny if all</span><br><span class="line"><span class="meta">#</span><span class="bash">上面可以设置为这样，结果是只有192.168.1.9可以访问状态页，其他主机不可访问。要注意acl与http-request要定义在一起，如果将http-request allow放在http-request deny下面，也会使所有主机都不能访问状态页</span></span><br><span class="line">==============================================================================================</span><br><span class="line">    errorloc 403 http://192.168.1.25:10080/errorloc/403.html</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里不能定义errorfile，因为上面已经拒绝本机访问了，也就是本机不能访问http://192.168.1.25</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里也可以使用errorfile 403 /etc/haproxy/errorfiles/403forbid.http，之后创建/etc/haproxy/errorfiles/403forbid.http，当无权访问时，就会提示错误页的内容。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> errorfile &lt;code&gt; &lt;file&gt;：在用户请求不存在的页面时，返回一个页面文件给客户端而非由haproxy生成的错误代码；可用于所有段中。&lt;code&gt;：指定对HTTP的哪些状态码返回指定的页面；这里可用的状态码有200、400、403、408、500、502、503和504；&lt;file&gt;：指定用于响应的页面文件；</span></span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line">listen sshsrvs</span><br><span class="line">    mode tcp</span><br><span class="line">    bind *:22322</span><br><span class="line">    balance leastconn</span><br><span class="line">    server sshsrv1 172.16.106.145:22 check</span><br><span class="line">    server sshsrv2 172.16.106.144:22 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]# yum install -y nginx</span><br><span class="line">[root@haproxy haproxy]# vim /etc/nginx/conf.d/errorsrv.conf</span><br><span class="line">server &#123;</span><br><span class="line">   listen 10080;</span><br><span class="line">   server_name 192.168.1.25;</span><br><span class="line">   root /data/nginx/html;</span><br><span class="line">&#125;</span><br><span class="line">[root@haproxy haproxy]# mkdir -pv /data/nginx/html/errorloc</span><br><span class="line">[root@haproxy haproxy]# vim /data/nginx/html/errorloc/403.html</span><br><span class="line">403 Forbidden from nginx </span><br><span class="line">[root@haproxy haproxy]# systemctl start nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用nginx提供一个haproxy的错误页</span></span><br><span class="line">[root@haproxy haproxy]# curl --basic --user admin:centos http://192.168.1.25:9099/myproxy?admin/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用curl命令访问，基于basic认证，用户名和密码用--user指定</span></span><br><span class="line"></span><br><span class="line">使用一台新主机访问http://192.168.1.25:9099/myproxy?admin，因为此主机的地址不是192.168.1.9，所以返回nginx提供的错误页内容：403 Forbidden from nginx。</span><br></pre></td></tr></table></figure>
+<h3 id="后端主机动静分离"><a href="#后端主机动静分离" class="headerlink" title="后端主机动静分离"></a>后端主机动静分离</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">后端两台web服务器，一台配置为两个虚拟主机，支持动态服务。另一台也配置为两台虚拟主机，支持静态服务。静态服务当图片服务器</span><br><span class="line">==============================================================================================</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd1</span><br><span class="line">------------</span><br><span class="line">[root@httpd1 network-scripts]# yum install -y php</span><br><span class="line">[root@httpd1 ~]# mkdir -pv /data/web/vhost&#123;1,2&#125;</span><br><span class="line">[root@httpd1 ~]# vim /data/web/vhost1/info.php</span><br><span class="line">&lt;h1&gt;Application Server 1&lt;/h1&gt;		#vhost2中将此处改为Application Server 2</span><br><span class="line">&lt;?php</span><br><span class="line">   phpinfo();</span><br><span class="line">?&gt;</span><br><span class="line">[root@httpd1 ~]# cp /data/web/vhost&#123;1,2&#125;/info.php</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将vhost1中的info.php复制到vhost2中</span></span><br><span class="line">[root@httpd1 ~]# vim /etc/httpd/conf.d/vhost1.conf</span><br><span class="line">&lt;VirtualHost *:80&gt;</span><br><span class="line">   ServerName www1.test.com</span><br><span class="line">   DocumentRoot "/data/web/vhost1"</span><br><span class="line">   &lt;Directory "/data/web/vhost1"&gt;</span><br><span class="line">      options FollowSymLinks</span><br><span class="line">      AllowOverride None</span><br><span class="line">      Require all granted</span><br><span class="line">   &lt;/Directory&gt;</span><br><span class="line">&lt;/VirtualHost&gt;</span><br><span class="line">[root@httpd1 ~]# cp /etc/httpd/conf.d/vhost&#123;1,2&#125;.conf</span><br><span class="line">[root@httpd1 ~]# vim /etc/httpd/conf.d/vhost2.conf</span><br><span class="line">Listen 8080</span><br><span class="line">&lt;VirtualHost *:8080&gt;</span><br><span class="line">   ServerName www2.test.com</span><br><span class="line">   DocumentRoot "/data/web/vhost2"</span><br><span class="line">   &lt;Directory "/data/web/vhost2"&gt;</span><br><span class="line">      options FollowSymLinks</span><br><span class="line">      AllowOverride None</span><br><span class="line">      Require all granted</span><br><span class="line">   &lt;/Directory&gt;</span><br><span class="line">&lt;/VirtualHost&gt;</span><br><span class="line">[root@httpd1 ~]# httpd -t</span><br><span class="line">[root@httpd1 ~]# systemctl restart httpd</span><br><span class="line">访问http://172.16.106.145/info.php，http://172.16.106.145:8080/info.php可以看到php页面</span><br><span class="line">[root@httpd1 ~]# scp /etc/httpd/conf.d/vhost* 172.16.106.144:/etc/httpd/conf.d/</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  httpd2</span><br><span class="line">------------</span><br><span class="line">[root@httpd2 ~]# mkdir -pv /data/web/vhost&#123;1,2&#125;</span><br><span class="line">[root@httpd2 vhost1]# find /usr/share -iname "*.jpg" -exec cp &#123;&#125; /data/web/vhost1/ \;</span><br><span class="line">[root@httpd2 vhost1]# find /usr/share -iname "*.jpg" -exec cp &#123;&#125; /data/web/vhost2/ \;</span><br><span class="line">[root@httpd2 ~]# vim /data/web/vhost1/test.txt</span><br><span class="line">Image Server 1</span><br><span class="line">[root@httpd2 ~]# vim /data/web/vhost2/test.txt</span><br><span class="line">Image Server 2</span><br><span class="line">[root@httpd2 ~]# systemctl restart httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里已有从httpd1上复制过来的配置文件</span></span><br><span class="line">访问http://172.16.106.144/test.txt，http://172.16.106.144:8080/test.txt</span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">    compression algo gzip</span><br><span class="line">    compression type text/html text/plain application/xml application/javascript</span><br><span class="line">    acl static path_end .jpg .jpeg .png .gif .txt .html .css .javascript .js</span><br><span class="line"><span class="meta">#</span><span class="bash"> path_end表示以什么结尾的。请求时，一定要写明后缀，如curl 192.168.1.25/index.html，不然请求都会被代理到动态服务器上。因为设置了默认是发给动态服务器，而且动态服务器设置了cookie粘性绑定，信息是不会变的</span></span><br><span class="line">    acl static path_beg /imgs /images /css /javascripts</span><br><span class="line"><span class="meta">#</span><span class="bash"> path_beg定义以什么开头。两个acl可以一起使用</span></span><br><span class="line">    use_backend staticsrvs if static</span><br><span class="line"><span class="meta">#</span><span class="bash"> use_backend表示当符合指定的条件时使用特定的backend。这表示如果访问的内容是以acl中定义的结尾的静态内容，就给后端的staticsrvs主机。否则就给下面default定义的动态主机</span></span><br><span class="line">	default_backend dynsrvs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认主机组</span></span><br><span class="line">    reqadd X-Proxy-By:\ HAProxy</span><br><span class="line">    rspadd X-Proxy-By:\ HAProxy-1.5</span><br><span class="line">    rspidel ^Server:.*</span><br><span class="line">backend dynsrvs</span><br><span class="line">    cookie SRV insert indirect nocache</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.145:80 check inter 3000ms rise 1 fall 2 weight 2 cookie dynsrv1</span><br><span class="line">    server      srv2 172.16.106.145:8080 check weight 1 cookie dynsrv2</span><br><span class="line">backend staticsrvs</span><br><span class="line">    balance     roundrobin</span><br><span class="line">    server      srv1 172.16.106.144:80 check</span><br><span class="line">    server      srv2 172.16.106.144:8080 check</span><br><span class="line">listen stats</span><br><span class="line">    bind *:9099</span><br><span class="line">    acl allowstats src 192.168.1.9</span><br><span class="line">    block if ! allowstats</span><br><span class="line">    errorloc 403 http://192.168.1.25:10080/errorloc/403.htm</span><br><span class="line">    stats enable</span><br><span class="line">    stats uri /myproxy?admin</span><br><span class="line">    stats realm "HAProxy Stats Page"</span><br><span class="line">    stats auth admin:centos</span><br><span class="line">    stats admin if TRUE</span><br><span class="line">listen sshsrvs</span><br><span class="line">    mode tcp</span><br><span class="line">    bind *:22322</span><br><span class="line">    balance leastconn</span><br><span class="line">    server sshsrv1 172.16.106.145:22 check</span><br><span class="line">    server sshsrv2 172.16.106.144:22 check</span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line"></span><br><span class="line">访问状态页192.168.1.25:9099/myproxy?admin</span><br><span class="line">访问192.168.1.25/info.php，因为cookie绑定了，所以内容不会变</span><br><span class="line">访问192.168.1.25/test.txt，多次访问会有变化</span><br></pre></td></tr></table></figure>
+<h3 id="阻塞curl工具访问"><a href="#阻塞curl工具访问" class="headerlink" title="阻塞curl工具访问"></a>阻塞curl工具访问</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">	acl bad_browsers hdr_reg(User-Agent) .*curl.*</span><br><span class="line">    block if bad_browsers</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入上面两条，定义acl，用hdr_reg，直接匹配用户请求报文中的首部，下面使用block拒绝acl设置的客户端访问</span></span><br><span class="line">[root@haproxy haproxy]# systemctl restart haproxy.service</span><br><span class="line">[root@haproxy haproxy]# curl http://192.168.1.25</span><br><span class="line">&lt;html&gt;&lt;body&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;</span><br><span class="line">Request forbidden by administrative rules.</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="阻塞域访问"><a href="#阻塞域访问" class="headerlink" title="阻塞域访问"></a>阻塞域访问</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  myweb  *:80</span><br><span class="line">	acl valid_referers hdr_reg(Referer) \.ruopu\.com.*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用hdr_reg，匹配Referer，匹配来自ruopu.com的任何值</span></span><br><span class="line">    block unless valid_referers</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不是上面定义的值就拒绝</span></span><br><span class="line">[root@haproxy haproxy]# curl -e "http://www.ruopu.com/admin.php" http://192.168.1.25/test2.html</span><br><span class="line">Test Page 2 @BES 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用-e模拟一个Referer，这样就能返回值了</span></span><br><span class="line">[root@haproxy haproxy]# curl http://192.168.1.25/test2.html</span><br><span class="line">&lt;html&gt;&lt;body&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;</span><br><span class="line">Request forbidden by administrative rules.</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接访问是没有权限的</span></span><br></pre></td></tr></table></figure>
+<h3 id="SSL功能"><a href="#SSL功能" class="headerlink" title="SSL功能"></a>SSL功能</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">  haproxy</span><br><span class="line">--------------</span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend https</span><br><span class="line">    bind *:443 ssl crt /etc/haproxy/certs/haproxy.pem</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义用ssl协议，crt指明密钥的路径</span></span><br><span class="line">    acl static path_end .jpg .jpeg .png .gif .txt .html .css .javascript .js</span><br><span class="line">    acl static path_beg /imgs /images /css /javascripts</span><br><span class="line">    use_backend staticsrvs if static</span><br><span class="line">    default_backend dynsrvs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 与上面一样，如果是特定结尾或开头的就转到静态页，不是的就转到动态页</span></span><br><span class="line"></span><br><span class="line">frontend  http   *:80</span><br><span class="line">    redirect scheme https if ! &#123; ssl_fc &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> redirect即为重定向之意。scheme指协议，ssl_fc指非ssl会话的前端链接。这是定义，如果不是https协议的非前端会话，都转到https443端口上。</span></span><br><span class="line">[root@haproxy certs]# mkdir /etc/haproxy/certs</span><br><span class="line">[root@haproxy certs]# cd /etc/pki/CA</span><br><span class="line">[root@haproxy certs]# (umask 077;openssl genrsa -out private/cakey.pem 4096)</span><br><span class="line">[root@haproxy certs]# openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 365</span><br><span class="line">[root@haproxy certs]# touch index.txt</span><br><span class="line">[root@haproxy certs]# echo 01 &gt; serial</span><br><span class="line">[root@haproxy certs]# cd /etc/haproxy/certs/</span><br><span class="line">[root@haproxy certs]# openssl genrsa -out haproxy.key 2048</span><br><span class="line">[root@haproxy certs]# openssl req -new -key haproxy.key -out haproxy.csr</span><br><span class="line">[root@haproxy certs]# openssl ca -in haproxy.csr -out haproxy.crt</span><br><span class="line">[root@haproxy certs]# cat haproxy.crt haproxy.key &gt; haproxy.pem</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将两个文件打包成pem文件</span></span><br><span class="line">[root@haproxy certs]# chmod 600 haproxy.pem</span><br><span class="line">[root@haproxy certs]# systemctl restart haproxy</span><br><span class="line">[root@haproxy certs]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时应该有443和8080端口被监听</span></span><br><span class="line"></span><br><span class="line">访问https://192.168.1.25/test.txt</span><br><span class="line">访问http://192.168.1.25/test.txt，访问会被重定向到https</span><br><span class="line"></span><br><span class="line">[root@haproxy haproxy]# vim haproxy.cfg</span><br><span class="line">frontend  http   *:80</span><br><span class="line">    redirect location https://192.168.1.25 if ! &#123; ssl_fc &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置所有请求都重定向到https://172.16.0.67</span></span><br><span class="line"></span><br><span class="line">访问http://192.168.1.25/test.txt，这会重定向到https://172.16.0.67。不论访问什么页面，都会重定向到https://172.16.0.67</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/haproxy/" rel="tag"># haproxy</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/28/LVS部署/" rel="next" title="LVS部署">
+                <i class="fa fa-chevron-left"></i> LVS部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">83</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件"><span class="nav-number">1.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试轮询"><span class="nav-number">2.</span> <span class="nav-text">测试轮询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#first算法"><span class="nav-number">3.</span> <span class="nav-text">first算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#uri算法"><span class="nav-number">4.</span> <span class="nav-text">uri算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hdr算法"><span class="nav-number">5.</span> <span class="nav-text">hdr算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#压缩测试"><span class="nav-number">6.</span> <span class="nav-text">压缩测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备用主机"><span class="nav-number">7.</span> <span class="nav-text">备用主机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七层反向代理"><span class="nav-number">8.</span> <span class="nav-text">七层反向代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重定向"><span class="nav-number">9.</span> <span class="nav-text">重定向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权重"><span class="nav-number">10.</span> <span class="nav-text">权重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态页"><span class="nav-number">11.</span> <span class="nav-text">状态页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义状态页uri"><span class="nav-number">12.</span> <span class="nav-text">自定义状态页uri</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#登录状态页认证"><span class="nav-number">13.</span> <span class="nav-text">登录状态页认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义状态页面的端口"><span class="nav-number">14.</span> <span class="nav-text">自定义状态页面的端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代理ssh"><span class="nav-number">15.</span> <span class="nav-text">代理ssh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie粘性绑定"><span class="nav-number">16.</span> <span class="nav-text">cookie粘性绑定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让后端主机收到的请求地址是源地址"><span class="nav-number">17.</span> <span class="nav-text">让后端主机收到的请求地址是源地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加首部"><span class="nav-number">18.</span> <span class="nav-text">添加首部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#acl访问控制"><span class="nav-number">19.</span> <span class="nav-text">acl访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后端主机动静分离"><span class="nav-number">20.</span> <span class="nav-text">后端主机动静分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞curl工具访问"><span class="nav-number">21.</span> <span class="nav-text">阻塞curl工具访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞域访问"><span class="nav-number">22.</span> <span class="nav-text">阻塞域访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL功能"><span class="nav-number">23.</span> <span class="nav-text">SSL功能</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -319,6 +319,375 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/23/docker学习六：数据管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/23/docker学习六：数据管理/" itemprop="url">
+                  docker学习六：数据管理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-23 09:40:22 / 修改時間：12:38:54" itemprop="dateCreated datePublished" datetime="2018-11-23T09:40:22+08:00">2018-11-23</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="数据管理"><a href="#数据管理" class="headerlink" title="数据管理"></a>数据管理</h3><h4 id="数据卷-Volumes"><a href="#数据卷-Volumes" class="headerlink" title="数据卷(Volumes)"></a>数据卷(Volumes)</h4><blockquote>
+<p>数据卷是一个可供一个或多个容器使用的特殊目录，它绕过UFS，可以提供很多有用的特性：</p>
+<ul>
+<li>数据卷可以在容器之间共享和重用</li>
+<li>对数据卷的修改会立即生效</li>
+<li>对数据卷的更新，不会影响镜像</li>
+<li>数据卷默认会一直存在，即使容器被删除</li>
+</ul>
+<p>数据卷的使用，类似于Linux下对目录或文件进行mount，镜像中的被指定为挂载点的目录中的文件会隐藏掉，能显示看的是挂载的数据卷</p>
+</blockquote>
+<h5 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">ruopu@ruopu:~$ docker volume  create my-vol</span><br><span class="line">my-vol</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个叫my-vol的卷</span></span><br><span class="line">ruopu@ruopu:~$ docker volume ls  </span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               my-vol</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看所有的数据卷</span></span><br><span class="line">ruopu@ruopu:~$ docker volume inspect my-vol </span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "CreatedAt": "2018-11-23T01:46:21Z",</span><br><span class="line">        "Driver": "local",</span><br><span class="line">        "Labels": &#123;&#125;,</span><br><span class="line">        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">        "Name": "my-vol",</span><br><span class="line">        "Options": &#123;&#125;,</span><br><span class="line">        "Scope": "local"</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看指定数据卷的信息。inspect[<span class="keyword">in</span>ˈspekt]:检查；point[pɔint]：点；mountpoint：挂载点；scope[skəup]：范围</span></span><br><span class="line">root@ruopu:~# ll -h /var/lib/docker/volumes/</span><br><span class="line">total 36K</span><br><span class="line">drwx------  3 root root 4.0K Nov 23 01:46 ./</span><br><span class="line">drwx--x--x 14 root root 4.0K Nov 21 03:40 ../</span><br><span class="line">-rw-------  1 root root  32K Nov 23 01:46 metadata.db</span><br><span class="line">drwxr-xr-x  3 root root 4.0K Nov 23 01:46 my-vol/</span><br></pre></td></tr></table></figure>
+<h5 id="启动一个挂载数据卷的容器"><a href="#启动一个挂载数据卷的容器" class="headerlink" title="启动一个挂载数据卷的容器"></a>启动一个挂载数据卷的容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">ruopu@ruopu:~$ docker run -d -P --name web --mount source=my-vol,target=/webapp nginx </span><br><span class="line">cb192c96fc3232d42e6a33440945e152cd3dd3a20fce95e0a12440b489a822fe</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建容器，-P选项表示让Docker随机映射一个 49000~49900 的端口到内部容器开放的网络端口。<span class="built_in">source</span>指定为外部的数据卷名，target指定容器内的路径，如果容器内没有这个路径，在创建时会自动创建。之后指定从哪个镜像创建。</span></span><br><span class="line">root@ruopu:~# docker exec -it web1 bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入容器</span></span><br><span class="line">root@fc042722e238:/# ls -l /     </span><br><span class="line">total 72</span><br><span class="line">.......</span><br><span class="line">drwxr-xr-x   1 root root 4096 Nov 12 00:00 usr</span><br><span class="line">drwxr-xr-x   1 root root 4096 Nov 12 00:00 var</span><br><span class="line">drwxr-xr-x   2 root root 4096 Nov 23 01:46 webapp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到容器内根下的webapp目录</span></span><br><span class="line">root@ruopu:~# cp /etc/fstab /var/lib/docker/volumes/my-vol/_data</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在数据卷中还有一个_data目录，要将文件放在这个目录中，这样在容器内的挂载点上就能看到这个文件了。这里将fstab文件放到了_data目录中。</span></span><br><span class="line">root@fc042722e238:/# ls /webapp/</span><br><span class="line">fstab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在容器内也可以看到这个文件了</span></span><br><span class="line">root@ruopu:~# docker inspect web</span><br><span class="line">...</span><br><span class="line">"Mounts": [</span><br><span class="line">            &#123;</span><br><span class="line">                "Type": "volume",</span><br><span class="line">                "Name": "my-vol",</span><br><span class="line">                "Source": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">                "Destination": "/webapp",</span><br><span class="line">                "Driver": "local",</span><br><span class="line">                "Mode": "z",</span><br><span class="line">                "RW": true,</span><br><span class="line">                "Propagation": ""</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用inspect命令检查web容器的信息，在输出中的Mounts中有数据卷的信息</span></span><br></pre></td></tr></table></figure>
+<h5 id="删除数据卷"><a href="#删除数据卷" class="headerlink" title="删除数据卷"></a>删除数据卷</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker volume rm my-vol </span><br><span class="line">Error response from daemon: remove my-vol: volume is in use - [cb192c96fc3232d42e6a33440945e152cd3dd3a20fce95e0a12440b489a822fe, fc042722e2380b62651271fe36a7d4388a50cff2ea2321550ad2953ea46cf4b0]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接删除数据卷会有一个错误提示，告知数据卷正在被哪些容器使用，也就是后面中括号中的容器ID。不删除容器，是不能删除数据卷的</span></span><br><span class="line">root@ruopu:~# docker container stop web1</span><br><span class="line">web1</span><br><span class="line">root@ruopu:~# docker container rm web1</span><br><span class="line">web1</span><br><span class="line">root@ruopu:~# docker container rm web</span><br><span class="line">web</span><br><span class="line">root@ruopu:~# docker volume rm my-vol </span><br><span class="line">my-vol</span><br><span class="line">root@ruopu:~# ls /var/lib/docker/volumes/</span><br><span class="line">metadata.db</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除这样占用数据卷的容器后再删除数据卷就没问题了，再查看本地的相应位置也没有数据卷了</span></span><br><span class="line">root@ruopu:~# docker -v</span><br><span class="line">Docker version 18.09.0, build 4d60db4</span><br><span class="line">root@ruopu:~# docker rm -v web</span><br><span class="line">web</span><br><span class="line">root@ruopu:~# ls /var/lib/docker/volumes/m</span><br><span class="line">metadata.db  my-vol/ </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在18.09.0版本中测试发现，使用<span class="string">"docker rm -v 容器ID"</span>命令并不会删除数据卷。</span></span><br><span class="line"></span><br><span class="line">* 删除无主的数据卷</span><br><span class="line">root@ruopu:~# docker volume create my-vol</span><br><span class="line">my-vol</span><br><span class="line">root@ruopu:~# docker volume inspect my-vol </span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "CreatedAt": "2018-11-23T03:36:38Z",</span><br><span class="line">        "Driver": "local",</span><br><span class="line">        "Labels": &#123;&#125;,</span><br><span class="line">        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",</span><br><span class="line">        "Name": "my-vol",</span><br><span class="line">        "Options": &#123;&#125;,</span><br><span class="line">        "Scope": "local"</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line">root@ruopu:~# docker volume prune</span><br><span class="line">WARNING! This will remove all local volumes not used by at least one container.</span><br><span class="line">Are you sure you want to continue? [y/N] y</span><br><span class="line">Deleted Volumes:</span><br><span class="line">my-vol</span><br><span class="line"></span><br><span class="line">Total reclaimed space: 0B</span><br><span class="line">root@ruopu:~# docker volume ls </span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先创建一个数据卷，再删除</span></span><br></pre></td></tr></table></figure>
+<h4 id="挂载主机目录-Bind-mounts"><a href="#挂载主机目录-Bind-mounts" class="headerlink" title="挂载主机目录(Bind mounts)"></a>挂载主机目录(Bind mounts)</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker run -d -P --name web --mount type=bind,source=/etc/init.d,target=/opt/webapp nginx</span><br><span class="line">58ef89a432971bcec8ca0031a69960549d85766b5f42cc40d09e65a662f027c9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="built_in">type</span>=<span class="built_in">bind</span>将本地的目录挂载到容器中，但用<span class="built_in">source</span>指定的本地目录一定要使用绝对路径，如果本地目录不存在，Docker会报错。</span></span><br><span class="line"></span><br><span class="line">* 以只读方式挂载本地目录</span><br><span class="line">root@ruopu:~# docker run -d -P --name web1 --mount type=bind,source=/etc/init.d,target=/opt/webapp,readonly nginx         </span><br><span class="line">f59500a342675873413040fa09dea6f626df2215430640830fde9e46c1195fc5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建时加入<span class="built_in">readonly</span>，使用户对目录只有只读权限</span></span><br><span class="line">root@10c115755312:/# cd /opt/webapp/</span><br><span class="line">root@10c115755312:/opt/webapp# mkdir a</span><br><span class="line">mkdir: cannot create directory 'a': Read-only file system</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建目录时会有不能创建的提示</span></span><br><span class="line">root@ruopu:~# docker inspect web1|grep Mounts -A 10</span><br><span class="line">            "Mounts": [</span><br><span class="line">                &#123;</span><br><span class="line">                    "Type": "bind",</span><br><span class="line">                    "Source": "/etc/init.d",</span><br><span class="line">                    "Target": "/opt/webapp",</span><br><span class="line">                    "ReadOnly": true</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            "Mounts": [</span><br><span class="line">                &#123;</span><br><span class="line">                    "Type": "bind",</span><br><span class="line">                    "Source": "/etc/init.d",</span><br><span class="line">                    "Destination": "/opt/webapp",</span><br><span class="line">                    "Mode": "",</span><br><span class="line">                    "RW": false,</span><br><span class="line">                    "Propagation": "rprivate"</span><br><span class="line">                &#125;</span><br><span class="line">        	],</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到，上面的ReadOnly是<span class="literal">true</span>，下面的RW是<span class="literal">false</span></span></span><br></pre></td></tr></table></figure>
+<h5 id="挂载一个本地主机文件作为数据卷"><a href="#挂载一个本地主机文件作为数据卷" class="headerlink" title="挂载一个本地主机文件作为数据卷"></a>挂载一个本地主机文件作为数据卷</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker run --rm -it --mount type=bind,source=$HOME/.bash_history,target=/root/.bash_history ubuntu:14.04 bash</span><br><span class="line">root@4e18204505bf:/# history </span><br><span class="line">    1  apt update</span><br><span class="line">    2  ping www.baidu.com</span><br><span class="line">    3  ip a</span><br><span class="line">    4  ping 192.168.0.1</span><br><span class="line">    5  vim /etc/resolv.conf </span><br><span class="line">    6  ping www.baidu.com</span><br><span class="line">    7  ping 192.168.0.55</span><br><span class="line">    8  vim /etc/network/interfaces </span><br><span class="line">    9  ip a</span><br><span class="line">   10  vim /etc/network/interfaces </span><br><span class="line">   11  systemctl restart networking</span><br><span class="line">   ...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用--mount标记从主机挂载单个文件到容器中，这样就可以记录在容器输入过的命令了，也可以看到本地执行过的命令了</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/22/docker学习五：访问Docker仓库/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/22/docker学习五：访问Docker仓库/" itemprop="url">
+                  docker学习五：访问Docker仓库
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-22 16:52:20" itemprop="dateCreated datePublished" datetime="2018-11-22T16:52:20+08:00">2018-11-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-23 08:55:25" itemprop="dateModified" datetime="2018-11-23T08:55:25+08:00">2018-11-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="访问仓库"><a href="#访问仓库" class="headerlink" title="访问仓库"></a>访问仓库</h3><blockquote>
+<p>仓库(Repository)是集中存放镜像的地方。<br>一个容易混淆的概念是注册服务器(Registry)。实际上注册服务器是管理仓库的具体服务器,每个服务器上可以有多个仓库,而每个仓库下面有多个镜像。从这方面来说,仓库可以被认为是一个具体的项目或目录。例如对于仓库地址 dl.dockerpool.com/ubuntu来说, dl.dockerpool.com是注册服务器地址，ubuntu是仓库名。</p>
+<p>大部分时候,并不需要严格区分这两者的概念。</p>
+</blockquote>
+<h4 id="Docker-Hub"><a href="#Docker-Hub" class="headerlink" title="Docker Hub"></a>Docker Hub</h4><h5 id="注册"><a href="#注册" class="headerlink" title="注册"></a>注册</h5><blockquote>
+<p>你可以在 <a href="https://cloud.docker.com" target="_blank" rel="noopener">https://cloud.docker.com</a> 免费注册一个 Docker 账号</p>
+</blockquote>
+<h5 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h5><blockquote>
+<p>可以通过执行docker login命令交互式的输入用户名及密码来完成在命令行界面登录Docker Hub</p>
+</blockquote>
+<h5 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker search centos</span><br><span class="line">NAME                               DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED</span><br><span class="line">centos                             The official build of CentOS.                   4939                [OK]                </span><br><span class="line">ansible/centos7-ansible            Ansible on Centos7                              119                                     [OK]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用search搜索镜像。可以看到返回了很多包含关键字的镜像,其中包括镜像名字、描述、收藏数(表示该镜像的受关注程度)、是否官方创建、是否自动创建。官方的镜像说明是官方项目组创建和维护的,automated 资源允许用户验证镜像的来源和内容。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 根据是否是官方提供,可将镜像资源分为两类。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一种是类似centos这样的镜像,被称为基础镜像或根镜像。这些基础镜像由 Docker 公司创建、验证、支持、提供。这样的镜像往往使用单个单词作为名字。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 还有一种类型,比如ansible/centos7-ansible镜像,它是由 Docker 的用户创建并维护的,往往带有用户名称前缀。可以通过前缀username/来指定使用某个用户提供的镜像,比如 ansible 用户。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外,在查找的时候通过--filter=stars=N参数可以指定仅显示收藏数量为N以上的镜像。</span></span><br><span class="line">root@ruopu:~# docker pull centos</span><br><span class="line">Using default tag: latest</span><br><span class="line">latest: Pulling from library/centos</span><br><span class="line">aeb7866da422: Pull complete </span><br><span class="line">Digest: sha256:67dad89757a55bfdfabec8abd0e22f8c7c12a1856514726470228063ed86593b</span><br><span class="line">Status: Downloaded newer image for centos:latest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用pull命令下载镜像</span></span><br></pre></td></tr></table></figure>
+<h5 id="推送镜像"><a href="#推送镜像" class="headerlink" title="推送镜像"></a>推送镜像</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu:~# docker login </span><br><span class="line">Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.</span><br><span class="line">Username: yaozheng64</span><br><span class="line">Password: </span><br><span class="line">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.</span><br><span class="line">Configure a credential helper to remove this warning. See</span><br><span class="line">https://docs.docker.com/engine/reference/commandline/login/#credentials-store</span><br><span class="line"></span><br><span class="line">Login Succeeded</span><br><span class="line"><span class="meta">#</span><span class="bash"> 登录docker</span></span><br><span class="line">root@ruopu:~# docker tag ubuntu:14.04 yaozheng64/ubuntu:14.04</span><br><span class="line"><span class="meta">#</span><span class="bash"> 准备要推送的镜像，一定要写为自己docker的username</span></span><br><span class="line">root@ruopu:~# docker image ls</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">yaozheng64/ubuntu   14.04               f17b6a61de28        2 days ago          188MB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看在本地有了要推送的镜像</span></span><br><span class="line">root@ruopu:~# docker push yaozheng64/ubuntu:14.04</span><br><span class="line">The push refers to repository [docker.io/yaozheng64/ubuntu]</span><br><span class="line">85a0d9a0e38e: Mounted from library/ubuntu </span><br><span class="line">fe72fc94fa1a: Mounted from library/ubuntu </span><br><span class="line">ea213108ab36: Mounted from library/ubuntu </span><br><span class="line">960c7c5516b2: Mounted from library/ubuntu </span><br><span class="line">14.04: digest: sha256:296c2904734ac0f13f3ab7265eeafb2efc33f085eeb87c875d28c360cec18700 size: 1152</span><br><span class="line"><span class="meta">#</span><span class="bash"> 推送镜像</span></span><br><span class="line">ruopu@ruopu:~$ docker search yaozheng64</span><br><span class="line">NAME                DESCRIPTION         STARS               OFFICIAL            AUTOMATED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询自己上传的镜像，没有结果。可能是因为上传的镜像与已有镜像是一样的，所以不会上传，并且再次上传时提示文件已存在。</span></span><br></pre></td></tr></table></figure>
+<h5 id="自动创建"><a href="#自动创建" class="headerlink" title="自动创建"></a>自动创建</h5><blockquote>
+<p> 自动创建(Automated Builds)功能对于需要经常升级镜像内程序来说,十分方便。<br> 有时候,用户创建了镜像,安装了某个软件,如果软件发布新版本则需要手动更新镜像。而自动创建允许用户通过 Docker Hub 指定跟踪一个目标网站(目前支持 GitHub 或BitBucket)上的项目,一旦项目发生新的提交或者创建新的标签(tag),Docker Hub 会自动构建镜像并推送到 Docker Hub 中。<br> 要配置自动创建,包括如下的步骤:</p>
+<ul>
+<li><p>创建并登录 Docker Hub,以及目标网站;</p>
+</li>
+<li><p>在目标网站中连接帐户到 Docker Hub;</p>
+</li>
+<li><p>在 Docker Hub 中 配置一个自动创建;</p>
+</li>
+<li><p>选取一个目标网站中的项目(需要含Dockerfile)和分支;</p>
+</li>
+<li><p>指定Dockerfile的位置,并提交创建。</p>
+</li>
+</ul>
+<p>之后,可以在 Docker Hub 的 自动创建页面中跟踪每次创建的状态。</p>
+</blockquote>
+<h4 id="私有仓库"><a href="#私有仓库" class="headerlink" title="私有仓库"></a>私有仓库</h4><h4 id="私有仓库高级配置"><a href="#私有仓库高级配置" class="headerlink" title="私有仓库高级配置"></a>私有仓库高级配置</h4><h4 id="Nexus3"><a href="#Nexus3" class="headerlink" title="Nexus3"></a>Nexus3</h4>
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/22/dns配置使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1799,395 +2168,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/阿里云调整/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/15/阿里云调整/" itemprop="url">
-                  阿里云调整
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-15 13:04:26" itemprop="dateCreated datePublished" datetime="2018-11-15T13:04:26+08:00">2018-11-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-11-21 10:56:24" itemprop="dateModified" datetime="2018-11-21T10:56:24+08:00">2018-11-21</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="报警"><a href="#报警" class="headerlink" title="报警"></a>报警</h3><p>可以先创建报警人组与报警人，这里只是对硬件的资源的基本监控。</p>
-<p><img src="/images/alichange/监控报警1.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警2.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警3.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警4.jpg" alt=""></p>
-<p><img src="/images/alichange/监控报警5.jpg" alt=""></p>
-<p><img src="/images/alichange/报警人1.jpg" alt=""></p>
-<p><img src="/images/alichange/报警人2.jpg" alt=""></p>
-<h3 id="创建交换机"><a href="#创建交换机" class="headerlink" title="创建交换机"></a>创建交换机</h3><p>建议将所有ECS虚拟机放在一个交换机中，这样便于管理，也可以避免不同交换机间通信需要进行一次路由的问题。</p>
-<p><img src="/images/alichange/vpc1.jpg" alt=""></p>
-<p><img src="/images/alichange/vpc2.jpg" alt=""></p>
-<p><img src="/images/alichange/vpc3.jpg" alt=""></p>
-<h3 id="共享带宽"><a href="#共享带宽" class="headerlink" title="共享带宽"></a>共享带宽</h3><p>购买NAT网关，设置DNAT，将需要外网访问的内网地址加入DNAT。SNAT中要匹配现有的所有交换机</p>
-<p><img src="/images/alichange/NAT1.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT2.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT3.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT4.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT5.jpg" alt=""></p>
-<p><img src="/images/alichange/NAT6.jpg" alt=""></p>
-<h3 id="内网负载均衡"><a href="#内网负载均衡" class="headerlink" title="内网负载均衡"></a>内网负载均衡</h3><p>主要为RabbitMQ使用。在监听中定义要监听的端口，在默认服务器组中加入两台服务器，这样就会监听两个服务器的这些定义了的端口</p>
-<p><img src="/images/alichange/balance1.jpg" alt=""></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/KVM使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/15/KVM使用/" itemprop="url">
-                  KVM使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-15 09:28:28" itemprop="dateCreated datePublished" datetime="2018-11-15T09:28:28+08:00">2018-11-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-22 17:12:17" itemprop="dateModified" datetime="2019-01-22T17:12:17+08:00">2019-01-22</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/虚拟化/" itemprop="url" rel="index"><span itemprop="name">虚拟化</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="KVM安装"><a href="#KVM安装" class="headerlink" title="KVM安装"></a>KVM安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">安装环境在CentOS6.6_x64</span><br><span class="line">* 方法一</span><br><span class="line">1. 查看是否支持虚拟化</span><br><span class="line">egrep '(vmx|svm)' /proc/cpuinfo</span><br><span class="line">2. 关闭SELinux和防火墙</span><br><span class="line">setenforce 0</span><br><span class="line">getenforce</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl disable firewalld</span><br><span class="line">3. 加载kvm模块</span><br><span class="line">modprobe kvm</span><br><span class="line">4. 查看是否加载kvm</span><br><span class="line">lsmod | grep kvm</span><br><span class="line">5. 安装KVM软件</span><br><span class="line">yum -y install qemu-kvm qemu-kvm-tools</span><br><span class="line">6. 因为安装后qemu-kvm命令不在环境变量中，所以要添加</span><br><span class="line">ln -sv /usr/libexec/qemu-kvm /usr/sbin</span><br><span class="line">7. qemu-kvm查看帮助、支持模拟的PC、可模拟的CPU架构</span><br><span class="line">qemu-kvm -h</span><br><span class="line">qemu-kvm -M ?</span><br><span class="line">qemu-kvm -cpu ?</span><br><span class="line">8. 安装VNC服务端</span><br><span class="line">yum -y install tigervnc-server</span><br><span class="line">9. 将系统镜像文件复制到服务器</span><br><span class="line">10. 创建虚拟机的镜像文件目录并创建镜像文件</span><br><span class="line">mkdir /images/vm1 -pv</span><br><span class="line">qemu-img create -f qcow2 -o size=100G /images/vm1/ubuntu.qcow2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟机前，需要先有一个虚拟磁盘文件，不然无法创建虚拟机</span></span><br><span class="line">11. 创建虚拟机</span><br><span class="line">qemu-kvm -name "ubuntu10" -m 1024 -smp 2 -hda /images/vm1/ubuntu.qcow2 -cdrom ubuntu-10.01.***.iso -vnc :0 -boot order=dc</span><br><span class="line"><span class="meta">#</span><span class="bash"> -name是取一个虚拟机的名字；-m指定内存大小；-smp指定CPU的颗数，但不要超过物理核心数；-hda是指定磁盘镜像，因为是本地第一个分区所以用-hda；-cdrom是指定光盘镜像；-boot是指定启动次序，这里的d指使用一次；-net nic是指定网卡的，指定nic会向某个接口进行桥连接，如果不能连接会报错，所以这里不用此选项；-vnc :0是为了避免vnc连接失败。启动后提示在5900上启动了vnc</span></span><br><span class="line">12. 在CentOS上安装vnc客户端测试</span><br><span class="line">yum -y install tigervnc</span><br><span class="line">13. 连接VNC服务器进行安装</span><br><span class="line">vncviewer :5900</span><br><span class="line">14. windows上安装VNC-viewer软件，连接时输入IP:5900，NAME输入在qemu-kvm创建时用-name创建的虚拟机名字</span><br><span class="line">15. 安装xp系统</span><br><span class="line">qemu-img create -f qcow2 -o size=100G /images/vm1/xp.qcow2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟磁盘</span></span><br><span class="line">qemu-kvm -name "winxp" -m 768 -smp 4 -drive file=/images/vm1/xp.qcow2,if=ide,index=0,media=disk,format=qcow2 -drive file=/root/winxp_ghost.iso,media=cdrom,index=1 -vnc :0 -boot order=dc</span><br><span class="line"><span class="meta">#</span><span class="bash"> -drive中的第一個file指定磁盤映像文件，<span class="keyword">if</span>指定磁盤接口類型，index表示爲第幾個設備，0爲第一個設備，從0開始編號，media=disk表示是一個磁盤設備，format=qcow2是指定映像文件的格式。第二個file指定光盤映像文件，media=cdrom是指明是一個光盤。啓動成功。</span></span><br><span class="line">16. 安装openSUSE</span><br><span class="line">qemu-kvm -m 2048 -name opensuse -drive file=/home/ruopu/private1/VirtaulOS/openSUSE/openSUSE.qcow2,media=disk,format=qcow2,if=ide -net nic -boot c</span><br><span class="line"></span><br><span class="line">* 方法二</span><br><span class="line">1. 查看是否支持虚拟化</span><br><span class="line">egrep '(vmx|svm)' /proc/cpuinfo</span><br><span class="line">2. 关闭SELinux和防火墙</span><br><span class="line">setenforce 0</span><br><span class="line">getenforce</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl disable firewalld</span><br><span class="line">3. 加载kvm模块</span><br><span class="line">modprobe kvm</span><br><span class="line">4. 查看是否加载kvm</span><br><span class="line">lsmod | grep kvm</span><br><span class="line">5. 安装依赖软件</span><br><span class="line">yum install -y qemu-kvm libvirt virt-install bridge-utils tigervnc tigervnc-server virt-manager</span><br><span class="line"><span class="meta">#</span><span class="bash"> virt-manager是一个图形管理页面</span></span><br><span class="line">6. 开启kvm服务，并且设置其开机自动启动</span><br><span class="line">systemctl start libvirtd</span><br><span class="line">systemctl enable libvirtd</span><br><span class="line">systemctl status libvirtd</span><br><span class="line">systemctl is-enabled libvirtd</span><br><span class="line">7. 配置网桥模式。配置好之后会有br0和virbr0两个网卡</span><br><span class="line">cd /etc/sysconfig/network-scripts</span><br><span class="line">cp ifcfg-eno16777736 ifcfg-eno16777736.bak</span><br><span class="line">vim ifcfg-br0</span><br><span class="line">    BOOTPROTO=static</span><br><span class="line">    DEVICE=br0</span><br><span class="line">    TYPE=Bridge</span><br><span class="line">    NM_CONTROLLED=no</span><br><span class="line">    IPADDR=192.168.1.90</span><br><span class="line">    NETMASK=255.255.255.0</span><br><span class="line">    GATEWAY=192.168.1.1</span><br><span class="line">    DNS1=192.168.1.1</span><br><span class="line">vim ifcfg-eno16777736</span><br><span class="line">    BOOTPROTO=none</span><br><span class="line">    DEVICE=enp0s25</span><br><span class="line">    NM_CONTROLLED=no	</span><br><span class="line">    # 此条必须配置。这是NetworkManager的参数，如果是yes，那么会实时生效，修改后无需要重启网卡立即生效。通常不使用NetworkManager管理网络</span><br><span class="line">    ONBOOT=yes</span><br><span class="line">    BRIDGE=br0</span><br><span class="line">systemctl restart network</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可按此方法配置多个网桥设备</span></span><br><span class="line">8. 复制系统镜像文件到服务器</span><br><span class="line">9. 创建虚拟磁盘，这里创建的镜像文件格式建议用.img格式。</span><br><span class="line">qemu-img create -f qcow2 -o size=50G centos7.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 需要事先创建磁盘文件，不然下面的命令会报错“ERROR Format cannot be specified <span class="keyword">for</span> unmanaged storage.”，这应该是virt-manager 没有找到存储池的问题</span></span><br><span class="line">qemu-img create -f qcow2 -opreallocation=metadata RHEL7.img 40G</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样创建磁盘也可以，重要的是-opreallocation=metadata选项，可以预分配磁盘，硬盘空间不会立即分配出去</span></span><br><span class="line">10. 创建虚拟机 </span><br><span class="line">virt-install -n xp -r 1024 --vcpus 2 --disk /images/xp.img,format=qcow2,size=50 --network bridge=br0 --os-type=windows --cdrom /images/vm1/xp.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate</span><br><span class="line"></span><br><span class="line">virt-install -n centos6 -r 1024 --vcpus 2 --disk /images/centos.img,format=qcow2,size=30 --network bridge=br0 --network bridge=br1 --os-type=linux --cdrom /images/vm1/centos6.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate </span><br><span class="line"><span class="meta">#</span><span class="bash"> --accelerate表示KVM或KQEMU内核加速,这个选项是推荐最好加上。如果KVM和KQEMU都支持，KVM加速器优先使用。--vncport指定端口，--vnclisten很重要，0.0.0.0表示监听在所有端口，不指定的话会监听在本地回环地址，用vncviewer是不能连接的。另外，不能两个VNC软件同时连接虚拟机；--disk /images/centos.img,format=qcow2,size=30是一定要定义的，这与上面创建的磁盘大小没有关系，如果这里不指定磁盘大小，在安装时会显示磁盘大小是0</span></span><br></pre></td></tr></table></figure>
-<h3 id="查看虚拟机状态"><a href="#查看虚拟机状态" class="headerlink" title="查看虚拟机状态"></a>查看虚拟机状态</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh list --all</span><br></pre></td></tr></table></figure>
-<h3 id="虚拟机的启动、停止与删除"><a href="#虚拟机的启动、停止与删除" class="headerlink" title="虚拟机的启动、停止与删除"></a>虚拟机的启动、停止与删除</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">* 启动</span><br><span class="line">virsh start xp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动虚拟机</span></span><br><span class="line">virsh create /etc/libvirt/qemu/C7.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过配置文件启动虚拟机</span></span><br><span class="line">virsh autostart RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置开机自启动虚拟机</span></span><br><span class="line"></span><br><span class="line">* 关闭</span><br><span class="line">virsh shutdown xp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭虚拟机</span></span><br><span class="line">systemctl start acpid</span><br><span class="line">systemctl enable acpid</span><br><span class="line">virsh shutdown RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认情况下virsh工具不能对linux虚拟机进行关机操作，linux操作系统需要开启与启动acpid服务。在安装KVM linux虚拟机必须配置此服务。</span></span><br><span class="line">virsh destroy RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 强制关闭虚拟机RHEL</span></span><br><span class="line"></span><br><span class="line">* 删除</span><br><span class="line">virsh undefine RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机，前提条件是这个虚拟机没有快照文件，如果有就要先删除快照再删除虚拟机。该命令只是删除RHEL虚拟机的配置文件，并不删除虚拟磁盘文件。</span></span><br><span class="line"></span><br><span class="line">* 挂起服务器</span><br><span class="line">virsh suspend RHEL</span><br><span class="line"></span><br><span class="line">* 恢复服务器</span><br><span class="line">virsh  resume RHEL</span><br><span class="line"></span><br><span class="line">* 导出KVM虚拟机配置文件</span><br><span class="line">virsh dumpxml RHEL &gt; /etc/libvirt/qemu/wintest02.xml</span><br><span class="line"></span><br><span class="line">*  重新定义虚拟机配置文件</span><br><span class="line">mv /etc/libvirt/qemu/C7_1.xml /etc/libvirt/qemu/C7.xml</span><br><span class="line">virsh define /etc/libvirt/qemu/C7.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过导出备份的配置文件恢复原KVM虚拟机的定义，并重新定义虚拟机。</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改现有虚拟机配置"><a href="#修改现有虚拟机配置" class="headerlink" title="修改现有虚拟机配置"></a>修改现有虚拟机配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">virsh edit RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这会打开虚拟机的配置文件，在虚拟机关机状态下修改后保存并启动虚拟机就会生效。如果用vim修改/etc/libvirt/qemu/目录中的虚拟机的xml文件是不能生效的</span></span><br><span class="line">virsh dominfo RHEL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改完以后用此命令查看现在的虚拟机的配置</span></span><br></pre></td></tr></table></figure>
-<h3 id="添加、删除网卡"><a href="#添加、删除网卡" class="headerlink" title="添加、删除网卡"></a>添加、删除网卡</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看网卡信息</span></span><br><span class="line">[root@ccjd shaosong]# virsh attach-interface SScentos7 --type bridge --source br1</span><br><span class="line">Interface attached successfully</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给SScentos7虚拟机临时添加一块叫br1的网卡</span></span><br><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line">vnet1      bridge     br1        -           52:54:00:b9:a1:e2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再查看时已多了一块网卡，在虚拟机中也可以看到此网卡，并且可以使用。</span></span><br><span class="line">[root@ccjd shaosong]# virsh attach-interface SScentos7 --type bridge --source br1 --config</span><br><span class="line"><span class="meta">#</span><span class="bash"> 永久添加网卡，使用--config选项</span></span><br><span class="line">Interface attached successfully</span><br><span class="line">[root@ccjd shaosong]# virsh edit SScentos7</span><br><span class="line">Domain SScentos7 XML configuration not changed.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看虚拟机的配置文件，可以看到多了一个新网卡的配置信息</span></span><br><span class="line"> &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;mac address='52:54:00:7e:7b:7e'/&gt;</span><br><span class="line">      &lt;source bridge='br0'/&gt;</span><br><span class="line">      &lt;address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;interface type='bridge'&gt;</span><br><span class="line">      &lt;mac address='52:54:00:5a:89:15'/&gt;</span><br><span class="line">      &lt;source bridge='br1'/&gt;</span><br><span class="line">      &lt;address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">[root@ccjd shaosong]# virsh shutdown SScentos7</span><br><span class="line">Domain SScentos7 is being shutdown</span><br><span class="line">[root@ccjd shaosong]# virsh start SScentos7</span><br><span class="line">Domain SScentos7 started</span><br><span class="line">[root@ccjd shaosong]# virsh domiflist SScentos7</span><br><span class="line">Interface  Type       Source     Model       MAC</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">vnet0      bridge     br0        -           52:54:00:7e:7b:7e</span><br><span class="line">vnet1      bridge     br1        -           52:54:00:5a:89:15</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启虚拟机可以看到网卡被永久添加上了</span></span><br><span class="line">[root@ccjd shaosong]# virsh detach-interface SScentos7 --type bridge --mac 52:54:00:5a:89:15 --config</span><br><span class="line">Interface attached successfully</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机网卡</span></span><br></pre></td></tr></table></figure>
-<h3 id="克隆虚拟机"><a href="#克隆虚拟机" class="headerlink" title="克隆虚拟机"></a>克隆虚拟机</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">virt-clone -o C7 -n C7-1 -f /data/c7_1.img -f /data/c7_2.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> C7是现有的域名(虚拟机名)，C7-1是要创建的域名，c7_1.img是要创建的镜像文件，这里不需要事先创建虚拟磁盘。这条命令是说将C7域克隆一个叫C7-1的域，创建的镜像文件在/data目录下，叫c7_1.img。克隆时要关闭虚拟机。如果有多个磁盘，要用多个-f选项指定。这里不需要指定原来的*.img镜像文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 克隆的问题是都会使用同样的VNC端口，这样就不能将所有克隆虚拟机都启动，需要使用<span class="string">"virsh edit 虚拟机名"</span>，打开虚拟机的配置文件，找到VNC的端口号并修改。之后保存退出才能启动。</span></span><br></pre></td></tr></table></figure>
-<h3 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">* 创建</span><br><span class="line">virsh snapshot-create C7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建域名叫C7的快照；快照配置文件在/var/lib/libvirt/qemu/snapshot/虚拟机名称/下</span></span><br><span class="line">virsh snapshot-list C7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看C7域的快照</span></span><br><span class="line">virsh snapshot-current C7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前虚拟机镜像快照的版本</span></span><br><span class="line"></span><br><span class="line">* 恢复虚拟机快照</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复虚拟机快照必须关闭虚拟机。</span></span><br><span class="line">virsh domstate winxp</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认虚拟机状态</span></span><br><span class="line">virsh snapshot-revert winxp 1515577720</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复快照。1515577720是winxp快照的名字，如果有多个快照，要先用virsh snapshot-list winxp查看快照名字</span></span><br><span class="line">qemu-img info winxp.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看镜像的快照名字，可能有多个</span></span><br><span class="line"></span><br><span class="line">* 删除</span><br><span class="line">virsh snapshot-delete winxp 1515577720</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除winxp的叫1515577720的快照</span></span><br></pre></td></tr></table></figure>
-<h3 id="重命名虚拟机"><a href="#重命名虚拟机" class="headerlink" title="重命名虚拟机"></a>重命名虚拟机</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">1. 关闭虚拟机</span><br><span class="line">2. 导出虚拟机配置文件</span><br><span class="line">cd /etc/libvirt/qemu/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到虚拟机配置文件目录</span></span><br><span class="line">virsh dumpxml Ytest &gt; openvpn.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 导出Ytest虚拟机的配置文件，叫openvpn.xml</span></span><br><span class="line">virsh snapshot-delete Ytest 1540542652</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先删除之前的虚拟机快照，如果不删除快照是不能删除虚拟机的</span></span><br><span class="line">virsh undefine Ytest</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟机</span></span><br><span class="line">vim openvpn.xml</span><br><span class="line">    &lt;domain type='kvm'&gt;</span><br><span class="line">      &lt;name&gt;openvpn&lt;/name&gt;	# 修改虚拟机的名字</span><br><span class="line">    .......</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">          &lt;driver name='qemu' type='qcow2' cache='none'/&gt;</span><br><span class="line">          &lt;source file='/home/IOS/openvpn/openvpn.img'/&gt;	# 修改虚拟机磁盘的路径</span><br><span class="line">cd /home/IOS</span><br><span class="line">mv Ytest/ openvpn</span><br><span class="line">mv Ytest.img openvpn.img</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改之前的虚拟机的目录名称与磁盘文件名称</span></span><br><span class="line">virsh define openvpn.xml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再加载新命名的虚拟机的配置文件</span></span><br><span class="line">virsh list --all</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看是否有新命名的虚拟机</span></span><br><span class="line">virsh start openvpn</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动新命名的虚拟机</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改虚拟机硬件配置"><a href="#修改虚拟机硬件配置" class="headerlink" title="修改虚拟机硬件配置"></a>修改虚拟机硬件配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ccjd qemu]# virsh edit gitlab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改虚拟机配置文件</span></span><br><span class="line">    &lt;domain type='kvm'&gt;</span><br><span class="line">      &lt;name&gt;gitlab&lt;/name&gt;</span><br><span class="line">      &lt;uuid&gt;77890890-312b-bfed-83ed-c53665cf86d1&lt;/uuid&gt;</span><br><span class="line">      &lt;memory unit='KiB'&gt;8192000&lt;/memory&gt;</span><br><span class="line">      &lt;currentMemory unit='KiB'&gt;8192000&lt;/currentMemory&gt;</span><br><span class="line">      &lt;vcpu placement='static'&gt;4&lt;/vcpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 8192000为内存大小，4为CPU核心数。修改后保存，再启动虚拟机即可。</span></span><br></pre></td></tr></table></figure>
-<h3 id="给KVM虚拟机添加磁盘"><a href="#给KVM虚拟机添加磁盘" class="headerlink" title="给KVM虚拟机添加磁盘"></a>给KVM虚拟机添加磁盘</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">1. cd /home/IOS/RHEL7</span><br><span class="line">2. qemu-img create -f raw RHEL7_1.img 10G</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个磁盘，格式是raw</span></span><br><span class="line">3. virsh edit RHEL7</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/home/IOS/RHEL/RHEL7_1.img'/&gt;</span><br><span class="line">      &lt;target dev='sda' bus='scsi'/&gt;</span><br><span class="line">      &lt;address type='drive' controller='0' bus='0' target='0' unit='0'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;disk type='file' device='disk'&gt;</span><br><span class="line">      &lt;driver name='qemu' type='raw' cache='none'/&gt;</span><br><span class="line">      &lt;source file='/home/IOS/RHEL/RHEL7_2.img'/&gt;</span><br><span class="line">      &lt;target dev='hda' bus='ide'/&gt;</span><br><span class="line">      &lt;address type='drive' controller='0' bus='0' target='0' unit='1'/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 原来的硬盘是hda，bus是ide，如果新磁盘与原磁盘一样是ide的，那么要改下面的unit的数字，不一样就可以，不然无法启动。如果磁盘类型不一样，可以直接改类型即可，如上面的类型就是 &lt;target dev=<span class="string">'sda'</span> bus=<span class="string">'scsi'</span>/&gt;，unit是按类型向下编号的，不一样就可以。</span></span><br><span class="line">4. tail -100 /var/log/libvirt/qemu/RHEL7.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不能启动，可以查看此日志，寻找原因。日志是以虚拟机名命名的。</span></span><br></pre></td></tr></table></figure>
-<h3 id="kvm开启虚拟化"><a href="#kvm开启虚拟化" class="headerlink" title="kvm开启虚拟化"></a>kvm开启虚拟化</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 先检查 KVM host（宿主机/母机）上的kvm_intel模块是否打开了嵌套虚拟机功能（默认是开启的）：</span></span><br><span class="line">1. modinfo kvm_intel | grep nested</span><br><span class="line">      parm: nested:bool</span><br><span class="line">2. cat /sys/module/kvm_intel/parameters/nested</span><br><span class="line">      Y</span><br><span class="line">3. 如果上面的显示结果不是 Y 的话需要开启 nested：</span><br><span class="line">modprobe -r kvm-intel</span><br><span class="line">modprobe kvm-intel nested=1</span><br><span class="line">cat /sys/module/kvm_intel/parameters/nested</span><br><span class="line">    Y</span><br><span class="line">4. 如果使用libvirt管理虚拟机,需要修改虚拟机xml文件中CPU的定义,下面定义方法都可以:</span><br><span class="line">* 方法一</span><br><span class="line">virsh edit debian9.3</span><br><span class="line">  &lt;cpu mode='custom' match='exact'&gt;</span><br><span class="line">    &lt;model fallback='allow'&gt;core2duo&lt;/model&gt;</span><br><span class="line">    &lt;feature policy='require' name='vmx'/&gt;	# 添加这一行</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash">这种方式为虚拟机定义需要模拟的CPU类型<span class="string">"core2duo"</span>,并且为虚拟机添加<span class="string">"vmx"</span>特性</span></span><br><span class="line"></span><br><span class="line">* 方法二</span><br><span class="line">  &lt;cpu mode='host-model'&gt;</span><br><span class="line">    &lt;model fallback='allow'/&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：https://www.cnblogs.com/chimeiwangliang/p/7862229.html</span></span><br></pre></td></tr></table></figure>
-<h3 id="虚拟机静态迁移"><a href="#虚拟机静态迁移" class="headerlink" title="虚拟机静态迁移"></a>虚拟机静态迁移</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">* 静态迁移就是虚拟机在关机状态下，拷贝虚拟机虚拟磁盘文件与配置文件到目标虚拟主机中，实现的迁移。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 虚拟主机各自使用本地存储存放虚拟机磁盘文件。本文实现基于本地磁盘存储虚拟机磁盘文件的迁移方式。虚拟主机之间使用共享存储存放虚拟机磁盘文件，该方式只是在目标虚拟主机上重新定义虚拟机就可以了。</span></span><br><span class="line">1. 先确定虚拟机关机</span><br><span class="line">virsh list --all</span><br><span class="line">2. 准备迁移winxp虚拟机，查看此虚拟机配置的磁盘文件</span><br><span class="line">virsh domblklist winxp</span><br><span class="line">3. 导出虚拟机配置文件</span><br><span class="line">virsh dumpxml winxp &gt; /root/winxp.xml</span><br><span class="line">4. 拷贝配置文件到目标虚拟主机上</span><br><span class="line">scp /root/winxp.xml root@192.168.1.11:/etc/libvirt/qemu/</span><br><span class="line">5. 拷贝虚拟机磁盘文件到目标虚拟机</span><br><span class="line">scp winxp.img root@192.168.1.11:/data</span><br><span class="line">6. 到目标主机上查看。目标主机的目录结构要与源虚拟主机一致</span><br><span class="line">7. 定义注册虚拟主机</span><br><span class="line">virsh define /etc/libvirt/qemu/winxp.xml</span><br><span class="line">8. 启动虚拟机</span><br><span class="line">virsh start winxp</span><br></pre></td></tr></table></figure>
-<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/etc/libvirt</span><br><span class="line"><span class="meta">#</span><span class="bash"> qemu配置文件位置 </span></span><br><span class="line">/etc/libvirt/qemu</span><br><span class="line"><span class="meta">#</span><span class="bash"> 虚拟机配置文件位置</span></span><br></pre></td></tr></table></figure>
-<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><h4 id="VNC软件无法正常连接"><a href="#VNC软件无法正常连接" class="headerlink" title="VNC软件无法正常连接"></a>VNC软件无法正常连接</h4><ol>
-<li>在windows主机上安装VNC Viewer，使用此软件打开虚拟机。另外，用此工具连接后可能会有错误提示“ZlibInStream:Inflate Failed”，并且不断刷新页面，无法正常进入。如下：</li>
-</ol>
-<p><img src="/images/KVM/winconnect1.jpg" alt=""></p>
-<ol start="2">
-<li>设置图像，从高到低试，测试时选择High就可以正常连接了。</li>
-</ol>
-<p><img src="/images/KVM/winconnect2.jpg" alt=""></p>
-<p><img src="/images/KVM/winconnect3.jpg" alt=""></p>
-<h4 id="virt-manager键盘输入错乱"><a href="#virt-manager键盘输入错乱" class="headerlink" title="virt-manager键盘输入错乱"></a>virt-manager键盘输入错乱</h4><ol>
-<li>需要在Details中的VNC中选择en-us</li>
-</ol>
-<p><img src="/images/KVM/vncconnect1.jpg" alt=""></p>
-<h4 id="从远程打开KVM的图形管理页面"><a href="#从远程打开KVM的图形管理页面" class="headerlink" title="从远程打开KVM的图形管理页面"></a>从远程打开KVM的图形管理页面</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">* CentOS6.6系统</span><br><span class="line">yum groupinstall "X 窗口系统"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 远程连接服务器，使用ssh -X IP</span></span><br><span class="line">virt-manager</span><br><span class="line">错误提示：</span><br><span class="line">    ”process 63345: D-Bus library appears to be incorrectly set up; failed to read machine uuid: Failed to open "/var/lib/dbus/machine-id": 没有那个文件或目录</span><br><span class="line">    See the manual page for dbus-uuidgen to correct this issue.</span><br><span class="line">      D-Bus not built with -rdynamic so unable to print a backtrace“</span><br></pre></td></tr></table></figure>
-<p><img src="/images/KVM/openkvm.jpg" alt=""></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">解决办法：</span><br><span class="line">dbus-uuidgen &gt; /var/lib/dbus/machine-id</span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行此命令后就可以远程打开virt-manager了，但是乱码</span></span><br><span class="line"></span><br><span class="line">yum groupinstall "中文支持"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装完中文后，乱码就解决了。</span></span><br></pre></td></tr></table></figure>
-<h4 id="报错error-unsupported-configuration-Unable-to-find-security-driver-for-label-selinux"><a href="#报错error-unsupported-configuration-Unable-to-find-security-driver-for-label-selinux" class="headerlink" title="报错error: unsupported configuration: Unable to find security driver for label selinux"></a>报错error: unsupported configuration: Unable to find security driver for label selinux</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">virsh edit 虚拟机名</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除最后有selinux的行，再启动就没问题了。</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2235,7 +2215,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-count">83</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2292,7 +2272,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">22</span>
+                      
+                    
+                    <span class="site-state-item-count">23</span>
                     <span class="site-state-item-name">分類</span>
                   </a>
                 </div>
@@ -2425,7 +2407,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">60</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

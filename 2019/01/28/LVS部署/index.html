@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="介绍 LVS是 Linux Virtual Server 的简称，也就是Linux虚拟服务器。这是一个由章文嵩博士发起的一个开源项目，它的官方网是 http://www.linuxvirtualserver.org 现在 LVS 已经是 Linux 内核标准的一部分。使用 LVS 可以达到的技术目标是：通过 LVS 达到的负载均衡技术和 Linux 操作系统实现一个高性能高可用的 Linux 服务">
+<meta name="keywords" content="lvs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVS部署">
+<meta property="og:url" content="http://yoursite.com/2019/01/28/LVS部署/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="介绍 LVS是 Linux Virtual Server 的简称，也就是Linux虚拟服务器。这是一个由章文嵩博士发起的一个开源项目，它的官方网是 http://www.linuxvirtualserver.org 现在 LVS 已经是 Linux 内核标准的一部分。使用 LVS 可以达到的技术目标是：通过 LVS 达到的负载均衡技术和 Linux 操作系统实现一个高性能高可用的 Linux 服务">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/lvs/基本工作原理.png">
+<meta property="og:image" content="http://yoursite.com/images/lvs/nat原理.png">
+<meta property="og:image" content="http://yoursite.com/images/lvs/dr原理.png">
+<meta property="og:image" content="http://yoursite.com/images/lvs/tun原理.png">
+<meta property="og:updated_time" content="2019-01-28T14:25:44.130Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LVS部署">
+<meta name="twitter:description" content="介绍 LVS是 Linux Virtual Server 的简称，也就是Linux虚拟服务器。这是一个由章文嵩博士发起的一个开源项目，它的官方网是 http://www.linuxvirtualserver.org 现在 LVS 已经是 Linux 内核标准的一部分。使用 LVS 可以达到的技术目标是：通过 LVS 达到的负载均衡技术和 Linux 操作系统实现一个高性能高可用的 Linux 服务">
+<meta name="twitter:image" content="http://yoursite.com/images/lvs/基本工作原理.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/28/LVS部署/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>LVS部署 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/28/LVS部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LVS部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-01-28 18:18:42 / 修改時間：22:25:44" itemprop="dateCreated datePublished" datetime="2019-01-28T18:18:42+08:00">2019-01-28</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/balance/" itemprop="url" rel="index"><span itemprop="name">balance</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>LVS是 Linux Virtual Server 的简称，也就是Linux虚拟服务器。这是一个由章文嵩博士发起的一个开源项目，它的官方网是 <a href="http://www.linuxvirtualserver.org" target="_blank" rel="noopener">http://www.linuxvirtualserver.org</a> 现在 LVS 已经是 Linux 内核标准的一部分。使用 LVS 可以达到的技术目标是：通过 LVS 达到的负载均衡技术和 Linux 操作系统实现一个高性能高可用的 Linux 服务器集群，它具有良好的可靠性、可扩展性和可操作性。从而以低廉的成本实现最优的性能。LVS 是一个实现负载均衡集群的开源软件项目，LVS架构从逻辑上可分为调度层、Server集群层和共享存储。</p>
+</blockquote>
+<h3 id="LVS的基本工作原理"><a href="#LVS的基本工作原理" class="headerlink" title="LVS的基本工作原理"></a>LVS的基本工作原理</h3><p><img src="/images/lvs/基本工作原理.png" alt=""></p>
+<blockquote>
+<ol>
+<li><p>当用户向负载均衡调度器（Director Server）发起请求时，调度器将请求发往至内核空间</p>
+</li>
+<li><p>PREROUTING链首先会接收到用户请求，判断目标IP确定是本机IP，将数据包发往INPUT链</p>
+</li>
+<li><p>IPVS是工作在INPUT链上的，当用户请求到达INPUT时，IPVS会将用户请求和自己已定义好的集群服务进行比对，如果用户请求的就是定义的集群服务，那么此时IPVS会强行修改数据包里的目标IP地址及端口，并将新的数据包发往POSTROUTING链</p>
+</li>
+<li><p>POSTROUTING链接收数据包后发现目标IP地址刚好是自己的后端服务器，那么此时通过选路，将数据包最终发送给后端的服务器</p>
+</li>
+</ol>
+</blockquote>
+<h3 id="LVS的组成"><a href="#LVS的组成" class="headerlink" title="LVS的组成"></a>LVS的组成</h3><blockquote>
+<p>LVS 由两部分程序组成，包括 ipvs 和 ipvsadm。</p>
+<ol>
+<li><p>ipvs(ip virtual server)：一段代码工作在内核空间，叫ipvs，是真正生效实现调度的代码。</p>
+</li>
+<li><p>ipvsadm：在用户空间，负责为ipvs内核框架编写规则，定义谁是集群服务，而谁是后端真实的服务器(Real Server)</p>
+</li>
+</ol>
+</blockquote>
+<h3 id="LVS相关术语"><a href="#LVS相关术语" class="headerlink" title="LVS相关术语"></a>LVS相关术语</h3><blockquote>
+<ol>
+<li>DS：Director Server。前端负载均衡器节点。</li>
+<li>RS：Real Server。后端真实的工作服务器。</li>
+<li>VIP：向外部直接面向用户请求，作为用户请求的目标的IP地址。</li>
+<li>DIP：Director Server IP，前端负载均衡器节点上用于和内部主机通讯的IP地址。</li>
+<li>RIP：Real Server IP，后端服务器的IP地址。</li>
+<li>CIP：Client IP，访问客户端的IP地址。</li>
+</ol>
+</blockquote>
+<h3 id="LVS-NAT原理和特点"><a href="#LVS-NAT原理和特点" class="headerlink" title="LVS/NAT原理和特点"></a>LVS/NAT原理和特点</h3><p><img src="/images/lvs/nat原理.png" alt=""></p>
+<blockquote>
+<ol>
+<li>当用户请求到达Director Server，此时请求的数据报文会先到内核空间的PREROUTING链。 此时报文的源IP为CIP，目标IP为VIP</li>
+<li>PREROUTING检查发现数据包的目标IP是本机，将数据包送至INPUT链</li>
+<li>IPVS比对数据包请求的服务是否为集群服务，若是，修改数据包的目标IP地址为后端服务器IP，然后将数据包发至POSTROUTING链。 此时报文的源IP为CIP，目标IP为RIP</li>
+<li>POSTROUTING链通过选路，将数据包发送给Real Server</li>
+<li>Real Server比对发现目标为自己的IP，开始构建响应报文发回给Director Server。 此时报文的源IP为RIP，目标IP为CIP</li>
+<li>Director Server在响应客户端前，此时会将源IP地址修改为自己的VIP地址，然后响应给客户端。 此时报文的源IP为VIP，目标IP为CIP</li>
+</ol>
+</blockquote>
+<h4 id="LVS-NAT模型的特性"><a href="#LVS-NAT模型的特性" class="headerlink" title="LVS-NAT模型的特性"></a>LVS-NAT模型的特性</h4><blockquote>
+<ol>
+<li>RS应该使用私有地址，RS的网关必须指向DIP</li>
+<li>DIP和RIP必须在同一个网段内</li>
+<li>请求和响应报文都需要经过Director Server，高负载场景中，Director Server易成为性能瓶颈<br>支持端口映射</li>
+<li>RS可以使用任意操作系统</li>
+<li>缺陷：对Director Server压力会比较大，请求和响应都需经过director server</li>
+</ol>
+</blockquote>
+<h3 id="LVS-DR原理和特点"><a href="#LVS-DR原理和特点" class="headerlink" title="LVS/DR原理和特点"></a>LVS/DR原理和特点</h3><p><img src="/images/lvs/dr原理.png" alt=""></p>
+<blockquote>
+<ol>
+<li>当用户请求到达Director Server，此时请求的数据报文会先到内核空间的PREROUTING链。 此时报文的源IP为CIP，目标IP为VIP</li>
+<li>PREROUTING检查发现数据包的目标IP是本机，将数据包送至INPUT链</li>
+<li>IPVS比对数据包请求的服务是否为集群服务，若是，将请求报文中的源MAC地址修改为DIP的MAC地址，将目标MAC地址修改RIP的MAC地址，然后将数据包发至POSTROUTING链。 此时的源IP和目的IP均未修改，仅修改了源MAC地址为DIP的MAC地址，目标MAC地址为RIP的MAC地址</li>
+<li>由于DS和RS在同一个网络中，所以是通过二层来传输。POSTROUTING链检查目标MAC地址为RIP的MAC地址，那么此时数据包将会发至Real Server。</li>
+<li>RS发现请求报文的MAC地址是自己的MAC地址，就接收此报文。处理完成之后，将响应报文通过lo接口传送给eth0网卡然后向外发出。 此时的源IP地址为VIP，目标IP为CIP</li>
+<li>响应报文最终送达至客户端</li>
+</ol>
+</blockquote>
+<h4 id="LVS-DR模型的特性"><a href="#LVS-DR模型的特性" class="headerlink" title="LVS-DR模型的特性"></a>LVS-DR模型的特性</h4><blockquote>
+<p>特点</p>
+<ol>
+<li>保证前端路由将目标地址为VIP报文统统发给Director Server，而不是RS</li>
+<li>RS可以使用私有地址；也可以是公网地址，如果使用公网地址，此时可以通过互联网对RIP进行直接访问</li>
+<li>RS和Director Server必须在同一个物理网络中</li>
+<li>所有的请求报文经由Director Server，但响应报文必须不能经过Director Server</li>
+<li>不支持地址转换，也不支持端口映射</li>
+<li>RS可以是大多数常见的操作系统</li>
+<li>RS的网关绝不允许指向DIP(因为我们不允许他经过director)</li>
+<li>RS上的lo接口配置VIP的IP地址</li>
+<li>缺陷：RS和DS必须在同一机房中</li>
+<li>企业中最常用的是 DR 模型</li>
+</ol>
+<p>解决</p>
+<ol>
+<li>在前端路由器做静态地址路由绑定，将对于VIP的地址仅路由到Director Server。但用户未必有路由操作权限，因为有可能是运营商提供的，所以这个方法未必实用</li>
+<li>arptables：在arp的层次上实现在ARP解析时做防火墙规则，过滤RS响应ARP请求。这是由iptables提供的。修改RS上内核参数（arp_ignore和arp_announce），将RS上的VIP配置在lo接口的别名上，并限制其不能响应对VIP地址解析请求。</li>
+</ol>
+</blockquote>
+<h3 id="LVS-Tun原理和特点"><a href="#LVS-Tun原理和特点" class="headerlink" title="LVS/Tun原理和特点"></a>LVS/Tun原理和特点</h3><p><img src="/images/lvs/tun原理.png" alt=""></p>
+<blockquote>
+<ol>
+<li>当用户请求到达Director Server，此时请求的数据报文会先到内核空间的PREROUTING链。 此时报文的源IP为CIP，目标IP为VIP 。</li>
+<li>PREROUTING检查发现数据包的目标IP是本机，将数据包送至INPUT链</li>
+<li>IPVS比对数据包请求的服务是否为集群服务，若是，在请求报文的首部再次封装一层IP报文，封装源IP为为DIP，目标IP为RIP。然后发至POSTROUTING链。 此时源IP为DIP，目标IP为RIP</li>
+<li>POSTROUTING链根据最新封装的IP报文，将数据包发至RS（因为在外层封装多了一层IP首部，所以可以理解为此时通过隧道传输）。 此时源IP为DIP，目标IP为RIP</li>
+<li>RS接收到报文后发现是自己的IP地址，就将报文接收下来，拆除掉最外层的IP后，会发现里面还有一层IP首部，而且目标是自己的lo接口VIP，那么此时RS开始处理此请求，处理完成之后，通过lo接口送给eth0网卡，然后向外传递。 此时的源IP地址为VIP，目标IP为CIP</li>
+<li>响应报文最终送达至客户端</li>
+</ol>
+</blockquote>
+<h4 id="LVS-Tun模型特性"><a href="#LVS-Tun模型特性" class="headerlink" title="LVS-Tun模型特性"></a>LVS-Tun模型特性</h4><blockquote>
+<ol>
+<li>RIP、VIP、DIP全是公网地址</li>
+<li>RS的网关不会也不可能指向DIP</li>
+<li>所有的请求报文经由Director Server，但响应报文必须不能进过Director Server</li>
+<li>不支持端口映射</li>
+<li>RS的系统必须支持隧道</li>
+</ol>
+</blockquote>
+<h3 id="LVS的八种调度算法"><a href="#LVS的八种调度算法" class="headerlink" title="LVS的八种调度算法"></a>LVS的八种调度算法</h3><h4 id="轮叫调度-rr"><a href="#轮叫调度-rr" class="headerlink" title="轮叫调度 rr"></a>轮叫调度 rr</h4><blockquote>
+<p>这种算法是最简单的，就是依次将请求调度到不同的服务器上，该算法最大的特点就是简单。轮询算法假设所有的服务器处理请求的能力都是一样的，调度器会将所有的请求平均分配给每个真实服务器，不管后端 RS 配置和处理能力，非常均衡地分发下去。</p>
+</blockquote>
+<h4 id="加权轮叫-wrr"><a href="#加权轮叫-wrr" class="headerlink" title="加权轮叫 wrr"></a>加权轮叫 wrr</h4><blockquote>
+<p>这种算法比 rr 的算法多了一个权重的概念，可以给 RS 设置权重，权重越高，那么分发的请求数越多，权重的取值范围 0 – 100。主要是对rr算法的一种优化和补充， LVS 会考虑每台服务器的性能，并给每台服务器添加权值，如果服务器A的权值为1，服务器B的权值为2，则调度到服务器B的请求会是服务器A的2倍。权值越高的服务器，处理的请求越多。</p>
+</blockquote>
+<h4 id="最少链接-lc"><a href="#最少链接-lc" class="headerlink" title="最少链接 lc"></a>最少链接 lc</h4><blockquote>
+<p>这个算法会根据后端 RS 的连接数来决定把请求分发给谁，比如 RS1 连接数比 RS2 连接数少，那么请求就优先发给 RS1</p>
+</blockquote>
+<h4 id="加权最少链接-wlc"><a href="#加权最少链接-wlc" class="headerlink" title="加权最少链接 wlc"></a>加权最少链接 wlc</h4><blockquote>
+<p>这个算法比 lc 多了一个权重的概念。</p>
+</blockquote>
+<h4 id="基于局部性的最少连接调度算法-lblc"><a href="#基于局部性的最少连接调度算法-lblc" class="headerlink" title="基于局部性的最少连接调度算法 lblc"></a>基于局部性的最少连接调度算法 lblc</h4><blockquote>
+<p>这个算法是请求数据包的目标 IP 地址的一种调度算法，该算法先根据请求的目标 IP 地址寻找最近的该目标 IP 地址所有使用的服务器，如果这台服务器依然可用，并且有能力处理该请求，调度器会尽量选择相同的服务器，否则会继续选择其它可行的服务器</p>
+</blockquote>
+<h4 id="复杂的基于局部性最少的连接算法-lblcr"><a href="#复杂的基于局部性最少的连接算法-lblcr" class="headerlink" title="复杂的基于局部性最少的连接算法 lblcr"></a>复杂的基于局部性最少的连接算法 lblcr</h4><blockquote>
+<p>记录的不是目标 IP 与一台服务器之间的连接记录，而是维护一个目标 IP 到一组服务器之间的映射关系，防止单点服务器负载过高。</p>
+</blockquote>
+<p>#### </p>
+<h4 id="目标地址散列调度算法-dh"><a href="#目标地址散列调度算法-dh" class="headerlink" title="目标地址散列调度算法 dh"></a>目标地址散列调度算法 dh</h4><blockquote>
+<p>该算法是根据目标 IP 地址通过散列函数将目标 IP 与服务器建立映射关系，出现服务器不可用或负载过高的情况下，发往该目标 IP 的请求会固定发给该服务器。</p>
+</blockquote>
+<h4 id="源地址散列调度算法-sh"><a href="#源地址散列调度算法-sh" class="headerlink" title="源地址散列调度算法 sh"></a>源地址散列调度算法 sh</h4><blockquote>
+<p>与目标地址散列调度算法类似，但它是根据源地址散列算法进行静态分配固定的服务器资源。</p>
+</blockquote>
+<h3 id="部署LVS-NAT模型"><a href="#部署LVS-NAT模型" class="headerlink" title="部署LVS/NAT模型"></a>部署LVS/NAT模型</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">环境</span><br><span class="line">准备三台主机</span><br><span class="line">director：外网地址：192.168.1.26；内网地址：172.16.106.140</span><br><span class="line">realServer1：内网地址：172.16.106.142</span><br><span class="line">realServer2：内网地址：172.16.106.141</span><br><span class="line">==============================================================================================</span><br><span class="line">---------------------</span><br><span class="line">  realServer1&amp;2</span><br><span class="line">---------------------</span><br><span class="line">[root@realserver1 ~]# vim /etc/sysconfig/network-scripts/ifcfg-ens33</span><br><span class="line">IPADDR=172.16.106.142</span><br><span class="line"><span class="meta">#</span> realServer2主机的地址为172.16.106.141</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=172.16.106.140</span><br><span class="line"><span class="meta">#</span> 配置两台realServer主机的地址为静态地址，并将网关指向director的内网地址。</span><br><span class="line">[root@realserver2 ~]# yum install -y nginx</span><br><span class="line"><span class="meta">#</span> 两台主机需要安装nginx，可以临时添加dirctor的防火墙规则，iptables -t nat -A POSTROUTING -s 172.16.106.0/24 -j SNAT --to-source 192.168.1.26，并开启路由转发功能，echo 1 &gt; /proc/sys/net/ipv4/ip_forward，最后为realServer配置DNS。这样realServer就可以连接外网了。安装nginx后再取消director的防火墙规则。</span><br><span class="line">[root@realserver1 ~]# mkdir /usr/share/nginx/html/test</span><br><span class="line">[root@realserver1 ~]# vim /usr/share/nginx/html/test/index.html</span><br><span class="line">	realServer1</span><br><span class="line"><span class="meta">#</span> 在两台主机上添加主面测试文件，一个是realServer1，一个是realServer2</span><br><span class="line">[root@realserver1 ~]# systemctl start nginx</span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  Director</span><br><span class="line">--------------</span><br><span class="line">[root@director ~]# yum install -y ipvsadm</span><br><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"><span class="meta">#</span></span><br><span class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/all/send_redirects</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/default/send_redirects</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/eth0/send_redirects</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/eth1/send_redirects</span><br><span class="line">[root@director ~]# ipvsadm -A -t 192.168.1.26:80 -s wrr</span><br><span class="line">[root@director ~]# ipvsadm -a -t 192.168.1.26:80 -r 172.16.106.142:80 -m -w 1</span><br><span class="line">[root@director ~]# ipvsadm -a -t 192.168.1.26:80 -r 172.16.106.141:80 -m -w 1</span><br><span class="line">[root@director ~]# ipvsadm -ln</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line"><span class="meta">  -&gt;</span> RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  192.168.1.26:80 wrr</span><br><span class="line"><span class="meta">  -&gt;</span> 172.16.106.141:80            Masq    1      1          0         </span><br><span class="line"><span class="meta">  -&gt;</span> 172.16.106.142:80            Masq    1      1          0  </span><br><span class="line"> [root@director ~]# ipvsadm -C</span><br><span class="line"><span class="meta"> #</span> 清除所有ipvs规则</span><br><span class="line">---------</span><br><span class="line">  本机</span><br><span class="line">---------</span><br><span class="line">使用IE浏览器访问192.168.1.26/test/，会轮流返回realServer上的页面内容。不能使用realServer访问，访问超时，不会返回结果</span><br></pre></td></tr></table></figure>
+<h3 id="部署LVS-DR模型"><a href="#部署LVS-DR模型" class="headerlink" title="部署LVS/DR模型"></a>部署LVS/DR模型</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">环境</span><br><span class="line">准备三台主机，以上面三台主机为基础</span><br><span class="line">director：外网地址：192.168.1.26</span><br><span class="line">realServer1：内网地址：192.168.1.27</span><br><span class="line">realServer2：内网地址：192.168.1.28</span><br><span class="line">VIP：192.168.1.260</span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">  Director</span><br><span class="line">--------------</span><br><span class="line">[root@director ~]# ipvsadm -C</span><br><span class="line">[root@director ~]# vim lvs_dr.sh</span><br><span class="line"><span class="meta">#</span>! /bin/bash</span><br><span class="line"><span class="meta">#</span></span><br><span class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line">vip=192.168.1.60</span><br><span class="line">rs1=192.168.1.27</span><br><span class="line">rs2=192.168.1.28</span><br><span class="line">ifconfig ens33:0 down</span><br><span class="line">ifconfig ens33:0 $vip broadcast $vip netmask 255.255.255.255 up</span><br><span class="line">route add -host $vip dev ens33:0</span><br><span class="line">[root@director ~]# ipvsadm -A -t 192.168.1.60:80 -s wrr</span><br><span class="line">[root@director ~]# ipvsadm -a -t 192.168.1.60:80 -r 192.168.1.27 -g -w 1</span><br><span class="line">[root@director ~]# ipvsadm -a -t 192.168.1.60:80 -r 192.168.1.28 -g -w 1</span><br><span class="line">[root@director ~]# ipvsadm -ln</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line"><span class="meta">  -&gt;</span> RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  192.168.1.60:80 wrr</span><br><span class="line"><span class="meta">  -&gt;</span> 192.168.1.27:80              Route   1      0          0         </span><br><span class="line"><span class="meta">  -&gt;</span> 192.168.1.28:80              Route   1      0          0</span><br><span class="line">  </span><br><span class="line">---------------------</span><br><span class="line">  realServer1&amp;2</span><br><span class="line">---------------------</span><br><span class="line">[root@realserver1 ~]# vim lvs_dr_rs.sh </span><br><span class="line"><span class="meta">#</span>! /bin/bash</span><br><span class="line"><span class="meta">#</span></span><br><span class="line">vip=192.168.1.60</span><br><span class="line">ifconfig lo:0 $vip broadcast $vip netmask 255.255.255.255 up</span><br><span class="line">route add -host $vip lo:0</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/lo/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/lo/arp_announce</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/all/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/all/arp_announce</span><br><span class="line"></span><br><span class="line">---------</span><br><span class="line">  本机</span><br><span class="line">---------</span><br><span class="line">使用IE浏览器访问192.168.1.26/test/，会轮流返回realServer上的页面内容。不能使用realServer访问，访问超时，不会返回结果</span><br></pre></td></tr></table></figure>
+<h3 id="部署keepalived-LVS环境"><a href="#部署keepalived-LVS环境" class="headerlink" title="部署keepalived+LVS环境"></a>部署keepalived+LVS环境</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line">环境</span><br><span class="line">准备四台主机，以上面三台主机为基础</span><br><span class="line">director1：外网地址：192.168.1.26</span><br><span class="line">director2：外网地址：192.168.1.26</span><br><span class="line">realServer1：内网地址：192.168.1.27</span><br><span class="line">realServer2：内网地址：192.168.1.28</span><br><span class="line">VIP：192.168.1.260</span><br><span class="line"></span><br><span class="line">------------------</span><br><span class="line">  Director1&amp;2</span><br><span class="line">------------------</span><br><span class="line">[root@director keepalived]# ifconfig ens33:0 down</span><br><span class="line"><span class="meta">#</span> down掉director1上的ens33:0网卡，因为此网卡上有VIP地址。影响下面的keepalived测试</span><br><span class="line">[root@realserver2 ~]# yum install -y ipvsadm keeyalived</span><br><span class="line">[root@director ~]# cd /etc/keepalived/</span><br><span class="line">[root@director keepalived]# cp keepalived.conf&#123;,.bak&#125;</span><br><span class="line">[root@director keepalived]# vim keepalived.conf</span><br><span class="line">! Configuration File for keepalived</span><br><span class="line"></span><br><span class="line">global_defs &#123;</span><br><span class="line">   notification_email &#123;</span><br><span class="line">      root@localhost</span><br><span class="line">   &#125;</span><br><span class="line">   notification_email_from keepalived@localhost</span><br><span class="line">   smtp_server 127.0.0.1</span><br><span class="line">   smtp_connect_timeout 30</span><br><span class="line">   router_id node1		# # director2这里要改为node2</span><br><span class="line">   vrrp_mcast_group4 224.1.101.12</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    state MASTER		# director2这里要改为BACKUP</span><br><span class="line">    interface ens33</span><br><span class="line">    virtual_router_id 51</span><br><span class="line">    priority 100		# dirctor2这里要改为96</span><br><span class="line">    advert_int 1</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass 1111</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.1.60 dev ens33 label ens33:0</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">virtual_server 192.168.1.60 80 &#123;</span><br><span class="line">    delay_loop 1</span><br><span class="line">    lb_algo wrr</span><br><span class="line">    lb_kind DR</span><br><span class="line">    protocol TCP</span><br><span class="line"></span><br><span class="line">    real_server 192.168.1.27 80 &#123;</span><br><span class="line">        weight 1</span><br><span class="line">           TCP_CHECK &#123;</span><br><span class="line">            connect_timeout 10</span><br><span class="line">            nb_get_retry 3</span><br><span class="line">            delay_before_retry 3</span><br><span class="line">            connect_port 80</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    real_server 192.168.1.28 80 &#123;</span><br><span class="line">        weight 1</span><br><span class="line">           TCP_CHECK &#123;</span><br><span class="line">            connect_timeout 10</span><br><span class="line">            nb_get_retry 3</span><br><span class="line">            delay_before_retry 3</span><br><span class="line">            connect_port 80</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@director keepalived]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line">[root@director keepalived]# systemctl start keepalived</span><br><span class="line"><span class="meta">#</span> 启动keepalived后，会自动生成ipvs规则</span><br><span class="line">[root@director keepalived]# tcpdump -i ens33 -vv -nn host 224.1.101.12</span><br><span class="line"><span class="meta">#</span>这时可以看到探测信息，这是拥有VIP地址的主机发来的。</span><br><span class="line">[root@director keepalived]# ip a</span><br><span class="line"><span class="meta">#</span> 可以看到VIP在director1上</span><br><span class="line">[root@director keepalived]# ipvsadm -ln</span><br><span class="line"><span class="meta">#</span> 查看是否生成了ipvs规则，如果未生成，可以用下面命令</span><br><span class="line">[root@director keepalived]# ipvsadm -A -t 192.168.1.60:80 -s wrr</span><br><span class="line"><span class="meta">#</span> 生成一个虚拟服务器，用加权轮询算法</span><br><span class="line">[root@director keepalived]# ipvsadm -a -t 192.168.1.60:80 -r 192.168.1.27:80 -g -w 1</span><br><span class="line">[root@director keepalived]# ipvsadm -a -t 192.168.1.60:80 -r 192.168.1.28:80 -g -w 1</span><br><span class="line"><span class="meta">#</span> 将realserver加入到虚拟服务器中，-g表示使用DR直接路由，-w指定权重。</span><br><span class="line">[root@director keepalived]# ipvsadm -E -t 10.5.5.140:9999 -s wrr</span><br><span class="line"><span class="meta">#</span> 修改调度算法</span><br><span class="line"></span><br><span class="line">---------------------</span><br><span class="line">  realServer1&amp;2</span><br><span class="line">---------------------</span><br><span class="line">[root@realserver1 ~]# vim lvs_dr_rs.sh </span><br><span class="line"><span class="meta">#</span>! /bin/bash</span><br><span class="line"><span class="meta">#</span></span><br><span class="line">vip=192.168.1.60</span><br><span class="line">ifconfig lo:0 $vip broadcast $vip netmask 255.255.255.255 up</span><br><span class="line">route add -host $vip lo:0</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/lo/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/lo/arp_announce</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/all/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/all/arp_announce</span><br><span class="line"></span><br><span class="line">---------</span><br><span class="line">  本机</span><br><span class="line">---------</span><br><span class="line">使用IE浏览器访问192.168.1.26/test/，会轮流返回realServer上的页面内容。不能使用realServer访问，访问超时，不会返回结果。使用命令：</span><br><span class="line">root@ru:ruopu.gitb#for i in `seq 10000`;do curl 192.168.1.60/test/ &amp;&amp; echo $i;done</span><br><span class="line">也会返回两台服务器的页面内容。这时如果停止一台keepalived，VIP地址会转移到另一台上，访问还会继续</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/lvs/" rel="tag"># lvs</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/25/ELK部署/" rel="next" title="ELK部署">
+                <i class="fa fa-chevron-left"></i> ELK部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/29/haproxy部署/" rel="prev" title="haproxy部署">
+                haproxy部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">83</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS的基本工作原理"><span class="nav-number">2.</span> <span class="nav-text">LVS的基本工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS的组成"><span class="nav-number">3.</span> <span class="nav-text">LVS的组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS相关术语"><span class="nav-number">4.</span> <span class="nav-text">LVS相关术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS-NAT原理和特点"><span class="nav-number">5.</span> <span class="nav-text">LVS/NAT原理和特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LVS-NAT模型的特性"><span class="nav-number">5.1.</span> <span class="nav-text">LVS-NAT模型的特性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS-DR原理和特点"><span class="nav-number">6.</span> <span class="nav-text">LVS/DR原理和特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LVS-DR模型的特性"><span class="nav-number">6.1.</span> <span class="nav-text">LVS-DR模型的特性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS-Tun原理和特点"><span class="nav-number">7.</span> <span class="nav-text">LVS/Tun原理和特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LVS-Tun模型特性"><span class="nav-number">7.1.</span> <span class="nav-text">LVS-Tun模型特性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVS的八种调度算法"><span class="nav-number">8.</span> <span class="nav-text">LVS的八种调度算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#轮叫调度-rr"><span class="nav-number">8.1.</span> <span class="nav-text">轮叫调度 rr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加权轮叫-wrr"><span class="nav-number">8.2.</span> <span class="nav-text">加权轮叫 wrr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最少链接-lc"><span class="nav-number">8.3.</span> <span class="nav-text">最少链接 lc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加权最少链接-wlc"><span class="nav-number">8.4.</span> <span class="nav-text">加权最少链接 wlc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于局部性的最少连接调度算法-lblc"><span class="nav-number">8.5.</span> <span class="nav-text">基于局部性的最少连接调度算法 lblc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复杂的基于局部性最少的连接算法-lblcr"><span class="nav-number">8.6.</span> <span class="nav-text">复杂的基于局部性最少的连接算法 lblcr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#目标地址散列调度算法-dh"><span class="nav-number">8.7.</span> <span class="nav-text">目标地址散列调度算法 dh</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源地址散列调度算法-sh"><span class="nav-number">8.8.</span> <span class="nav-text">源地址散列调度算法 sh</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署LVS-NAT模型"><span class="nav-number">9.</span> <span class="nav-text">部署LVS/NAT模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署LVS-DR模型"><span class="nav-number">10.</span> <span class="nav-text">部署LVS/DR模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署keepalived-LVS环境"><span class="nav-number">11.</span> <span class="nav-text">部署keepalived+LVS环境</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
