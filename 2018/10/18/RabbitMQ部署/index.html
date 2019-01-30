@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="介绍 RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写，支持多种客户端，如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等，支持AJAX。用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。 AMQP，即Advanced message Queuing Protocol，高级消息队列协议">
+<meta name="keywords" content="RabbitMQ部署">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RabbitMQ部署">
+<meta property="og:url" content="http://yoursite.com/2018/10/18/RabbitMQ部署/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="介绍 RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写，支持多种客户端，如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等，支持AJAX。用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。 AMQP，即Advanced message Queuing Protocol，高级消息队列协议">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/下载页面1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/下载页面2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/下载页面3.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/下载页面4.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/登录1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/登录2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加用户1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加用户2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加虚拟主机1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加虚拟主机2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加虚拟主机3.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/添加用户3.jpg">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/创建队列.png">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/问题一.png">
+<meta property="og:image" content="http://yoursite.com/images/rabbitmq/问题一解决.png">
+<meta property="og:updated_time" content="2019-01-30T09:11:49.769Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RabbitMQ部署">
+<meta name="twitter:description" content="介绍 RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写，支持多种客户端，如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等，支持AJAX。用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。 AMQP，即Advanced message Queuing Protocol，高级消息队列协议">
+<meta name="twitter:image" content="http://yoursite.com/images/rabbitmq/下载页面1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/18/RabbitMQ部署/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>RabbitMQ部署 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/18/RabbitMQ部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RabbitMQ部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-18 14:52:42" itemprop="dateCreated datePublished" datetime="2018-10-18T14:52:42+08:00">2018-10-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-30 17:11:49" itemprop="dateModified" datetime="2019-01-30T17:11:49+08:00">2019-01-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/消息队列/" itemprop="url" rel="index"><span itemprop="name">消息队列</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写，支持多种客户端，如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等，支持AJAX。用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。</p>
+<p>AMQP，即Advanced message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。消息中间件主要用于组件之间的解耦，消息的发送者无需知道消息使用者的存在，反之亦然。</p>
+<p>AMQP的主要特征是面向消息、队列、路由（包括点对点和发布/订阅）、可靠性、安全。</p>
+</blockquote>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<ul>
+<li>RabbitMQ Server也称为Broker Server，是一种传输服务。它的角色就是维护一条从Producer（生产者）到Consumer（消费者）的路线，保证数据能够按照指定的方式进行传输。虽然这个保证也不是100%的保证，但是对于普通的应用来说这已经足够了。当然对于商业系统来说，可以再做一层数据一致性的guard，就可以彻底保证系统的一致性了。</li>
+<li>producer：数据的发送方。Create messages and publish (send) them to a Broker Server (RabbitMQ)。一个Message有两个部分：payload（有效载荷）和label（标签）。payload顾名思义就是传输的数据。label是exchange的名字或者说是一个tag，它描述了payload，而且RabbitMQ也是通过这个label来决定把这个Message发给哪个Consumer。AMQP仅仅描述了label，而RabbitMQ决定了如何使用这个label的规则。</li>
+<li>consumer：数据的接收方。Consumers attach to a Broker Server (RabbitMQ) and subscribe to a queue。把queue比作是一个有名字的邮箱。当有Message到达某个邮箱后，RabbitMQ把它发送给它的某个订阅者即Consumer。当然可能会把同一个Message发送给很多的Consumer。在这个Message中，只有payload，label已经被删掉了。对于Consumer来说，它是不知道谁发送的这个信息的,就是协议本身不支持。如果Producer发送的payload包含了Producer的信息就另当别论了。</li>
+<li>Connection：就是一个TCP的连接。Producer和Consumer都是通过TCP连接到RabbitMQ Server的。</li>
+<li>Connection Factory：连接管理器。应用程序与Rabbit之间建立连接的管理器，程序代码中使用；</li>
+<li>Channel：信道。消息推送使用的通道。虚拟连接。它建立在上述的TCP连接中。数据流动都是在Channel中进行的。也就是说，一般情况是程序起始建立TCP连接，第二步就是建立这个Channel。因为对于系统来说，建立和关闭TCP连接是有代价的，频繁的建立关闭TCP连接对于系统的性能有很大的影响，而且TCP的连接数也有限制，这也限制了系统处理高并发的能力。但是，在TCP连接中建立Channel是没有上述代价的。对于Producer或者Consumer来说，可以并发的使用多个Channel进行Publish或者Receive。</li>
+<li>exchanges：消息交换机，它指定消息按什么规则，路由到哪个队列。</li>
+<li>Queue：消息队列载体，每个消息都会被投入到一个或多个队列，用于存储生产者的消息。</li>
+<li>Binding：绑定是如何将消息从Exchange路由到特定队列的。也就是把exchange和queue按照路由规则绑定起来。</li>
+<li>Routing Key：路由关键字，exchange根据这个关键字进行消息投递</li>
+<li><strong><em>由Exchange、Queue、RoutingKey三个才能决定一个从Exchange到Queue的唯一的线路。</em></strong></li>
+<li>VHost：虚拟主机，一个broker里可以开设多个vhost，用作不同用户的权限分离。</li>
+</ul>
+</blockquote>
+<h4 id="publish消息确认机制"><a href="#publish消息确认机制" class="headerlink" title="publish消息确认机制"></a>publish消息确认机制</h4><blockquote>
+<p> 如果采用标准的 AMQP 协议，则唯一能够保证消息不会丢失的方式是利用事务机制 — 令 channel 处于 transactional 模式、向其 publish 消息、执行 commit 动作。在这种方式下，事务机制会带来大量的多余开销，并会导致吞吐量下降 250% 。为了补救事务带来的问题，引入了 confirmation 机制（即 Publisher Confirm）。</p>
+<p>confirm 机制是在channel上使用 confirm.select方法，处于 transactional 模式的 channel 不能再被设置成 confirm 模式，反之亦然。</p>
+<p>在 channel 被设置成 confirm 模式之后，所有被 publish 的后续消息都将被 confirm（即 ack） 或者被 nack 一次。但是没有对消息被 confirm 的快慢做任何保证，并且同一条消息不会既被 confirm 又被 nack 。</p>
+<p>RabbitMQ 将在下面的情况中对消息进行 confirm ：</p>
+<ol>
+<li>RabbitMQ发现当前消息无法被路由到指定的 queues 中；</li>
+<li>非持久属性的消息到达了其所应该到达的所有 queue 中（和镜像 queue 中）；</li>
+<li>持久消息到达了其所应该到达的所有 queue 中（和镜像 queue 中），并被持久化到了磁盘（被 fsync）；</li>
+<li>持久消息从其所在的所有 queue 中被 consume 了（如果必要则会被 acknowledge）。</li>
+</ol>
+</blockquote>
+<h4 id="consumer消息确认机制"><a href="#consumer消息确认机制" class="headerlink" title="consumer消息确认机制"></a>consumer消息确认机制</h4><blockquote>
+<p>为了保证数据不被丢失，RabbitMQ支持消息确认机制，即acknowledgments。</p>
+<p>如果没启动消息确认机制，RabbitMQ在consumer收到消息后就会把消息删除。</p>
+<p>启用消息确认后，consumer在处理数据后应通过回调函数显示发送ack， RabbitMQ收到ack后才会删掉数据。如果consumer一段时间内不回馈，RabbitMQ会将该消息重新分配给另外一个绑定在该队列上的consumer。另一种情况是consumer断开连接，但是获取到的消息没有回馈，则RabbitMQ同样重新分配。</p>
+<p>注意：如果consumer 没调用basic.qos 方法设置prefetch_count=1，那即使该consumer有未ack的messages，RabbitMQ仍会继续发messages给它。</p>
+</blockquote>
+<h4 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h4><blockquote>
+<p>消息确认机制确保了consumer退出时消息不会丢失，但如果是RabbitMQ本身因故障退出，消息还是会丢失。为了保证在RabbitMQ出现意外情况时数据仍没有丢失，需要将queue和message都要持久化。</p>
+<p>queue持久化：channel.queue_declare(queue=’hello’, durable=True)</p>
+<p>message持久化：channel.basic_publish(exchange=”,</p>
+<p>routing_key=”task_queue”,</p>
+<p>body=message,</p>
+<p>properties=pika.BasicProperties(</p>
+<p>delivery_mode = 2,)  #消息持久化</p>
+<p>)</p>
+<p>即使有消息持久化，数据也有可能丢失，因为rabbitmq是先将数据缓存起来，到一定条件才保存到硬盘上，这期间rabbitmq出现意外数据有可能丢失。</p>
+<p>网上有测试表明：持久化会对RabbitMQ的性能造成比较大的影响，可能会下降10倍不止。</p>
+</blockquote>
+<h4 id="RABBITMQ集群基本概念"><a href="#RABBITMQ集群基本概念" class="headerlink" title="RABBITMQ集群基本概念"></a>RABBITMQ集群基本概念</h4><blockquote>
+<p>一个RABBITMQ集群中可以共享user，virtualhosts，queues（开启Highly Available Queues），exchanges等。但message只会在创建的节点上传输。当message进入A节点的queue中后，consumer从B节点拉取时，RabbitMQ会临时在A、B间进行消息传输，把A中的消息实体取出并经过B发送给consumer。所以consumer应尽量连接每一个节点，从中取消息。</p>
+<p>RABBITMQ的集群节点包括内存节点、磁盘节点。内存节点的元数据仅放在内存中，性能比磁盘节点会有所提升。不过，如果在投递message时，打开了message的持久化，那么内存节点的性能只能体现在资源管理上，比如增加或删除队列（queue），虚拟主机（vrtual hosts），交换机（exchange）等，发送和接受message速度同磁盘节点一样。<font color="green">一个集群至少要有一个磁盘节点。</font></p>
+</blockquote>
+<h4 id="镜像队列概念"><a href="#镜像队列概念" class="headerlink" title="镜像队列概念"></a><strong>镜像队列概念</strong></h4><blockquote>
+<p>镜像队列可以同步queue和message，当主queue挂掉，从queue中会有一个变为主queue来接替工作。</p>
+<p>镜像队列是基于普通的集群模式的,所以你还是得先配置普通集群,然后才能设置镜像队列。</p>
+<p>镜像队列设置后，会分一个主节点和多个从节点，如果主节点宕机，从节点会有一个选为主节点，原先的主节点起来后会变为从节点。</p>
+<p>queue和message虽然会存在所有镜像队列中，但客户端读取时不论物理机连接的主节点还是从节点，都是从主节点读取数据，然后主节点再将queue和message的状态同步给从节点，因此多个客户端连接不同的镜像队列不会产生同一message被多次接受的情况。</p>
+</blockquote>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><ul>
+<li>下载rpm包<br><a href="http://www.rabbitmq.com/download.html" target="_blank" rel="noopener">http://www.rabbitmq.com/download.html</a></li>
+</ul>
+<p><img src="/images/rabbitmq/下载页面1.jpg" alt=""></p>
+<ul>
+<li>分别点击两个箭头指向的页面下载相应包</li>
+</ul>
+<p><img src="/images/rabbitmq/下载页面2.jpg" alt=""></p>
+<ul>
+<li>箭头指向为CentOS7中可以安装的erlang的rpm包和rabbitmq的rpm包</li>
+</ul>
+<p><img src="/images/rabbitmq/下载页面3.jpg" alt=""></p>
+<p><img src="/images/rabbitmq/下载页面4.jpg" alt=""></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">yum install -y erlang-19.3.6.11-2.el7.centos.x86_64.rpm</span><br><span class="line">yum install -y rabbitmq-server-3.6.16-2.el7.noarch.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将两个rpm包上传到服务器并安装</span></span><br><span class="line">vim /etc/rabbitmq/rabbitmq.config</span><br><span class="line">	[&#123;rabbit, [&#123;loopback_users, []&#125;]&#125;].</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装后没有此文件，自已创建此文件并加入上面内容，不要忘记最后的点</span></span><br><span class="line">rabbitmq-plugins enable rabbitmq_management</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启网页管理页面的插件。如果停用可以使用<span class="built_in">disable</span>参数</span></span><br><span class="line">cd /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/</span><br><span class="line">wget https://dl.bintray.com/rabbitmq/community-plugins/rabbitmq_delayed_message_exchange-0.0.1.ez</span><br><span class="line"><span class="meta">#</span><span class="bash"> 消息延迟发送给消费者的插件</span></span><br><span class="line">rabbitmq-plugins enable rabbitmq_delayed_message_exchange</span><br><span class="line">service rabbitmq-server start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果无法启动，可以使用journalctl -xe &gt; /root/abc.txt命令将报错信息重定向到一个文件，并查看。测试中无法启动是因为上面的配置文件写错了，改成上面的样子后启动就没问题了。</span></span><br><span class="line">ss -tlnp</span><br><span class="line"><span class="meta">#</span><span class="bash"> rabbitmq的网页默认监听在15672端口上，服务器监听在5672端口</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>访问rabbitmq远程管理页面。默认用户名和密码都是guest</li>
+</ul>
+<p><img src="/images/rabbitmq/登录1.jpg" alt=""></p>
+<p><img src="/images/rabbitmq/登录2.jpg" alt=""></p>
+<h3 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h3><h4 id="账号级别"><a href="#账号级别" class="headerlink" title="账号级别"></a>账号级别</h4><ul>
+<li>超级管理员administrator，可以登录控制台，查看所有信息，可以对用户和策略进行操作</li>
+<li>监控者monitoring，可以登录控制台，可以查看节点的相关信息，比如进程数，内存磁盘使用情况</li>
+<li>策略制定者policymaker，可以登录控制台，制定策略，但是无法查看节点信息</li>
+<li>普通管理员management，仅能登录控制台</li>
+<li>其他，无法登录控制台，一般指的是提供者和消费者</li>
+</ul>
+<h4 id="添加账号"><a href="#添加账号" class="headerlink" title="添加账号"></a>添加账号</h4><h5 id="命令添加"><a href="#命令添加" class="headerlink" title="命令添加"></a>命令添加</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rabbitmqctl add_user username password</span><br><span class="line"><span class="meta">#</span><span class="bash">添加用户和密码</span></span><br><span class="line">rabbitmqctl set_user_tags username Account_level</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给用户一个账号级别，如administrator,monitoring等</span></span><br></pre></td></tr></table></figure>
+<h5 id="网页添加"><a href="#网页添加" class="headerlink" title="网页添加"></a>网页添加</h5><ul>
+<li>添加用户</li>
+</ul>
+<p><img src="/images/rabbitmq/添加用户1.jpg" alt=""></p>
+<ul>
+<li>添加后的用户还没有指定可以访问的路径</li>
+</ul>
+<p><img src="/images/rabbitmq/添加用户2.jpg" alt=""></p>
+<ul>
+<li>添加虚拟主机</li>
+</ul>
+<p><img src="/images/rabbitmq/添加虚拟主机1.jpg" alt=""></p>
+<ul>
+<li>点击/test进入页面，之后指定用户。这相当于建立了一个用户可以访问的库</li>
+</ul>
+<p><img src="/images/rabbitmq/添加虚拟主机2.jpg" alt=""></p>
+<p><img src="/images/rabbitmq/添加虚拟主机3.jpg" alt=""></p>
+<p><img src="/images/rabbitmq/添加用户3.jpg" alt=""></p>
+<h3 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h3><h4 id="创建并加入集群"><a href="#创建并加入集群" class="headerlink" title="创建并加入集群"></a>创建并加入集群</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">准备三台主机</span><br><span class="line">主机名：rabbitmq1	地址：192.168.1.60</span><br><span class="line">主机名：rabbitmq2	地址：192.168.1.61</span><br><span class="line">主机名：rabbitmq3	地址：192.168.1.62</span><br><span class="line"></span><br><span class="line">注意事项</span><br><span class="line">1. 三台主机互相可以解析主机名，erlang是通过主机名来连接服务，必须保证各个主机名之间可以ping通。</span><br><span class="line">2. 三台主机的cookie文件要一致</span><br><span class="line">3. 如果queue是非持久化queue，则如果创建queue的那个节点失败，发送方和接收方可以创建同样的queue继续运作。但如果是持久化queue，则只能等创建queue的那个节点恢复后才能继续服务。</span><br><span class="line">4. 在集群元数据有变动的时候需要有disk node在线，但是在节点加入或退出的时候所有的disk node必须全部在线。如果没有正确退出disk node，集群会认为这个节点当掉了，在这个节点恢复之前不要加入其它节点。.</span><br><span class="line"></span><br><span class="line">集群创建流程</span><br><span class="line">1. 关闭两个节点的rabbitmq服务</span><br><span class="line">2. 第一个节启动rabbitmq服务，将cookie文件与hosts文件复制到另两个节点</span><br><span class="line">3. 另两个节点将cookie文件的属主属组改为rabbitmq。启动rabbitmq服务，关闭5672端口，加入集群，再启动5672端口</span><br><span class="line">==============================================================================================</span><br><span class="line">------------------------</span><br><span class="line">  rabbitmq2&amp;3</span><br><span class="line">------------------------</span><br><span class="line">[root@rabbitmq1 ~]# ps aux|grep rabbit|awk '&#123;print $2&#125;'|xargs kill -9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 杀掉三台主机上的rabbitmq进程</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# systemctl start rabbitmq-server</span><br><span class="line"><span class="meta">#</span><span class="bash"> rabbitmq1上的服务不能关闭</span></span><br><span class="line">[root@rabbitmq1 ~]# scp /var/lib/rabbitmq/.erlang.cookie 192.168.1.61:/var/lib/rabbitmq/ </span><br><span class="line">[root@rabbitmq1 ~]# scp /var/lib/rabbitmq/.erlang.cookie 192.168.1.62:/var/lib/rabbitmq/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将cookie文件传到另两台主机，使三台主机的cookie文件一致</span></span><br><span class="line">[root@rabbitmq1 ~]# vim /etc/hosts</span><br><span class="line">192.168.1.60 rabbitmq1</span><br><span class="line">192.168.1.61 rabbitmq2</span><br><span class="line">192.168.1.62 rabbitmq3</span><br><span class="line">[root@rabbitmq1 ~]# scp /etc/hosts 192.168.1.61:/etc/</span><br><span class="line">[root@rabbitmq1 ~]# scp /etc/hosts 192.168.1.62:/etc/</span><br><span class="line"></span><br><span class="line">------------------------</span><br><span class="line">  rabbitmq2&amp;3</span><br><span class="line">------------------------</span><br><span class="line">[root@rabbitmq3 ~]# chown rabbitmq.rabbitmq /var/lib/rabbitmq/.erlang.cookie</span><br><span class="line"><span class="meta">#</span><span class="bash"> cookie文件的属主属组应该是rabbitmq，启动rabbitmq程序的也是rabbitmq用户</span></span><br><span class="line">[root@rabbitmq2 ~]# systemctl start rabbitmq-server.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动两个节点的rabbitmq服务</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面进行加入集群工作</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl cluster_status</span><br><span class="line">Cluster status of node rabbit@rabbitmq1 ...</span><br><span class="line">[&#123;nodes,[&#123;disc,[rabbit@rabbitmq1]&#125;]&#125;,</span><br><span class="line"> &#123;running_nodes,[rabbit@rabbitmq1]&#125;,</span><br><span class="line"> &#123;cluster_name,&lt;&lt;"rabbit@rabbitmq1"&gt;&gt;&#125;,</span><br><span class="line"> &#123;partitions,[]&#125;]</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在rabbitmq1上查看集群中主机的情况，这时只有一台主机</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq2</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl stop_app</span><br><span class="line">Stopping node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭应用，也就是关闭了5672端口</span></span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl join_cluster rabbit@rabbitmq1</span><br><span class="line">Clustering node rabbit@rabbitmq2 with rabbit@rabbitmq1 ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入集群，集群名称rabbit@rabbitmq1是在rabbitmq1上查看集群信息显示的</span></span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl start_app</span><br><span class="line">Starting node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动应用</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq3</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq3 ~]# rabbitmqctl stop_app</span><br><span class="line">Stopping node rabbit@rabbitmq3 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq3 ~]# rabbitmqctl join_cluster rabbit@rabbitmq1</span><br><span class="line">Clustering node rabbit@rabbitmq3 with rabbit@rabbitmq1 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq3 ~]# rabbitmqctl start_app</span><br><span class="line">Starting node rabbit@rabbitmq3 ...</span><br><span class="line">...done.</span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl cluster_status</span><br><span class="line">Cluster status of node rabbit@rabbitmq1 ...</span><br><span class="line">[&#123;nodes,[&#123;disc,[rabbit@rabbitmq1,rabbit@rabbitmq2,rabbit@rabbitmq3]&#125;]&#125;,</span><br><span class="line"> &#123;running_nodes,[rabbit@rabbitmq3,rabbit@rabbitmq2,rabbit@rabbitmq1]&#125;,</span><br><span class="line"> &#123;cluster_name,&lt;&lt;"rabbit@rabbitmq1"&gt;&gt;&#125;,</span><br><span class="line"> &#123;partitions,[]&#125;]</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到三台主机在集群中，[&#123;nodes,[&#123;disc,[rabbit@rabbitmq1,rabbit@rabbitmq2,rabbit@rabbitmq3]&#125;]&#125;,中的disc表示三个节点都是磁盘节点，后面是节点的名称。</span></span><br></pre></td></tr></table></figure>
+<h4 id="改变存储模式"><a href="#改变存储模式" class="headerlink" title="改变存储模式"></a>改变存储模式</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">--------------------</span><br><span class="line">  rabbitmq1&amp;2</span><br><span class="line">--------------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl stop_app</span><br><span class="line">Stopping node rabbit@rabbitmq1 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl change_cluster_node_type ram</span><br><span class="line">Turning rabbit@rabbitmq1 into a ram node ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 改两个节点为内存节点，ram表示内存节点，disc表示磁盘节点</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl start_app</span><br><span class="line">Starting node rabbit@rabbitmq1 ...</span><br><span class="line">...done.</span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl cluster_status</span><br><span class="line">Cluster status of node rabbit@rabbitmq1 ...</span><br><span class="line">[&#123;nodes,[&#123;disc,[rabbit@rabbitmq3]&#125;,&#123;ram,[rabbit@rabbitmq2,rabbit@rabbitmq1]&#125;]&#125;,</span><br><span class="line"> &#123;running_nodes,[rabbit@rabbitmq2,rabbit@rabbitmq3,rabbit@rabbitmq1]&#125;,</span><br><span class="line"> &#123;cluster_name,&lt;&lt;"rabbit@rabbitmq1"&gt;&gt;&#125;,</span><br><span class="line"> &#123;partitions,[]&#125;]</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到节点3为磁盘节点，另外两个为内存节点</span></span><br></pre></td></tr></table></figure>
+<h4 id="退出集群"><a href="#退出集群" class="headerlink" title="退出集群"></a>退出集群</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">-----------------</span><br><span class="line">  rabbitmq2</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl stop_app</span><br><span class="line">Stopping node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl reset</span><br><span class="line">Resetting node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl start_app</span><br><span class="line">Starting node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl forget_cluster_node rabbit@rabbitmq2</span><br><span class="line">Removing node rabbit@rabbitmq2 from cluster ...</span><br><span class="line">Error: &#123;not_a_cluster_node,"The node selected is not in the cluster."&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 移除节点时会有一个错误提示：<span class="string">"选定的节点不在群集中。"</span></span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl cluster_status                      </span><br><span class="line">Cluster status of node rabbit@rabbitmq1 ...</span><br><span class="line">[&#123;nodes,[&#123;disc,[rabbit@rabbitmq3]&#125;,&#123;ram,[rabbit@rabbitmq1]&#125;]&#125;,</span><br><span class="line"> &#123;running_nodes,[rabbit@rabbitmq3,rabbit@rabbitmq1]&#125;,</span><br><span class="line"> &#123;cluster_name,&lt;&lt;"rabbit@rabbitmq1"&gt;&gt;&#125;,</span><br><span class="line"> &#123;partitions,[]&#125;]</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再查看已经没有rabbitmq2节点了</span></span><br></pre></td></tr></table></figure>
+<h4 id="集群重启"><a href="#集群重启" class="headerlink" title="集群重启"></a>集群重启</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 集群重启时，最后一个挂掉的节点应该第一个重启，如果因特殊原因（比如同时断电），而不知道哪个节点最后一个挂掉。可用以下方法重启：</span></span><br><span class="line"></span><br><span class="line">* 先在一个节点上执行</span><br><span class="line">rabbitmqctl force_boot</span><br><span class="line">service rabbitmq-server start</span><br><span class="line"></span><br><span class="line">* 在其他节点上执行</span><br><span class="line">service rabbitmq-server start</span><br><span class="line"></span><br><span class="line">* 查看cluster状态是否正常（要在所有节点上查询）。</span><br><span class="line">rabbitmqctl cluster_status</span><br><span class="line"></span><br><span class="line"><span class="meta"> #</span><span class="bash"> 如果有节点没加入集群，可以先退出集群，然后再重新加入集群。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上述方法不适合内存节点重启，内存节点重启的时候是会去磁盘节点同步数据，如果磁盘节点没起来，内存节点一直失败。</span></span><br></pre></td></tr></table></figure>
+<h4 id="配置镜像队列"><a href="#配置镜像队列" class="headerlink" title="配置镜像队列"></a>配置镜像队列</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl list_queues</span><br><span class="line">Listing queues ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看队列</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl eval 'rabbit_amqqueue:declare(&#123;resource,&lt;&lt;"/"&gt;&gt;,queue,&lt;&lt;"hello"&gt;&gt;&#125;,true,false,[],none).'</span><br><span class="line">&#123;new,&#123;amqqueue,&#123;resource,&lt;&lt;"/"&gt;&gt;,queue,&lt;&lt;"hello"&gt;&gt;&#125;,</span><br><span class="line">               true,false,none,[],&lt;5370.11741.0&gt;,[],[],undefined,[],[]&#125;&#125;</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个叫hello的队列</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl list_queues</span><br><span class="line">Listing queues ...</span><br><span class="line">hello   0</span><br><span class="line">test    0</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在可以看到两个队列，<span class="built_in">test</span>队列是在web页面上创建的，相对简单，只要在queues页面中添加一个队列，输入队列名即可完成简单的创建。</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl set_policy ha-all "test" '&#123;"ha-mode":"all"&#125;'    </span><br><span class="line">Setting policy "ha-all" for pattern "test" to "&#123;\"ha-mode\":\"all\"&#125;" with priority "0" ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把名为“<span class="built_in">test</span>”的队列设置为同步给所有节点</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ha-all 是同步模式，指同步给所有节点，还有另外两种模式ha-exactly表示在指定个数的节点上进行镜像，节点的个数由ha-params指定，ha-nodes表示在指定的节点上进行镜像，节点名称通过ha-params指定；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">test</span> 是同步的队列名，可以用正则表达式匹配；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> &#123;<span class="string">"ha-mode"</span>:<span class="string">"all"</span>&#125; 表示同步给所有，同步模式的不同，此参数也不同。</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/rabbitmq/创建队列.png" alt=""></p>
+<blockquote>
+<p>执行上面命令后，可以在web管理界面查看queue 页面，里面test队列的node节点后会出现+2标签，表示有2个从节点，而主节点则是当前显示的node。而hello因为没有设置镜像队列，所以没有+2标签。</p>
+</blockquote>
+<h4 id="创建帐户"><a href="#创建帐户" class="headerlink" title="创建帐户"></a>创建帐户</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">-----------------</span><br><span class="line">  rabbitmq2</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl stop_app</span><br><span class="line">Stopping node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl join_cluster rabbit@rabbitmq1</span><br><span class="line">Clustering node rabbit@rabbitmq2 with rabbit@rabbitmq1 ...</span><br><span class="line">...done.</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl start_app</span><br><span class="line">Starting node rabbit@rabbitmq2 ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先将rabbitmq2加入集群</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line">  rabbitmq1</span><br><span class="line">-----------------</span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl add_user test centos</span><br><span class="line">Creating user "test" ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个叫<span class="built_in">test</span>的用户，密码是centos</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl set_user_tags test administrator</span><br><span class="line">Setting tags for user "test" to [administrator] ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给<span class="built_in">test</span>用户添加一个管理员的角色</span></span><br><span class="line">[root@rabbitmq1 ~]# rabbitmqctl set_permissions -p / test ".*" ".*" ".*"</span><br><span class="line">Setting permissions for user "test" in vhost "/" ...</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在根虚拟机里设置<span class="built_in">test</span>用户配置权限、写权限、读权限。.*是正则表达式。rabbitmq的权限是根据不同的虚拟主机（virtual hosts）配置的，同用户在不同的虚拟主机（virtual hosts）里可能不一样。</span></span><br><span class="line"></span><br><span class="line">---------------------</span><br><span class="line">  rabbitmq2&amp;3</span><br><span class="line">---------------------</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmqctl list_users</span><br><span class="line">Listing users ...</span><br><span class="line">guest   [administrator]</span><br><span class="line">test    [administrator]</span><br><span class="line">...done.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为是集群，只要在一台主机设置即可，其它会自动同步。</span></span><br></pre></td></tr></table></figure>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><h4 id="Node-statistics-not-available"><a href="#Node-statistics-not-available" class="headerlink" title="Node statistics not available"></a>Node statistics not available</h4><p><img src="/images/rabbitmq/问题一.png" alt=""></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 显示Node statistics not available是因为节点的web插件未启用</span></span><br><span class="line">---------------------</span><br><span class="line">  rabbitmq2&amp;3</span><br><span class="line">---------------------</span><br><span class="line">[root@rabbitmq2 ~]# rabbitmq-plugins enable rabbitmq_management</span><br><span class="line">The following plugins have been enabled:</span><br><span class="line">  mochiweb</span><br><span class="line">  webmachine</span><br><span class="line">  rabbitmq_web_dispatch</span><br><span class="line">  amqp_client</span><br><span class="line">  rabbitmq_management_agent</span><br><span class="line">  rabbitmq_management</span><br><span class="line">Plugin configuration has changed. Restart RabbitMQ for changes to take effect.</span><br><span class="line">[root@rabbitmq2 ~]# systemctl restart rabbitmq-server.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 需要重新启动才能生效</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不能启动插件，可以先rabbitmqctl stop_app，之后再添加</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/rabbitmq/问题一解决.png" alt=""></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RabbitMQ部署/" rel="tag"># RabbitMQ部署</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/17/awk内置函数/" rel="next" title="awk内置函数">
+                <i class="fa fa-chevron-left"></i> awk内置函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/19/RabbitMQ概念/" rel="prev" title="RabbitMQ概念">
+                RabbitMQ概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">85</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">63</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#publish消息确认机制"><span class="nav-number">2.1.</span> <span class="nav-text">publish消息确认机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#consumer消息确认机制"><span class="nav-number">2.2.</span> <span class="nav-text">consumer消息确认机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息持久化"><span class="nav-number">2.3.</span> <span class="nav-text">消息持久化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RABBITMQ集群基本概念"><span class="nav-number">2.4.</span> <span class="nav-text">RABBITMQ集群基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#镜像队列概念"><span class="nav-number">2.5.</span> <span class="nav-text">镜像队列概念</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">3.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加用户"><span class="nav-number">4.</span> <span class="nav-text">添加用户</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#账号级别"><span class="nav-number">4.1.</span> <span class="nav-text">账号级别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加账号"><span class="nav-number">4.2.</span> <span class="nav-text">添加账号</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#命令添加"><span class="nav-number">4.2.1.</span> <span class="nav-text">命令添加</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#网页添加"><span class="nav-number">4.2.2.</span> <span class="nav-text">网页添加</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群部署"><span class="nav-number">5.</span> <span class="nav-text">集群部署</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建并加入集群"><span class="nav-number">5.1.</span> <span class="nav-text">创建并加入集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改变存储模式"><span class="nav-number">5.2.</span> <span class="nav-text">改变存储模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#退出集群"><span class="nav-number">5.3.</span> <span class="nav-text">退出集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集群重启"><span class="nav-number">5.4.</span> <span class="nav-text">集群重启</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置镜像队列"><span class="nav-number">5.5.</span> <span class="nav-text">配置镜像队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建帐户"><span class="nav-number">5.6.</span> <span class="nav-text">创建帐户</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">6.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Node-statistics-not-available"><span class="nav-number">6.1.</span> <span class="nav-text">Node statistics not available</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
