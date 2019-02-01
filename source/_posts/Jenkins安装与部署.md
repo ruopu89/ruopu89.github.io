@@ -5,10 +5,247 @@ tags: Jenkins
 categories: 持续集成与部署
 ---
 
+## Jenkins简单部署
+### rpm包安装启动
+
+```shell
+============================================================================================
+环境
+准备两台主机
+node1：地址：192.168.1.63
+node2：地址：192.168.1.64
+============================================================================================
+------------
+  jenkins
+------------  
+[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel
+[root@jenkins ~]# yum install -y jenkins-2.60.3-1.1.noarch.rpm
+[root@jenkins ~]# systemctl start jenkins
+[root@jenkins ~]# ss -tln
+State       Recv-Q Send-Q            Local Address:Port                           Peer Address:Port              
+LISTEN      0      128                           *:111                                       *:*                  
+LISTEN      0      128                           *:22                                        *:*                  
+LISTEN      0      100                   127.0.0.1:25                                        *:*                  
+LISTEN      0      128                          :::111                                      :::*                  
+LISTEN      0      50                           :::8080
+# 可以看到监控了8080端口
+[root@jenkins ~]# vim /etc/sysconfig/jenkins
+JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+# 调整jenkins的使用内存，默认此项是-Djava.awt.headless=true
+# -Xms：初始堆内存Heap大小，使用的最小内存，cpu性能高时此值应设的大一些
+# -Xmx：初始堆内存heap最大值，使用的最大内存
+# -XX:MaxPermSize:设定最大内存的永久保存区域
+# -Xms与-Xmx设置相同的值，需要根据实际情况设置，增大内存可以提高读写性能
+访问http://192.168.1.63:8080
+```
+
+
+
+### tomcat启动
+
+```shell
+------------
+  jenkins
+------------  
+[root@jenkins ~]# yum install -y tomcat
+[root@jenkins ~]# cp /usr/lib/jenkins/jenkins.war /usr/share/tomcat/webapps/
+# 将上面安装的jenkins的war包复制到tomcat的部署目录下，也可以直接下载jenkins的war包
+[root@jenkins ~]# vim /etc/sysconfig/tomcat
+JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+# 调整tomcat使用jvm内存
+[root@jenkins ~]# systemctl start tomcat
+[root@jenkins ~]# ps aux|grep tomcat
+tomcat     2242 17.4 40.8 3718460 763224 ?      Ssl  19:27   0:21 /usr/lib/jvm/jre/bin/java -Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m -classpath /usr/share/tomcat/bin/bootstrap.jar:/usr/share/tomcat/bin/tomcat-juli.jar:/usr/share/java/commons-daemon.jar -Dcatalina.base=/usr/share/tomcat -Dcatalina.home=/usr/share/tomcat -Djava.endorsed.dirs= -Djava.io.tmpdir=/var/cache/tomcat/temp -Djava.util.logging.config.file=/usr/share/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager org.apache.catalina.startup.Bootstrap start
+
+访问http://192.168.1.63:8080/jenkins
+[root@jenkins ~]# cat /usr/share/tomcat/.jenkins/secrets/initialAdminPassword 
+cdc0bfcfa03e4d2da4f7232b213c50c1
+#  查看登录jenkins的默认密码
+```
+
+
+
+### 安装maven
+
+```shell
+------------
+  maven
+------------
+[root@maven ~]# yum install -y java-1.8.0-openjdk-devel  tomcat tomcat-admin-webapps
+# 在当前主机上安装一个tomcat，稍后测试maven构建的包是否可以正常运行
+[root@maven ~]# yum install -y maven git
+[root@maven ~]# git clone https://github.com/mageedu/spring-boot-web-jsp.git
+# 克隆一个java代码测试。
+# 对maven来说最重要的是pom.xml文件，它描述了这个代码是如何构建的
+[root@maven ~]# cd spring-boot-web-jsp/
+[root@maven ~]# vim /etc/maven/settings.xml
+<mirrors>
+<mirror>
+       <id>nexus-osc</id>
+       <mirrorOf>*</mirrorOf>
+       <name>Nexus osc</name>
+       <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+    </mirror>
+# mirrors段添加国内源地址。
+<profile>
+    <id>jdk-1.4</id>
+    <activation>
+    <jdk>1.4</jdk>
+    </activation>
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>local private nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus</id>
+            <name>local private nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+</profile>
+# Maven 还需要安装一些插件包，这些插件包的下载地址也让其指向 oschina.net 的 Maven 地址。在<profiles>中插入
+# 一定要修改为国内源，不然构建速度将非常慢。尤其是在jenkins中
+[root@maven spring-boot-web-jsp]# mvn package
+# 开始构建。
+[root@maven ~]# vim /etc/tomcat/tomcat-users.xml
+<role rolename="manager-gui"/> 
+<role rolename="manager-script"/>
+<user name="tomcat" password="tomcat" roles="manager-gui,manager-script" />
+[root@maven ~]# vim /etc/sysconfig/tomcat
+JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+[root@maven ~]# systemctl start tomcat
+[root@maven spring-boot-web-jsp]# ls target/
+classes            maven-archiver  spring-boot-web-jsp-1.0      spring-boot-web-jsp-1.0.war.original
+generated-sources  maven-status    spring-boot-web-jsp-1.0.war
+# 可以看到构建后有了war包
+[root@maven spring-boot-web-jsp]# cp target/spring-boot-web-jsp-1.0.war /usr/share/tomcat/webapps/
+访问http://192.168.1.64:8080/spring-boot-web-jsp-1.0/，可以看到部署的结果了
+```
+
+
+
+### 测试jenkins
+
+```shell
+------------
+  jenkins
+------------  
+[root@jenkins ~]# scp jenkins.war 192.168.1.64:/usr/share/tomcat/webapps/
+# jenkins.war包的属主属组应该是tomcat，权限是644
+
+------------
+  maven
+------------
+[root@maven webapps]# cat /usr/share/tomcat/.jenkins/secrets/initialAdminPassword 
+083cbf58aefd411b89558aea505f3e94
+[root@maven webapps]# vim /etc/tomcat/server.xml
+<Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" URIEncoding="UTF-8"/>
+#  让tomcat可以使用UTF-8编码。这是为了让jenkins不再报需要使用UTF-8编码的错误
+[root@maven webapps]# systemctl restart tomcat
+访问http://192.168.1.64:8080/jenkins/  -->  输入密码  -->  选择默认插件  -->  创建新用户  --> 在系统管理中配置jenkins的环境  -->  到系统管理中的global tool configuration中配置JDK的别名和路径，取消自动安装，路径写/usr即可  -->  git工具被默认配置了，因为git包已经安装了。Gradle是java的新的构建工具  -->  配置Mave，使用mvn -v查看版本，将版本号输入到Name中，如maven-3.0.5，路径写/usr
+
+新建一个任务，叫spring-boot-web-jsp。一般构建选择两种，一是自由风格，一是pipeline（流水线），这里选自由风格。选择github project，输入https://github.com/mageedu/spring-boot-web-jsp.git，这是给定一个代码路径，点击高级可显示Display name输入spring-boot-web，这是自定义的。源码管理中的Git是指如果要推送到远程服务器上，在这里要输入地址，用户名和密码或密钥，在这里还是输入https://github.com/mageedu/spring-boot-web-jsp.git，源码管理不做配置也可以，但测试中发现一定要配置源码管理的地址，不然会提示找不到pom.xml文件。构建触发器是指如果代码更新了要怎么办或什么条件下进行构建。第一可以自定义脚本来触发，build after other projects are built指在其他项目构建完触发，build pericxfically是周期性构建，每隔一段时间就看一下源代码是否有变化，有变化就构建，GitHub hook trigger for GITScrn polling是如果GitHub上注册的hook有变化，就会发送通知，下载代码构建，Poll SCM是不断向github轮询，有符合条件的就构建，这里可以在日程表中写入H/5 * * * *，表示每5分钟轮询一次。在构建中可以选择Invoke top-level Maven targets，表示一个顶级的maven构建，在Maven Version中选择安装的maven版本，Goals中输入构建的路径，这种方式易出错。选择Execute shell表示脚本构建，在Command中写入/usr/bin/mvn package即可，它会自动切换到构建目录下构建。构建后操作就是要发布了。视频中这里没有选择。直接点击项目中的立即构建了，在构建中可以选择console一项，可以打开一个窗口查看构建的过程。
+
+[root@maven webapps]# cd /usr/share/tomcat/.jenkins/
+# 构建完成后进入此目录
+[root@maven .jenkins]# ls workspace/spring-boot-web-jsp/
+# 在workspace目录中有构建完的程序
+
+------------
+  jenkins
+------------ 
+[root@jenkins ~]# rm -rf /usr/share/tomcat/webapps/jenkins*
+[root@jenkins ~]# cd /etc/tomcat/
+[root@jenkins tomcat]# vim tomcat-users.xml
+<role rolename="manager-script"/> 
+<user name="admin" password="admin" roles="manager-script" />
+#  我们要将maven上构建的结果在 jenkins上的tomcat上运行，所以需要这里打开manager-script功能。
+[root@jenkins tomcat]# systemctl restart tomcat
+[root@jenkins tomcat]# ss -tln
+
+------------
+  maven
+------------
+选择系统管理中的管理插件，在可选插件中选择安装Deploy to container，选择安装完成后重启Jenkins。进入spring-boot-web-jsp项目中，点击配置，选择构建后操作中的Deploy war/ear to a container，这是刚安装的插件，WAR/EAR files输入**target/*.war，（**表示任意个路径下的target目录中的.war文件。也可以写为**/*.war或*.war）。Context path可以不改，使用默认，这里使用/test-spring（这是部署到node1的tomcat上的目录的名称）。Containers选择Tomcat7.*，用户名和密码就是上面配置的manager-script的用户名和密码，输入两次tomcat。Tomcat URL输入http://IP:8080/，这是tomcat的访问路径。如果要构建多个tomcat，可以再添加Add Container就可以了。最后保存。
+点击项目中的立即构建。构建中出了问题，一直提示没有权限部署。因为node1上没有安装tomcat-admin-webapps
+
+------------
+  jenkins
+------------ 
+[root@jenkins tomcat]# yum install -y tomcat-admin-webapps
+[root@jenkins tomcat]# ls webapps/
+host-manager  manager  test-spring  test-spring.war
+# 在此目录下有刚部署的test-spring.war文件
+
+访问http://192.168.1.63:8080/test-spring/
+
+------------
+  maven
+------------
+[root@maven .jenkins]# rm -rf workspace/spring-boot-web-jsp/
+# 删除代码，测试重新构建
+[root@maven .jenkins]# cd
+[root@maven ~]# ls
+anaconda-ks.cfg  netty-new.jar  spring-boot-web-jsp
+[root@maven ~]# vim spring-boot-web-jsp/src/main/resources/application.properties
+spring.mvc.view.prefix: /WEB-INF/jsp/
+spring.mvc.view.suffix: .jsp
+
+welcome.message: Hi Jenkins, Test.com, iunx.io.
+# 修改这个文件中的显示内容，再保存，这里修改了Test.com, iunx.io.
+[root@maven ~]# vim spring-boot-web-jsp/src/main/resources/static/css/main.css
+h1{
+        color:#FFFF00;
+}
+
+h2{
+        color:#0000FF;
+}
+# 修改颜色
+cd spring-boot-web-jsp
+git add .
+git commit -m "version 4.2.0"
+git push 
+点击自动构建
+如果是灰度发布，可以使用脚本，脚本可实现将指定文件发送到服务器并部署
+回滚到之前的版本，可以在构建时指定构建的版本就可以了，使用git克隆时就克隆指定的版本就可以了。
+在ganneral最上方的一栏中可以选择参数化构建过程。
+参考：blog.ramanshalupau.com/parameterized-jenkins-build-for-rollback-purposes，实现滚动发布与回滚
+```
+
+
+
+
+
+## Jenkins&Gitlab
+
 ### Jenkins依赖环境准备
 
 ```shell
 * 安装java环境
+[root@jenkins ~]# ll
+total 83356
+-rw-------. 1 root root     1292 Oct 24 05:42 anaconda-ks.cfg
+-rwxr-xr-x  1 root root  9621331 Feb  1 12:51 apache-tomcat-8.5.33.tar.gz
+-rwxr-xr-x  1 root root 75728164 Feb  1 12:51 jenkins.war
 [root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel
 [root@jenkins ~]# vim /etc/profile.d/java.sh
 	export JAVA_HOME=/usr
@@ -36,8 +273,14 @@ OpenJDK 64-Bit Server VM (build 25.181-b13, mixed mode)
                connectionTimeout="20000"
                redirectPort="8443" URIEncoding="UTF-8" />
 # 加入URIEncoding="UTF-8"地址的编码解码字符集
+[root@jenkins local]# vim /usr/local/tomcat/bin/catalina.sh
+    JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+# 调整tomcat使用jvm内存
 [root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh
 [root@jenkins tomcat]# tail -f /usr/local/tomcat/logs/catalina.out
+# 查看启动过程
+[root@jenkins local]# ps aux|grep tomcat
+root       3101 33.7 38.4 3704844 717556 pts/0  Sl   13:02   0:17 /usr/bin/java -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m -Djdk.tls.ephemeralDHKeySize=2048 -Djava.protocol.handler.pkgs=org.apache.catalina.webresources -Dorg.apache.catalina.security.SecurityListener.UMASK=0027 -Dignore.endorsed.dirs= -classpath /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar -Dcatalina.base=/usr/local/tomcat -Dcatalina.home=/usr/local/tomcat -Djava.io.tmpdir=/usr/local/tomcat/temp org.apache.catalina.startup.Bootstrap start
 [root@jenkins tomcat]# cat /root/.jenkins/secrets/initialAdminPassword 
 2296380bbe5e4753bc970240aca8ae2d
 # 这是打开jenkins页面时要输入的密码，这也是Jenkins的admin管理员的登录密码
@@ -101,6 +344,8 @@ Oct 21 23:15:06 jenkins systemd: Configuration file /usr/lib/systemd/system/ebta
 
 ![](/images/jenkins/jenkins10.jpg)
 
+
+
 ### 配置JDK和Maven并安装Deploy插件
 
 * 登录Jenkins
@@ -140,13 +385,56 @@ Maven home: /usr/local/apache-maven-3.5.4
 Java version: 1.8.0_181, vendor: Oracle Corporation, runtime: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.181-3.b13.el7_5.x86_64/jre
 Default locale: en_US, platform encoding: ANSI_X3.4-1968
 OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"
+[root@jenkins local]# vim /usr/local/apache-maven-3.5.4/conf/settings.xml
+<mirrors>
+<mirror>
+       <id>nexus-osc</id>
+       <mirrorOf>*</mirrorOf>
+       <name>Nexus osc</name>
+       <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+    </mirror>
+# mirrors段添加国内源地址。
+<profile>
+    <id>jdk-1.4</id>
+    <activation>
+    <jdk>1.4</jdk>
+    </activation>
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>local private nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus</id>
+            <name>local private nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+</profile>
+# Maven 还需要安装一些插件包，这些插件包的下载地址也让其指向 oschina.net 的 Maven 地址。在<profiles>中插入
+# 一定要修改为国内源，不然构建速度将非常慢。尤其是在jenkins中
 ```
 
 * 选择插件管理
 
 ![](/images/jenkins/jenkins配置7.jpg)
 
-* 安装插件deploy to container
+* 安装插件deploy to container，这个插件是让jenkins成功构建后可以部署war包到tomcat的
 
 ![](/images/jenkins/jenkins配置8.jpg)
 
@@ -159,9 +447,13 @@ OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"
 [root@localhost ~]# yum install -y gitlab-ce-10.6.1-ce.0.el7.x86_64.rpm
 [root@localhost ~]# vim /etc/gitlab/gitlab.rb
 	external_url 'http://10.5.5.199'
+# 设置服务地址
 [root@localhost ~]# gitlab-ctl reconfigure
 # 这是一个初始化的过程
-访问IP，要求设置root密码，之后就可以正常登录了
+访问IP，要求设置root密码，需要是一个复杂的密码，之后就可以正常登录了
+# 如果访问出现502错误，可以查看是否之前安装并启动过web服务或tomcat服务，卸载服务并重启gitlab后就可以正常访问了。
+# [root@gitlab ~]# gitlab-ctl restart		# 重启gitlab命令
+# 另外也可以查看一下内存是否不足
 ```
 
 ### 获取gitlab的token
@@ -170,7 +462,7 @@ OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"
 
 ![](/images/jenkins/gitlabgetToken1.jpg)
 
-* 选择右侧的settings，并勾选最下方的“Allow requests to the local network from hooks and services”并保存。此项非常关键，如果不勾选此项，之后测试连接jenkins时会报500错误
+* 选择左下角的settings，并勾选最下方的“Allow requests to the local network from hooks and services”并保存。此项非常关键，如果不勾选此项，之后测试连接jenkins时会报500错误
 
 ![](/images/jenkins/gitlabgetToken2.jpg)
 
@@ -204,7 +496,7 @@ OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"
 
 ### 生成访问Gitlab的ssh秘钥。
 
->  **从gitlab以SSH方式拉取或提交代码需要用到这个SSH 秘钥**，哪台机器需要从gitlab上拉取代码，就在哪台机器上生成一次SHH Key，因此，在jenkins服务器上，以及你的开发PC上，都需要生成SSH密钥。
+>  **从gitlab以SSH方式拉取或提交代码需要用到这个SSH 秘钥**，哪台机器需要从gitlab上拉取代码，就在哪台机器上生成一次SSH Key，因此，在jenkins服务器上，以及你的开发PC上，都需要生成SSH密钥。
 
 ![](/images/jenkins/gitlabssh1.jpg)
 
@@ -242,15 +534,24 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 
 ### jenkins中安装gitlab插件
 
-* 需要的插件：Gitlab Hook、Build Authorization Token Root、Publish Over SSH、Gitlab Authentication、Gitlab、Git Parameter
+> 需要的插件：
+>
+> * GitLab Hook：使 gitlab web 挂钩能够用于触发 gitlab 项目上的 smc 轮询
+> * GitLab：这个插件允许 gitlab 触发 jenkins 构建, 并在 gitlab ui 中显示它们的结果。
+> * Gitlab Authentication：这是使用 gitlab oauth 的身份验证插件。
+> * Git Parameter：增加了从项目中配置的 git 存储库中选择分支、标记或修订的功能。
+> * Build Authorization Token Root：即使匿名用户看不到 jenkins, 也可以访问生成和相关的 rest 生成触发器
+> * Publish Over SSH：通过 ssh 发送生成项目
 
-  ![](/images/jenkins/gitlabPlugin1.jpg)
+![](/images/jenkins/gitlabPlugin1.jpg)
 
 ![](/images/jenkins/gitlabPlugin2.jpg)
 
 ![](/images/jenkins/gitlabPlugin3.jpg)
 
 ### jenkins中设置token
+
+> jenkins可以通过从gitlab上得到的token，与gitlab协同工作
 
 ![](/images/jenkins/jenkinsgitlabtoken1.jpg)
 
@@ -274,7 +575,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 
 ![](/images/jenkins/jenkinsSSH1.jpg)
 
-* 输入jenkins服务器的私钥，SSH Servers中设置自定义Name，Hostname是要部署代码的服务器地址，Username是登录用的用户名
+* 输入jenkins服务器的私钥，也就是用户家目录中.ssh中的id_rsa文件的内容（这是为了可以通过jenkins的公钥与私钥进行配对，使jenkins可以在远程主机上操作，当然也需要jenkins将公钥传到远程主机），SSH Servers中设置自定义Name，Hostname是要部署代码的服务器地址，Username是登录用的用户名，Remote Directory这里设置为了/usr/share/nginx/html，之后jenkins就可以向这个目录部署网页文件了
 
 ![](/images/jenkins/jenkinsSSH2.jpg)
 
@@ -288,13 +589,13 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 
 ![](/images/jenkins/git插件2.jpg)
 
-* 设置Git插件的全局配置，然后点击“apply”——“save”。全局配置就是上面“Gitlab创建项目”部分中的global setting ，在项目第一次commit前，这些信息都可以在GitLab的项目的首页里找到
+* 设置Git插件的全局配置，然后点击“apply”——“save”。全局配置就是上面“Gitlab创建项目”部分中的global setting ，也就是git的用户名和邮箱地址。在项目第一次commit前，这些信息都可以在GitLab的项目的首页里找到
 
 ![](/images/jenkins/git插件3.jpg)
 
 ### 创建一个Jenkins Job
 
-> 在jenkins里，一个任务叫做一个job。一般我们的项目会有多个分支，比如开发分支和产品分支，我们可以对每一个分支都新建一个job，比如，我们对开发分支创建一个测试的job,每次有代码提交就自动运行一次测试，对产品分支创建一个打包的job，每次有代码提交就运行打包任务。
+> 在jenkins里，一个任务叫做一个job。一般我们的项目会有多个分支，比如开发分支和产品分支，我们可以对每一个分支都新建一个job，比如，我们对开发分支创建一个测试的job，每次有代码提交就自动运行一次测试，对产品分支创建一个打包的job，每次有代码提交就运行打包任务。
 >
 > 在系统设置中设置的项就是为了可以在任务中得到引用。
 
@@ -310,7 +611,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 
 ![](/images/jenkins/配置job1.jpg)
 
-* 添加用户，类型选“SSH Username with private key”；Username填root；选择PrivateKey中的Enter directly，在下面的key中输入jenkins服务器的私钥，可以用命令`cat /root/.ssh/id_rsa `查看。
+* 添加用户，类型选“SSH Username with private key”；Username填root；选择PrivateKey中的Enter directly，在下面的key中输入jenkins服务器的私钥，可以用命令`cat /root/.ssh/id_rsa `查看。也里是指使用jenkins服务器上root用户的私钥访问gitlab上的项目，与gitlab上的jenkins服务器的root用户的公钥进行验证。
 
 ![](/images/jenkins/配置job2.jpg)
 
@@ -346,7 +647,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 
 ![](/images/jenkins/webhook2.jpg)
 
-* 添加后在下面的Webhooks中就会有添加的项，点Test中的Push events测试。这里一定要在gitlab的项目中有一个文件，如果没有，测试时会提示“Hook execution failed: Ensure the project has at least one commit.”
+* 添加后在下面的Webhooks中就会有添加的项，点Test中的Push events测试。这里一定要在gitlab的项目中有一个文件，如果没有，测试时会提示“Hook execution failed: Ensure the project has at least one commit.”。可以在gitlab项目中创建一个README文件
 
 ![](/images/jenkins/webhook3.jpg)
 
@@ -362,6 +663,9 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lK
 * 到jenkins服务器上安装git，准备拉取代码
 
 ```shell
+-------------
+  jenkins
+-------------
 ssh-copy-id -i /root/.ssh/id_rsa.pub 10.5.5.22
 # 要与部署代码的服务器实现密钥通讯
 git clone git@10.5.5.11:test/ccjdtest.git
@@ -385,9 +689,9 @@ git push
 
 
 
-## 测试maven手动部署
+### 测试maven手动部署
 
-### 部署流程
+#### 部署流程
 
 1. 注册gitlab帐号
 2. 创建git项目
@@ -399,7 +703,7 @@ git push
 8. 第一次构建，要到Job中点击“立即构建”
 9. 构建后操作
 
-### 设置Job
+#### 设置Job
 
 * 设置Job，输入git地址，设置jenkins服务器登录gitlib时用的用户名与私钥，这样私钥与jenkins上传到gitlab上的公钥就可以配对了
 
@@ -440,5 +744,28 @@ git push
 
 
 
+### 总结
+```shell
+-------------
+  jenkins
+-------------
+1. 全局安全设置，可以用户注册
+2. 系统设置中设置maven和java的家目录
+3. 安装deploy to container及gitlib相关插件
+4. jenkins中设置token，使jenkins与gitlab可以联合工作
+5. 配置publish over ssh，使jenkins可以使用ssh方法发送文件到远程服务器，或在远程服务器上执行命令。当然还需要将jenkins的公钥传输到远程主机
+6. 配置git，使用jenkins可以到远程的gitlab上进行验证
+7. 配置JOB
+7.1 源码管理中使用git，创建一个带有jenkins服务器上私钥的用户名，让jenkins可以使用私钥与github上的jenkins的公钥配对。让gitlab可以将代码推送到jenkins。
+7.2 构建触发器选择Build when a change is pushed to GitLab. (当更改推送到 gitlab 时生成。)，这是为了让gitlab可以向jenkins发送POST请求的。之后设置自动触发的分支，生成一个webhook安全令牌。
+7.3 构建，选择Send files or execute commands over SSH，也就是在构建期间通过ssh作为构建步骤发送文件或执行命令的方法，之后可以设置要部署的服务器，这个服务器是在publish over ssh中设置好的某台服务器，还可以设置代码的源路径，要部署的远程服务器的路径，要在远程服务器上执行的命令等。
 
+-----------
+  gitlab
+-----------
+1. 生成token，给jenkins使用
+2. 为某个项目设置webhook。设置jenkins的URL与jenkins中生成的webhook安全令牌，使gitlab知道如何通知jenkins
+3. 当项目中的代码发生变化时，gitlab会将代码推送到jenkins主机进行部署
+
+```
 

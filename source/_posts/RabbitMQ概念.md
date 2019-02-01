@@ -7,15 +7,62 @@ categories: 消息队列
 
 ## 转：干货：这也许是最全面透彻的一篇RabbitMQ指南！
 
-RabbitMQ是一个Erlang开发的AMQP（Advanced Message Queuing Protocol ）的开源实现。
+原文地址：https://www.cnblogs.com/zhangxiaoliu/p/7524846.html
+
+**本文大纲：**
+
+1. RabbitMQ 历史
+2. RabbitMQ 应用场景
+3. RabbitMQ 系统架构
+4. RabbitMQ 基本概念
+5. RabbitMQ 细节阐明
+
+ 
+
+**历史-从开始到现在**
+
+RabbitMQ是一个Erlang开发的AMQP（Advanced Message Queuing Protocol ）的开源实现。AMQP 的出现其实也是应了广大人民群众的需求，虽然在同步消息通讯的世界里有很多公开标准（如 Cobar）的 IIOP ，或者是 SOAP 等），但是在异步消息处理中却不是这样，只有大企业有一些商业实现（如微软的 MSMQ ，IBM 的 WebSphere MQ 等），因此，在 2006 年的 6 月，Cisco 、Red Hat、iMatix 等联合制定了 AMQP 的公开标准。
+
+ 
+
+RabbitMQ由RabbitMQ Technologies Ltd开发并且提供商业支持的。该公司在2010年4月被SpringSource（VMware的一个部门）收购。在2013年5月被并入Pivotal。其实VMware，Pivotal和EMC本质上是一家的。不同的是，VMware是独立上市子公司，而Pivotal是整合了EMC的某些资源，现在并没有上市。
+
+ 
 
 RabbitMQ官网：http://www.rabbitmq.com
+
+ 
+
+### 应用场景
+
+言归正传。RabbitMQ，或者说AMQP解决了什么问题，或者说它的应用场景是什么？
+
+ 
+
+对于一个大型的软件系统来说，它会有很多的组件或者说模块，又或者说子系统。那这些模块又如何通信？这和传统的IPC有很大的区别。传统的IPC很多都是在单一系统上的，模块耦合性很大，不适合扩展（Scalability）。如果使用Socket，那么不同的模块的确可以部署到不同的机器上，但是还是有很多问题需要解决。比如：
+
+ 
+
+- 信息的发送者和接收者如何维持这个连接，如果一方的连接中断，这期间的数据是以什么方式丢失？
+- 如何降低发送者和接收者的耦合度？
+- 如何让Priority高的接收者先接到数据？
+- 如何做到Load Balance？有效均衡接收者的负载？
+- 如何有效的将数据发送到相关的接收者？也就是说将接收者subscribe 不同的数据，如何做有效的filter。
+- 如何做到可扩展，甚至将这个通信模块发到cluster上？
+- 如何保证接收者接收到了完整，正确的数据？
+
+
+AMQP协议解决了以上的问题，而RabbitMQ实现了AMQP。
+
+
 
 ### 系统架构
 
 ![](/images/rabbitmq/消息模型.jpg)
 
-&emsp;&emsp;RabbitMQ Server也称为Broker Server，是一种传输服务。它的角色就是维护一条从Producer（生产者）到Consumer（消费者）的路线，保证数据能够按照指定的方式进行传输。虽然这个保证也不是100%的保证，但是对于普通的应用来说这已经足够了。当然对于商业系统来说，可以再做一层数据一致性的guard，就可以彻底保证系统的一致性了。
+#### **RabbitMQ Server**
+
+&emsp;&emsp;也叫Broker Server，它不是运送食物的卡车，而是一种传输服务。原话是RabbitMQ isn't a food truck, it's a delivery service. 它的角色就是维护一条从Producer到Consumer的路线，保证数据能够按照指定的方式进行传输。虽然这个保证也不是100%的保证，但是对于普通的应用来说这已经足够了。当然对于商业系统来说，可以再做一层数据一致性的guard，就可以彻底保证系统的一致性了。
 
 #### producer
 
@@ -24,6 +71,18 @@ RabbitMQ官网：http://www.rabbitmq.com
 #### consumer
 
 &emsp;&emsp;数据的接收方。Consumers attach to a Broker Server (RabbitMQ) and subscribe to a queue。把queue比作是一个有名字的邮箱。当有Message到达某个邮箱后，RabbitMQ把它发送给它的某个订阅者即Consumer。当然可能会把同一个Message发送给很多的Consumer。在这个Message中，只有payload，label已经被删掉了。对于Consumer来说，它是不知道谁发送的这个信息的,就是协议本身不支持。如果Producer发送的payload包含了Producer的信息就另当别论了。
+
+对于一个数据从Producer到Consumer的正确传递，还有三个概念需要明确：exchanges, queues and bindings。
+
+ 
+
+- Exchanges are where producers publish their messages.
+- Queues are where the messages end up and are received by consumers.
+- Bindings are how the messages get routed from the exchange to particular queues.
+
+ 
+
+还有几个概念是上述图中没有标明的，那就是Connection（连接）和Channel（通道，频道）。
 
 #### Connection
 
@@ -35,29 +94,23 @@ RabbitMQ官网：http://www.rabbitmq.com
 
 #### Channel
 
-&emsp;&emsp;信道。消息推送使用的通道。虚拟连接。它建立在上述的TCP连接中。数据流动都是在Channel中进行的。也就是说，一般情况是程序起始建立TCP连接，第二步就是建立这个Channel。因为对于系统来说，建立和关闭TCP连接是有代价的，频繁的建立关闭TCP连接对于系统的性能有很大的影响，而且TCP的连接数也有限制，这也限制了系统处理高并发的能力。但是，在TCP连接中建立Channel是没有上述代价的。对于Producer或者Consumer来说，可以并发的使用多个Channel进行Publish或者Receive。
+&emsp;&emsp;信道。消息推送使用的通道。虚拟连接。它建立在上述的TCP连接中。数据流动都是在Channel中进行的。也就是说，一般情况是程序起始建立TCP连接，第二步就是建立这个Channel。因为对于系统来说，建立和关闭TCP连接是有代价的，频繁的建立关闭TCP连接对于系统的性能有很大的影响，而且TCP的连接数也有限制，这也限制了系统处理高并发的能力。但是，在TCP连接中建立Channel是没有上述代价的。对于Producer或者Consumer来说，可以并发的使用多个Channel进行Publish或者Receive。有实验表明，1s的数据可以Publish10K的数据包。当然对于不同的硬件环境，不同的数据包大小这个数据肯定不一样，但是我只想说明，对于普通的Consumer或者Producer来说，这已经足够了。如果不够用，你考虑的应该是如何细化SPLIT你的设计。
 
-#### exchanges
+#### 相关定义
 
-&emsp;&emsp;消息交换机，它指定消息按什么规则，路由到哪个队列。
+- Broker： 简单来说就是消息队列服务器实体
+- Exchange： 消息交换机，它指定消息按什么规则，路由到哪个队列
+- Queue： 消息队列载体，每个消息都会被投入到一个或多个队列
+- Binding： 绑定，它的作用就是把exchange和queue按照路由规则绑定起来
+- Routing Key： 路由关键字，exchange根据这个关键字进行消息投递
+- VHost： 虚拟主机，一个broker里可以开设多个vhost，用作不同用户的权限分离。
+- Producer： 消息生产者，就是投递消息的程序
+- Consumer： 消息消费者，就是接受消息的程序
+- Channel： 消息通道，在客户端的每个连接里，可建立多个channel，每个channel代表一个会话任务
 
-#### Queue
+ 
 
-&emsp;&emsp;消息队列载体，每个消息都会被投入到一个或多个队列，用于存储生产者的消息。
-
-#### Binding
-
-&emsp;&emsp;绑定是如何将消息从Exchange路由到特定队列的。也就是把exchange和queue按照路由规则绑定起来。
-
-#### Routing Key
-
-&emsp;&emsp;路由关键字，exchange根据这个关键字进行消息投递
-
-&emsp;&emsp;**由Exchange、Queue、RoutingKey三个才能决定一个从Exchange到Queue的唯一的线路。**
-
-#### VHost
-
-&emsp;&emsp;虚拟主机，一个broker里可以开设多个vhost，用作不同用户的权限分离。
+由Exchange、Queue、RoutingKey三个才能决定一个从Exchange到Queue的唯一的线路。
 
 
 

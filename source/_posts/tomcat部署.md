@@ -91,6 +91,31 @@ Catalina
 
 
 
+#### 调整tomcat使用jvm内存
+
+```shell
+* 源码安装
+[root@jenkins local]# vim /usr/local/tomcat/bin/catalina.sh
+    JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+# 调整tomcat使用jvm内存
+[root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh
+[root@jenkins tomcat]# tail -f /usr/local/tomcat/logs/catalina.out
+# 查看启动过程
+[root@jenkins local]# ps aux|grep tomcat
+root       3101 33.7 38.4 3704844 717556 pts/0  Sl   13:02   0:17 /usr/bin/java -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m -Djdk.tls.ephemeralDHKeySize=2048 -Djava.protocol.handler.pkgs=org.apache.catalina.webresources -Dorg.apache.catalina.security.SecurityListener.UMASK=0027 -Dignore.endorsed.dirs= -classpath /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar -Dcatalina.base=/usr/local/tomcat -Dcatalina.home=/usr/local/tomcat -Djava.io.tmpdir=/usr/local/tomcat/temp org.apache.catalina.startup.Bootstrap start
+
+* rpm包安装
+[root@jenkins ~]# vim /etc/sysconfig/jenkins
+JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"
+# 调整jenkins的使用内存，默认此项是-Djava.awt.headless=true
+# -Xms：初始堆内存Heap大小，使用的最小内存，cpu性能高时此值应设的大一些
+# -Xmx：初始堆内存heap最大值，使用的最大内存
+# -XX:MaxPermSize:设定最大内存的永久保存区域
+# -Xms与-Xmx设置相同的值，需要根据实际情况设置，增大内存可以提高读写性能
+```
+
+
+
 #### 页面中的manager
 
 ```shell

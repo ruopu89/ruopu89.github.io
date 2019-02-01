@@ -1,7 +1,7 @@
 ---
 title: AnsibleTest
 date: 2018-07-16 15:28:08
-categories: ansible
+categories: 编排工具
 tags: ansible
 type: 管理工具
 ---
@@ -267,7 +267,7 @@ ansible 192.168.1.100 -m setup
 >     tasks：任务列表
 >
 >     	模块，模块参数
->	
+>		
 >     	格式
 >
 >    * action
