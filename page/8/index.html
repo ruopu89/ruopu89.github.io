@@ -319,6 +319,187 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云日志文件备份/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/18/阿里云日志文件备份/" itemprop="url">
+                  阿里云日志文件备份
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-18 16:09:41" itemprop="dateCreated datePublished" datetime="2018-09-18T16:09:41+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-21 10:56:20" itemprop="dateModified" datetime="2018-11-21T10:56:20+08:00">2018-11-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>密钥访问</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* 准备备份日志的服务器</span><br><span class="line">ssh-keygen -t rsa -P ''</span><br><span class="line">ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.250</span><br></pre></td></tr></table></figure>
+<ul>
+<li>脚本</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">vim /root/sh</span><br><span class="line">    #!/bin/bash</span><br><span class="line">    #</span><br><span class="line">    nettylog=/apps/echarging/log/nettylog</span><br><span class="line">    processorlog=/apps/echarging/log/processor_1_log</span><br><span class="line">    nettyback=/home/nettylog</span><br><span class="line">    processorback=/home/processorlog1</span><br><span class="line">    nettybackR=/home/logbackup/nettylog</span><br><span class="line">    processorbackR=/home/logbackup/processorlog1</span><br><span class="line"></span><br><span class="line">    cd $nettylog</span><br><span class="line">    find ./ -name netty.log-`date -d yesterday +%F`."*".log -exec cp &#123;&#125; $nettyback \;</span><br><span class="line">    tar -zcf $nettyback/netty-log.`date -d yesterday +%F`.tar.gz $nettyback/*.log</span><br><span class="line">    scp $nettyback/netty-log.`date -d yesterday +%F`.tar.gz 192.168.2.250:$nettybackR</span><br><span class="line">    rm -rf $nettyback/*</span><br><span class="line"></span><br><span class="line">    cd $processorlog</span><br><span class="line">    find ./ -name processor_1.log-`date -d yesterday +%F`."*".log -exec cp &#123;&#125; $processorback \;</span><br><span class="line">    tar -zcf $processorback/processor_1.log-`date -d yesterday +%F`.tar.gz $processorback/*.log</span><br><span class="line">    scp $processorback/processor_1.log-`date  -d yesterday +%F`.tar.gz 192.168.2.250:$processorbackR</span><br><span class="line">    rm -rf $processorback/*</span><br><span class="line"><span class="meta">#</span><span class="bash">本打算使用find ./ -name processor_1.log-`date -d yesterday +%F`.<span class="string">"*"</span>.<span class="built_in">log</span> -<span class="built_in">exec</span> tar -zcf processor_log-`date -d yesterday +%F`.tar.gz &#123;&#125; \;命令来直接打包，但测试发现打出的包中只有find查到的最后一个文件。所以将命令改为了两条，先将找到的文件移到一个临时目录，再打包发送。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>定时任务</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br><span class="line">	* 4 * * * /bin/bash /root/sh/scplog.sh</span><br><span class="line">crontab -l</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云RDS数据库备份下载/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2073,174 +2254,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/修改tomcat默认页面/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/12/修改tomcat默认页面/" itemprop="url">
-                  修改tomcat默认页面
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-12 12:50:03 / 修改時間：13:09:51" itemprop="dateCreated datePublished" datetime="2018-09-12T12:50:03+08:00">2018-09-12</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tomcat/" itemprop="url" rel="index"><span itemprop="name">tomcat</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>修改tomcat的默认页面为自己的主页，再使用nginx反代到tomcat。实现访问域名即可打开主页。</p>
-</blockquote>
-<ul>
-<li>tomcat</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">	&lt;Host name="localhost"  appBase="webapps"</span><br><span class="line">            unpackWARs="true" autoDeploy="true"&gt;</span><br><span class="line">        &lt;Context path="" docBase="echarge" reloadable="true" /&gt;</span><br><span class="line">//在Host下面加入Context一行，设置path为空，这样就不会访问到默认页了。之后用docBase指定主页的路径，这里写echarge表示是在webapps下的echarge目录。reloadable表示是否自动装载。</span><br><span class="line">/usr/local/tomcat/bin/shutdown.sh</span><br><span class="line">/usr/local/tomcat/bin/startup.sh</span><br><span class="line">//此例中已将主机的IP地址解析为域名了，另外tomcat监听在8081端口。这时可以通过"域名:8081"访问到主页了。</span><br></pre></td></tr></table></figure>
-<ul>
-<li>nginx</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/web.conf</span><br><span class="line">	proxy_cache_path /etc/nginx/cache levels=1:2:2 keys_zone=web_cache:10m max_size=2g;</span><br><span class="line">    server&#123;</span><br><span class="line">       server_name web.jdyichong.com;</span><br><span class="line">       index index.html index.htm;</span><br><span class="line">       charset utf-8;</span><br><span class="line">       proxy_cache web_cache;</span><br><span class="line">       proxy_cache_key $request_uri;</span><br><span class="line">       proxy_cache_methods GET HEAD;</span><br><span class="line">       proxy_cache_min_uses 1;</span><br><span class="line">       proxy_cache_valid 200 302 10m;</span><br><span class="line">       proxy_cache_valid 400 1m;</span><br><span class="line">       proxy_cache_use_stale http_502;</span><br><span class="line"></span><br><span class="line">       location / &#123;</span><br><span class="line">            proxy_pass http://web.jdyichong.com:8081;</span><br><span class="line">            //这里只要将所有访问都反代到本机的tomcat上即可。</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">//用nginx加入缓存设置，之后反向代理到本机的tomcat上，这样使用域名即可访问到主页了。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2288,7 +2301,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">85</span>
+                    <span class="site-state-item-count">86</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2486,7 +2499,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">63</span>
+                      
+                    
+                    <span class="site-state-item-count">64</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

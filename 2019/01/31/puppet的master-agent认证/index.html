@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="mastar&amp;amp;agent手动注册123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949">
+<meta name="keywords" content="puppet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="puppet的master&amp;agent认证">
+<meta property="og:url" content="http://yoursite.com/2019/01/31/puppet的master-agent认证/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="mastar&amp;amp;agent手动注册123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2019-02-01T04:53:02.270Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="puppet的master&amp;agent认证">
+<meta name="twitter:description" content="mastar&amp;amp;agent手动注册123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/31/puppet的master-agent认证/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>puppet的master&agent认证 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/31/puppet的master-agent认证/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">puppet的master&agent认证
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-01-31 22:06:41" itemprop="dateCreated datePublished" datetime="2019-01-31T22:06:41+08:00">2019-01-31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-02-01 12:53:02" itemprop="dateModified" datetime="2019-02-01T12:53:02+08:00">2019-02-01</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编排工具/" itemprop="url" rel="index"><span itemprop="name">编排工具</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="mastar-amp-agent"><a href="#mastar-amp-agent" class="headerlink" title="mastar&amp;agent"></a>mastar&amp;agent</h3><h4 id="手动注册"><a href="#手动注册" class="headerlink" title="手动注册"></a>手动注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">手动注册是由Agent端先发起证书申请请求，然后由Puppetserver端确认，方可注册成功，这种注册方式安全系数中等，逐一注册（puppet cert --sign certnmame）在节点数量较大的情况下是比较麻烦的，效率也低，批量注册(puppet cert --sign --all)效率很高，一次性便可注册所有的Agent的请求，但是这种方式安全系数较低，因为错误的请求也会被注册上。</span><br><span class="line"></span><br><span class="line">环境</span><br><span class="line">master：192.168.1.70</span><br><span class="line">agent1：192.168.1.71</span><br><span class="line">agent2：192.168.1.72</span><br><span class="line">===========================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# hostnamectl set-hostname master.ruopu.com</span><br><span class="line">[root@master ~]# vim /etc/hosts</span><br><span class="line">192.168.1.70 master.ruopu.com</span><br><span class="line">192.168.1.71 node1.ruopu.com</span><br><span class="line">192.168.1.72 node2.ruopu.com</span><br><span class="line">[root@master ~]# rsync -e ssh -arvz --progress /etc/hosts 192.168.1.71:/etc</span><br><span class="line">[root@master ~]# rsync -e ssh -arvz --progress /etc/hosts 192.168.1.72:/etc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 主机名的修改非常重要，必须做。让三台主机可以互相解析</span></span><br><span class="line">[root@puppet ~]# yum install -y puppt puppet-server facter tree</span><br><span class="line">[root@puppet ~]# vim /etc/puppet/puppet.conf</span><br><span class="line">[main]</span><br><span class="line">    logdir = /var/log/puppet		# 默认日志存放路径</span><br><span class="line">    rundir = /var/run/puppet		# pid存放路径</span><br><span class="line">    ssldir = $vardir/ssl		 # 证书存放目录，默认$vardir为/var/lib/puppet</span><br><span class="line">[agent]</span><br><span class="line">    classfile = $vardir/classes.txt</span><br><span class="line">    localconfig = $vardir/localconfig</span><br><span class="line">    server = master.ruopu.com		# 设置agent认证连接master端的服务器名称，注意这个名字必须能够被节点解析</span><br><span class="line">    certname = master.ruopu.com		# 设置agent端certname名称</span><br><span class="line">[master]</span><br><span class="line">    certname = master.ruopu.com		# 设置puppetmaster认证服务器名</span><br><span class="line">[root@puppet ~]# touch /etc/puppet/manifests/site.pp</span><br><span class="line">[root@puppet ~]# systemctl start puppetmaster </span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务端，自动生成CA证书，并签署。</span></span><br><span class="line">[root@master ~]# ss -tln</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              </span><br><span class="line">LISTEN     0      128        *:8140                   *:*   </span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听在8140端口</span></span><br><span class="line">[root@puppet ~]# tree /var/lib/puppet/ssl/</span><br><span class="line">/var/lib/puppet/ssl/</span><br><span class="line">├── ca</span><br><span class="line">│   ├── ca_crl.pem</span><br><span class="line">│   ├── ca_crt.pem</span><br><span class="line">│   ├── ca_key.pem</span><br><span class="line">│   ├── ca_pub.pem</span><br><span class="line">│   ├── inventory.txt</span><br><span class="line">│   ├── private</span><br><span class="line">│   │   └── ca.pass</span><br><span class="line">│   ├── requests</span><br><span class="line">│   ├── serial</span><br><span class="line">│   └── signed</span><br><span class="line">│       └── master.ruopu.com.pem</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到，signed中已经有服务端了，证明服务器已被认证</span></span><br><span class="line">[root@puppet ~]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line"><span class="meta">#</span><span class="bash"> 有加号的证明是已被认证的主机</span></span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听日志</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  agent1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@puppettest1 ~]# hostnamectl set-hostname node1.ruopu.com</span><br><span class="line">[root@puppettest1 ~]# yum install -y puppet facter</span><br><span class="line">[root@node1 ~]# vim /etc/puppet/puppet.conf </span><br><span class="line">[main]</span><br><span class="line">    logdir = /var/log/puppet</span><br><span class="line">    rundir = /var/run/puppet</span><br><span class="line">    ssldir = $vardir/ssl</span><br><span class="line">[agent]</span><br><span class="line">    classfile = $vardir/classes.txt</span><br><span class="line">    localconfig = $vardir/localconfig</span><br><span class="line">    server = master.ruopu.com		# 指向puppetmaster端</span><br><span class="line">    certname = node1.ruopu.com		# 设置自己的certname名</span><br><span class="line">    listen = true		# 让puppet监听8139端口 </span><br><span class="line">[root@node1 ~]# vim /etc/puppet/auth.conf</span><br><span class="line">path /run</span><br><span class="line">method save</span><br><span class="line">auth any</span><br><span class="line">allow master.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在文件尾部path /的上方加入上面内容</span></span><br><span class="line">[root@puppettest1 ~]# systemctl start puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动客户端</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master ~]# puppet cert --list --all</span><br><span class="line">  "node1.ruopu.com"  (SHA256) F8:DF:B8:26:AE:92:5D:26:96:D9:21:AE:92:3F:84:40:6F:65:3F:B5:D0:C7:27:AC:12:44:E3:87:09:6B:19:0D</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line"><span class="meta">#</span><span class="bash">  这时可以看到客户端的请求，没有加号</span></span><br><span class="line">[root@master ~]# puppet cert --sign --all</span><br><span class="line">Notice: Signed certificate request for node1.ruopu.com</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/ca/requests/node1.ruopu.com.pem'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 签署请求</span></span><br><span class="line">[root@master ~]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 已被认证</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  agent1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@node1 ~]# ss -tln</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              </span><br><span class="line">LISTEN     0      128        *:8139                   *:* </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到客户端监听在8139端口了，在认证后需要等待一会儿才会监听地址。</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master ~]# puppet kick --all</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试推送是否成功</span></span><br><span class="line">[root@master ~]# cd /etc/puppet/modules/</span><br><span class="line">[root@master modules]# mkdir -pv &#123;jdk8,tomcat,nginx&#125;/&#123;manifests,files,templates,lib,spec,tests&#125;</span><br><span class="line">[root@master modules]# yum install -y nginx tomcat java-1.8.0-openjdk-devel</span><br><span class="line">[root@master modules]# vim /etc/nginx/nginx.conf</span><br><span class="line">		location / &#123;</span><br><span class="line">           proxy_pass http://192.168.1.72:8080;</span><br><span class="line">        &#125;</span><br><span class="line">[root@master modules]# cp /etc/nginx/nginx.conf /etc/puppet/modules/nginx/files/</span><br><span class="line">[root@master modules]# cp /etc/tomcat/server.xml /etc/puppet/modules/tomcat/files/</span><br><span class="line">[root@master modules]# vim nginx/manifests/init.pp</span><br><span class="line">class nginx &#123;</span><br><span class="line">   package&#123;'nginx':</span><br><span class="line">      name =&gt; 'nginx',</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125;</span><br><span class="line">   file&#123;'nginx.conf':</span><br><span class="line">      path =&gt; '/etc/nginx/nginx.conf',</span><br><span class="line">      source =&gt; "puppet:///modules/nginx/nginx.conf",</span><br><span class="line">   &#125;</span><br><span class="line">   service&#123;'nginx':</span><br><span class="line">      ensure =&gt; running,</span><br><span class="line">      enable =&gt; true,</span><br><span class="line">   &#125;</span><br><span class="line">   Package['nginx'] -&gt; File['nginx.conf'] ~&gt; Service['nginx']</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim tomcat/manifests/init.pp</span><br><span class="line">class tomcat &#123;</span><br><span class="line">   package&#123;['tomcat','tomcat-webapps','tomcat-admin-webapps','tomcat-docs-we</span><br><span class="line">bapp']:		# 安装多个包要用这种定义方式</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125; -&gt;</span><br><span class="line">   file&#123;'server.xml':</span><br><span class="line">      path =&gt; '/etc/tomcat/server.xml',</span><br><span class="line">      source =&gt; 'puppet:///modules/tomcat/server.xml',</span><br><span class="line">   &#125; ~&gt;</span><br><span class="line">   service&#123;'tomcat':</span><br><span class="line">      ensure =&gt; running,</span><br><span class="line">      enable =&gt; true,</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim jdk8/manifests/init.pp</span><br><span class="line">class jdk8 &#123;</span><br><span class="line">   package&#123;'jdk8':</span><br><span class="line">      name =&gt; 'java-1.8.0-openjdk-devel',</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125;</span><br><span class="line">   file&#123;'java.sh':</span><br><span class="line">      path =&gt; '/etc/profile.d/java.sh',</span><br><span class="line">      source =&gt; "puppet:///modules/jdk8/java.sh",</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim jdk8/files/java.sh</span><br><span class="line">export JAVA_HOME=/usr</span><br><span class="line">[root@master modules]# cd /etc/puppet/manifests/</span><br><span class="line">[root@master manifests]# vim site.pp		# 定义主机清单</span><br><span class="line">node 'node1.test.com' &#123;</span><br><span class="line">   include nginx</span><br><span class="line">&#125;</span><br><span class="line">node 'node2.test.com' &#123;</span><br><span class="line">   include jdk8</span><br><span class="line">   include tomcat</span><br><span class="line">&#125;</span><br><span class="line">[root@master manifests]# puppet module list</span><br><span class="line">/etc/puppet/modules</span><br><span class="line">├── jdk8 (???)</span><br><span class="line">├── nginx (???)</span><br><span class="line">└── tomcat (???)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看上面定义的三个模块tomcat、nginx、jdk8是否加载</span></span><br><span class="line">[root@master modules]# puppet kick --all</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提醒所有客户端进行同步，如果是单个主机，可以写为客户端的主机名，如node1.ruopu.com，不能写为node1，因为不是主机名，所以推送不过去。也可以写多个主机名，主机名之间用空格分隔。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个推送的过程很慢，测试中一起推送非常慢，使用了单个主机的推送</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@node1 ~]# rpm -q nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到安装了nginx</span></span><br><span class="line">[root@node1 ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务也启动了</span></span><br><span class="line">[root@node1 ~]# vim /etc/nginx/nginx.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件也被修改了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个过程有些慢，需要在服务端推送后等一会儿才会生效。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">===========================================================================================</span><br><span class="line">客户端认证出现问题或推送失败的解决方法</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# puppet cert --clean node1.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务端使用此命令将某个主机的认证清除</span></span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line">  agent</span><br><span class="line">----------</span><br><span class="line">[root@puppettest1 ~]# systemctl stop puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先停止服务</span></span><br><span class="line">[root@puppettest1 ~]# rm -rf /var/lib/puppet/ssl/*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除所有密钥</span></span><br><span class="line">[root@puppettest1 ~]# systemctl start puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# puppet cert --list --all</span><br><span class="line">[root@puppet ~]# puppet cert --sign --all </span><br><span class="line"><span class="meta">#</span><span class="bash"> 签署认证</span></span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志</span></span><br><span class="line">[root@puppet ~]# tree /var/lib/puppet/ssl/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看认证</span></span><br><span class="line">===========================================================================================</span><br></pre></td></tr></table></figure>
+<h4 id="自动注册"><a href="#自动注册" class="headerlink" title="自动注册"></a>自动注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">这种注册方式简单来讲是通过Puppetmaster端的ACL列表进行控制的，安全系统较低，也就是说符合预先定义的ACL列表中的所有节点请求不需要确认都会被自动注册上，也就是说你只需要知道ACL列表要求，其次能和PuppetMaster端通信便可轻易注册成功。当然，它的最大优点就是效率非常高。</span><br><span class="line">============================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --clean node2.ruopu.com</span><br><span class="line">Notice: Revoked certificate with serial 5</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node2.ruopu.com at '/var/lib/puppet/ssl/ca/signed/node2.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node2.ruopu.com at '/var/lib/puppet/ssl/certs/node2.ruopu.com.pem'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除PuppetMaster端已经注册的agent2的证书</span></span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# rm -rf /var/lib/puppet/ssl/*</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# vim /etc/puppet/autosign.conf</span><br><span class="line">*.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在Puppetmaster端编写ACL列表</span></span><br><span class="line">[root@master modules]# systemctl restart puppetmaster.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启服务</span></span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# puppet agent --test</span><br><span class="line">Info: Creating a new SSL key for node2.ruopu.com</span><br><span class="line">Info: Caching certificate for ca</span><br><span class="line">Info: csr_attributes file loading from /etc/puppet/csr_attributes.yaml</span><br><span class="line">Info: Creating a new SSL certificate request for node2.ruopu.com</span><br><span class="line">Info: Certificate Request fingerprint (SHA256): 6E:0E:32:71:38:77:41:92:E6:55:B0:90:07:3B:42:BF:87:8A:A7:16:2F:C2:90:25:43:10:B6:8B:DF:0A:65:A8</span><br><span class="line">Info: Caching certificate for node2.ruopu.com</span><br><span class="line">Info: Caching certificate_revocation_list for ca</span><br><span class="line">Info: Caching certificate for ca</span><br><span class="line">Notice: Ignoring --listen on onetime run</span><br><span class="line">Info: Retrieving pluginfacts</span><br><span class="line">Info: Retrieving plugin</span><br><span class="line">Info: Caching catalog for node2.ruopu.com</span><br><span class="line">Warning: The package type's allow_virtual parameter will be changing its default value from false to true in a future release. If you do not want to allow virtual packages, please explicitly set allow_virtual to false.</span><br><span class="line">   (at /usr/share/ruby/vendor_ruby/puppet/type.rb:816:in `set_default')</span><br><span class="line">Info: Applying configuration version '1548985465'</span><br><span class="line">Notice: Finished catalog run in 4.31 seconds</span><br><span class="line"><span class="meta">#</span><span class="bash"> 申请证书</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line">+ "node2.ruopu.com"  (SHA256) 3F:C1:1E:F7:4B:BA:2B:28:E0:79:49:AF:F3:96:BC:FE:78:A2:D2:F6:A4:9A:76:E6:29:BA:D9:09:29:D4:E0:79</span><br><span class="line"><span class="meta">#</span><span class="bash"> agent2已经自动注册成功</span></span><br><span class="line"></span><br><span class="line">[root@master modules]# puppet kick node2.ruopu.com   </span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node2.ruopu.com</span><br><span class="line">Error: Host node2.ruopu.com failed: SSL_connect returned=1 errno=0 state=error: certificate verify failed: [certificate revoked for /CN=node2.ruopu.com]</span><br><span class="line"></span><br><span class="line">node2.ruopu.com finished with exit code 2</span><br><span class="line">Failed: node2.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时向agent2推送可能会有问题，需要重启agent2的puppet服务</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# systemctl restart puppetagent</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# vim /root/puppetclient.txt</span><br><span class="line">node1.ruopu.com</span><br><span class="line">node2.ruopu.com</span><br><span class="line">[root@master modules]# puppet kick --host `cat /root/puppetclient.txt`</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node1.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is success</span><br><span class="line">node1.ruopu.com finished with exit code 0</span><br><span class="line">Triggering node2.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is success</span><br><span class="line">node2.ruopu.com finished with exit code 0</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用此种方法一起推送</span></span><br></pre></td></tr></table></figure>
+<h4 id="预签名注册"><a href="#预签名注册" class="headerlink" title="预签名注册"></a>预签名注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">预签名注册是在agent端未提出申请的情况下，预先在puppetmaster端生成agent端的证书，然后复制到节点对应的目录下即可注册成功，这种方式安全系数最高，但是操作麻烦，需要提前预知所有节点服务器的certname名称，其次需要将生成的证书逐步copy到所有节点上去。不过，如果你的系统中安装了kickstart或者cobbler这样的自动化工具，倒是可以将证书部分转换成脚本集成到统一自动化部署中</span><br><span class="line">== 生产环境中建议此方式进行注册，既安全又可靠！ ==</span><br><span class="line">============================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --clean node1.ruopu.com</span><br><span class="line">Notice: Revoked certificate with serial 4</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node1.ruopu.com at '/var/lib/puppet/ssl/ca/signed/node1.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node1.ruopu.com at '/var/lib/puppet/ssl/certs/node1.ruopu.com.pem'</span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node2.ruopu.com"  (SHA256) 3F:C1:1E:F7:4B:BA:2B:28:E0:79:49:AF:F3:96:BC:FE:78:A2:D2:F6:A4:9A:76:E6:29:BA:D9:09:29:D4:E0:79</span><br><span class="line">[root@master modules]# mv /etc/puppet/autosign.conf&#123;,.bak&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除自动注册ACL列表</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# rm -rf /var/lib/puppet/*</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet ca generate node1.ruopu.com</span><br><span class="line">Notice: node1.ruopu.com has a waiting certificate request</span><br><span class="line">Notice: Signed certificate request for node1.ruopu.com</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/ca/requests/node1.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/certificate_requests/node1.ruopu.com.pem'</span><br><span class="line">"-----BEGIN CERTIFICATE-----\nM...</span><br><span class="line"><span class="meta">#</span><span class="bash"> puppetserver端预先生成agent1证书</span></span><br><span class="line">============================================================================================</span><br><span class="line">[root@master modules]# puppet --version</span><br><span class="line">3.6.2</span><br><span class="line">[root@master modules]# puppet help</span><br><span class="line"><span class="meta">#</span><span class="bash"> 3.6.2版本中的命令与网上的一些教程已有很多不同，可以通过此命令查看帮助信息</span></span><br><span class="line">[root@master modules]# puppet help ca</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是查看ca模块的帮助命令</span></span><br><span class="line">============================================================================================</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# puppet agent --test --server=master.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点生成目录结构，最后是服务端的主机名</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/private_keys/node1.ruopu.com.pem node1.ruopu.com:/var/lib/puppet/ssl/private_keys/</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/certs/node1.ruopu.com.pem node1.ruopu.com:/var/lib/puppet/ssl/certs/</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/certs/ca.pem node1.ruopu.com:/var/lib/puppet/ssl/certs/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 复制密钥到客户端</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# puppet agent --test</span><br><span class="line">Notice: Ignoring --listen on onetime run</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试。实际发现，在服务端生成客户端密钥时就已经完成客户端的认证了。</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet kick node1.ruopu.com      </span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node1.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is running</span><br><span class="line">Host node1.ruopu.com is already running</span><br><span class="line">node1.ruopu.com finished with exit code 3</span><br><span class="line">Failed: node1.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提示错误的原因是agent1节点每5秒与服务器同步一次，比较频繁，所以有此提示。如果将更新时间改为默认的1800秒，再次推送就不会有此提示了。</span></span><br></pre></td></tr></table></figure>
+<h4 id="客户端定时更新"><a href="#客户端定时更新" class="headerlink" title="客户端定时更新"></a>客户端定时更新</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# puppet agent --configprint runinterval</span><br><span class="line">1800</span><br><span class="line"><span class="meta">#</span><span class="bash"> Puppet客户端定时更新时间默认为30分钟</span></span><br><span class="line">[root@node2  modules]# vim /etc/puppet/puppet.conf</span><br><span class="line">[agent]</span><br><span class="line">    runinterval = 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在agent段中加入上述内容，表示设置agent端5秒去同步。修改即可，无需重启服务</span></span><br><span class="line">[root@node2 ~]# puppet agent --configprint runinterval</span><br><span class="line">5</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志会频繁变动</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> runinterval=0，并不表示从来不运行，而是表示继续运行；如果想要puppet agent从不运行，应该使用--no-client选项来启动；如：puppet agent --no-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--no-client选项，会启动守护进程但不检测配置，除非它被puppet kick触发。而且只有当puppet.conf配置listen=<span class="literal">true</span>或启动时有带--listen选项时，它才生效；</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/puppet/" rel="tag"># puppet</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/29/查看用户登录信息/" rel="next" title="查看用户登录信息">
+                <i class="fa fa-chevron-left"></i> 查看用户登录信息
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">86</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">64</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#mastar-amp-agent"><span class="nav-number">1.</span> <span class="nav-text">mastar&amp;agent</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#手动注册"><span class="nav-number">1.1.</span> <span class="nav-text">手动注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自动注册"><span class="nav-number">1.2.</span> <span class="nav-text">自动注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#预签名注册"><span class="nav-number">1.3.</span> <span class="nav-text">预签名注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端定时更新"><span class="nav-number">1.4.</span> <span class="nav-text">客户端定时更新</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
