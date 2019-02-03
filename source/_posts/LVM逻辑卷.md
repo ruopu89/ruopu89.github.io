@@ -370,6 +370,10 @@ total 20
 drwxr-xr-x. 80 root root  4096 Oct  9 11:45 etc
 drwx------.  2 root root 16384 Oct  9 11:44 lost+found
 #之前复制进去的/etc目录还存在。这样就实现了热扩容
+
+root@ruopu:~# lvextend -r -l +100%free /dev/ubuntu-vg/ubuntu-lv
+# 使用-r选项可以使扩容的空间当时生效，无需再使用resize2fs命令，使用-l表示指定逻辑卷的LE数，-L表示指定逻辑卷的大小，单位为“kKmMgGtT”字节。+100%free表示将所有空余空间都加进来，只能使用-l选项指定。
+root@ruopu:~# lvextend -r -L 19G /dev/ubuntu-vg/ubuntu-lv
 ```
 
 ## 缩减

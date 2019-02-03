@@ -5,7 +5,7 @@ tags: docker
 categories: Container
 ---
 
-#### 安装配置
+### 安装配置
 
 ```shell
 [root@test ~]# yum install -y epel-release
@@ -20,10 +20,11 @@ categories: Container
 [root@test ~]# systemctl start docker
 ```
 
-#### 测试
+### 测试
+
+#### 压测内存
 
 ```shell
-* 压测内存
 [root@test ~]# docker pull lorel/docker-stress-ng
 Using default tag: latest
 Trying to pull repository docker.io/lorel/docker-stress-ng ... 
@@ -59,8 +60,13 @@ root                2440                2415                99                  
 CONTAINER           CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
 d07a7a5544ca        6.19%               255.9 MiB / 256 MiB   99.96%              648 B / 648 B       17.1 GB / 49.3 GB   5
 # 查看容器的实时使用情况，因为设置了容器可用的内存数，所以不会超过256M。
+```
 
-* 压测CPU
+
+
+#### 压测CPU
+
+```shell
 [root@test ~]# docker run --name stress -it --rm lorel/docker-stress-ng stress --cpu 8
 stress-ng: info: [1] defaulting to a 86400 second run per stressor
 stress-ng: info: [1] dispatching hogs: 8 cpu
@@ -82,8 +88,13 @@ bab5b7de1a68        2.72%               21.23 MiB / 976.3 MiB   2.18%           
 CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS
 bab5b7de1a68        198.59%             21.23 MiB / 976.3 MiB   2.18%               648 B / 648 B       0 B / 0 B           9
 # 因为是双核CPU，所以容器使用CPU的比例会一直接近200%。
+```
 
-* 设置容器可使用的CPU核心数
+
+
+#### 设置容器可使用的CPU核心数
+
+```shell
 [root@test ~]# docker run --name stress -it --rm --cpus 1 lorel/docker-stress-ng stress --cpu 8 
 stress-ng: info: [1] defaulting to a 86400 second run per stressor
 stress-ng: info: [1] dispatching hogs: 8 cpu
@@ -105,8 +116,13 @@ c21d92bb4bc7        1.33%               25.54 MiB / 976.3 MiB   2.62%           
 CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS
 c21d92bb4bc7        107.44%             25.54 MiB / 976.3 MiB   2.62%               648 B / 648 B       0 B / 0 B           9
 # 因为限制了容器可用CPU的核心数为1，所以容器使用CPU的比例在100%
+```
 
-* 限制容器在指定的CPU核心上运行
+
+
+#### 限制容器在指定的CPU核心上运行
+
+```shell
 [root@test ~]# docker run --name stress -it --rm --cpuset-cpus 0 lorel/docker-stress-ng stress --cpu 8
 stress-ng: info: [1] defaulting to a 86400 second run per stressor
 stress-ng: info: [1] dispatching hogs: 8 cpu
@@ -127,8 +143,13 @@ CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %           
 4ebe403ca83c        2.07%               22.63 MiB / 976.3 MiB   2.32%               648 B / 648 B       0 B / 0 B           9
 CONTAINER           CPU %               MEM USAGE / LIMIT       MEM %               NET I/O             BLOCK I/O           PIDS
 4ebe403ca83c        100.61%             22.63 MiB / 976.3 MiB   2.32%               648 B / 648 B       0 B / 0 B           9
+```
 
-* 使用权重
+
+
+#### 使用权重
+
+```shell
 [root@test ~]# docker run --name stress -it --rm --cpu-shares 1024 lorel/docker-stress-ng stress --cpu 8         
 stress-ng: info: [1] defaulting to a 86400 second run per stressor
 stress-ng: info: [1] dispatching hogs: 8 cpu

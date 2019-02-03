@@ -16,7 +16,7 @@ categories: Container
 > * 对数据卷的更新，不会影响镜像
 > * 数据卷默认会一直存在，即使容器被删除
 >
-> 数据卷的使用，类似于Linux下对目录或文件进行mount，镜像中的被指定为挂载点的目录中的文件会隐藏掉，能显示看的是挂载的数据卷
+> 数据卷的使用，类似于Linux下对目录或文件进行mount，镜像中的被指定为挂载点的目录中的文件会隐藏掉，能显示的是挂载的数据卷
 
 ##### 创建
 
@@ -40,7 +40,7 @@ ruopu@ruopu:~$ docker volume inspect my-vol
         "Scope": "local"
     }
 ]
-# 查看指定数据卷的信息。inspect[inˈspekt]:检查；point[pɔint]：点；mountpoint：挂载点；scope[skəup]：范围
+# 查看指定数据卷的信息。inspect[inˈspekt]：检查；point[pɔint]：点；mountpoint：挂载点；scope[skəup]：范围
 root@ruopu:~# ll -h /var/lib/docker/volumes/
 total 36K
 drwx------  3 root root 4.0K Nov 23 01:46 ./
@@ -49,13 +49,15 @@ drwx--x--x 14 root root 4.0K Nov 21 03:40 ../
 drwxr-xr-x  3 root root 4.0K Nov 23 01:46 my-vol/
 ```
 
+
+
 ##### 启动一个挂载数据卷的容器
 
 ```shell
 ruopu@ruopu:~$ docker run -d -P --name web --mount source=my-vol,target=/webapp nginx 
 cb192c96fc3232d42e6a33440945e152cd3dd3a20fce95e0a12440b489a822fe
 # 创建容器，-P选项表示让Docker随机映射一个 49000~49900 的端口到内部容器开放的网络端口。source指定为外部的数据卷名，target指定容器内的路径，如果容器内没有这个路径，在创建时会自动创建。之后指定从哪个镜像创建。
-root@ruopu:~# docker exec -it web1 bash
+root@ruopu:~# docker exec -it web bash
 # 进入容器
 root@fc042722e238:/# ls -l /     
 total 72
@@ -87,6 +89,8 @@ root@ruopu:~# docker inspect web
 # 使用inspect命令检查web容器的信息，在输出中的Mounts中有数据卷的信息
 ```
 
+
+
 ##### 删除数据卷
 
 ```shell
@@ -103,7 +107,7 @@ root@ruopu:~# docker volume rm my-vol
 my-vol
 root@ruopu:~# ls /var/lib/docker/volumes/
 metadata.db
-# 删除这样占用数据卷的容器后再删除数据卷就没问题了，再查看本地的相应位置也没有数据卷了
+# 删除占用数据卷的容器后再删除数据卷就没问题了，再查看本地的相应位置也没有数据卷了
 root@ruopu:~# docker -v
 Docker version 18.09.0, build 4d60db4
 root@ruopu:~# docker rm -v web
@@ -134,9 +138,10 @@ Deleted Volumes:
 my-vol
 
 Total reclaimed space: 0B
+# prune[pru:n]：修剪
 root@ruopu:~# docker volume ls 
 DRIVER              VOLUME NAME
-# 先创建一个数据卷，再删除
+# 先创建一个数据卷，再删除。
 ```
 
 
@@ -177,6 +182,8 @@ root@ruopu:~# docker inspect web1|grep Mounts -A 10
         	],
 # 可以看到，上面的ReadOnly是true，下面的RW是false
 ```
+
+
 
 ##### 挂载一个本地主机文件作为数据卷
 

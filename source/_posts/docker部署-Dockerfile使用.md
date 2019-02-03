@@ -35,7 +35,7 @@ vim Dockerfile
     EXPOSE 80
     CMD ["/usr/local/sbin/run.sh"]
 docker build -t apache_dockerfile:centos .
-# 生成镜像。这样创建镜像的问题就是使用了太多的RUN命令，Dockerfile 中每一个指令都会建立一层，RUN也不例外。每一个RUN的行为都会新建立一层，在其上执行这些命令，执行结束后，commit这一层的修改，构成新的镜像。这样创建镜像大概需要十多层
+# 生成镜像。生成的镜像仓库是apache_dockerfile，标签是centos，以centos镜像为基础。这样创建镜像的问题就是使用了太多的RUN命令，Dockerfile 中每一个指令都会建立一层，RUN也不例外。每一个RUN的行为都会新建立一层，在其上执行这些命令，执行结束后，commit这一层的修改，构成新的镜像。这样创建镜像大概需要十多层
 
 * 测试二
 # 使用Dockerfile文件，简化RUN命令
@@ -57,7 +57,7 @@ vim Dockerfile
     RUN chmod 755 /usr/local/sbin/run.sh
     EXPOSE 80
     CMD ["/usr/local/sbin/run.sh"]
-docker build -t apache_dockerfile:centos .
+docker build -t apache_dockerfile1:centos .
 
 * 测试三
 # 加入构建后的清除动作
@@ -82,7 +82,7 @@ vim Dockerfile
     RUN chmod 755 /usr/local/sbin/run.sh
     EXPOSE 80
     CMD ["/usr/local/sbin/run.sh"]
-docker build -t apache_dockerfile:centos .
+docker build -t apache_dockerfile2:centos .
 docker images
 REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
 apache_dockerfile2   centos              ad579e67578a        23 minutes ago      304MB
@@ -92,11 +92,13 @@ centos               latest              75835a67d134        7 weeks ago        
 # 可以看到，基础镜像centos只有200M，第一次构建后有545M，减少RUN命令使用后的构建较第一次少了近100M，如果删除缓存与安装包后，镜像较第一次构建少了200多M。
 root@test:~/apache_centos# docker run -d -p 8000:80 apache_dockerfile2:centos /usr/local/sbin/run.sh
 09e9cc066eaf250ea4fa18e8a7755c666d308267dcc3f2e4c40f9d4941fb94c5
-# 创建镜像
+# 创建镜像，可以不使用最后的命令，因为与镜像中的命令重复了
 root@test:~/apache_centos# curl localhost:8000
 <html><body><h1>It works!</h1></body></html>
 # 访问测试
 ```
+
+
 
 #### 创建mysql镜像
 
@@ -108,7 +110,8 @@ cd /root/mysql
 vim Dockerfile
     FROM mysql:5.7
     ENV MYSQL_ALLOW_ENPTY_PASSWORD yes
-    COPY setup.sh schema.sql privileges.sql /mysql/
+    COPY setup.sh schema.sql privileges.sql /mysql/		
+# 这里最后要复制到mysql目录中，mysql后面的斜线一定不能少。
     CMD ["sh", "/mysql/setup.sh"]
 # 下载mysql:5.7镜像；ENV MYSQL_ALLOW_ENPTY_PASSWORD yes表示可以免密码登录，这是为了方便导入数据，导入后会再设置密码；复制脚本与sql脚本到容器；最后启动容器。这个mysql:5.7是安装在Debian9系统中的
 
@@ -132,9 +135,10 @@ vim setup.sh
     echo '5. setpasswordOK'
     sleep 3
     echo `service mysql status`
-    echo `mysql_container_OK`
-   
-# 启动mysql与导入数据。set -e表示如果任何语句的执行结果不是true则应该退出。写这些echo是为了之后使用docker logs可以查看到相关日志，便于排错。
+    echo 'mysql_container_OK'
+# 启动mysql与导入数据。set -e表示如果任何语句的执行结果不是true则应该退出。写这些echo是为了之后使用此镜像创建容器时使用docker logs可以查看到相关日志，便于排错。
+chmod +x setup.sh		# 一定不能忘记给脚本执行权限
+
 * 准备sql脚本
 vim schema.sql
     CREATE database `docker_mysql` default character set utf8 collate utf8_general_ci;
@@ -217,7 +221,7 @@ vim setup.sh
     echo '5. setpasswordOK'
     sleep 3
     echo `service mysql status`
-    echo `mysql_container_OK`
+    echo 'mysql_container_OK'
 # 因为set -e在返回错误代码时就会退出脚本，所以这里注释了，因为导入数据库时可能会有报错。因为echarging.sql中没有创建数据库的命令，所以这里加入了创建数据库的命令，并且在导入时也指定了数据库，如果不写明这两项，在导入数据库时都会报找不到数据库的错误。
 vim my.cnf
     [client]
@@ -232,7 +236,7 @@ vim user.sql
     flush privileges;
 # 新建一个用户并设置root用户与新建用户的密码与权限。
 docker build -t jdycm:Jmysql .
-dcoker run -d -p 3306:3306 --name jdycmysql jdycm:Jmysql
+docker run -d -p 3306:3306 --name jdycmysql jdycm:Jmysql
 watch 'docker logs -t jdycmysql'
     2018-11-30T08:57:34.924250376Z MySQL Community Server 5.7.24 is not running.
     2018-11-30T08:57:34.924304852Z 1. startup mysql...
@@ -258,6 +262,7 @@ watch 'docker logs -t jdycmysql'
     2018-11-30T09:06:06.151459148Z MySQL Community Server 5.7.24 is running.
     2018-11-30T09:06:06.151902503Z /mysql/setup.sh: 1: /mysql/setup.sh: mysql_container_OK: not found
     2018-11-30T09:06:06.151989387Z
+# docker logs的-t选项是显示时间戳的。
 docker exec -it 901fc12e6e48 bash
 mysql
 mysql> show databases;
