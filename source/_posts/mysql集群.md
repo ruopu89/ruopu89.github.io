@@ -60,6 +60,7 @@ net.ipv4.ip_forward = 1
 # 到主节点上创建拥有复制权限的用户，创建的用户最好使用最小权限法则，并且只允许从某个节点连接
 mysql -uroot -p
 mysql> GRANT REPLICATION CLIENT,REPLICATION SLAVE ON *.* TO 'repluser'@'172.16.106.%' IDENTIFIED BY 'replpass';
+# 创建的用户最好指定一个具体地址，只让某个地址的某个用户可以有复制权限
 mysql> FLUSH PRIVILEGES;
 mysql> SHOW MASTER STATUS;
 +-------------------+----------+--------------+------------------+-------------------+
@@ -72,7 +73,7 @@ mysql> SHOW MASTER STATUS;
 * 从节点
 mysql -uroot -p
 mysql> CHANGE MASTER TO MASTER_HOST='172.16.106.132',MASTER_USER='repluser',MASTER_PASSWORD='replpass',MASTER_PORT=3306,MASTER_LOG_FILE='master-log.000003',MASTER_LOG_POS=2643;
-# 连接用CHANGE MASTER TO命令,MASTER_HOST指向主节点地址，MASTER_CONNECT_RETRY是多长时间做一次复制MASTER_LOG_FILE是指定主节点的日志文件，MASTER_LOG_POS是日志的位置
+# 连接用CHANGE MASTER TO命令,MASTER_HOST指向主节点地址，MASTER_CONNECT_RETRY是多长时间做一次复制，MASTER_LOG_FILE是指定主节点的日志文件，MASTER_LOG_POS是日志的位置
 mysql> SHOW SLAVE STATUS\G
 *************************** 1. row ***************************
                Slave_IO_State: 
@@ -245,13 +246,13 @@ mysql> show databases;
 | information_schema |
 | jiaowu             |
 
-========================================================
+===========================================================================================
 流程：
 1. 主节点/etc/my.cnf打开server_id=1、log-bin=master-log（启动二进制日志）。启动服务
 2. 从节点server_id=11、relay_log=relay-log（启动中继日志）、read_only=ON（让从节点为只读）。启动服务 
 3. 到主节点上创建拥有复制权限的用户，创建的用户最好使用最小权限，并且只允许从某个节点连接
 4. 到从节点用CHANGE MASTER TO命令连接主节点
-========================================================
+===========================================================================================
 ```
 
 
@@ -419,7 +420,7 @@ set smtp=imap.exmail.qq.com
 set smtp-auth-user=budongchan@ccgoldenet.com
 set smtp-auth-password=CCjd1rj.com
 set smtp-auth=login
-# /加入上面的内容。以便下面实现邮件报警功能
+# 加入上面的内容。以便下面实现邮件报警功能
 [root@test ~]# vim /etc/keepalived/chk_mysql.sh
 #!/bin/bash
 #

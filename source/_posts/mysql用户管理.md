@@ -1,5 +1,5 @@
 ---
-title: mysql基本使用方法
+title: mysql用户管理
 date: 2019-01-03 23:27:35
 tags: mysql用户管理
 categories: MySQL
@@ -154,6 +154,15 @@ ERROR 1044 (42000): Access denied for user 'cactiuser'@'%' to database 'cactiuse
 # 要用root用户才能创建此库或给cactiuser一个创建的权限
 
 方法二
+INSERT INTO mysql.user
+mysql>FLUSH PRIVILEGES;            
+# 這條必須執行
+```
+
+##### 创建用户并授权
+
+```shell
+语法：
 GRANT ALL PRIVILEGES ON db.* TO username@'%' WITH_OPTION;
 GRANT EXECUTE ON FUNCTION db.abc TO username@'%';
 with_option：
@@ -169,7 +178,7 @@ with_option：
         # 同一帳號最多連接多少次
 
 mysql> GRANT CREATE ON cactidb.* TO 'cactiuser'@'%' WITH GRANT OPTION;
-# 給用戶cactiuser創建cactidb庫及在cactidb庫中創建表的權限；CREATE的權限是建庫、表、索引等
+# 給用戶cactiuser創建cactidb庫及在cactidb庫中創建表的權限；CREATE的權限是建庫、表、索引等；WITH GRANT OPTION表示此用户可以将自己的权限给自己创建的用户，但此用户无法操作mysql.user表，所以此项无用。
 
 mysql> GRANT INSERT ON cactidb.* TO 'cactiuser'@'%';
 # 給用戶插入權限，INSERT權限既可以在表級別也可以用在字段級別，這樣寫是用在表級別的，給予此類權限後要重新登陸才能生效，FLUSH PRIVILEGES;是沒有用的，因爲cactiuser沒有此權限。
@@ -180,22 +189,25 @@ mysql> GRANT SELECT ON cactidb.* TO 'cactiuser'@'%';
 mysql> GRANT SELECT,INSERT,CREATE ON cactidb.* TO 'cactiuser'@'%' IDENTIFIED BY 'centos';
 # 用一个命令给上面三个权限，并设置密码
 
-mysql> SHOW GRANTS FOR 'cactiuser'@'%';
-# 查看用戶都有哪些權限
-
 mysql> GRANT ALTER ON cactidb.* TO 'cactiuser'@'%';
 # 給用戶ALTER權限，重新登陸生效
 
-mysql> REVOKE SELECT ON cactidb.* FROM 'cactiuser'@'%';
-# 取消某個權限
-
 mysql> RENAME USER cactiuser TO cactiu;
 # 給用戶重命名
+```
 
-方法三
-INSERT INTO mysql.user
-mysql>FLUSH PRIVILEGES;            
-# 這條必須執行
+##### 查看用户权限
+
+```shell
+mysql> SHOW GRANTS FOR 'cactiuser'@'%';
+# 查看用戶都有哪些權限
+```
+
+##### 取消权限
+
+```shell
+mysql> REVOKE SELECT ON cactidb.* FROM 'cactiuser'@'%';
+# 取消某個權限
 ```
 
 

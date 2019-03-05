@@ -322,8 +322,6 @@ Python中的变量不需要声明，变量的赋值操作既是变量声明和�
  print name
 ```
 
-[尝试一下 »](https://www.w3cschool.cn/tryrun/showpython/demo_variable)   
-
 
 
 以上实例中，100，1000.0和"John"分别赋值给counter，miles，name变量。
