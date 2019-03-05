@@ -319,6 +319,180 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/iptables基本操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/12/iptables基本操作/" itemprop="url">
+                  iptables基本操作
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-12 14:03:43" itemprop="dateCreated datePublished" datetime="2018-10-12T14:03:43+08:00">2018-10-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-15 10:29:53" itemprop="dateModified" datetime="2019-01-15T10:29:53+08:00">2019-01-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -t filter -L</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">OUTPUT_direct  all  --  anywhere             anywhere</span><br><span class="line"><span class="meta">#</span><span class="bash"> 列出filter表的所有规则</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 报文发往本机时，会经过PREROUTING链与INPUT链。所以，如果我们想要禁止某些报文发往本机，我们只能在PREROUTING链和INPUT链中定义规则，但是PREROUTING链并不存在于filter表中，因为PREROUTING链没有过滤功能，所以，只能在INPUT链上定义</span></span><br><span class="line"></span><br><span class="line">root@bogon ~]# iptables -L INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line">ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash">只查看指定表中的指定链规则。可以省略-t filter，当没有使用-t选项指定表时，默认为操作filter表</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -vL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"> 1894  144K ACCEPT     all  --  any    any     anywhere             anywhere             ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-v选项可以显示更多信息。字段含义如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pkts:对应规则匹配到的报文的个数。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bytes:对应匹配到的报文包的大小总和。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> target:规则对应的target（目标），往往表示规则对应的<span class="string">"动作"</span>，即规则匹配成功后需要采取的措施。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> prot:表示规则对应的协议，是否只针对某些协议应用此规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> opt:表示规则对应的选项。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">in</span>:表示数据包由哪个接口(网卡)流入，我们可以设置通过哪块网卡流入的报文需要匹配当前规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> out:表示数据包由哪个接口(网卡)流出，我们可以设置通过哪块网卡流出的报文需要匹配当前规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">source</span>:表示规则对应的源头地址，可以是一个IP，也可以是一个网段。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> destination:表示规则对应的目标地址。可以是一个IP，也可以是一个网段。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">source</span>与destination为anywhere是因为做了名称解析</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -nvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"> 1918  146K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在规则非常多的情况下如果进行名称解析，效率会比较低。可以使用-n选项，表示不对IP地址进行名称反解，直接显示IP地址</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line-number -nvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num   pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line">1     1971  150K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--line-numbers即可显示规则的编号。--line-numbers选项并没有对应的短选项，不过我们缩写成--line</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Chain INPUT (policy ACCEPT 0 packets, 0 bytes)的含义如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> policy表示当前链的默认策略，policy ACCEPT表示INPUT的链的默认动作为ACCEPT，默认接受通过INPUT关卡的所有请求</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> packets表示当前链（上例为INPUT链）默认策略匹配到的包的数量，0 packets表示默认策略匹配到0个包。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bytes表示当前链默认策略匹配到的所有包的大小总和。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line -xnvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 5557 packets, 332K bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        2012   153468 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED</span><br><span class="line"><span class="meta">#</span><span class="bash"> 其实，我们可以把packets与bytes称作<span class="string">"计数器"</span>，上例中的计数器记录了默认策略匹配到的报文数量与总大小，<span class="string">"计数器"</span>只会在使用-v选项时，才会显示出来。当被匹配到的包达到一定数量时，计数器会自动将匹配到的包的大小转换为可读性较高的单位。如果你想要查看精确的计数值，而不是经过可读性优化过的计数值，那么你可以使用-x选项，表示显示精确的计数值</span></span><br></pre></td></tr></table></figure>
+<h4 id="添加规则"><a href="#添加规则" class="headerlink" title="添加规则"></a>添加规则</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">* 拒绝某地址访问</span><br><span class="line">[root@bogon ~]# iptables -t filter -I INPUT -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.249访问本机，这时249主机不能ping通本机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -I表示将规则插入到每一条，-s指定源地址，-j指定动作。在iptables中，动作被称之为<span class="string">"target"</span></span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 519 packets, 33559 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         193    16212 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 有193个包被对应的规则匹配到，总计大小16212bytes。</span></span><br><span class="line">[root@bogon ~]# iptables -A INPUT -s 10.5.5.249 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> -A为append之意，表示追加一条规则到末尾</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 86 packets, 6164 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         598    50232 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 追加规则后发现追加的规则并未匹配到，因为数据是按规则序列从上向下匹配的，第一条规则已经拒绝了所有请求，所以后面的规则也不会匹配到了。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT 3 -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定将规则插入到INPUT链的第三条</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 51 packets, 3610 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         941    79044 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">3           0        0 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br></pre></td></tr></table></figure>
+<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -D INPUT 3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除INPUT链中的第三条规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 466 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        1040    87360 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 ACCEPT     all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line">[root@bogon ~]# iptables -D INPUT -s 10.5.5.249 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 根据匹配条件删除规则，这里要删除的是源地址是10.5.5.249，动作是ACCEPT的规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 428 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1        1128    94752 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0</span><br><span class="line">[root@bogon ~]# iptables -t filter -F</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除filter表中的所有规则</span></span><br></pre></td></tr></table></figure>
+<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -R INPUT 1 -s 10.5.5.249 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> -R选项表示修改指定的链，使用-R INPUT 1表示修改INPUT链的第1条规则，使用-j REJECT表示将INPUT链中的第一条规则的动作修改为REJECT，注意：上例中， -s选项以及对应的源地址不可省略。在使用-R选项修改某个规则时，必须指定规则对应的原本的匹配条件。如果上例中的命令没有使用-s指定对应规则中原本的源地址，那么在修改完成后，你修改的规则中的源地址会自动变为0.0.0.0/0</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你想要修改某条规则，还不如先将这条规则删除，然后在同样位置再插入一条新规则</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 9 packets, 662 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           2      168 REJECT     all  --  *      *       10.5.5.249           0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 修改默认策略</span><br><span class="line">[root@bogon ~]# iptables -P FORWARD DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-P选项修改默认策略，修改filter表中的FORWARD链的默认策略为DROP</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL FORWARD</span><br><span class="line">Chain FORWARD (policy DROP 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到policy后面是DROP了</span></span><br></pre></td></tr></table></figure>
+<h4 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">* CentOS6</span><br><span class="line">[root@bogon ~]# service iptables save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使修改的规则永久生效</span></span><br><span class="line">[root@bogon ~]# cat /etc/sysconfig/iptables</span><br><span class="line"><span class="meta">#</span><span class="bash"> 规则保存在/etc/sysconfig/iptables中</span></span><br><span class="line"></span><br><span class="line">* CentOS7</span><br><span class="line">[root@test ~]# yum install -y iptables-services</span><br><span class="line">[root@bogon ~]# systemctl start iptables</span><br><span class="line">[root@bogon ~]# systemctl enable iptables</span><br><span class="line">[root@bogon ~]# service iptables save</span><br><span class="line">iptables: Saving firewall rules to /etc/sysconfig/iptables:[  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要安装iptables-services后才能使用service命令保存规则</span></span><br><span class="line"></span><br><span class="line">* 其他保存方法</span><br><span class="line">[root@bogon ~]# iptables-save &gt; /etc/sysconfig/iptables</span><br><span class="line"></span><br><span class="line">* 重新加载规则</span><br><span class="line">[root@bogon ~]# iptables-restore &lt; /etc/sysconfig/iptables</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/jdyc环境简单部署/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2202,225 +2376,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/20/docker学习二：安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/20/docker学习二：安装/" itemprop="url">
-                  docker学习二：安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-20 13:01:32" itemprop="dateCreated datePublished" datetime="2018-09-20T13:01:32+08:00">2018-09-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-12-19 11:53:54" itemprop="dateModified" datetime="2018-12-19T11:53:54+08:00">2018-12-19</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="ubuntu18-04-Server"><a href="#ubuntu18-04-Server" class="headerlink" title="ubuntu18.04_Server"></a>ubuntu18.04_Server</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">apt install apt-transport-https ca-certificates curl software-properties-common</span><br><span class="line"><span class="meta">#</span><span class="bash"> 由于apt源使用 HTTPS 以确保软件下载过程中不被篡改。因此,我们首先需要添加使用HTTPS 传输的软件包以及 CA 证书。</span></span><br><span class="line">curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为了确认所下载软件包的合法性,需要添加软件源的GPG密钥。</span></span><br><span class="line">add-apt-repository  "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu $(lsb_release -cs) stable"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 向source.list中添加 Docker 软件源</span></span><br><span class="line">apt update</span><br><span class="line">apt install docker-ce</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装docker</span></span><br><span class="line">groupadd docker</span><br><span class="line">usermod -aG docker test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将当前用户加入docker组</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认情况下,docker命令会使用 Unix socket 与 Docker 引擎通讯。而只有root用户和组的用户才可以访问 Docker 引擎的 Unix socket。出于安全考虑,一般 Linux 系统上不会直接使用root用户。因此,更好地做法是将需要使用docker的用户加入docker用户组。</span></span><br><span class="line">vim /etc/docker/daemon.json</span><br><span class="line">    &#123;</span><br><span class="line">      "registry-mirrors":[</span><br><span class="line">        "https://87uxhe5.mirror.aliyuncs.com"</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置docker加速器，地址是从阿里云的容器镜像服务器得到的</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl start docker</span><br><span class="line">docker run hello-world</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试docker安装是否成功。如果安装成功，会输入下列内容</span></span><br><span class="line">    Hello from Docker!</span><br><span class="line">    This message shows that your installation appears to be working correctly.</span><br><span class="line"></span><br><span class="line">    To generate this message, Docker took the following steps:</span><br><span class="line">     1. The Docker client contacted the Docker daemon.</span><br><span class="line">     2. The Docker daemon pulled the "hello-world" image from the Docker Hub.</span><br><span class="line">        (amd64)</span><br><span class="line">     3. The Docker daemon created a new container from that image which runs the</span><br><span class="line">        executable that produces the output you are currently reading.</span><br><span class="line">     4. The Docker daemon streamed that output to the Docker client, which sent it</span><br><span class="line">        to your terminal.</span><br><span class="line"></span><br><span class="line">    To try something more ambitious, you can run an Ubuntu container with:</span><br><span class="line">     $ docker run -it ubuntu bash</span><br><span class="line"></span><br><span class="line">    Share images, automate workflows, and more with a free Docker ID:</span><br><span class="line">     https://hub.docker.com/</span><br><span class="line"></span><br><span class="line">    For more examples and ideas, visit:</span><br><span class="line">     https://docs.docker.com/get-started/</span><br></pre></td></tr></table></figure>
-<h1 id="Kali3-0"><a href="#Kali3-0" class="headerlink" title="Kali3.0"></a>Kali3.0</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">apt-key adv \--keyserver hkp://ha.pool.sks-keyservers.net:80 \--recv-keys 58118E89F3A912897C070ADBF76221572C52609D</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加key</span></span><br><span class="line">vim /etc/apt/sources.list</span><br><span class="line">		deb https://apt.dockerproject.org/repo debian-wheezy main</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加源</span></span><br><span class="line">apt update</span><br><span class="line">apt install docker-engine</span><br><span class="line">systemctl start docker</span><br><span class="line">systemctl status docker</span><br><span class="line">systemctl enable docker</span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> https://www.jianshu.com/p/6b1cb6927e9e</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Docker官网地址：https://docs.docker.com/</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Debian安装Docker官方教程：https://docs.docker.com/engine/installation/linux/debian/</span></span><br></pre></td></tr></table></figure>
-<h1 id="Windows7"><a href="#Windows7" class="headerlink" title="Windows7"></a>Windows7</h1><ol>
-<li>下载DockerToolbox，地址：<a href="https://github.com/docker/toolbox/releases" target="_blank" rel="noopener">https://github.com/docker/toolbox/releases</a></li>
-<li>安装中，如果VirualBox和Git已经安装，可以不选</li>
-</ol>
-<p><img src="\images\docker\docker1.jpg" alt=""></p>
-<ol start="3">
-<li>安装完成后，桌面上会多出3各图标，如下。其中VirtualBox提供了linux虚拟机的运行环境，Docker Quickstart Terminal用于快速介入linux虚拟机，提供命令行交互，Kitematic是docker GUI很少用到。</li>
-</ol>
-<p><img src="\images\docker\docker2.jpg" alt=""></p>
-<ol start="4">
-<li>使用命令创建default虚拟机</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">打开cmd</span><br><span class="line">docker-machine create default</span><br></pre></td></tr></table></figure>
-<p><img src="\images\docker\docker3.jpg" alt=""></p>
-<p>启动时会进行Docker环境的初始化，会在VirtualBox中自动创建名字为default的linux虚拟机，在此过程中会用到boot2docker.iso镜像文件。默认情况下，启动程序会从GitHub上下载此文件的最新版，但由于文件相对较大且速度不给力，多数情况下会下载失败，造成Docker环境无法启动。解决办法：其实DockerToolbox安装文件自带了boot2docker.iso镜像文件，位于安装目录下（如C:\Program Files\Docker Toolbox） ，将此文件拷至C:\Users\Administrator.docker\machine\cache目录下，然后在<strong>网络断开</strong>的情况下重新启动，便可初始化成功。</p>
-<ol start="5">
-<li>查看default虚拟机的IP地址，使用Xshell连接</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">打开cmd</span><br><span class="line">docker-machine ls</span><br><span class="line"><span class="meta">#</span><span class="bash">查看default地址</span></span><br><span class="line"><span class="meta">#</span><span class="bash">登录default信息</span></span><br><span class="line"><span class="meta">#</span><span class="bash">用户名：docker</span></span><br><span class="line"><span class="meta">#</span><span class="bash">密码：tcuser</span></span><br></pre></td></tr></table></figure>
-<ol start="6">
-<li>更改虚拟磁盘存储位置</li>
-</ol>
-<p>虚拟机的默认存储位置是C:\Users\Administrator.docker\machine\machines ，后期docke镜像文件会不断增加，为了给系统盘减负，最好将磁盘移动到其他位置。</p>
-<ul>
-<li>首先通过PowerShell或cmd终端中执行【docker-machine stop default】命令停止default虚拟机。</li>
-</ul>
-<p><img src="\images\docker\docker4.jpg" alt=""></p>
-<ul>
-<li>通过VirtualBox”管理”–&gt;”虚拟介质管理”界面对虚拟磁盘进行复制。之后添加新磁盘，删除旧磁盘即可</li>
-</ul>
-<p><img src="\images\docker\docker5.jpg" alt=""></p>
-<p><img src="\images\docker\docker6.jpg" alt=""></p>
-<p><img src="\images\docker\docker7.jpg" alt=""></p>
-<p><img src="\images\docker\docker8.jpg" alt=""></p>
-<p><img src="\images\docker\docker9.jpg" alt=""></p>
-<p><img src="\images\docker\docker10.jpg" alt=""></p>
-<p><img src="\images\docker\docker11.jpg" alt=""></p>
-<p><img src="\images\docker\docker12.jpg" alt=""></p>
-<p><img src="\images\docker\docker13.jpg" alt=""></p>
-<p><img src="\images\docker\docker14.jpg" alt=""></p>
-<p><img src="\images\docker\docker15.jpg" alt=""></p>
-<ol start="7">
-<li>配置镜像加速器</li>
-</ol>
-<p>登录阿里云<a href="https://cr.console.aliyun.com，点击右侧的镜像加速器，复制地址。最后用命令修改镜像地址即可" target="_blank" rel="noopener">https://cr.console.aliyun.com，点击右侧的镜像加速器，复制地址。最后用命令修改镜像地址即可</a></p>
-<p><img src="\images\docker\docker16.jpg" alt=""></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">登录虚拟机default</span><br><span class="line">sudo sed -i "s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=加速地址 |g" /var/lib/boot2docker/profile</span><br><span class="line"><span class="meta">#</span><span class="bash">修改后，可调整default的硬件配置，如CPU，memory，disk等，disk可以不用复制，创建一个新的，大一点的空间。另外，不可取消光驱的启动，因为启动时要用到boot2docker.iso文件</span></span><br><span class="line">打开cmd</span><br><span class="line">docker-machine restart default</span><br><span class="line"><span class="meta">#</span><span class="bash">重启docker服务</span></span><br></pre></td></tr></table></figure>
-<p>参考：<a href="https://www.cnblogs.com/canger/p/9028723.html" target="_blank" rel="noopener">https://www.cnblogs.com/canger/p/9028723.html</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2468,7 +2423,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">86</span>
+                    <span class="site-state-item-count">87</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
