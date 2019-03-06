@@ -273,6 +273,8 @@ Clustering node rabbit@rabbitmq2 with rabbit@rabbitmq1 ...
 Starting node rabbit@rabbitmq2 ...
 ...done.
 # 启动应用
+[root@rabbitmq2 ~]#  rabbitmq-plugins enable rabbitmq_management
+# 两个从节点也一定要启动rabbitmq_management，不然在网页中可以看到两个从节点，但提示"Node statistics not available"
 
 -----------------
   rabbitmq3
@@ -286,6 +288,7 @@ Clustering node rabbit@rabbitmq3 with rabbit@rabbitmq1 ...
 [root@rabbitmq3 ~]# rabbitmqctl start_app
 Starting node rabbit@rabbitmq3 ...
 ...done.
+[root@rabbitmq3 ~]#  rabbitmq-plugins enable rabbitmq_management
 
 -----------------
   rabbitmq1
