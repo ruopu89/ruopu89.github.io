@@ -21,6 +21,7 @@ if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
 fi
 EOF
 # 该方法仅限与CentOS系统使用。Transparent Huge Pages (THP)，通过使用更大的内存页面，可以减少具有大量内存的机器上的缓冲区（TLB）查找的开销。但是，数据库工作负载通常对THP表现不佳，因为它们往往具有稀疏而不是连续的内存访问模式。您应该在Linux机器上禁用THP，以确保MongoDB的最佳性能。
+[root@test ~]# chmod +x /etc/rc.d/rc.local
 [root@test ~]# wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.2.8.tgz
 [root@test ~]# tar xf mongodb-linux-x86_64-rhel62-3.2.8.tgz
 [root@test ~]# mv mongodb-linux-x86_64-rhel62-3.2.8 /usr/local/mongodb
@@ -53,6 +54,19 @@ killing process with pid: 5118
    普通格式
 ==========
 [root@test ~]# vim /usr/local/mongodb/conf/mongod1.conf
+port=27017
+bind_ip = 192.168.251.129                 
+# 这个最好配置成本机的ip地址。否则后面进行副本集初始化的时候可能会失败！           
+dbpath=/usr/local/mongodb/data
+logpath=/usr/local/mongodb/log/mongo.log
+pidfilepath=/usr/local/mongodb/mongo.pid
+fork=true
+logappend=true
+shardsvr=true
+directoryperdb=true
+# auth=true
+# keyFile =/usr/local/mongodb/keyfile
+# replSet =hqmongodb
 [root@test ~]# mongod -f /usr/local/mongodb/conf/mongod1.conf 
 about to fork child process, waiting until server is ready for connections.
 forked process: 5201
