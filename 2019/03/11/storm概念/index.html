@@ -142,10 +142,12 @@
 <meta property="og:site_name" content="ruopu&#39;s blog">
 <meta property="og:description" content="概念 Storm 是一个分布式的，可靠的，容错的数据流处理系统。它会把工作任务委托给不同类型的组件，每个组件负责处理一项简单特定的任务。Storm 集群的输入流由一个被称作 spout 的组件管理，spout 把数据传递给 bolt， bolt 要么把数据保存到某种存储器，要么把数据传递给其它的 bolt。你可以想象一下，一个 Storm 集群就是在一连串的 bolt 之间转换 spout 传过来">
 <meta property="og:locale" content="zh-TW">
-<meta property="og:updated_time" content="2019-03-11T10:43:20.525Z">
+<meta property="og:image" content="http://yoursite.com/images/storm/topology处理流程.png">
+<meta property="og:updated_time" content="2019-03-13T05:00:26.949Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="storm概念">
 <meta name="twitter:description" content="概念 Storm 是一个分布式的，可靠的，容错的数据流处理系统。它会把工作任务委托给不同类型的组件，每个组件负责处理一项简单特定的任务。Storm 集群的输入流由一个被称作 spout 的组件管理，spout 把数据传递给 bolt， bolt 要么把数据保存到某种存储器，要么把数据传递给其它的 bolt。你可以想象一下，一个 Storm 集群就是在一连串的 bolt 之间转换 spout 传过来">
+<meta name="twitter:image" content="http://yoursite.com/images/storm/topology处理流程.png">
 
 
 
@@ -277,11 +279,42 @@
 
       
       
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
     </ul>
   
 
   
 
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
   
 </nav>
 
@@ -365,12 +398,24 @@
                 
               
 
-              <time title="創建時間：2019-03-11 17:00:54 / 修改時間：18:43:20" itemprop="dateCreated datePublished" datetime="2019-03-11T17:00:54+08:00">2019-03-11</time>
+              <time title="創建時間：2019-03-11 17:00:54" itemprop="dateCreated datePublished" datetime="2019-03-11T17:00:54+08:00">2019-03-11</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-03-13 13:00:26" itemprop="dateModified" datetime="2019-03-13T13:00:26+08:00">2019-03-13</time>
               
             
           </span>
@@ -441,9 +486,8 @@
 </ul>
 </blockquote>
 <h3 id="Storm-组件"><a href="#Storm-组件" class="headerlink" title="Storm 组件"></a>Storm 组件</h3><blockquote>
-<p>对于一个Storm集群，一个连续运行的主节点组织若干节点工作。</p>
-<p>在 Storm 集群中，有两类节点：主节点 master node 和工作节点 worker nodes。主节点运行着一个叫做 Nimbus 的守护进程。这个守护进程负责在集群中分发代码，为工作节点分配任务，并监控故障。Supervisor守护进程作为拓扑的一部分运行在工作节点上。一个 Storm 拓扑结构在不同的机器上运行着众多的工作节点。</p>
-<p>因为 Storm 在 Zookeeper 或本地磁盘上维持所有的集群状态，守护进程可以是无状态的而且失效或重启时不会影响整个系统的健康</p>
+<p>Storm 集群由一个主节点(也可称为控制节点)和多个工作节点组成。主节点运行一个名为“Nimbus”的守护进程，工作节点都运行一个名为“Supervisor”的守护进程，两者的协调工作由 ZooKeeper 来完成， ZooKeeper 用于管理集群中的不同组件。</p>
+<p>每一个工作节点上运行的 Supervisor 监听分配给它那台机器的工作，根据需要启动 / 关闭工作进程，每一个工作进程执行一个 Topology 的一个子集；一个运行的 Topology 由运行在很多机器上的很多工作进程 Worker 组成。那么Storm 的核心就是主节点（Nimbus）、工作节点（Supervisor）、协调器（ZooKeeper）、工作进程（ Worker）、任务线程（Task）。</p>
 <p>在系统底层，Storm 使用了 zeromq(0mq, zeromq(<a href="http://www.zeromq.org/" target="_blank" rel="noopener">http://www.zeromq.org</a>))。这是一种先进的，可嵌入的网络通讯库，它提供的绝妙功能使 Storm 成为可能。下面列出一些 zeromq 的特性。</p>
 <ul>
 <li>一个并发架构的 Socket 库</li>
@@ -453,6 +497,56 @@
 <li>利用扇出(fanout), 发布订阅（PUB-SUB）,管道（pipeline）, 请求应答（REQ-REP），等方式实现 N-N 连接</li>
 </ul>
 <p>Storm 只用了 push/pull sockets</p>
+</blockquote>
+<h4 id="Nimbus"><a href="#Nimbus" class="headerlink" title="Nimbus"></a>Nimbus</h4><blockquote>
+<p>主节点通常运行一个后台程序——Nimbus，用于响应分布在集群中的节点，分配任务和监测故障，这类似于 Hadoop 中的 JobTracker。<br>Nimbus 进程是快速失败（ fail-fast）和无状态的，所有的状态要么在 ZooKeeper 中，要么在本地磁盘上。可以使用 kill -9 来杀死 Nimbus 进程，然后重启即可继续工作。</p>
+</blockquote>
+<h4 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h4><blockquote>
+<p>工作节点同样会运行一个后台程序——Supervisor，用于收听工作指派并基于要求运行工作进程。每个工作节点都是Topology中一个子集的实现。而Nimbus 和 Supervisor 之间的协调则通过 ZooKeeper 系统。<br>同 样，Supervisor进程也是快速失败（fail-fast）和无状态的， 所有的状态要么在ZooKeeper中，要么在本地磁盘上，用kill -9来杀死Supervisor进程，然后重启就可以继续工作。这个设计使得storm不可思议的稳定。</p>
+</blockquote>
+<h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h4><blockquote>
+<p>ZooKeeper 是完成 Nimbus 和 Supervisor 之间协调的服务。 Storm使用ZooKeeper 协调集群，由于ZooKeeper 并不用于消息传递，所以Storm给ZooKeeper 带来的压力相当低。<strong>在大多数情况下，单个节点的 ZooKeeper 集群足够胜任，不过为了确保故障恢复或者部署大规模Storm集群，可能需要更大规模的 ZooKeeper 集群</strong>。</p>
+</blockquote>
+<h4 id="worker"><a href="#worker" class="headerlink" title="worker"></a>worker</h4><blockquote>
+<p>运行具体处理组件逻辑的进程。</p>
+</blockquote>
+<h4 id="Topology"><a href="#Topology" class="headerlink" title="Topology"></a>Topology</h4><blockquote>
+<p>拓扑。一个Storm拓扑打包了一个实时处理程序的逻辑。一个Storm拓扑类似一个Hadoop的MapReduce任务(Job)。主要区别是MapReduce任务最终会结束，而拓扑会一直运行（当然直到你杀死它)。一个拓扑是一个通过流分组(stream grouping)把Spout和Bolt连接到一起的拓扑结构。一个拓扑就是一个复杂的多阶段的流计算。</p>
+<p>所有Topology任务的提交必须在Storm客户端节点上进行(需要配置~/.storm/storm.yaml文件)，由Nimbus节点分配给其他Supervisor节点进行处理。Nimbus节点首先将提交的Topology进行分片，分成一个个的Task，并将Task和Supervisor相关的信息提交到<strong>zookeeper</strong>集群上，Supervisor会去zookeeper集群上认领自己的Task，通知自己的Worker进程进行Task的处理。总体的Topology处理流程图为：</p>
+</blockquote>
+<p><img src="/images/storm/topology处理流程.png" alt=""></p>
+<blockquote>
+<p>每个Topology都由<strong>Spout和Bolt</strong>组成，在Spout和Bolt传递信息的基本单位叫做<strong>Tuple</strong>，由Spout发出的连续不断的Tuple及其在相应Bolt上处理的子Tuple连起来称为一个<strong>Steam</strong>，每个Stream的命名是在其首个Tuple被Spout发出的时候，此时Storm会利用内部的<strong>Ackor机制</strong>保证每个Tuple可靠的被处理。</p>
+<p>而Tuple可以理解成键值对，其中，键就是定义在declareStream方法中的Fields字段，而值就是在emit方法中发送的Values字段。</p>
+<p>在运行Topology之前，可以通过一些参数的配置来调节运行时的状态，参数的配置是通过Storm框架部署目录下的<strong>conf/storm.yaml</strong>文件来完成的。在此文件中可以配置运行时的Storm本地目录路径、运行时Worker的数目等。</p>
+<p>在代码中，也可以设置Config的一些参数，但是优先级是不同的，不同位置配置Config参数的优先级顺序为：外部组件的special configuration &gt; 内部组件的special configuration &gt; topology内部的configuration &gt; storm.yaml &gt; default.yaml</p>
+</blockquote>
+<h4 id="Spout"><a href="#Spout" class="headerlink" title="Spout"></a>Spout</h4><blockquote>
+<p>一个在Topology中产生源数据流的组件。通常情况下Spout会从外部数据源中读取数据，然后转换为Topology内部的源数据。Spout 是一个主动的角色，其接口中有个nextTuple()函数， Storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</p>
+</blockquote>
+<h4 id="Bolt"><a href="#Bolt" class="headerlink" title="Bolt"></a>Bolt</h4><blockquote>
+<p>一个在Topology中接收由Spout或者其他上游Bolt类发来的Tuple数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数，在接收到消息后会调用此函数，用户可以在其中执行自己想要的操作。</p>
+</blockquote>
+<h4 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h4><blockquote>
+<p>Worker中每一个Spout/Bolt的线程称为一个Task。在 Storm 0.8之后，task不再与物理线程对应，同一个Spout/Bolt的Task可能会共享一个物理线程，该线程称为Executor。</p>
+</blockquote>
+<h4 id="Tuple"><a href="#Tuple" class="headerlink" title="Tuple"></a>Tuple</h4><blockquote>
+<p>元组，一次消息传递的基本单元。</p>
+</blockquote>
+<h4 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h4><blockquote>
+<p>源源不断传递的Tuple就组成了stream。</p>
+</blockquote>
+<h4 id="Stream-Grouping"><a href="#Stream-Grouping" class="headerlink" title="Stream Grouping"></a>Stream Grouping</h4><blockquote>
+<p>即消息的partition方法。流分组策略告诉Topology如何在两个组件之间发送Tuple。 Storm 中提供若干种实用的grouping方式，包括shuffle, fields hash, all, global, none, direct和localOrShuffle等。</p>
+<ul>
+<li>ShuffleGrouping:随机分组，随机分发Stream中的tuple，保证每个Bolt的Task接收Tuple数量大致一致；</li>
+<li>FieldsGrouping：按照字段分组，保证相同字段的Tuple分配到同一个Task中；</li>
+<li>AllGrouping：广播发送，每一个Task都会受到所有的Tuple；</li>
+<li>GlobalGrouping：全局分组，所有的Tuple都发送到同一个Task中，此时一般将当前Component的并发数目设置为1；</li>
+<li>NonGrouping：不分组，和ShuffleGrouping类似，当前Task的执行会和它的被订阅者在同一个线程中执行；</li>
+<li>DirectGrouping：直接分组，直接指定由某个Task来执行Tuple的处理，而且，此时必须有emitDirect方法来发送；</li>
+<li>localOrShuffleGrouping：和ShuffleGrouping类似，若Bolt有多个Task在同一个进程中，Tuple会随机发给这些Task。</li>
+</ul>
 </blockquote>
 <h3 id="Storm-的特性"><a href="#Storm-的特性" class="headerlink" title="Storm 的特性"></a>Storm 的特性</h3><blockquote>
 <p>在所有这些设计思想与决策中，有一些非常棒的特性成就了独一无二的 Storm。</p>
@@ -466,6 +560,47 @@
 <li>事务性：You can get exactly once messaging semantics for pretty much any computation. 你可以为几乎任何计算得到恰好一次消息语义。</li>
 </ul>
 </blockquote>
+<h3 id="Topology运行流程"><a href="#Topology运行流程" class="headerlink" title="Topology运行流程"></a>Topology运行流程</h3><blockquote>
+<p>Topology的运行可以分为<strong>本地模式</strong>和<strong>分布式模式</strong>，模式的设置可以在配置文件中设定，也可以在代码中设置。需要注意的是，在Storm代码编写完成之后，需要打包成jar包放到Nimbus中运行，打包的时候，不需要把依赖的jar都打进去，否则如果把依赖的storm.jar包打进去的话，运行时会出现重复的配置文件错误导致Topology无法运行。因为Topology运行之前，会加载本地的storm.yaml配置文件。</p>
+<ul>
+<li>Storm提交后，会把代码首先存放到<strong>Nimbus节点的inbox目录</strong>下，之后，会把当前Storm运行的配置生成一个<strong>stormconf.ser文件</strong>放到<strong>Nimbus节点的stormdist目录</strong>中，在此目录中同时还有<strong>序列化之后的Topology代码文件</strong>；</li>
+<li>在<strong>设定Topology所关联的Spouts和Bolts</strong>时，可以同时<strong>设置当前Spout和Bolt的executor数目和task数目</strong>，默认情况下，一个Topology的task的总和是和executor的总和一致的。之后，系统根据worker的数目，尽量平均的分配这些task的执行。worker在哪个supervisor节点上运行是由storm本身决定的；</li>
+<li>任务分配好之后，Nimbus节点会将任务的信息提交到<strong>zookeeper集群</strong>，同时在zookeeper集群中会有<strong>workerbeats节点</strong>，这里<strong>存储了当前Topology的所有worker进程的心跳信息</strong>；</li>
+<li>Supervisor节点会不断的<strong>轮询</strong>zookeeper集群，在<strong>zookeeper的assignments节点中保存了所有Topology的任务分配信息、代码存储目录、任务之间的关联关系</strong>等，Supervisor通过轮询此节点的内容，来领取自己的任务，启动worker进程运行；</li>
+<li>一个Topology运行之后，就会不断的通过Spouts来发送Stream流，通过Bolts来不断的处理接收到的Stream流，Stream流是无界的。这一步会不间断的执行，除非<strong>手动结束Topology</strong>。</li>
+</ul>
+</blockquote>
+<h3 id="Topology并行度"><a href="#Topology并行度" class="headerlink" title="Topology并行度"></a>Topology并行度</h3><blockquote>
+<ul>
+<li>worker：每个worker都属于一个特定的Topology，每个Supervisor节点的worker可以有多个，每个worker使用一个单独的端口，它对Topology中的每个component运行一个或者多个executor线程来提供task的运行服务。</li>
+<li>executor：executor是产生于worker进程内部的线程，会执行同一个component的一个或者多个task。</li>
+<li>task：实际的数据处理由task完成，在Topology的生命周期中，每个组件的task数目是不会发生变化的，而executor的数目却不一定。executor数目小于等于task的数目，默认情况下，二者是相等的。</li>
+</ul>
+<p>​    在运行一个Topology时，可以根据具体的情况来设置不同数量的worker、task、executor，而<strong>设置的位置</strong>也可以在多个地方。</p>
+<ul>
+<li><p>worker设置：</p>
+<ul>
+<li>可以通过设置yaml中的topology.workers属性</li>
+<li>在代码中通过<strong>Config的setNumWorkers方法设定</strong></li>
+</ul>
+</li>
+<li><p>executor设置：</p>
+<ul>
+<li>通过<strong>在Topology的入口类中setBolt、setSpout方法的最后一个参数指定</strong>，不指定的话，默认为1；</li>
+</ul>
+</li>
+<li><p>task设置：</p>
+<ul>
+<li>默认情况下，<strong>和executor数目一致</strong>；</li>
+<li>在代码中通过<strong>TopologyBuilder的setNumTasks方法设定具体某个组件的task数目</strong>；</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>参考：</p>
+<p><a href="http://www.cnblogs.com/zlslch/p/5989256.html" target="_blank" rel="noopener">http://www.cnblogs.com/zlslch/p/5989256.html</a></p>
+<p><a href="https://blog.yaodataking.com/2017/03/07/storm-2/" target="_blank" rel="noopener">https://blog.yaodataking.com/2017/03/07/storm-2/</a></p>
+<p><a href="http://www.cnblogs.com/xymqx/p/4366429.html" target="_blank" rel="noopener">http://www.cnblogs.com/xymqx/p/4366429.html</a></p>
 
       
     </div>
@@ -581,7 +716,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">100</span>
+                    <span class="site-state-item-count">101</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -849,7 +984,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用案例"><span class="nav-number">2.</span> <span class="nav-text">应用案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Storm-组件"><span class="nav-number">3.</span> <span class="nav-text">Storm 组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Storm-的特性"><span class="nav-number">4.</span> <span class="nav-text">Storm 的特性</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用案例"><span class="nav-number">2.</span> <span class="nav-text">应用案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Storm-组件"><span class="nav-number">3.</span> <span class="nav-text">Storm 组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nimbus"><span class="nav-number">3.1.</span> <span class="nav-text">Nimbus</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Supervisor"><span class="nav-number">3.2.</span> <span class="nav-text">Supervisor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZooKeeper"><span class="nav-number">3.3.</span> <span class="nav-text">ZooKeeper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#worker"><span class="nav-number">3.4.</span> <span class="nav-text">worker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Topology"><span class="nav-number">3.5.</span> <span class="nav-text">Topology</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Spout"><span class="nav-number">3.6.</span> <span class="nav-text">Spout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bolt"><span class="nav-number">3.7.</span> <span class="nav-text">Bolt</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Task"><span class="nav-number">3.8.</span> <span class="nav-text">Task</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tuple"><span class="nav-number">3.9.</span> <span class="nav-text">Tuple</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Stream"><span class="nav-number">3.10.</span> <span class="nav-text">Stream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Stream-Grouping"><span class="nav-number">3.11.</span> <span class="nav-text">Stream Grouping</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Storm-的特性"><span class="nav-number">4.</span> <span class="nav-text">Storm 的特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topology运行流程"><span class="nav-number">5.</span> <span class="nav-text">Topology运行流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topology并行度"><span class="nav-number">6.</span> <span class="nav-text">Topology并行度</span></a></li></ol></div>
             
 
           </div>
@@ -1020,6 +1155,326 @@
 
 
   
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
 
 
 
