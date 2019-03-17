@@ -139,6 +139,33 @@ export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31  
 
 
 
+### 在zsh中使用find命令不能使用星号
+
+```shell
+ ⚡ root@ruopu64  ~  vim .zshrc 
+ setopt no_nomatch
+ # 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
+```
+
+
+
+### 清理家目录中的.cache文件
+
+```shell
+ ⚡ root@ruopu64  ~  df -h
+文件系统                      容量  已用  可用 已用% 挂载点
+udev                          7.7G     0  7.7G    0% /dev
+tmpfs                         1.6G  9.8M  1.6G    1% /run
+/dev/mapper/ruopu64--vg-root   53G   48G  2.8G   95% /
+# root目录增长太大
+ ⚡ root@ruopu64  ~  find ~/.cache -size +100M -delete
+ # 清理大于100M的文件
+  ⚡ root@ruopu64  ~  find ~/.cache -type f -atime +365
+  # 清理日期大于365天的文件
+```
+
+
+
 ### 添加用户
 ```shell
 root@ruopu64:~#useradd -m python
@@ -218,6 +245,31 @@ export GTK_IM_MODULE=xim
 #export XMODIFIERS=@im=ibus
 #export QT_IM_MODULE=ibus
 #export GTK_IM_MODULE=ibus 
+```
+
+
+
+### 安装老版本firefox
+
+```shell
+# 因为需要连接VPN，且在linux主机上只能安装在老版本的firefox上，所以不得不先安装老版本的firefox
+首先在https://pkgs.org/download/firefox中找到了一个debian7上安装的firefox-esr_52.8.0esr-1~deb7u1_amd64.deb。安装时还会依赖一些包，也需要从这个网址下载，所需包有libhunspell-1.3-0_1.3.3-3_amd64.deb、libevent-2.0-5_2.0.21-stable-3_amd64.deb、libjsoncpp0_0.6.0_rc2-3.1_amd64.deb、libffi5_3.0.10-3_amd64.deb、libpango1.0-0_1.40.5-1_amd64.deb。
+ ⚡ root@ruopu64  ~  apt remove firefox-esr
+ # 首先卸载之前安装的firefox
+ ⚡ root@ruopu64  ~  find / -name firefox
+ # 找一下是否还有残留的文件，发现只在用户家目录中有一些缓存文件，都删除即可
+ ⚡ root@ruopu64  ~  gdebi firefox-esr_52.8.0esr-1\~deb7u1_amd64.deb
+ # 安装老版本的firefox，如果有依赖问题，就先安装依赖包
+ 安装好之后，打开firefox，在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。
+ 访问https://211.99.15.34:6443下载插件，之后解压，在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，登录后就可以访问内网了。
+```
+
+
+
+### 连接VPN网络
+
+```shell
+当宿主机的firefox连接到VPN后，虚拟机使用NAT方式联网，就可以连接到VPN网络内，无需设置。
 ```
 
 
