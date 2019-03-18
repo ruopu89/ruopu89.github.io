@@ -266,6 +266,18 @@ export GTK_IM_MODULE=xim
 
 
 
+### 忽略某个可以升级的包
+
+```shell
+⚡ ⚙ root@ruopu64  ~  apt-mark hold firefox-esr 
+firefox-esr 设置为保留。
+# 使用此命令可以忽略某个可以升级的包，再使用apt upgrade时就不会升级此包了。
+apt-mark unhold firefox-esr
+# 此命令可以解除忽略的包
+```
+
+
+
 ### 连接VPN网络
 
 ```shell
