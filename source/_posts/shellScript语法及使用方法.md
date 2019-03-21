@@ -1392,49 +1392,6 @@ array=($(ls))
 
 
 
-### 实用脚本
-
-```shell
-* 跳板机
-[root@template sh]# vim /etc/profile.d/tiaoban.sh
-	[ $UID -ne 0 ] && . /tmp/tiaoban.sh
-# 判断用户是否为root用户，如果不是就加载tiaoban.sh脚本
-[root@template sh]# vim /tmp/tiaoban.sh
-# 这个脚本要放在一个登录的普通用户可以进入执行的路径 
-trapper() {
-   trap ':' INT EXIT TSTP TERM HUP
-}
-# 测试发现，这里使用trap ':'或trap ''都是一样的。如果不使用trap命令，普通用户登录后，在菜单中使用ctrl+c可以退出到命令行界面
-while :;do
-   trapper
-   clear
-   cat << menu
-        1. web a
-        2. web b
-        3. exit
-menu
-   read -p "pls select: " num
-   case "$num" in
-   1)
-        echo 1
-        ssh root@192.168.1.14
-        # 这里如果不指定用户登录，会使用当前的用户登录
-        ;;
-   2)
-        echo 2
-        ssh root@192.168.1.15
-        ;;
-   3|*)
-        exit
-        ;;
-   esac
-done
-# 用户以普通用户的身份登录后只会显示菜单，再传输跳板机中普通用户的密钥到目标主机，最后禁止使用密码登录跳板机或禁止root用户登录即可
-# 跳板机的实现，就是通过一个脚本，提供菜单，实现登录远程主机与退出功能，另外，添加一个环境变量，判断只要不是root用户登录，就加载这个跳板机脚本，给用户提供菜单，最后给创建一个普通用户的权限，可以连接跳板机，这样在用户登录时就可以看到菜单，但用户无法连接到这台跳板机服务器的命令行。可否添加高可用keepalived？
-```
-
-
-
 ### trap信号
 
 ```shell
