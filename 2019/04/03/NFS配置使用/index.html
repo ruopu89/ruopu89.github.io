@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概念 ext3、ext2等文件系統工作在內核空間，任何程序只要能夠執行都工作在用戶空間，如mke2fs命令工作在用戶空間，NFS是文件系統，工作在內核空間；內核空間中的程序只有內核自我能夠管理。 向磁盤讀寫數據要通過內核調用也叫函數調用，如read()，write()，函數執行要經過一個過程，所以函數調用又叫過程調用；一般本地應用程序實現某個操作的時候都是通過本地的過程調用來完成的，叫作local">
+<meta name="keywords" content="网络存储">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NFS配置使用">
+<meta property="og:url" content="http://yoursite.com/2019/04/03/NFS配置使用/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="概念 ext3、ext2等文件系統工作在內核空間，任何程序只要能夠執行都工作在用戶空間，如mke2fs命令工作在用戶空間，NFS是文件系統，工作在內核空間；內核空間中的程序只有內核自我能夠管理。 向磁盤讀寫數據要通過內核調用也叫函數調用，如read()，write()，函數執行要經過一個過程，所以函數調用又叫過程調用；一般本地應用程序實現某個操作的時候都是通過本地的過程調用來完成的，叫作local">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2019-04-03T09:53:23.891Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NFS配置使用">
+<meta name="twitter:description" content="概念 ext3、ext2等文件系統工作在內核空間，任何程序只要能夠執行都工作在用戶空間，如mke2fs命令工作在用戶空間，NFS是文件系統，工作在內核空間；內核空間中的程序只有內核自我能夠管理。 向磁盤讀寫數據要通過內核調用也叫函數調用，如read()，write()，函數執行要經過一個過程，所以函數調用又叫過程調用；一般本地應用程序實現某個操作的時候都是通過本地的過程調用來完成的，叫作local">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/03/NFS配置使用/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>NFS配置使用 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/03/NFS配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NFS配置使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-04-03 14:53:41 / 修改時間：17:53:23" itemprop="dateCreated datePublished" datetime="2019-04-03T14:53:41+08:00">2019-04-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>ext3、ext2等文件系統工作在內核空間，任何程序只要能夠執行都工作在用戶空間，如mke2fs命令工作在用戶空間，NFS是文件系統，工作在內核空間；內核空間中的程序只有內核自我能夠管理。</p>
+<p>向磁盤讀寫數據要通過內核調用也叫函數調用，如read()，write()，函數執行要經過一個過程，所以函數調用又叫過程調用；一般本地應用程序實現某個操作的時候都是通過本地的過程調用來完成的，叫作local procedure call，就是本地的兩個程序或程序與內核之間調用函數完成某種功能的過程；作爲程序員，如果想與某個程序交互，只要某個程序提供函數就可以交互了；</p>
+<p>LPC：本地過程調用，local procedure call</p>
+<p>RPC：遠程過程調用，Remote procedure call</p>
+<p>客戶端與遠程服務器端通過一個RPC客戶端（RPC客戶端叫stub：存根客戶端）與服務器端（運行的是RPC server）聯系，實現數據的讀取，RPC服務器端監聽的套接字是隨機的。linux提供rpc服務的程序叫Portmap，監聽在111/tcp, 111/udp端口。</p>
+<p>RPC（框架）是一種編程技術，可以簡化分布式應用程序的開發。从RPC的客戶端向RPC的服務器端發起通信，RPC服務器端再將用戶請求真正轉給客戶端真正請求的服務器端。c –&gt; rpc c –&gt; rpc s –&gt; s</p>
+<p>NFS Client →  NFS Server</p>
+<p>RPC通信既可基於二進制也可基於文本格式進行數據交換，基於文本格式比較常見的叫XMLRPC，之後又發展出SOAP（Simple Object Access Protocol）簡單對象訪問協議。</p>
+<p>RPC是一種協議或編程技術，連接兩臺主機，像一臺主機一樣實現數據交換。</p>
+<p>將遠程的設備掛載到本地時，在本地才叫NFS系統。NFS也是一種協議，現在用NFSv3，NFSv4版本，服務器端只能驗證IP不能驗證用戶名</p>
+</blockquote>
+<h4 id="NFS對服務器來講有兩個組件"><a href="#NFS對服務器來講有兩個組件" class="headerlink" title="NFS對服務器來講有兩個組件"></a>NFS對服務器來講有兩個組件</h4><blockquote>
+<p>服務器端：nfs-utils，安裝此軟件包就可配置爲服務器端了。</p>
+<p>因爲NFS是基於RPC運行的，所以要確保RPC在linux上的服務portmap已經啓動。portmap是監聽在111/tcp, 111/udp端口的。還可以使用rpcinfo -p來查看一臺主機上的所有rpc進程所監聽的端口號，如：rpcinfo -p localhost，會查到有很多端口監聽，這些是NFS啓動時向RPC請求的端口，nfs會啓動三個進程：nfsd(nfs的主服務)，mountd（接受客戶端掛載請求的）, quotad（限定客戶端在本地只能使用多大磁盤空間的）；nfsd監聽在2049/tcp端口，這是注冊使用的；mountd，quotad會改變端口，是半隨機的端口，是RPC服務幫助選取的，因爲是RPC隨機選取的，所以叫半隨機的端口，可能使用其他服務的端口，所以最好配置一個固定端口給這兩個服務，默認是使用隨機端口。nfslock是分布式文件鎖，當一臺主機在讀取NFS磁盤數據時，要先加鎖，這樣其他主機就不能讀取磁盤數據了，避免磁盤崩潰。NFS配置文件/etc/exports，在此配置文件中定義共享哪個文件系統，哪些可以使用文件系統，讓其可被掛載到本地像使用本地磁盤一樣使用。</p>
+</blockquote>
+<h4 id="NFS工作流程"><a href="#NFS工作流程" class="headerlink" title="NFS工作流程"></a>NFS工作流程</h4><blockquote>
+<p>對於NFSv3來講，客戶端先去聯系服務器上的portmap（RPC服務器），RPC服務器會告訴客戶端rpc.mountd所監聽的端口號，當這個端口號回傳給客戶端以後，客戶端會重新連接rpc.mountd，rpc.mountd返回給用戶一個初始化文件句柄或叫訪問令牌，也就是在配置文件中定義的IP地址訪問時才會發給令牌，這時客戶端來找nfsd，nfsd監聽在2049端口上。這時就能訪問了。</p>
+<p>讓mountd和quotad等進程監聽在固定端口，編輯配置文件/etc/sysconfig/nfs，其中有MOUNTD_PORT=<strong><em>一項，定義好端口號即可。QUOTAD_PORT=</em></strong>也一樣。LOCKD_TCPPORT=<strong><em>,  LOCKD_UDPPORT=</em></strong>是啓動鎖進程要監聽的端口。</p>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[root@webdav ~]# yum install -y nfs-utils</span><br><span class="line">[root@webdav ~]# netstat -tlnp</span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span><br><span class="line">tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      1/systemd           </span><br><span class="line">tcp        0      0 0.0.0.0:20048           0.0.0.0:*               LISTEN      97455/rpc.mountd          </span><br><span class="line">tcp        0      0 0.0.0.0:43326           0.0.0.0:*               LISTEN      -                   </span><br><span class="line">tcp        0      0 0.0.0.0:2049            0.0.0.0:*               LISTEN      -                   </span><br><span class="line">tcp        0      0 0.0.0.0:42758           0.0.0.0:*               LISTEN      97452/rpc.statd   </span><br><span class="line">[root@webdav ~]# mkdir /shared</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(ro) 192.168.1.0/24(rw)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件中每一行包含一個共享出去的文件系統以及哪些客戶端可使用此文件系統；每個客戶端後必須跟一個小括號，小括號中定義了客戶端訪問此文件系統時所具有的屬性</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> /path/to/somedir共享哪個目錄，可以是獨立的分區或目錄，建議使用獨立分區，之後是客戶端列表CLIENT_LIST，多個客戶列表之間用空格分隔。每個客戶端後面必須跟一個小括號，裏面定義了此客戶訪問特性，如訪問權限等。如：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 172.16.0.0/16(ro,async) 192.16.0.0/24(rw,sync)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> async異步寫入，sync同步寫入，ro只讀，rw讀寫。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 客戶端可以是單個主機用FQDN或IP定義都可以；也可以用通配符，如*.example.com；也可以是IP/netmask的方式</span></span><br><span class="line">[root@webdav ~]# exportfs -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令重新导出</span></span><br><span class="line">[root@webdav ~]# showmount -e 192.168.2.128</span><br><span class="line">Export list for 192.168.2.128:</span><br><span class="line">192.168.1.0/24,192.168.2.0/24</span><br><span class="line"><span class="meta">#</span><span class="bash"> -e表示顯示共享了哪些目錄，也可以選程主機上使用此命令查看某主機共享了哪些目錄</span></span><br><span class="line"></span><br><span class="line">=================</span><br><span class="line">   debian系统挂载</span><br><span class="line">=================</span><br><span class="line">⚡ root@ruopu64  ~  apt install nfs-common</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 安装包，如果不安装此包，挂载时会提示<span class="string">"mount: /mnt: bad option; for several filesystems (e.g. nfs, cifs) you might need a /sbin/mount.&lt;type&gt; helper program."</span>。</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> 如果debian是服务端，要安装 nfs-kernel-server包</span></span><br><span class="line">⚡ root@ruopu64  ~  mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">⚡ root@ruopu64  ~  df -h</span><br><span class="line">文件系统                      容量  已用  可用 已用% 挂载点</span><br><span class="line">...</span><br><span class="line">192.168.2.128:/shared          17G  1.3G   16G    8% /mnt</span><br></pre></td></tr></table></figure>
+<h4 id="showmount命令"><a href="#showmount命令" class="headerlink" title="showmount命令"></a>showmount命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">showmount -e NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看NFS服務器“導出”的各文件系統，導出就是共享的意思</span></span><br><span class="line">showmount -a NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看NFS服務器所有被掛載的文件系統及其客戶端對應列表</span></span><br><span class="line">showmount -d NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 顯示NFS服務器所有導出的文件系統中被客戶端掛載了的文件系統列表</span></span><br></pre></td></tr></table></figure>
+<h4 id="exportfs命令"><a href="#exportfs命令" class="headerlink" title="exportfs命令"></a>exportfs命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-a：跟-r或-u選項同時使用，表示重新掛載所有文件系統或取消導出所有文件系統</span><br><span class="line">-r：重新導出</span><br><span class="line">-u：取消導出</span><br><span class="line">-v：顯示詳細信息</span><br><span class="line">exportfs -rav：不必重啓服務，重新導出</span><br></pre></td></tr></table></figure>
+<h4 id="设置访问权限"><a href="#设置访问权限" class="headerlink" title="设置访问权限"></a>设置访问权限</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# useradd hadoop</span><br><span class="line">[root@webdav ~]# id hadoop</span><br><span class="line">uid=1000(hadoop) gid=1000(hadoop) 组=1000(hadoop)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看用户与组ID</span></span><br><span class="line">[root@webdav ~]# setfacl -m u:hadoop:rwx /shared/</span><br><span class="line">[root@webdav ~]# su - hadoop</span><br><span class="line">[hadoop@webdav ~]$ cd /shared/</span><br><span class="line">[hadoop@webdav shared]$ touch a.hadoop</span><br><span class="line">[hadoop@webdav shared]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 Apr  3 16:24 a.hadoop</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# groupadd -g 1000 openstack</span><br><span class="line">[root@primary ~]# useradd -g 1000 -u 1000 openstack</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建用户与组ID与服务器端一样的用户，只是用户名不同</span></span><br><span class="line">[root@primary ~]# mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">[root@primary ~]# ll /mnt</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 4月   3 2019 a.hadoop</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在客户端挂载NFS系统后，因为用户与组ID与服务器端一样，所以用户和组都变成了openstack</span></span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[hadoop@webdav shared]$ exit</span><br><span class="line">logout</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw) 192.168.1.0/24(rw)</span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# su - openstack</span><br><span class="line">[openstack@primary ~]$ cd /mnt</span><br><span class="line">[openstack@primary mnt]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 a.hadoop</span><br><span class="line">[openstack@primary mnt]$ touch b.openstack</span><br><span class="line">[openstack@primary mnt]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 a.hadoop</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 b.openstack</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# ll /shared/</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 4月   3 16:24 a.hadoop</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 4月   3 16:41 b.openstack</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[openstack@primary mnt]$ exit</span><br><span class="line">logout</span><br><span class="line">[root@primary ~]# rm /mnt/b.openstack </span><br><span class="line">rm：是否删除普通空文件 "/mnt/b.openstack"？y</span><br><span class="line">rm: 无法删除"/mnt/b.openstack": 权限不够</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時是不能刪除的，root用戶是不能操作遠程主機上的文件的。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw,no_root_squash) 192.168.1.0/24(rw)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可用选项如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> no_root_squash：任何主機以root掛載此目錄都將是管理員了，这样root就可以删除远程文件了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> root_squash：將root用戶映射爲來賓賬號，這是默認功能，不加也會執行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> all_squash：無論是誰都轉換爲來賓帳號。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> anonuid, anongid：指定映射的來賓賬號的UID和GID</span></span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">[root@primary ~]# rm -rf /mnt/b.openstack</span><br><span class="line">[root@primary ~]# ll /mnt</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 4月   3 2019 a.hadoop</span><br><span class="line"><span class="meta">#</span><span class="bash"> 文件被删除了</span></span><br><span class="line">[root@primary ~]# vim /etc/fstab </span><br><span class="line">192.168.2.128:/shared   /mnt                    nfs     defaults,_rnetdev       0 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> mount的選項中有_rnetdev，表示如果主機不在或無法掛載就跳過</span></span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# mount -a</span><br><span class="line">[root@primary ~]# df -h</span><br><span class="line">Filesystem            Size  Used Avail Use% Mounted on</span><br><span class="line">192.168.2.128:/shared                       17G  1.3G   16G   8% /mnt</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络存储/" rel="tag"># 网络存储</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/02/tmux使用/" rel="next" title="tmux使用">
+                <i class="fa fa-chevron-left"></i> tmux使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/04/logrotate配置使用/" rel="prev" title="logrotate配置使用">
+                logrotate配置使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">113</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NFS對服務器來講有兩個組件"><span class="nav-number">1.1.</span> <span class="nav-text">NFS對服務器來講有兩個組件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NFS工作流程"><span class="nav-number">1.2.</span> <span class="nav-text">NFS工作流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">2.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本配置"><span class="nav-number">2.1.</span> <span class="nav-text">基本配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#showmount命令"><span class="nav-number">2.2.</span> <span class="nav-text">showmount命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exportfs命令"><span class="nav-number">2.3.</span> <span class="nav-text">exportfs命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置访问权限"><span class="nav-number">2.4.</span> <span class="nav-text">设置访问权限</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概念 DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。  一般情况下文件写入磁盘的步骤是：写操作 –&amp;gt; 文件系统 –&amp;gt; 内存缓存中 –&amp;gt; 磁盘调度器 –&amp;gt; 磁盘驱动器 –&amp;gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模">
+<meta name="keywords" content="drbd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="drbd基本配置使用">
+<meta property="og:url" content="http://yoursite.com/2019/03/29/drbd基本配置使用/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="概念 DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。  一般情况下文件写入磁盘的步骤是：写操作 –&amp;gt; 文件系统 –&amp;gt; 内存缓存中 –&amp;gt; 磁盘调度器 –&amp;gt; 磁盘驱动器 –&amp;gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/drbd/工作流程.png">
+<meta property="og:updated_time" content="2019-03-29T06:10:56.640Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="drbd基本配置使用">
+<meta name="twitter:description" content="概念 DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。  一般情况下文件写入磁盘的步骤是：写操作 –&amp;gt; 文件系统 –&amp;gt; 内存缓存中 –&amp;gt; 磁盘调度器 –&amp;gt; 磁盘驱动器 –&amp;gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模">
+<meta name="twitter:image" content="http://yoursite.com/images/drbd/工作流程.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/29/drbd基本配置使用/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>drbd基本配置使用 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/drbd基本配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">drbd基本配置使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 10:57:21 / 修改時間：14:10:56" itemprop="dateCreated datePublished" datetime="2019-03-29T10:57:21+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。 </p>
+<p>一般情况下文件写入磁盘的步骤是：写操作 –&gt; 文件系统 –&gt; 内存缓存中 –&gt; 磁盘调度器 –&gt; 磁盘驱动器 –&gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模块通过tcp/ip协议栈经过网卡和对方建立数据同步。 </p>
+</blockquote>
+<p><img src="/images/drbd/工作流程.png" alt=""></p>
+<h4 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h4><blockquote>
+<ol>
+<li><p>主从模型</p>
+<p>master/slave模型，在某一时刻只允许有一个主节点。主节点的作用是可以挂载使用，写入数据等；从节点只作为主节点的镜像，是主节点的备份。 </p>
+</li>
+<li><p>主主模型</p>
+<p>dula primary模型，2个节点都可以当做主节点来挂载使用。需要配合集群文件系统使用，通过分布式文件锁管理器避免同时写一个文件造成文件系统损坏的问题。</p>
+</li>
+</ol>
+</blockquote>
+<h4 id="复制模型"><a href="#复制模型" class="headerlink" title="复制模型"></a>复制模型</h4><blockquote>
+<ol>
+<li>A协议：异步复制（asynchronous），写操作到本机网卡时即认为成功，性能好，数据可靠性差。 </li>
+<li>B协议：半同步复制（semi sync），写操作到达备节点网卡即认为成功，数据可靠性介于A和C之间。 </li>
+<li>C协议：同步复制（ sync），备用节点写入磁盘即认为成功，性能差，数据可靠性高。也是drbd默认使用的复制协议 </li>
+</ol>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">环境：</span><br><span class="line">主机两台，操作系统CentOS6.6，内核2.6.32-504.el6.x86_64。地址：192.168.2.132、192.168.2.133</span><br><span class="line">安装与配置在两个节点上是一样的</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash"> 两台主机均按如下方法操作</span></span><br><span class="line">[root@primary drbd]# rpm -ivh drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装包取自生产环境。drbd84-utils-8.9.1-1.el6.elrepo包提供配置文件与工具，komd-drbd84-8.4.6-504.el6.x86_64.rpm包提供内核模块。注意两个包要一起安装，不然可能不会添加设备</span></span><br><span class="line">[root@template ~]# ls /dev/d</span><br><span class="line">disk/   dm-1    drbd1   drbd11  drbd13  drbd15  drbd3   drbd5   drbd7   drbd9   dvdrw   </span><br><span class="line">dm-0    drbd0   drbd10  drbd12  drbd14  drbd2   drbd4   drbd6   drbd8   dvd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装软件后可以看到添加了很多以drbd开头的设备</span></span><br><span class="line">[root@primary ~]# fdisk /dev/sdb</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在两个分区上提供大小一致的分区</span></span><br><span class="line">[root@primary ~]# ntpdate ntp1.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@primary ~]# partprobe /dev/sdb</span><br><span class="line">[root@primary drbd]# vim /etc/sysconfig/network</span><br><span class="line">NETWORKING=yes</span><br><span class="line">HOSTNAME=primary</span><br><span class="line">[root@primary drbd]# hostname primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改主机名</span></span><br><span class="line">[root@primary drbd]# ssh-keygen -t rsa -P ''</span><br><span class="line">[root@primary drbd]# ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.133</span><br><span class="line"><span class="meta">#</span><span class="bash"> 密钥通信</span></span><br><span class="line">[root@primary drbd]# vim /etc/hosts</span><br><span class="line">192.168.2.132 primary</span><br><span class="line">192.168.2.133 secondary</span><br><span class="line">[root@primary drbd]# scp drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm secondary:/root</span><br></pre></td></tr></table></figure>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">[root@primary ~]# cd /etc/drbd.d</span><br><span class="line">[root@primary drbd.d]# vim global_common.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此配置文件提供全局配置，及多个drbd设备相同的配置 </span></span><br><span class="line">global &#123;</span><br><span class="line">	usage-count no;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否加入改进计划 </span></span><br><span class="line">&#125;</span><br><span class="line">common &#123;</span><br><span class="line">	handlers &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	startup &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	options &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	disk &#123;</span><br><span class="line">		on-io-error detach;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> IO出问题时，就将节点卸载 </span></span><br><span class="line">	&#125;</span><br><span class="line">	net &#123;</span><br><span class="line">		cram-hmac-alg "sha1";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 使用的算法 </span></span><br><span class="line">		shared-secret "mydrbdshared123";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 共享密钥，建议用随机数生成 </span></span><br><span class="line">	&#125;</span><br><span class="line">	syncer &#123;</span><br><span class="line">		rate 500M;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 同步速率</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> glocal：全局属性，定义drbd自己的工作特性。common：通用属性，定义多组drbd设备通用特性 </span></span><br><span class="line"></span><br><span class="line">[root@primary drbd.d]# vim mystore.res</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此文件为自建文件</span></span><br><span class="line">resource mystore &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 首先定义公共配置，这一段可以被下面的多段使用 </span></span><br><span class="line">    device /dev/drdb0;</span><br><span class="line">    # 定义设备</span><br><span class="line">    disk /dev/sdb1;</span><br><span class="line">    # 定义磁盘，定义这两项就让磁盘与设备关联了？</span><br><span class="line">    meta-disk internal;</span><br><span class="line">     # 在自己的dev内部构建使用</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面定义单个节点的属性 </span></span><br><span class="line">    on primary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">    on secondary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化资源，mystore是资源名，是在mystore.res文件中定义的。在两个节点上分别执行 </span></span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line">[root@primary drbd.d]# service drbd start</span><br><span class="line">Starting DRBD resources: [</span><br><span class="line">     create res: mystore</span><br><span class="line">   prepare disk: mystore</span><br><span class="line">    adjust disk: mystore</span><br><span class="line">     adjust net: mystore</span><br><span class="line">]</span><br><span class="line">....</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动一个节点后，它会等待另一个节点也启动此服务，这时两个节点才会一起启动服务</span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:Inconsistent/Inconsistent C r-----</span><br><span class="line">    ns:0 nr:0 dw:0 dr:0 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:3140544</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看运行状态，现在两个都是Secondary，没有同步 </span></span><br><span class="line">[root@primary drbd.d]# drbd-overview </span><br><span class="line"> 0:mystore/0  Connected Secondary/Secondary Inconsistent/Inconsistent </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 使用此命令也可以</span></span><br><span class="line"> [root@primary drbd.d]# drbdadm primary --force mystore</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 设置节点1为主节点</span></span><br><span class="line"> [root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:SyncSource ro:Primary/Secondary ds:UpToDate/Inconsistent C r-----</span><br><span class="line">    ns:1067676 nr:0 dw:0 dr:1069720 al:0 bm:0 lo:0 pe:2 ua:2 ap:0 ep:1 wo:f oos:2074560</span><br><span class="line">	[=====&gt;..............] sync'ed: 34.1% (2074560/3140544)K</span><br><span class="line">	finish: 0:00:52 speed: 39,708 (39,480) K/sec</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 显示同步过程，有两种状态，primary和secondary，主和从，左边为自己的状态右边是对方的状态 </span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3140544 nr:0 dw:0 dr:3141208 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步完成，这是状态为Primary/Secondary </span></span><br><span class="line">[root@primary drbd.d]# mke2fs -t ext4 /dev/drbd0</span><br><span class="line">mke2fs 1.41.12 (17-May-2010)</span><br><span class="line">文件系统标签=</span><br><span class="line">操作系统:Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">196608 inodes, 785136 blocks</span><br><span class="line">39256 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=805306368</span><br><span class="line">24 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成</span><br><span class="line"></span><br><span class="line">This filesystem will be automatically checked every 26 mounts or</span><br><span class="line">180 days, whichever comes first.  Use tune2fs -c or -i to override.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在主节点格式化磁盘，从节点也会自动格式化，因为是按位同步的</span></span><br></pre></td></tr></table></figure>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary drbd.d]# ls /mnt</span><br><span class="line">lost+found</span><br><span class="line">[root@primary drbd.d]# cd /mnt</span><br><span class="line">[root@primary mnt]# cp /etc/issue ./</span><br><span class="line">[root@primary mnt]# ls</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@primary mnt]# cd</span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把自己切换为从节点</span></span><br><span class="line">[root@primary ~]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3256316 nr:0 dw:115772 dr:3141925 al:31 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态都是从节点</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node2    </span><br><span class="line">=========</span><br><span class="line">[root@secondary drbd.d]# drbdadm primary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在哪个节点执行此命令就是切换哪个节点的状态，这里将备用节点切换为主节点</span></span><br><span class="line">[root@secondary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:0 nr:3256316 dw:3256316 dr:664 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line">[root@secondary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@secondary drbd.d]# ls /mnt</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@secondary drbd.d]# vim /mnt/issue</span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入一些内容</span></span><br><span class="line">[root@secondary drbd.d]# umount /mnt</span><br><span class="line">[root@secondary drbd.d]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要切换状态，备用状态是不能被挂载</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">mount: you must specify the filesystem type</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备用状态是不能被挂载的</span></span><br><span class="line">[root@primary ~]# drbdadm primary mystore</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary ~]# cat /mnt/issue </span><br><span class="line">CentOS release 6.6 (Final)</span><br><span class="line">Kernel \r on an \m</span><br><span class="line"></span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 内容也被改变了</span></span><br><span class="line">[root@primary ~]# service drbd status</span><br><span class="line">drbd driver loaded OK; device status:</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line">m:res      cs         ro                 ds                 p  mounted  fstype</span><br><span class="line">0:mystore  Connected  Primary/Secondary  UpToDate/UpToDate  C  /mnt     ext4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，UpToDate/UpToDate 表示已经同步</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/drbd/" rel="tag"># drbd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/26/python基础学习-语句/" rel="next" title="python基础学习-语句">
+                <i class="fa fa-chevron-left"></i> python基础学习-语句
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/29/corosync&pacemaker集群部署/" rel="prev" title="corosync&pacemaker集群部署">
+                corosync&pacemaker集群部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">113</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#工作模式"><span class="nav-number">1.1.</span> <span class="nav-text">工作模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复制模型"><span class="nav-number">1.2.</span> <span class="nav-text">复制模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">2.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置"><span class="nav-number">2.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试"><span class="nav-number">2.3.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

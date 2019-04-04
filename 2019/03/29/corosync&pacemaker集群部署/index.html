@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概念OpenAIS OpenAIS是基于SA Forum 标准的集群框架的应用程序接口规范。OpenAIS提供一种集群模式，这个模式包括集群框架，集群成员管理，通信方式，集群监测等，能够为集群软件或工具提供满足 AIS标准的集群接口，但是它没有集群资源管理功能，不能独立形成一个集群。OpenAIS组件包括AMF，CLM，CKPT，EVT，LCK，MSG，TMR，CPG，EVS等，因OpenAIS分">
+<meta name="keywords" content="corosync">
+<meta property="og:type" content="article">
+<meta property="og:title" content="corosync&amp;pacemaker集群部署">
+<meta property="og:url" content="http://yoursite.com/2019/03/29/corosync&pacemaker集群部署/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="概念OpenAIS OpenAIS是基于SA Forum 标准的集群框架的应用程序接口规范。OpenAIS提供一种集群模式，这个模式包括集群框架，集群成员管理，通信方式，集群监测等，能够为集群软件或工具提供满足 AIS标准的集群接口，但是它没有集群资源管理功能，不能独立形成一个集群。OpenAIS组件包括AMF，CLM，CKPT，EVT，LCK，MSG，TMR，CPG，EVS等，因OpenAIS分">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2019-04-04T02:33:08.507Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="corosync&amp;pacemaker集群部署">
+<meta name="twitter:description" content="概念OpenAIS OpenAIS是基于SA Forum 标准的集群框架的应用程序接口规范。OpenAIS提供一种集群模式，这个模式包括集群框架，集群成员管理，通信方式，集群监测等，能够为集群软件或工具提供满足 AIS标准的集群接口，但是它没有集群资源管理功能，不能独立形成一个集群。OpenAIS组件包括AMF，CLM，CKPT，EVT，LCK，MSG，TMR，CPG，EVS等，因OpenAIS分">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/29/corosync&pacemaker集群部署/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>corosync&pacemaker集群部署 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/corosync&pacemaker集群部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">corosync&pacemaker集群部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 14:16:07" itemprop="dateCreated datePublished" datetime="2019-03-29T14:16:07+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-04-04 10:33:08" itemprop="dateModified" datetime="2019-04-04T10:33:08+08:00">2019-04-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="OpenAIS"><a href="#OpenAIS" class="headerlink" title="OpenAIS"></a>OpenAIS</h4><blockquote>
+<p>OpenAIS是基于SA Forum 标准的集群框架的应用程序接口规范。OpenAIS提供一种集群模式，这个模式包括集群框架，集群成员管理，通信方式，集群监测等，能够为集群软件或工具提供满足 AIS标准的集群接口，但是它没有集群资源管理功能，不能独立形成一个集群。OpenAIS组件包括AMF，CLM，CKPT，EVT，LCK，MSG，TMR，CPG，EVS等，因OpenAIS分支不同，组件略有不同。OpenAIS主要包含三个分支：Picacho，Whitetank，Wilson。Wilson是最新的，比较稳定的版本是从openais 1.0.0到openais1.1.4。Whitetank现在是主流分支版本，比较稳定的版本是openais0.80到openais0.86。Picacho第一代的OpenAIS的分支，比较稳定的版本是openais0.70和openais0.71。现在比较常用的是Whitetank和Wilson，两者之间有很多不同。OpenAIS从Whitetank升级到Wilson版本后，组件变化很大，Wilson把Openais核心架构组件独立出来放在Corosync（Corosync是一个集群管理引擎）里面。Whitetank包含的组件有AMF，CLM，CKPT，EVT，LCK ，MSG，CPG，CFG，EVS，aisparser，VSF_ykd，bojdb等。而Wilson只含有AMF，CLM，CKPT，LCK, MSG，EVT，TMR（TMR，Whitetank里面没有），这些都是AIS组件。其他核心组件被放到了Corosync内。Wilson被当做Corosync的一个插件。</p>
+</blockquote>
+<h4 id="corosync"><a href="#corosync" class="headerlink" title="corosync"></a>corosync</h4><blockquote>
+<p>Corosync是OpenAIS发展到Wilson版本后衍生出来的开放性集群引擎工程。可以说Corosync是OpenAIS工程的一部分。OpenAIS从openais0.90开始独立成两部分，一个是Corosync；另一个是AIS标准接口Wilson。Corosync包含OpenAIS的核心框架用来对Wilson的标准接口的使用、管理。它为商用的或开源性的集群提供集群执行框架。Corosync执行高可用应用程序的通信组系统，它有以下特征： </p>
+<ul>
+<li>一个封闭的程序组（A closed process group communication model）通信模式，这个模式提供一种虚拟的同步方式来保证能够复制服务器的状态。 </li>
+<li>一个简单可用性管理组件（A simple availability manager），这个管理组件可以重新启动应用程序的进程当它失败后。 </li>
+<li>一个配置和内存数据的统计（A configuration and statistics <a href="http://en.wikipedia.org/wiki/in-memory_database" target="_blank" rel="noopener">in-memory database</a>），内存数据能够被设置，回复，接受通知的更改信息。 </li>
+<li>一个定额的系统（A quorum  system），定额完成或者丢失时通知应用程序。 </li>
+</ul>
+</blockquote>
+<h4 id="cman"><a href="#cman" class="headerlink" title="cman"></a>cman</h4><blockquote>
+<p>CMAN是红帽RHCS套件的核心部分，CCS是CMAN集群配置系统，配置cluster.conf，而cluster.conf其实就是openais的配置文件，通过CCS映射到openais。 </p>
+</blockquote>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
+<p>AIS就是一个通用的应用程序编程接口，OpenAIS是AIS的子项目，标准的集群框架的应用程序接口规范，而corosync是OpenAIS是具体实现。</p>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="基本实现"><a href="#基本实现" class="headerlink" title="基本实现"></a>基本实现</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">环境：</span><br><span class="line">准备三台主机，地址：192.168.2.132（primary, node1）、192.168.2.133（secondary, node2）。192.168.2.128（node3）提供NFS服务。</span><br><span class="line">===========================================================================================</span><br><span class="line">----------------</span><br><span class="line">   node1&amp;2</span><br><span class="line">----------------</span><br><span class="line">[root@primary ~]# ntpdate ntp.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@primary ~]# ssh-keygen -t rsa -P ''</span><br><span class="line">[root@primary ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.133</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让两节点使用密钥通信</span></span><br><span class="line">[root@primary ~]# yum install -y corosync pacemaker</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装两个包</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# cd /etc/corosync/</span><br><span class="line">[root@primary corosync]# cp corosync.conf.example</span><br><span class="line">corosync.conf.example       corosync.conf.example.udpu  </span><br><span class="line">[root@primary corosync]# cp corosync.conf.example corosync.conf</span><br><span class="line">[root@primary corosync]# vim corosync.conf</span><br><span class="line">compatibility: whitetank</span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否兼容whitetank </span></span><br><span class="line">totem &#123;</span><br><span class="line">	version: 2</span><br><span class="line">	secauth: on</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否打开安装认证，不让其他主机加入，打开此功能后需要使用corosync-keygen生成密钥 </span></span><br><span class="line">	threads: 0</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 工作时的线程数，0表示基于进程模式工作</span></span><br><span class="line">	interface &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 定义多个节点之间通过哪个接口，基于哪个多播地址，监听什么端口完成多播通信 </span></span><br><span class="line">		ringnumber: 0</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 环数目，一般为0，类似TTL值 </span></span><br><span class="line">		bindnetaddr: 192.168.2.0</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 这通常是要绑定到的接口的*网络*地址，也就是本机所在的网络。这样可以确保您可以跨所有集群节点使用此配置文件的相同实例，而无需修改此选项。 </span></span><br><span class="line">		mcastaddr: 239.165.134.13</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 多播地址</span></span><br><span class="line">		mcastport: 5405</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 多播监听端口 </span></span><br><span class="line">		ttl: 1</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">logging &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定日志系统</span></span><br><span class="line">	fileline: off</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录fileline </span></span><br><span class="line">	to_stderr: no</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否发往标准错误输出，一般不发送</span></span><br><span class="line">	to_logfile: yes</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录到日志文件中</span></span><br><span class="line">	logfile: /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 日志位置 </span></span><br><span class="line">	to_syslog: no</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 也发往syslog一份，一般记录一份<span class="built_in">log</span>即可，所以这里关闭了此功能 </span></span><br><span class="line">	debug: off</span><br><span class="line">	timestamp: on</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否在日志中打开时间戳功能，如果是on，会影响系统性能 </span></span><br><span class="line">	logger_subsys &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录子系统，记录AMF，这是OpenAIS的子组件</span></span><br><span class="line">		subsys: AMF</span><br><span class="line">		debug: off</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">service &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此段，以插件形式运行pacemaker</span></span><br><span class="line">	ver: 0</span><br><span class="line">	name: pacemaker</span><br><span class="line">	use_mgmtd: yes</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 此项可有可无 </span></span><br><span class="line">&#125;</span><br><span class="line">aisexec &#123;</span><br><span class="line">	user: root</span><br><span class="line">	group:	root</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 以root用户身份运行，此项可有可无 </span></span><br><span class="line">&#125;</span><br><span class="line">[root@primary corosync]# ip link show</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:83:af:ca brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看网卡是否支持MULTICAST</span></span><br><span class="line">[root@primary corosync]# corosync-keygen </span><br><span class="line">Corosync Cluster Engine Authentication key generator.</span><br><span class="line">Gathering 1024 bits for key from /dev/random.</span><br><span class="line">Press keys on your keyboard to generate entropy.</span><br><span class="line">Writing corosync key to /etc/corosync/authkey.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从随机数中生成密钥，需要1024个字符，可能不够，如果不够，可以下载大文件产生IO数，使熵池中生成随机数</span></span><br><span class="line">[root@primary corosync]# ll </span><br><span class="line">总用量 32</span><br><span class="line">-rw-r--r-- 1 root root 5384 7月  20 2011 amf.conf.example</span><br><span class="line">-r-------- 1 root root  128 4月   2 15:47 authkey</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成了authkey文件，权限400</span></span><br><span class="line">[root@primary corosync]# scp authkey corosync.conf 192.168.2.133:/etc/corosync/</span><br><span class="line">[root@primary corosync]# service corosync start; ssh 192.168.2.133 'service corosync start'</span><br><span class="line">Starting Corosync Cluster Engine (corosync):               [  OK  ]</span><br><span class="line">Starting Corosync Cluster Engine (corosync): [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动两个节点的corosync服务</span></span><br><span class="line">[root@primary corosync]# ss -tlun</span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听了5405多播端口</span></span><br><span class="line">[root@primary corosync]# tail -f /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志中是否有报错信息</span></span><br><span class="line">[root@primary corosync]# grep -e "Corosync Cluster Engine" -e "configuration file" /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看两个节点中是否有两条信息，如果有就证明启动成功了</span></span><br><span class="line">[root@primary corosync]# grep TOTEM /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看初始化成员节点通知是否正常发出，应该可以查到内容</span></span><br><span class="line">[root@primary corosync]# grep ERROR: /var/log/cluster/corosync.log | grep –v unpack_resources</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="comment"># 检查启动过程中是否有错误产生，错误信息表示packmaker不久之后将不再作为corosync的插件运行，因此，建议使用cman作为集群基础架构服务，此处可安全忽略。 </span></span></span><br><span class="line">[root@primary corosync]# grep pcmk_startup /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果有信息说明启动完成</span></span><br></pre></td></tr></table></figure>
+<h4 id="使用crmsh配置pacemaker"><a href="#使用crmsh配置pacemaker" class="headerlink" title="使用crmsh配置pacemaker"></a>使用crmsh配置pacemaker</h4><blockquote>
+<p>crmsh工具在集群中的任一节点上安装均可，不需要每个节点都安装</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@primary corosync]# cd /etc/yum.repos.d/</span><br><span class="line">[root@primary yum.repos.d]# wget http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/CentOS_CentOS-6/network:ha-clustering:Stable.repo</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载opensuse的源，因为crmsh工具是opensuse提供的</span></span><br><span class="line">[root@primary yum.repos.d]# yum install -y crmsh pssh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装，连接速度很慢</span></span><br><span class="line">[root@primary yum.repos.d]# crm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入crm模式</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:03:21 2019</span><br><span class="line">Last change: Tue Apr  2 15:51:08 2019 by hacluster via crmd on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">0 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">No resources</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，也可以直接使用crm status命令。可以看到DC是主机名为primary的节点，Online: [ primary secondary ]表示有两台主机都在线。</span></span><br></pre></td></tr></table></figure>
+<h5 id="configure配置集群"><a href="#configure配置集群" class="headerlink" title="configure配置集群"></a>configure配置集群</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@primary ~]# crm </span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在子命令中使用此命令，表示配置集群模式 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">help</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看configure的帮助</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary</span><br><span class="line">node secondary</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是configure中的子命令，显示当前集群配置信息，实际配置文件是XML格式的。显示的property表示集群的全局属性，全局属性是配置集群的基本特性的 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show xml</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样就可以看到xml格式的配置文件</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property </span></span><br><span class="line">batch-limit=                   enable-startup-probes=         node-health-strategy=          stonith-enabled= </span><br><span class="line">cluster-delay=                 have-watchdog=                 node-health-yellow=            stonith-max-attempts= </span><br><span class="line">cluster-ipc-limit=             is-managed-default=            pe-error-series-max=           stonith-timeout= </span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行此命令后，再按两次Tab键，可以看到可以配置的全局属性。stonity-enabled=表示是否必须配置stonith设备，默认为是。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property stonith-enabled=</span></span><br><span class="line">stonith-enabled (boolean, [true]): </span><br><span class="line">    Failed nodes are STONITH'd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 按两次Tab键后可以看到默认的值是True </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property stonith-enabled=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 禁用stonith</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 校验配置是否有错，如果没错，不会显示任何信息</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary</span><br><span class="line">node secondary</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2 \</span><br><span class="line">	stonith-enabled=false</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再查看，多了stonith-enabled=<span class="literal">false</span>一项</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交，这样才能生效。因为上面的配置都是在内存中完成的。</span></span><br></pre></td></tr></table></figure>
+<h5 id="node"><a href="#node" class="headerlink" title="node"></a>node</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> ls</span></span><br><span class="line">..               help             fence            </span><br><span class="line">show             attribute        back             </span><br><span class="line">cd               ready            status-attr      </span><br><span class="line">quit             end              utilization      </span><br><span class="line">exit             ls               maintenance      </span><br><span class="line">online           bye              ?                </span><br><span class="line">status           clearstate       standby          </span><br><span class="line">list             up               server           </span><br><span class="line">delete           </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看可用的命令</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> show</span></span><br><span class="line">primary: normal</span><br><span class="line">secondary: normal</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示当前在线节点，都是normal状态</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把当前节点设置为备用状态 </span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> show</span></span><br><span class="line">primary: normal</span><br><span class="line">	standby=on</span><br><span class="line">secondary: normal</span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> online</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 再让节点上线</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> status</span></span><br><span class="line">&lt;nodes&gt;</span><br><span class="line">  &lt;node id="primary" uname="primary"&gt;</span><br><span class="line">    &lt;instance_attributes id="nodes-primary"&gt;</span><br><span class="line">      &lt;nvpair id="nodes-primary-standby" name="standby" value="off"/&gt;</span><br><span class="line">    &lt;/instance_attributes&gt;</span><br><span class="line">  &lt;/node&gt;</span><br><span class="line">  &lt;node id="secondary" uname="secondary"/&gt;</span><br><span class="line">&lt;/nodes&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前节点信息</span></span><br></pre></td></tr></table></figure>
+<h5 id="resource"><a href="#resource" class="headerlink" title="resource"></a>resource</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">help</span></span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源状态</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> restart resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启资源</span></span><br></pre></td></tr></table></figure>
+<h5 id="ra资源代理"><a href="#ra资源代理" class="headerlink" title="ra资源代理"></a>ra资源代理</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> ra </span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> ls</span></span><br><span class="line">..               info             quit             </span><br><span class="line">end              help             providers        </span><br><span class="line">up               list             cd               </span><br><span class="line">classes          meta             ls               </span><br><span class="line">back             exit             validate         </span><br><span class="line">bye              ?                </span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> classes</span></span><br><span class="line">lsb</span><br><span class="line">ocf / .isolation heartbeat linbit pacemaker</span><br><span class="line">service</span><br><span class="line">stonith</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示资源代理模式 </span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list lsb</span></span><br><span class="line">abrt-ccpp                abrt-oops                abrtd                    acpid                    atd</span><br><span class="line">auditd                   autofs                   blk-availability         bmc-snmp-proxy           certmonger</span><br><span class="line">cgconfig                 cgred                    cman                     corosync                 corosync-notifyd</span><br><span class="line">cpuspeed                 crond                    cups                     drbd                     exchange-bmc-os-info</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看lsb中有哪些资源代理可用</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list ocf heartbeat</span></span><br><span class="line">CTDB              Delay             Dummy             Filesystem        IPaddr            IPaddr2           IPsrcaddr</span><br><span class="line">LVM               MailTo            Route             SendArp           Squid             VirtualDomain     Xinetd</span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list ocf pacemaker</span></span><br><span class="line">ClusterMon    Dummy         HealthCPU     HealthSMART   Stateful      SysInfo       SystemHealth  attribute     ifspeed</span><br><span class="line">ping          pingd         remote  </span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list service</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> service与lsb是一样的</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list stonith</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> <span class="built_in">help</span> info</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  info可以查看帮助信息</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> info ocf:heartbeat:IPaddr</span></span><br></pre></td></tr></table></figure>
+<h5 id="配置资源primitive"><a href="#配置资源primitive" class="headerlink" title="配置资源primitive"></a>配置资源primitive</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webip ocf:heartbeat:IPaddr params ip=192.168.2.100 nic=eth1 cidr_netmask=24</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> webip是资源名称，ocf:heartbeat:IPaddr是资源代理，params 用来指明参数，IP地址，网卡，掩码。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:26:40 2019</span><br><span class="line">Last change: Tue Apr  2 16:26:27 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到webip资源添加到了节点1上</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# ip a</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:83:af:ca brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.2.132/24 brd 192.168.2.255 scope global eth1</span><br><span class="line">    inet 192.168.2.100/24 brd 192.168.2.255 scope global secondary eth1</span><br><span class="line">    inet6 fe80::20c:29ff:fe83:afca/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看看到添加了一个IP</span></span><br><span class="line">[root@primary ~]# crm node standby</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要将哪个节点转为备节点，就在哪个节点上执行此命令</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:30:38 2019</span><br><span class="line">Last change: Tue Apr  2 16:30:34 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Node primary: standby</span><br><span class="line">Online: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，online的就只有node2了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ip a</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:af:e1:97 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.2.133/24 brd 192.168.2.255 scope global eth1</span><br><span class="line">    inet 192.168.2.100/24 brd 192.168.2.255 scope global secondary eth1</span><br><span class="line">    inet6 fe80::20c:29ff:feaf:e197/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到ip地址转到node2了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm node online</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点1上线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:32:28 2019</span><br><span class="line">Last change: Tue Apr  2 16:32:25 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源没有转回</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# service corosync stop</span><br><span class="line">Signaling Corosync Cluster Engine (corosync) to terminate: [  OK  ]</span><br><span class="line">Waiting for corosync services to unload:.                  [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停掉节点2的服务，看资源是转到节点1上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition WITHOUT quorum</span><br><span class="line">Last updated: Tue Apr  2 16:34:22 2019</span><br><span class="line">Last change: Tue Apr  2 16:32:25 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 看资源是否转移，显示资源没有启动，因为一个服务停止了，所以只有一个节点在线，未超过半数，并且资源默认是关闭的，所以资源未启动 </span></span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property no-quorum-policy=ignore</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置没有法定票数时怎么办，设置为ignore</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition WITHOUT quorum</span><br><span class="line">Last updated: Tue Apr  2 16:36:29 2019</span><br><span class="line">Last change: Tue Apr  2 16:35:58 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到资源启动了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# service corosync start</span><br><span class="line">Starting Corosync Cluster Engine (corosync): </span><br><span class="line">                                                           [  OK  ]</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm resource</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: primary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源状态，显示资源在primary上</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> migrate webip secondary</span></span><br><span class="line">INFO: Move constraint created for webip to secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 转移资源 到secondary上，secondary是主机名</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示资源在secondary上</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源 </span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is NOT running</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源 </span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status </span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看所有资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> unmigrate webip</span></span><br><span class="line">INFO: Removed migration constraints for webip</span><br><span class="line"><span class="meta">#</span><span class="bash"> 转回到原来的节点</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为没有倾向性，所以没有转移</span></span><br></pre></td></tr></table></figure>
+<h5 id="高可用web"><a href="#高可用web" class="headerlink" title="高可用web"></a>高可用web</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br></pre></td><td class="code"><pre><span class="line">----------------</span><br><span class="line">   node1&amp;2</span><br><span class="line">----------------</span><br><span class="line">[root@primary ~]# yum install -y httpd</span><br><span class="line">[root@primary ~]# vim /var/www/html/index.html</span><br><span class="line">node1:primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提供网页文件，另一台内容为node2:secondary</span></span><br><span class="line">[root@primary ~]# service httpd start</span><br><span class="line">[root@primary ~]# curl 192.168.2.132</span><br><span class="line">node1:primary</span><br><span class="line">[root@primary ~]# curl 192.168.2.133</span><br><span class="line">node2:secondary</span><br><span class="line">[root@secondary ~]# service httpd stop</span><br><span class="line">[root@secondary ~]# chkconfig httpd off</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为要高可用此资源，所以不可以让服务自动启动</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm configure      </span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webserver lsb:httpd</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> web服务在节点2上启动了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm resource</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源是启动的</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Stopped (disabled)</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时资源还是在节点2上启动</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2成为备用节点</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:10:10 2019</span><br><span class="line">Last change: Tue Apr  2 17:08:47 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时两个资源都在节点1上运行了</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node online secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2上线</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:11:16 2019</span><br><span class="line">Last change: Tue Apr  2 17:11:08 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> web资源又转移到了节点2上</span></span><br><span class="line"> </span><br><span class="line"> ==========================================================================================</span><br><span class="line"> 使用资源组的方式，让资源在同一个节点运行</span><br><span class="line"> ==========================================================================================</span><br><span class="line"><span class="meta"> crm(live)configure#</span><span class="bash"> group webservice webip webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一个组叫webservice，组内有两个资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:14:15 2019</span><br><span class="line">Last change: Tue Apr  2 17:13:22 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> web资源又转移到节点1上了</span></span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> edit</span></span><br><span class="line">node primary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">primitive webip IPaddr \</span><br><span class="line">        params ip=192.168.2.100 nic=eth1 cidr_netmask=24 \</span><br><span class="line">        meta target-role=Started</span><br><span class="line">primitive webserver lsb:httpd \</span><br><span class="line">        meta target-role=Started</span><br><span class="line">group webservice webip webserver</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">        have-watchdog=false \</span><br><span class="line">        dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">        cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">        expected-quorum-votes=2 \</span><br><span class="line">        stonith-enabled=false \</span><br><span class="line">        no-quorum-policy=ignore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 编辑配置文件</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:18:54 2019</span><br><span class="line">Last change: Tue Apr  2 17:18:36 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到两个资源在一个资源组中</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure delete webservice</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除资源组，并不会报错，资源组马上被删除了</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:19:12 2019</span><br><span class="line">Last change: Tue Apr  2 17:19:10 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源组没有了</span></span><br><span class="line">==========================================================================================</span><br><span class="line">定义排列约束，即将资源绑定在一起</span><br><span class="line">==========================================================================================</span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> colocation webserver_with_webip inf: webserver webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> colocation定义排列约束，webserver_with_webip是自定义名称，inf表示定义分数，冒号后没有东西表示无穷大，这样两个资源就永远在一起了 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:26:39 2019</span><br><span class="line">Last change: Tue Apr  2 17:26:35 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交后，两个资源就都在节点1上运行了</span></span><br><span class="line">==========================================================================================</span><br><span class="line">定义顺序约束，即资源的启动顺序。定义位置约束，即让资源倾向在哪个节点上运行。</span><br><span class="line">==========================================================================================</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> order webip_before_webserver Mandatory: webip webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义顺序约束，先启动webip再启动webserver </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> location webip_on_node2 webip 50: secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义位置约束，让webip资源尽量在节点2上运行 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:51:11 2019</span><br><span class="line">Last change: Tue Apr  2 17:50:50 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 提交后，资源都转到节点2运行了</span></span><br><span class="line"> </span><br><span class="line"><span class="meta"> crm(live)configure#</span><span class="bash"> delete webip_on_node2 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary \</span><br><span class="line">	attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">	attributes standby=off</span><br><span class="line">primitive webip IPaddr \</span><br><span class="line">	params ip=192.168.2.100 nic=eth1 cidr_netmask=24 \</span><br><span class="line">	meta target-role=Started</span><br><span class="line">primitive webserver lsb:httpd \</span><br><span class="line">	meta target-role=Started</span><br><span class="line">order webip_before_webserver Mandatory: webip webserver</span><br><span class="line">colocation webserver_with_webip inf: webserver webip</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2 \</span><br><span class="line">	stonith-enabled=false \</span><br><span class="line">	no-quorum-policy=ignore</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> location webip_on_node2 webip rule 50: <span class="comment">#uname eq secondary</span></span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2成为备用节点</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:55:23 2019</span><br><span class="line">Last change: Tue Apr  2 17:55:07 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时资源会转移到节点1</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> online secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点2上线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:55:38 2019</span><br><span class="line">Last change: Tue Apr  2 17:55:34 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源又转回到节点2</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> rsc_defaults resource-stickiness=50</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置资源指黏性值，默认是0。之前的命令property default-resource-stickiness=50 已经不能使用了</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点2下线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:10:12 2019</span><br><span class="line">Last change: Tue Apr  2 18:07:48 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 资源到节点1</span></span><br><span class="line"><span class="meta"> crm(live)#</span><span class="bash"> node online secondary</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> 节点2上线</span></span><br><span class="line"> [root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:11:19 2019</span><br><span class="line">Last change: Tue Apr  2 18:10:41 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 资源不再转移，与设置资源黏性有关</span></span><br><span class="line"> [root@primary ~]# killall httpd</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 停止web服务</span></span><br><span class="line"><span class="meta"> crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:12:49 2019</span><br><span class="line">Last change: Tue Apr  2 18:10:41 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认只高可用节点，资源停掉也不会关心，还是显示资源在节点1上运行</span></span><br><span class="line"></span><br><span class="line">===========================================================================================</span><br><span class="line">配置高可用web资源，设置监控</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webserver</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure edit</span></span><br><span class="line">node primary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">        have-watchdog=false \</span><br><span class="line">        dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">        cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">        expected-quorum-votes=2 \</span><br><span class="line">        stonith-enabled=false \</span><br><span class="line">        no-quorum-policy=ignore</span><br><span class="line">rsc_defaults rsc-options: \</span><br><span class="line">        resource-stickiness=50</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除上面定义的资源，下面重新定义</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webip ocf:heartbeat:IPaddr params ip=192.168.2.100 nic=eth1 cidr_netmask=24 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> monitor webip 10s:20s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 单独定义monitor，后面是interval和timeout的时间</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webserver lsb:httpd op monitor interval=10s timeout=20s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 也可以将定义资源与监控在一起定义。一定要用op才能使用monitor命令。monitor表示监控，interval=10s timeout=20s是监控的轮询时间和超时时间，有了监控，就可以在资源停止时进行转移了 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> group webservice webip webserver</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在服务运行在节点1上</span></span><br><span class="line">[root@primary ~]# killall httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止web服务</span></span><br><span class="line">[root@primary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 10秒后，web服务会再次启动</span></span><br><span class="line">[root@primary ~]# yum install -y epel-release</span><br><span class="line">[root@primary ~]# yum install -y nginx</span><br><span class="line">[root@primary ~]# killall httpd</span><br><span class="line">[root@primary ~]# service nginx start</span><br><span class="line">Starting nginx:                                            [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止httpd服务，并启动nginx服务，为了不让httpd服务在节点1启动。看资源是否会转移到节点2上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ss -tln</span><br><span class="line">[root@secondary ~]# ip a</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务与地址都转到了节点2上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node3</span><br><span class="line">-------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此节点提供NFS服务</span></span><br><span class="line">[root@webdav ~]# yum install -y nfs-utils nginx</span><br><span class="line">[root@webdav ~]# systemctl start nfs</span><br><span class="line">[root@webdav ~]# mkdir /shared</span><br><span class="line">[root@webdav ~]# vim /shared/index.html</span><br><span class="line">test page</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw,no_root_squash) 192.168.1.0/24(rw)</span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line">[root@webdav ~]# showmount -e 192.168.2.128</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webstore ocf:heartbeat:Filesystem params device=<span class="string">"192.168.2.128:/shared"</span> directory=<span class="string">"/var/www/html"</span> fstype=<span class="string">"nfs"</span> op monitor interval=20s timeout=40s op start timeout=60s op stop timeout=60s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一个存储资源，提供NFS地址与挂载地址、文件系统类型。最后设置监控。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> edit</span></span><br><span class="line">group webservice webip webserver webstore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将资源加入组</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: secondary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Wed Apr  3 04:58:49 2019</span><br><span class="line">Last change: Wed Apr  3 04:57:53 2019 by hacluster via cibadmin on secondary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Stopped</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为实验不是一起做的，提供NFS服务是第二次接着做，所以忘记上一次为什么资源会停止了，新加入的服务也停止了，使用节点上线与启动资源的命令也没有反应。所以下面准备重新启动服务</span></span><br><span class="line">[root@primary ~]# service corosync status</span><br><span class="line">corosync (pid  46159) is running...</span><br><span class="line">[root@primary ~]# kill -9 46159</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为停止服务非常 慢，所以使用<span class="built_in">kill</span>杀死服务，两个节点都重新启动服务</span></span><br><span class="line">[root@primary ~]# service corosync start</span><br><span class="line">[root@primary ~]# crm </span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: NONE</span><br><span class="line">Last updated: Wed Apr  3 05:02:40 2019</span><br><span class="line">Last change: Wed Apr  3 04:57:53 2019 by hacluster via cibadmin on secondary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">OFFLINE: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Stopped</span><br><span class="line">     webserver	(lsb:httpd):	Stopped</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务后，资源还是停止状态</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource start webservice</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Wed Apr  3 05:03:07 2019</span><br><span class="line">Last change: Wed Apr  3 05:03:03 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line">     webserver	(lsb:httpd):	Started secondary</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源后正常了</span></span><br><span class="line">访问192.168.2.100，可以看到test page的字样证明成功了。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止节点2后，资源无法转移，后发现是在节点1上启动了nginx服务，停止nginx服务后仍然无法启动webserver资源。未找到原因，删除webserver资源重新添加后正常。</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/corosync/" rel="tag"># corosync</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/29/drbd基本配置使用/" rel="next" title="drbd基本配置使用">
+                <i class="fa fa-chevron-left"></i> drbd基本配置使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/29/集群概念/" rel="prev" title="集群概念">
+                集群概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">113</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OpenAIS"><span class="nav-number">1.1.</span> <span class="nav-text">OpenAIS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#corosync"><span class="nav-number">1.2.</span> <span class="nav-text">corosync</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cman"><span class="nav-number">1.3.</span> <span class="nav-text">cman</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">2.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本实现"><span class="nav-number">2.1.</span> <span class="nav-text">基本实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用crmsh配置pacemaker"><span class="nav-number">2.2.</span> <span class="nav-text">使用crmsh配置pacemaker</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#configure配置集群"><span class="nav-number">2.2.1.</span> <span class="nav-text">configure配置集群</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#node"><span class="nav-number">2.2.2.</span> <span class="nav-text">node</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#resource"><span class="nav-number">2.2.3.</span> <span class="nav-text">resource</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ra资源代理"><span class="nav-number">2.2.4.</span> <span class="nav-text">ra资源代理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置资源primitive"><span class="nav-number">2.2.5.</span> <span class="nav-text">配置资源primitive</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#高可用web"><span class="nav-number">2.2.6.</span> <span class="nav-text">高可用web</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

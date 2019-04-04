@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="消息交换和基础结构层 Messaging and Infrastructure Layer：这一层也被称为心跳层，这一层主要包含了如发送心跳信息和集群中各种事务信息  Membership Layer：也叫CCM层，用来计算整个集群中的节点状态信息的大图景，以及同步这个信息给集群中的所有节点，如集群中有几个节点，可以投几票等信息。还有组织集群拓朴的组件，所以它可以拥有整个集群的全局视图。   资">
+<meta name="keywords" content="概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集群概念">
+<meta property="og:url" content="http://yoursite.com/2019/03/29/集群概念/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="消息交换和基础结构层 Messaging and Infrastructure Layer：这一层也被称为心跳层，这一层主要包含了如发送心跳信息和集群中各种事务信息  Membership Layer：也叫CCM层，用来计算整个集群中的节点状态信息的大图景，以及同步这个信息给集群中的所有节点，如集群中有几个节点，可以投几票等信息。还有组织集群拓朴的组件，所以它可以拥有整个集群的全局视图。   资">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/cluster/架构.png">
+<meta property="og:updated_time" content="2019-03-29T09:30:10.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="集群概念">
+<meta name="twitter:description" content="消息交换和基础结构层 Messaging and Infrastructure Layer：这一层也被称为心跳层，这一层主要包含了如发送心跳信息和集群中各种事务信息  Membership Layer：也叫CCM层，用来计算整个集群中的节点状态信息的大图景，以及同步这个信息给集群中的所有节点，如集群中有几个节点，可以投几票等信息。还有组织集群拓朴的组件，所以它可以拥有整个集群的全局视图。   资">
+<meta name="twitter:image" content="http://yoursite.com/images/cluster/架构.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/29/集群概念/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>集群概念 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/集群概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">集群概念
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 14:44:46 / 修改時間：17:30:10" itemprop="dateCreated datePublished" datetime="2019-03-29T14:44:46+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/cluster/架构.png" alt=""></p>
+<h3 id="消息交换和基础结构层"><a href="#消息交换和基础结构层" class="headerlink" title="消息交换和基础结构层"></a>消息交换和基础结构层</h3><blockquote>
+<p>Messaging and Infrastructure Layer：这一层也被称为心跳层，这一层主要包含了如发送心跳信息和集群中各种事务信息 </p>
+<p>Membership Layer：也叫CCM层，用来计算整个集群中的节点状态信息的大图景，以及同步这个信息给集群中的所有节点，如集群中有几个节点，可以投几票等信息。还有组织集群拓朴的组件，所以它可以拥有整个集群的全局视图。 </p>
+</blockquote>
+<h3 id="资源分配层"><a href="#资源分配层" class="headerlink" title="资源分配层"></a>资源分配层</h3><blockquote>
+<ul>
+<li>CRM：资源分配层所采取的每个动作都是通过CRM来实现的，所以它是基础核心层，在每个节点上，CRM负责生成一个CIB，使每个节点都能了解整个集群的所有配置状态等。CRM会在集群中选举出一个节点当作DC，DC负责维持主CIB文档，所有对CIB的修改都应该通过DC来实现，而后由DC同步给其他节点，对CIB的读写都应该通过主CIB，也就是DC上的CIB，不能修改非DC的CIB，因为非DC的CIB是不会同步的。在一个集群中DC是唯一的，而且能做集群范围的修改操作及其他所有操作都是由DC来做出的。CIB是一个位于内存中的（也会同步到磁盘中），XML格式的，保存了集群每个条目的相关信息，包括集群状态，节点成员关系，定义的资源，及资源的关系等，如果要修改CIB的话可以使用各种客户端工具，如cibadmin这样的命令行工具或heartbeat GUI这样的图形化工具。DC还拥有PE和TE两个组件，一旦DC要做一个集群全局范围的修改，Policy Engine将用于实现计算集群的下一个状态，如当某一个节点离去了，此时位于这个节点上的所有资源应该被转移，之后运行在哪个节点就要由DC来决策，决策后还要修改CIB文档，PE还要将状态变化保存到CIB中，DC所做出的决策，如约束，是否爆头等都是由PE计算得出的，之后由TE负责执行。由TE将PE的决策发放给每个CRM，各CRM收到信息后，将指令发送给LRM，LRM将指令发给RA去执行。RA是脚本，可以执行基本的三个操作，start/stop/monitor </li>
+</ul>
+</blockquote>
+<h4 id="群集资源管理器-CRM"><a href="#群集资源管理器-CRM" class="headerlink" title="群集资源管理器 (CRM)"></a>群集资源管理器 (CRM)</h4><blockquote>
+<p>在资源分配层中执行的每个操作都要经过群集资源管理器。如果资源分配层的其他组件（或更高层中的组件）需要通讯，则它们通过本地 CRM 进行。在每个节点上，CRM 都会维护群集信息库 (CIB)</p>
+</blockquote>
+<h4 id="群集信息库-CIB"><a href="#群集信息库-CIB" class="headerlink" title="群集信息库 (CIB)"></a>群集信息库 (CIB)</h4><blockquote>
+<p>群集信息库是整个群集配置和当前状态在内存中的 XML 表示。它包含所有群集选项、节点、资源、约束及其之间的关系的定义。CIB 还将更新同步到所有群集节点。群集中有一个主 CIB，由指定协调器 (DC)进行维护。所有其他节点都包含 CIB 复本。</p>
+</blockquote>
+<h4 id="指定协调器-DC"><a href="#指定协调器-DC" class="headerlink" title="指定协调器 (DC)"></a>指定协调器 (DC)</h4><blockquote>
+<p>群集中的一个 CRM 会被选为 DC。DC 是群集中唯一可以决定需要在整个群集执行更改（例如节点屏蔽或资源移动）的实体。DC 同时也是用于保存 CIB 主副本的节点。所有其他节点都从当前 DC 获取他们的配置和资源分配信息。DC 是在成员资格更改后从群集的所有节点中选出的。</p>
+</blockquote>
+<h4 id="策略引擎-PE"><a href="#策略引擎-PE" class="headerlink" title="策略引擎 (PE)"></a>策略引擎 (PE)</h4><blockquote>
+<p>只要指定协调程序需要进行群集范围的更改（对新 CIB 作出反应），策略引擎就会根据群集的当前状态和配置计算其下一个状态。PE 还生成一个转换图，包含用于达到下一个群集状态的（资源）操作和依赖性的列表。PE 始终在 DC 上运行。</p>
+</blockquote>
+<h4 id="本地资源管理器-LRM"><a href="#本地资源管理器-LRM" class="headerlink" title="本地资源管理器 (LRM)"></a>本地资源管理器 (LRM)</h4><blockquote>
+<p>LRM一般由CRM提供，代表 CRM 调用本地资源代理。因此它可以执行启动/停止/监视操作并将结果报告给 CRM。LRM 是其本地节点上所有资源相关信息的权威来源。</p>
+</blockquote>
+<h3 id="资源层"><a href="#资源层" class="headerlink" title="资源层"></a>资源层</h3><blockquote>
+<p>最高层是资源层。资源层包括一个或多个资源代理 (RA)。资源代理是已写入的用来启动、停止和监视某种服务（资源）的程序（通常是shell脚本）。资源代理仅由 LRM 调用。第三方可将他们自己的代理放在文件系统中定义的位置，这样就为各自的软件提供了现成群集集成。</p>
+<p>Resource Layer：这里是一堆脚本ocf格式或lsb格式，建议使用ocf格式 </p>
+</blockquote>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>群集最多可包含 32 个 Linux 服务器。如果群集内的一台服务器发生故障，则群集内的任何其他服务器均可重启动此服务器上的资源（应用程序、服务、IP 地址和文件系统）。</p>
+<p>集群中应该有奇数个节点，如果是偶数，应该引入仲裁设备，集群中的节点通过心跳信息通告自己的健康状态，而不是探测其他主机，这意味着每个节点上都要运行一个应用程序，这些应用程序在固定的IP地址和端口上工作，通常因为是一对多的通信关系，因此是通过多播的方式向多播域内发送心跳信息和集群事务信息，其他主机看到这个信息就知道这个主机是在线的，这种功能的实现的层次称为message layer，message layer不但能传送心跳，还能传送集群事务信息，比如：如果集群发生分裂的话，失去联系并不具备法定票数的主机会被杀死。这就是集群事务内的决策信息。任何应用要想实现高可用，就要调用message layer提供的多播模式传递心跳信息和集群事务信息完成集群内部资源运行的决策，但不是所有应用都有这种能力，这就需要由CRM集群资源管理器实现，它向上可以为不具备高可用能力的服务提供高可用性，让其可以利用message layer完成高可用。向下，它利用message layer传递过来的各节点的心跳和集群事务信息，形成一个大的决策图景，从而决策都由CRM决定。因为各种资源的启动方式各有不同，为了避免这种麻烦，在CRM之上又加入了一个层次，叫LRM本地资源管理器。本地资源管理器一般都是由集群资源管理器提供的，本地资源不能做出一个资源应该如何启动与关闭，而要借助资源代理RA来实现，这是第四个层次。在每个节点上都有众多的RA，它是帮助启动关闭监控资源的脚本 。</p>
+</blockquote>
+<h4 id="资源类型"><a href="#资源类型" class="headerlink" title="资源类型"></a>资源类型</h4><blockquote>
+<ul>
+<li>Primitive：主资源，只能运行于集群内的某单个节点；只能启动一份，也称作native </li>
+<li>Group：组资源，这是一个容器类资源，它可以包含一个或多个资源，这些资源可通过“组”这个资源统一进行调度 </li>
+<li>Clone：克隆资源，可以在同一个集群内的多个节点运行多份克隆； </li>
+<li>Master/slave：主从资源，在同一集群内部于两个节点运行两份资源，其中一个为主一个为从 </li>
+</ul>
+</blockquote>
+<h4 id="资源的约束的关系"><a href="#资源的约束的关系" class="headerlink" title="资源的约束的关系"></a>资源的约束的关系</h4><blockquote>
+<ul>
+<li>location：位置约束，定义资源对节点的倾向性；用数值表示，从负无穷到正无穷 </li>
+<li>colocation：排列约束，定义资源彼此间“在一起”的倾向性；从负无穷到正无穷</li>
+<li>分组：也能实现将多个资源绑定在一起；但不能让资源不在一起 </li>
+<li>Order：顺序约束，定义资源在同一个节点上启动时的先后顺序； </li>
+</ul>
+<p>运行在哪个节点，是在资源管理器的接口上进行配置，配置有三：1.这个资源更倾向运行在哪个节点上；2.这个资源更倾向与哪个资源运行在一起，注意：一个资源不能称之为服务，比如构建一个高可用的web集群，需要IP地址，进程，页面文件等，所以高可用服务与高可用资源是两回事。高可用服务可能包括多个高可用资源。一个高可用集群中的高可用资源可能有多个，而且要分类在一起才能构建成一个服务，比如，要启动三个资源，IP在第一个节点上，进程在第二个节点上，页面文件在第三个节点上，这是没用的，因为它们要同进退的。所以哪些资源要运行在一起，不能分开。这叫资源的排列约束。这主要是定义资源在一起的倾向性的。3. 如果多个资源必须运行在同一个节点上，并提供同一个服务工作，那是否有先后次序关系呢？是否要先启动一个再启动一个。比如：是先挂载页面文件还是先启动web进程。这就是次序约束。 </p>
+</blockquote>
+<blockquote>
+<p>参考：</p>
+<p><a href="https://www.suse.com/zh-cn/documentation/sle_ha/singlehtml/book_sleha/book_sleha.html#idm140043812445408" target="_blank" rel="noopener">SUSE Linux Enterprise High Availability Extension 11 SP4 高可用性指南</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/概念/" rel="tag"># 概念</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/29/corosync&pacemaker集群部署/" rel="next" title="corosync&pacemaker集群部署">
+                <i class="fa fa-chevron-left"></i> corosync&pacemaker集群部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/02/tmux使用/" rel="prev" title="tmux使用">
+                tmux使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">113</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息交换和基础结构层"><span class="nav-number">1.</span> <span class="nav-text">消息交换和基础结构层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源分配层"><span class="nav-number">2.</span> <span class="nav-text">资源分配层</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#群集资源管理器-CRM"><span class="nav-number">2.1.</span> <span class="nav-text">群集资源管理器 (CRM)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#群集信息库-CIB"><span class="nav-number">2.2.</span> <span class="nav-text">群集信息库 (CIB)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定协调器-DC"><span class="nav-number">2.3.</span> <span class="nav-text">指定协调器 (DC)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#策略引擎-PE"><span class="nav-number">2.4.</span> <span class="nav-text">策略引擎 (PE)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本地资源管理器-LRM"><span class="nav-number">2.5.</span> <span class="nav-text">本地资源管理器 (LRM)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源层"><span class="nav-number">3.</span> <span class="nav-text">资源层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">4.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#资源类型"><span class="nav-number">4.1.</span> <span class="nav-text">资源类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#资源的约束的关系"><span class="nav-number">4.2.</span> <span class="nav-text">资源的约束的关系</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
