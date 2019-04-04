@@ -164,7 +164,8 @@ for i in `find ./ -name *.rpm`;do
 # 搜索当前目录下的所有rpm包，路径最好写绝对路径
     test=`basename $i | cut -d'.' -f1 | awk -F"-" 'OFS="-"{$NF=""}END{sub(/-$/,"");print}'`
 # 先取包名，如：drbd84-utils-8.4.1-2.el6.elrepo.x86_64.rpm，因为不想加包的版本号，所以继续取包名，使用cut命令按点来分隔，取出第一段，这时是这样的：drbd84-utils-8，再使用awk命令，指定分隔符为"-"，之后再指定输出分隔符为"-"，$NF表示最后一列，如果只写到这里，取出的值是：drbd84-utils-，只去除了以"-"为分隔符后的最后一段，但最后还有一个"-"，这样就使用END命令，在最后再处理一次，sub是内置函数，/-$/是指尾部的"-"，sub(/-$/,"")表示将尾部的"-"改为空，最后打印出来，就成了：drbd84-utils
-    yum remove -y $test
+    rpm -e --nodeps $test
+# 使用rpm -e --nodeps可以只卸载指定的包，而不卸载依赖包
 done
 ```
 

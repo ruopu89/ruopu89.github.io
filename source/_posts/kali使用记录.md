@@ -149,6 +149,14 @@ export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31  
 
 
 
+### linux下载工具motrix
+
+```shell
+号称是一款全能的下载工具，使用上的确比以往的下载工具好用。下载地址：https://motrix.app/zh-CN/
+```
+
+
+
 ### 清理家目录中的.cache文件
 
 ```shell
@@ -162,6 +170,76 @@ tmpfs                         1.6G  9.8M  1.6G    1% /run
  # 清理大于100M的文件
   ⚡ root@ruopu64  ~  find ~/.cache -type f -atime +365
   # 清理日期大于365天的文件
+```
+
+
+
+### 设置开机启动
+
+```shell
+ ⚡ ⚙ root@ruopu64  ~  vim /lib/systemd/system/rc.local.service
+ #  SPDX-License-Identifier: LGPL-2.1+
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+# This unit gets pulled automatically into multi-user.target by
+# systemd-rc-local-generator if /etc/rc.local is executable.
+[Unit]
+Description=/etc/rc.local Compatibility
+Documentation=man:systemd-rc-local-generator(8)
+ConditionFileIsExecutable=/etc/rc.local
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+RemainAfterExit=yes
+GuessMainPID=no
+
+ ⚡ ⚙ root@ruopu64  ~  vim /etc/rc.local
+ #!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+electron-ssr
+/bin/bash /root/sh/Typora.sh
+
+exit 0
+# 此文件需要手动创建。服务启动后，将要启动的命令或脚本放入此文件即可。
+
+ ⚡ ⚙ root@ruopu64  ~  systemctl start rc-local.service
+# 启动服务
+  ⚡ ⚙ root@ruopu64  ~  systemctl status rc-local.service
+  ● rc-local.service - /etc/rc.local Compatibility
+   Loaded: loaded (/lib/systemd/system/rc-local.service; static; vendo
+  Drop-In: /lib/systemd/system/rc-local.service.d
+           └─debian.conf
+   Active: active (exited) since Fri 2019-03-22 08:15:42 CST; 7min ago
+     Docs: man:systemd-rc-local-generator(8)
+  Process: 4063 ExecStart=/etc/rc.local start (code=exited, status=0/S
+
+3月 22 08:15:42 ruopu64 systemd[1]: Starting /etc/rc.local Compatibili
+3月 22 08:15:42 ruopu64 systemd[1]: Started /etc/rc.local Compatibilit
+lines 1-10/10 (END)
+# 状态应该是active
+⚡ ⚙ root@ruopu64  ~  systemctl enable rc-local
+⚡ ⚙ root@ruopu64  ~  systemctl list-unit-files
+# 查看开机启动项
 ```
 
 
@@ -463,6 +541,14 @@ perl securecrt_linux_crack.pl /usr/bin/SecureCRT
 ```shell
 apt install tofrodos
 # 此包安装后有两个命令，todos和fromdos，相当于unix2dos和dos2unix。
+```
+
+
+
+### 文件对比软件
+
+```shell
+apt install -y meld
 ```
 
 

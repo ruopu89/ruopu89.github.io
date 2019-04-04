@@ -1,4 +1,9 @@
-
+---
+title: supervisord配置使用
+date: 2019-03-11 17:00:54
+tags: supervisord
+categories: 大数据
+---
 
 ### 介绍
 
