@@ -78,9 +78,14 @@ git config --global user.email  "liji.anchang@163.com"
 4. 打开本地创建的Hexo目录，打开_config.yml文件
 5. 在配置文件中修改
 
-![1535591045608](C:\Users\r\AppData\Local\Temp\1535591045608.png)
+6. 执行命令
 
-6. 执行命令```hexo g -d```完成远程部署，如果有报错 ERROR Deployer not found: git，可以删除node_modules目录，再重新执行命令```npm install hexo-deployer-git --save```
+   ```shell
+   hexo g -d
+   # 完成远程部署，如果有报错 ERROR Deployer not found: git，可以删除node_modules目录，再重新执行下面的命令
+   npm install hexo-deployer-git --save
+   ```
+
 7. 访问name.github.io
 
 
