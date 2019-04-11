@@ -135,6 +135,11 @@ root@ruopu64:~# ntfsfix /dev/sda4
 vim ~/.bashrc
 export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31    m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$'
 # 加入这一行后，提示符只显示当前目录
+
+8. 报错"GLib-GIO-Message: 21:55:51.450: Using the 'memory' GSettings backend.  Your settings will not be saved or shared with other applications."
+vim ~/.zshrc
+export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules 
+source  ~/.zshrc
 ```
 
 
@@ -386,6 +391,14 @@ ls ~/.oh-my-zsh
 # 这是安装后的目录，其中的lib提供了核心功能的脚本库，tools提供安装、升级等功能的快捷工具、plugins自带插件的存放位置，templates是自带的zshrc模板，也就是家目录中的.zshrc文件，temes是主题存放位置，custom是个性化配置目录，自安装的插件和主题存在这里。
 主题效果查看地址：https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/
+```
+
+
+
+### GitKraken
+
+```shell
+官网：https://www.gitkraken.com/，首页左侧有git客户端下载，安装即可。
 ```
 
 
