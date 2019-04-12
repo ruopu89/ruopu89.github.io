@@ -140,6 +140,9 @@ export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31  
 vim ~/.zshrc
 export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules 
 source  ~/.zshrc
+
+9. Opera浏览器无法启动
+解决：右键Opera图标 --> 应用程序 --> 在命令栏中的最后加入--no-sandbox
 ```
 
 

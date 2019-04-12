@@ -700,3 +700,37 @@ Do you really want to remove active logical volume ruopuvg/ruopuss? [y/n]: y
 
 
 
+## 实例
+
+```shell
+# 完成一次磁盘从缩减到扩充的过程
+umount /home/ruopu/share
+umount /home
+# 卸载分区
+fuser -km /home
+# 如果分区被占用，可用此命令清理分区的使用者
+umount /home
+# 再次卸载分区
+resize2fs /dev/shouyu-vg/home 330000M
+# 将LVM分区缩减到330000M，会提示使用e2fsck -f /dev/shouyu-vg/home命令先检查
+e2fsck -f /dev/shouyu-vg/home
+# 检查
+resize2fs /dev/shouyu-vg/home 330000M
+# 再缩减
+mount /dev/shouyu-vg/home /home
+# 缩减后挂载
+df -h
+# 可以看到分区缩减了
+lvs
+vgs
+# 但lv和vg并未减少
+lvresize -L -71G /dev/shouyu-vg/home
+# 将分区真正减少，减少的磁盘容量就是缩减前与缩减后的差
+df -h
+# 真正减少了
+lvextend -r -L +20G /dev/shouyu-vg/var
+lvextend -r -l +100%free /dev/shouyu-vg/home
+# 直接给分区扩容
+# 扩容也可能失败，需要将分区再次卸载之后再使用上面命令扩容，扩容后再挂载
+```
+
