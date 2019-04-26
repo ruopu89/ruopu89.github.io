@@ -125,9 +125,3 @@ UserParameter=mysql_monitor[*],/etc/zabbix/zabbix_agentd.d/mysql_monitor.sh "$1"
 
 
 
-# 脚本监控tcp连接数
-
-```shell
-
-```
-

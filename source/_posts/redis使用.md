@@ -1,5 +1,5 @@
 ---
-title: Redis使用
+title: redis使用
 date: 2019-04-10 10:39:14
 tags: redis使用
 categories: Redis

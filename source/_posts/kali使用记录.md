@@ -183,6 +183,15 @@ root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/pr
 
 
 
+### 解压缩
+
+```shell
+apt install xarchiver
+# 可以解压rar和zip文件
+```
+
+
+
 ### 查看网速
 
 ```shell
