@@ -143,6 +143,14 @@ source  ~/.zshrc
 
 9. Opera浏览器无法启动
 解决：右键Opera图标 --> 应用程序 --> 在命令栏中的最后加入--no-sandbox
+
+10. 在没有全局代理的情况下让chrome登录google帐号
+root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/proxy.pac"
+# 使用此命令启动google浏览器就可以连接到本地的端口
+
+11. 安装xfce4桌面后，启动electron-ssr看不到系统托盘中的图标，可以使用Ctrl + Shift + w 调出程序的窗口。
+
+12. 在系统托盘中没有网络图标时，可以使用nmtui进入启用连接中连接无线网络。
 ```
 
 
@@ -161,6 +169,54 @@ source  ~/.zshrc
 
 ```shell
 号称是一款全能的下载工具，使用上的确比以往的下载工具好用。下载地址：https://motrix.app/zh-CN/
+```
+
+
+
+### 安装鼠标主题
+
+```shell
+到https://limitland.gitlab.io/flatbedcursors/下载主题，FlatbedCursors-0.5.tar.bz2 
+解压主题
+将解压的目录都放入/usr/share/icons/中
+```
+
+
+
+### 查看网速
+
+```shell
+⚡ root@ruopu64  ~  apt install -y nethogs
+# nethogs可以查看实时进程网络占用
+⚡ root@ruopu64  ~  nethogs wlan0
+# 查看某网络状态
+
+ ⚡ root@ruopu64  ~  apt install ethstatus
+ # 可以监控实时的网卡带宽占用
+ ⚡ root@ruopu64  ~  ethstatus -i wlan0
+ # 查看网卡速度
+ 
+ ⚡ root@ruopu64  ~  apt install bmon
+ # 监控网卡状态
+ ⚡ root@ruopu64  ~  bmon -p wlan0
+* 输入g控制流量面板的显示和隐藏 
+* 输入d控制详情信息的显示和隐藏 
+* 输入q退出面板 
+可以配合nginx部署通过浏览器监控网络
+
+# Netspeed是拥有GUI界面实时显示网速的工具，未测试
+sudo add-apt-repository ppa:ferramroberto/linuxfreedomlucid && sudo apt-get update 
+# 添加源
+sudo apt-get install netspeed
+```
+
+
+
+### 安装xfce4桌面
+
+```shell
+apt install xfce4 xfce4-goodies kali-desktop-xfce
+# xfce4是基础的包，xfce4-goodies是很多插件的包，kali-desktop-xfce安装后才能看到系统托盘中的网络图标。但最后还是有一些图标在系统托盘中看不到，原因不明。
 ```
 
 
