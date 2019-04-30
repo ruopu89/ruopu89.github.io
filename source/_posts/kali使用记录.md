@@ -151,16 +151,26 @@ root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/pr
 11. 安装xfce4桌面后，启动electron-ssr看不到系统托盘中的图标，可以使用Ctrl + Shift + w 调出程序的窗口。
 
 12. 在系统托盘中没有网络图标时，可以使用nmtui进入启用连接中连接无线网络。
+
+13. 安装xfce4桌面系统后没有声音。
+apt install alsamixergui
+# 安装此软件后部分解决声音问题
 ```
 
 
 
-### 在zsh中使用find命令不能使用星号
+### 安装监控软件netdata
 
 ```shell
- ⚡ root@ruopu64  ~  vim .zshrc 
- setopt no_nomatch
- # 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
+apt update
+apt install zlib1g-dev uuid-dev libmnl-dev gcc make autoconf autoconf-archive autogen automake pkg-config curl
+# 安装Netdata的依赖项，其中包括gcc（一个C编译器），GNU Autoconf工具，GUID管理和Netdata内部Web服务器的压缩库。
+apt install python python-yaml python-mysqldb python-psycopg2 nodejs lm-sensors netcat
+# 下一组软件包是可选的，但Netdata推荐使用，包括Python，一些Python软件包和Node.JS。与系统包管理器捆绑在一起的稳定版Node.js适用于Netdata的要求。
+git clone https://github.com/firehol/netdata.git --depth=1 ~/netdata
+cd ~/netdata
+./netdata-installer.sh
+安装时执行回车即可，等待完成。脚本中有一步会使用curl -sSL 命令下载安装包，如果速度太慢，可以到netdata-installer.sh脚本中取消curl的这三个选项。
 ```
 
 
@@ -459,6 +469,67 @@ ls ~/.oh-my-zsh
 # 这是安装后的目录，其中的lib提供了核心功能的脚本库，tools提供安装、升级等功能的快捷工具、plugins自带插件的存放位置，templates是自带的zshrc模板，也就是家目录中的.zshrc文件，temes是主题存放位置，custom是个性化配置目录，自安装的插件和主题存在这里。
 主题效果查看地址：https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/
+
+===============================
+    在zsh中使用find命令不能使用星号
+===============================
+ ⚡ root@ruopu64  ~  vim .zshrc 
+ setopt no_nomatch
+ # 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
+```
+
+
+
+### vim配置
+
+```shell
+在用户家目录中创建的.vimrc文件只对当前用户生效，配置后不用重新加载，立即生效。但/etc下的vimrc配置会失效，所以这个文件中要将需要的功能都写入。
+vim ~/.vimrc
+set nocompatible
+# 不与 Vi 兼容（采用 Vim 自己的操作命令）
+set nu      
+# 显示行号                                                                
+set hlsearch
+# 搜索时，高亮显示匹配结果。
+set showmatch
+# 光标遇到圆括号、方括号、大括号时，自动高亮对应的另一个圆括号、方括号和大括号。
+set history=1000
+# Vim 需要记住多少次历史操作。
+syntax on
+# 打开语法高亮。自动识别代码，使用多种颜色显示。即使加载时报错，也要加入此行
+set cursorline
+# 光标所在的当前行高亮。
+set showcmd
+# 命令模式下，在底部显示，当前键入的指令。比如，键入的指令是2y3d，那么底部就会显示2y3，当键入d的时候，操作完成，显示消失。
+set autoindent
+# 按下回车键后，下一行的缩进会自动跟上一行的缩进保持一致。
+set expandtab
+# 由于 Tab 键在不同的编辑器缩进不一致，该设置自动将 Tab 转为空格。
+set wrap
+# 自动折行，即太长的行分成几行显示。
+set incsearch
+# 输入搜索模式时，每输入一个字符，就自动跳到第一个匹配的结果。
+set ignorecase
+# 搜索时忽略大小写。
+colorscheme slate 即使加载时报错，也要加入此行
+# 调整配色方案，还有default、blue、darkblue、delek、desert、elflord、evening、industry、koehler、morning、murphy、pablo、peachpuff、ron、shine、slate、torte、zellner
+highlight StatusLine guifg=SlateBlue guibg=Yellow 
+highlight StatusLineNC guifg=Gray guibg=White
+# 状态行颜色，不使用
+set tabstop=4 
+＃ 制表符为4
+set softtabstop=4 
+set shiftwidth=4
+＃ 统一缩进为4 
+# 创建.vimrc文件后就可以在命令行中使用鼠标右键了，这是抵消了/etc/vimrc文件中的设置。
+
+vim命令粘贴带数字或符号的信息时格式混乱解决
+使用vim打开文件时，使用:set paste命令关闭缩进功能就可以解决了。如果要开启缩进功能，使用命令:set nopaste。或一种方法是，打开.vimrc文件，加入set pastetoggle=<F9>，之后可以使用F9键来切换缩进功能了。配置文件中的<F9>是按F9键录入的。
+
+在vim中，使用%表示全文
+
+关闭高亮
+:nohl
 ```
 
 
@@ -534,7 +605,7 @@ apt install linux-headers-$(uname -r)
 直接无法启动，没有反应
  vim /usr/share/applications/netease-cloud-music.desktop
     ...
-    Exec=netease-cloud-music --o-sandbox %U
+    Exec=netease-cloud-music --no-sandbox %U
     ...
 # 修改上面一行的设置
 如果上面的设置不起作用，就需要使用sudo启动软件了
@@ -558,6 +629,9 @@ chmod +x unetbootin-linux
 ```shell
 apt install flameshot
 设置>工作区>快捷键>全局快捷键，之后选择加号，然后选择要使用快捷键的程序，在右侧设置此程序的快捷键。
+
+⚡ root@ruopu64  ~  apt install deepin-screenshot
+# 这个软件在xfce4环境下更管用，在xfce4环境中安装上面的软件打不开。
 ```
 
 
@@ -691,6 +765,11 @@ apt install thunderbird evolution
 ### everynote云笔记
 ```shell
 apt install nixnote2
+
+tusk是另一款evernote第三方客户端，下载地址：https://github.com/klaussinani/tusk/releases/tag/v0.22.0
+使用中发现两个问题，一是打开软件需要等待较长时间，才能登录evernote，大概三至五分钟。第二是复制到软件内的图片无法显示，如果单独再复制一次，在网页版的evernote上就会看到两张同样的图片。
+
+whatever是一款evernote第三方客户端，下载地址：https://sourceforge.net/projects/whatever-evernote-client/files/v1.0.0/Whatever_1.0.0_amd64.deb/download。登录缓慢，登录后无法打开，一片空白。
 ```
 
 

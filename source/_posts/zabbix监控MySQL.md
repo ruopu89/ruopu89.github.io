@@ -33,9 +33,9 @@ categories: 监控
 -------------
     Client
 -------------
-[root@zabbixagent ~]# wget https://www.percona.com/downloads/percona-monitoring-plugins/percona-monitoring-plugins-1.1.8/binary/redhat/6/x86_64/percona-zabbix-templates-1.1.8-1.noarch.rpm
+[root@zabbixagent ~]# wget https://www.percona.com/downloads/percona-monitoring-plugins/percona-monitoring-plugins-1.1.8/binary/redhat/7/x86_64/percona-zabbix-templates-1.1.8-1.noarch.rpm
 [root@zabbixagent ~]# rpm -ivh percona-zabbix-templates-1.1.8-1.noarch.rpm
-# 下載percona-zabbix-templates-1.1.6-1.noarch.rpm包到客戶端並安裝
+# 下載percona-zabbix-templates-1.1.8-1.noarch.rpm包到客戶端並安裝
 [root@zabbixagent ~]# rpm -ql percona-zabbix-templates
 /var/lib/zabbix/percona
 /var/lib/zabbix/percona/scripts
@@ -52,6 +52,7 @@ categories: 监控
 # 複製配置文件到zabbix客戶端
 [root@zabbixagent ~]# systemctl restart zabbix-agent
 [root@zabbixagent ~]# yum install mariadb-server php php-mysql
+# 在不能联网的情况下，如果安装php-mysql可能要依赖	mysql-community-libs-compat-5.7.22-1.el7.x86_64.rpm包。可以到https://centos.pkgs.org/7/mysql-5.7-x86_64/mysql-community-libs-compat-5.7.22-1.el7.x86_64.rpm.html下载
 [root@zabbixagent ~]# systemctl start mariadb
 [root@zabbixagent ~]# mysql_secure_installation
 [root@zabbixagent ~]# chown -R zabbix. /var/lib/zabbix/
@@ -79,7 +80,8 @@ socket=/var/lib/mysql/mysql.sock
 [root@zabbixagent scripts]# wget http://jaminzhang.github.io/soft-conf/Zabbix/zbx_percona_mysql_template.xml
 # 下载模板到本地
 # /var/lib/zabbix/percona/templates/zabbix_agent_template_percona_mysql_server_ht_2.0.9-sver1.1.8.xml是安装percona时生成的模板，但导入此模板时会报错："标签无效 "/zabbix_export/date": "YYYY-MM-DDThh:mm:ssZ" 预计"，有说可以将模板先导入zabbix2.4版本中再导出，之后再导入3.0版本就不会有这个问题了。
-打开管理页面中配置 --> 模板 --> 导入，之后选择上面下载的模板即可。导入成功后，会有一个叫Template Percona MySQL Server的模板导入进来。之後將模板克隆一份並改為主動監控模式。然後在主機部分關聯此模板。最後就可以在Monitoring中查看到Graphs了，另外導入的模板中還包括大量Screen都可以為主機添加上，以便在Screen中展示。在主动采集数据模式下，此模板才会显示正常启动。如果是被动采集模式，模板中的监控项均会显示不支持的。
+打开管理页面中配置 --> 模板 --> 导入，之后选择上面下载的模板，勾选图形和聚合图形的前两项，点击导入即可。导入成功后，会有一个叫Template Percona MySQL Server的模板导入进来。之後將模板克隆一份並改為主動監控模式。然後在主機部分關聯此模板。最後就可以在Monitoring中查看到Graphs了，另外導入的模板中還包括大量Screen都可以為主機添加上，以便在Screen中展示。在主动采集数据模式下，此模板才会显示正常启动。如果是被动采集模式，模板中的监控项均会显示不支持的。
+如果是被动模式，会提示"Timeout while executing shell script"，这可以调大客户端的Timeout选项为30
 ```
 
 

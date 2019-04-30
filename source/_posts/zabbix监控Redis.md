@@ -27,7 +27,7 @@ LISTEN     0      128          *:6379                     *:*
 [root@zabbixagent zabbix_agentd.d]# vim all.conf
 UserParameter=redis_status[*],/etc/zabbix/zabbix_agentd.d/redis_status.sh "$1" "$2" "$3"
 [root@zabbixagent zabbix]# vim redis_status.sh
-# 测试中，如果将脚本放在zabbix_agentd.d目录下，重启zabbix-agent时会报错"invalid entry "redis_status(){" (not following "parameter=value" notation) in config file "/etc/zabbix/zabbix_agentd.d/redis_status.sh", line 3"
+# 测试中，如果将脚本放在zabbix_agentd.d目录下，重启zabbix-agent时会报错"invalid entry "redis_status(){" (not following "parameter=value" notation) in config file "/etc/zabbix/zabbix_agentd.d/redis_status.sh", line 3"，所以将脚本放在了/etc/zabbix目录下，或在/etc/zabbix下创建一个scripts目录也可以。
 #!/bin/bash
 #
 redis_status(){
@@ -61,5 +61,6 @@ main $1 $2 $3
 [root@zabbixagent zabbix_agentd.d]# bash redis_status.sh redis_status 6379 used_cpu_sys
 0.36
 # 测试，取出CPU中的某个数据
+下面创建监控项与图形、触发器即可。
 ```
 
