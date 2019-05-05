@@ -110,7 +110,44 @@ apt update
 3. 新装系统后，安装完各种包后，重启无法进入系统，发现是登录页面的左上角的会话中没有了相应的图形环境。需要重新安装。如：apt install kali-defaults kali-root-login desktop-base kde-plasma-desktop，安装完之后重启即可解决。
 参考： https://www.52os.net/articles/kail-change-desktop-environment.html(kali切换桌面环境)
 
-4. 安装完VMware后，无法启动，提示“GNU C Compiler(gcc)version 7.3 was not found”
+4. 调整LVM后，开机启动有问题，无法正常进入图形界面，注释/etc/fstab文件中有问题的LVM卷自动挂载后正常，进入系统后修复。
+
+5. 挂载提示"The disk contains an unclean file system (0, 0).Metadata kept in Windows cache, refused to mount. Falling back to read-only mount because the NTFS partition is in an unsafe state. Please resume and shutdown Windows fully (no hibernation or fast restartin"
+root@ruopu64:~# ntfsfix /dev/sda4
+# 修复有问题的分区即可
+
+6. 修改命令提示符
+vim ~/.bashrc
+export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31    m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$'
+# 加入这一行后，提示符只显示当前目录
+
+7. 报错"GLib-GIO-Message: 21:55:51.450: Using the 'memory' GSettings backend.  Your settings will not be saved or shared with other applications."
+vim ~/.zshrc
+export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules 
+source  ~/.zshrc
+
+8. Opera浏览器无法启动
+解决：右键Opera图标 --> 应用程序 --> 在命令栏中的最后加入--no-sandbox
+
+9. 在没有全局代理的情况下让chrome登录google帐号
+root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/proxy.pac"
+# 使用此命令启动google浏览器就可以连接到本地的端口
+
+10. 安装xfce4桌面后，启动electron-ssr看不到系统托盘中的图标，可以使用Ctrl + Shift + w 调出程序的窗口。
+
+11. 在系统托盘中没有网络图标时，可以使用nmtui进入启用连接中连接无线网络。
+
+12. 安装xfce4桌面系统后没有声音。
+apt install alsamixergui
+# 安装此软件后部分解决声音问题
+```
+
+
+
+### VMWare问题解决
+
+```shell
+1. 安装完VMware后，无法启动，提示“GNU C Compiler(gcc)version 7.3 was not found”
 gcc --version
 # 现在是8.2版本
 apt install -y gcc-7
@@ -125,36 +162,14 @@ gcc --version
 apt install linux-headers-$(uname -r)
 # 安装后重启系统，就可以进入软件了。
 
-5. 调整LVM后，开机启动有问题，无法正常进入图形界面，注释/etc/fstab文件中有问题的LVM卷自动挂载后正常，进入系统后修复。
+2. 安装vmware-workstation15，安装完成后启动提示“Kernel Headers for version X.X.XX-XX-XX were not found”
+解决办法
+apt install linux-headers-$(uname -r)
+# 安装这个头文件后，启动就正常了
 
-6. 挂载提示"The disk contains an unclean file system (0, 0).Metadata kept in Windows cache, refused to mount. Falling back to read-only mount because the NTFS partition is in an unsafe state. Please resume and shutdown Windows fully (no hibernation or fast restartin"
-root@ruopu64:~# ntfsfix /dev/sda4
-# 修复有问题的分区即可
-
-7. 修改命令提示符
-vim ~/.bashrc
-export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;31    m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$'
-# 加入这一行后，提示符只显示当前目录
-
-8. 报错"GLib-GIO-Message: 21:55:51.450: Using the 'memory' GSettings backend.  Your settings will not be saved or shared with other applications."
-vim ~/.zshrc
-export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules 
-source  ~/.zshrc
-
-9. Opera浏览器无法启动
-解决：右键Opera图标 --> 应用程序 --> 在命令栏中的最后加入--no-sandbox
-
-10. 在没有全局代理的情况下让chrome登录google帐号
-root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/proxy.pac"
-# 使用此命令启动google浏览器就可以连接到本地的端口
-
-11. 安装xfce4桌面后，启动electron-ssr看不到系统托盘中的图标，可以使用Ctrl + Shift + w 调出程序的窗口。
-
-12. 在系统托盘中没有网络图标时，可以使用nmtui进入启用连接中连接无线网络。
-
-13. 安装xfce4桌面系统后没有声音。
-apt install alsamixergui
-# 安装此软件后部分解决声音问题
+3. 安装VMWare-tools时报错:"there was a problem updating a software component. try again later and if the"，实际是下载有问题
+手动解决：
+下载地址：http://softwareupdate.vmware.com/cds/vmw-desktop/ws/15.0.4/12990004/windows/packages/，下载其中的tools-windows.tar，之后将其解压，在虚拟机中加载解压后的iso文件即可手动安装。
 ```
 
 
@@ -171,6 +186,43 @@ git clone https://github.com/firehol/netdata.git --depth=1 ~/netdata
 cd ~/netdata
 ./netdata-installer.sh
 安装时执行回车即可，等待完成。脚本中有一步会使用curl -sSL 命令下载安装包，如果速度太慢，可以到netdata-installer.sh脚本中取消curl的这三个选项。
+```
+
+
+
+### 安装微信
+
+```shell
+wget https://github.com/geeeeeeeeek/electronic-wechat/releases/download/v1.4.0/linux-x64.tar.gz
+tar xf linux-x64.tar.gz
+./electronic-wechat-linux-x64/electronic-wechat
+```
+
+
+
+### 创建启动器
+
+```shell
+# Linux 系统中的Desktop Entry 文件以desktop为后缀名。Desktop Entry 文件是 Linux 桌面系统中用于描述程序启动配置信息的文件。
+wget https://raw.githubusercontent.com/geeeeeeeeek/electronic-wechat/master/assets/icon.png -O electronic-wechat.png
+# 下载一个微信图标
+mv electronic-wechat.png works/ubuntutool/electronWechat/electronic-wechat-linux-x64/
+# 将图标与执行程序放在一起
+vim /usr/share/applications/electronic-wechat.desktop
+[Desktop Entry]                                                                 
+Name=Electronic Wechat
+Name[zh_CN]=微信电脑版
+Name[zh_TW]=微信电脑版
+Exec=/root/works/ubuntutool/electronWechat/electronic-wechat-linux-x64/electronic-wechat
+Icon=/root/works/ubuntutool/electronWechat/electronic-wechat-linux-x64/electronic-wechat.png
+Terminal=false
+# 软件打开时是否启动终端
+X-MultipleArgs=false
+Type=Application
+Encoding=UTF-8
+Categories=Application;Utility;Network;InstantMessaging;
+StartupNotify=false
+编辑完上面的文件，进入/usr/share/applications 目录就可以看到一个叫微信电脑版的图标，可以在图标上右键，将其发送至桌面，之后就可以双击这个图标启动微信了。
 ```
 
 
@@ -422,7 +474,7 @@ export GTK_IM_MODULE=xim
  ⚡ root@ruopu64  ~  gdebi firefox-esr_52.8.0esr-1\~deb7u1_amd64.deb
  # 安装老版本的firefox，如果有依赖问题，就先安装依赖包
  安装好之后，打开firefox，在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。
- 访问https://211.99.15.34:6443下载插件，之后解压，在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，登录后就可以访问内网了。
+ 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份执行解压后目录中的install.sh脚本，之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，登录后就可以访问内网了。
 ```
 
 
@@ -447,7 +499,7 @@ apt-mark unhold firefox-esr
 
 
 
-### 安装oh-my-zsh
+### 安装oh-my-zsh及问题解决
 ```shell
 apt install -y zsh
 # 安装zsh
@@ -471,7 +523,7 @@ ls ~/.oh-my-zsh
 zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/
 
 ===============================
-    在zsh中使用find命令不能使用星号
+  在zsh中使用find命令不能使用星号
 ===============================
  ⚡ root@ruopu64  ~  vim .zshrc 
  setopt no_nomatch
@@ -586,16 +638,6 @@ root@ruopu64:~#ln -sv /usr/bin/tilix.wrapper /usr/bin/konsole
 # 这样打开终端时就会使用tilix了。
 # 尝试使用root@ruopu64:~#update-alternatives --config x-terminal-emulator命令修改没有成功
 # 在设置中的应用程序中修改默认打开的终端也没有成功
-```
-
-
-
-### vmware-workstation
-```shell
-安装vmware-workstation15，安装完成后启动提示“Kernel Headers for version X.X.XX-XX-XX were not found”
-解决办法
-apt install linux-headers-$(uname -r)
-# 安装这个头文件后，启动就正常了
 ```
 
 
