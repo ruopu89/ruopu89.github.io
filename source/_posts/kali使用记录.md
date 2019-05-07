@@ -170,6 +170,8 @@ apt install linux-headers-$(uname -r)
 3. 安装VMWare-tools时报错:"there was a problem updating a software component. try again later and if the"，实际是下载有问题
 手动解决：
 下载地址：http://softwareupdate.vmware.com/cds/vmw-desktop/ws/15.0.4/12990004/windows/packages/，下载其中的tools-windows.tar，之后将其解压，在虚拟机中加载解压后的iso文件即可手动安装。
+
+4. 添加共享文件夹后，在虚拟机的网络中可以查看到，前提是安装了vmware-tools。
 ```
 
 
