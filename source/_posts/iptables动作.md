@@ -94,6 +94,7 @@ Oct 16 17:41:08 localhost kernel: want-in-from-port-22IN=eno16777736 OUT= MAC=00
 [root@localhost ~]# iptables -t nat -A POSTROUTING -s 192.168.116.0/24 -j SNAT --to-source 10.5.5.91
 # 添加规则，让内网主机经过防火墙出去时的地址都改为防火墙的外网地址。"-t nat"表示操作nat表。filter表的功能是过滤，nat表的功能就是地址转换，所以我们需要在nat表中定义nat规则。"-A POSTROUTING"表示将SNAT规则添加到POSTROUTING链的末尾，在centos7中，SNAT规则只能存在于POSTROUTING链与INPUT链中，在centos6中，SNAT规则只能存在于POSTROUTING链中。"-j SNAT"表示使用SNAT动作，对匹配到的报文进行处理，对匹配到的报文进行源地址转换。"--to-source 10.5.5.91"表示将匹配到的报文的源IP修改为10.5.5.91
 # 在centos7中，SNAT规则也可以定义在INPUT链中，我们可以这样理解，发往本机的报文经过INPUT链以后报文就到达了本机，如果再不修改报文的源地址，就没有机会修改了。
+# 这时还要注意客户端是否有多块网卡，默认路由是什么，如果有多块网卡，默认路由又不是从我们想要的出去的网卡，可以暂时关闭不需要的网卡。如果不关闭，客户端也是不能访问互联网的。
 [root@localhost ~]# iptables -t nat --line -nvxL
 Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)
 num      pkts      bytes target     prot opt in     out     source               destination         
