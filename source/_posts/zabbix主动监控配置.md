@@ -51,14 +51,14 @@ zabbixAgent: 192.168.2.138
     zabbixProxy
 ----------------------
 ********
-   安装
+  安装
 ********
 [root@zabbixproxy ~]# wget https://mirrors.aliyun.com/zabbix/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
 [root@zabbixproxy ~]# yum install -y zabbix-release-3.0-1.el7.noarch.rpm 
 [root@zabbixproxy ~]# yum install -y zabbix-proxy-mysql.x86_64 zabbix-get.x86_64 zabbix-agent.x86_64  zabbix-sender.x86_64 mariadb-server
 
 *****************
-    mysql端配置
+   mysql端配置
 *****************
 [root@zabbixproxy ~]# vim /etc/my.cnf
 [mysqld]
@@ -80,7 +80,7 @@ MariaDB [(none)]> use zabbix_proxy
 MariaDB [zabbix_proxy]> SHOW TABLES;
 
 *****************
-    Proxy端配置
+   Proxy端配置
 *****************
 [root@zabbixproxy ~]# cd /etc/zabbix/
 [root@zabbixproxy zabbix]# cp zabbix_proxy.conf{,.bak} 
@@ -103,17 +103,18 @@ DBUser=zproxy
 DBPassword=zproxy
 DBPort=3306
 ProxyLocalBuffer=72
-# 保存多久的数据。这里是72小时
+# 设置zabbix proxy暂存在本地mysql的监控数据的时间。默认是0，不暂存。即使zabbix proxy已经把数据发送给了zabbix server，还是会暂存数据在本地设置的时间。取值范围是0~720小时
 ProxyOfflineBuffer=720
-# 这个时间可以长一些
+# 设置当zabbix proxy与zabbix server无法连接时保留监控数据的时间间隔。默认是1小时，取值是1~720小时。这个参数特别有用，在维护中，停掉zabbix server后如果没有设置zabbix proxy的这个参数，所以当维护结束后启动zabbix server，会发现有段时间内的数据没有。这是因zabbix proxy按照默认的保留时间执行housekeeper把过期的数据删除了。
+# 这个时间最好根据要维护的时间来设定，比如要维护10个小时，那么就要设置ProxyOfflineBuffer=10
 HeartbeatFrequency=60
-# 心跳间隔检测时间，默认60秒，范围0-3600秒，被动模式不使用
+# 每隔60秒探测一下服务器的活动状态，心跳间隔检测时间，默认60秒，范围0-3600秒，被动模式不使用
 ConfigFrequency=5
-# 间隔多久从zabbix server获取监控信息
+# 代理在几秒钟内从zabbix服务器检索配置数据的频率
 DataSenderFrequency=5
 # 数据发送时间间隔，默认为1秒，范围为1=3600秒，被动模式不使用
 StartPollers=50
-# 启动的线程数，与客户端的数据保持一致
+# 轮询器的预分叉实例数。启动的线程数，与客户端的数据保持一致
 JavaGateway=192.168.2.140
 JavaGatewayPort=10052
 # java-gateway服务器地址和端口
@@ -130,10 +131,10 @@ LISTEN     0      128         :::10051                   :::*
 # zabbix-proxy也会监听10051端口
 
 ----------------------
-    zabbixProxy
+    zabbixAgent
 ----------------------
 *****************
-    agent端配置
+   agent端配置
 *****************
 [root@zabbixagent ~]# cd /etc/zabbix/
 [root@zabbixagent zabbix]# cp zabbix_agentd.conf{,.bak}
@@ -144,8 +145,10 @@ LogFileSize=0
 Server=192.168.2.137
 ServerActive=192.168.2.137
 # 這裡的Server與ServerActive兩項設置都是有用的，如果註釋了Server一行，啟動會報錯，這裡都輸入Proxy端的地址即可。
+StartAgents=0
+# 如果加入了此项，就可以关闭被动模式，也可以注释掉Server项。不建议使用此项并注释Server项，有可能使agent端无法启动
 Hostname=192.168.2.138
-Include=/etc/zabbix/zabbix_agentd.d/
+Include=/etc/zabbix/zabbix_agentd.d/*.conf
 [root@zabbixagent zabbix]# systemctl restart zabbix-agent
 
 ----------------------

@@ -2,7 +2,7 @@
 title: zookeeper&kafka部署
 date: 2019-01-21 14:51:45
 tags: zookeeper&kafka部署
-categories: zookeeper&kafka
+categories: 消息队列
 ---
 
 ### kafka配置文件說明

@@ -67,7 +67,7 @@ categories: 监控
 skip_name_resolve = ON
 innodb_file_per_table = ON
 [root@zabbix ~]# systemctl start mariadb.service
-[root@zabbix ~]# systemctl enalbe mariadb.service
+[root@zabbix ~]# systemctl enable mariadb.service
 [root@zabbix ~]# mysql_secure_installation
 [root@zabbix ~]# mysql -uroot -pcentos
 MariaDB [(none)]> CREATE DATABASE zabbix CHARSET 'utf8';
@@ -78,6 +78,7 @@ MariaDB [(none)]> FLUSH PRIVILEGES;
    安装zabbix_server
 -----------------------------
 [root@zabbix ~]# wget https://mirrors.aliyun.com/zabbix/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
+# 4.0版本下载地址：https://mirrors.aliyun.com/zabbix/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm 
 [root@zabbix ~]# yum install -y zabbix-release-3.0-1.el7.noarch.rpm
 # 下载源文件并安装
 [root@zabbix ~]# vim /etc/yum.repos.d/zabbix.repo
@@ -95,7 +96,9 @@ enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
 gpgcheck=0
 # 将gpgcheck都改为0
-[root@zabbix ~]# yum install -y zabbix-server-mysql.x86_64 zabbix-web.noarch zabbix-get.x86_64 zabbix-web-mysql.noarch zabbix-agent.x86_64 zabbix-sender.x86_64 httpd php php-mysql php-mbstring php-gd php-bcmath php-ldap php-xml
+# 上面的repo地址可能连接有问题，可以将[zabbix]中的baseurl改为阿里地址，https://mirrors.aliyun.com/zabbix/zabbix/4.0/rhel/7/x86_64/。
+[root@zabbix ~]# yum install -y zabbix-server-mysql.x86_64 zabbix-web.noarch zabbix-get.x86_64 zabbix-web-mysql.noarch zabbix-agent.x86_64 zabbix-sender.x86_64 httpd php php-mysql php-mbstring php-gd php-bcmath php-ldap php-xml 
+# 安装4.0版本需要先安装libiksemel.so.3，libiksemel.so.3在iksemel-1.4-6.sdl7.x86_64.rpm包中，下载地址：https://centos.pkgs.org/7/puias-unsupported-x86_64/iksemel-1.4-6.sdl7.x86_64.rpm.html
 # 安装zabbix相关包
 # zabbix程序组件
 # zabbix_server：服务端守护进程
@@ -159,7 +162,7 @@ LogSlowQueries=3000
 php_value date.timezone Asia/Shanghai   
 # 配置时区
 [root@zabbix ~]# systemctl start httpd
-下面进入页面访问安装
+下面进入页面访问安装，地址:IP/zabbix
 ```
 
 ![](/images/zabbix/安装1.png)
@@ -194,6 +197,8 @@ php_value date.timezone Asia/Shanghai
 ----------------------------
    安装zabbix_agent
 ----------------------------
+[root@zabbix ~]# yum install zabbix-agent zabbix-sender
+# 这里以在server端安装agent端为例，可按此方法在其他主机安装agent端
 [root@zabbix ~]# cd /etc/zabbix/
 [root@zabbix ~]# cp zabbix_agentd.conf{,.bak}
 [root@zabbix ~]# vim zabbix_agentd.conf
@@ -204,6 +209,7 @@ Server=127.0.0.1,192.168.2.140
 # 被动模式下需要设置，从哪个服务器连接agent，这里要输入的是zabbix_server的地址。
 ServerActive=127.0.0.1
 #  主动模式下需要设置，向哪个服务器发送数据，这里要输入的是zabbix_server的地址。
+# 主动与被动指的是客户端主动还是被动
 Hostname=Zabbix server
 # 主动模式下必须设置，被动模式不需要
 Include=/etc/zabbix/zabbix_agentd.d/
@@ -227,7 +233,7 @@ zabbix_get [4179]: Get value error: cannot connect to [[192.168.2.140]:10050]: [
 点击右上角的Admin图标，进入页面选择Language为Chinese(zh_CN)，再次刷新页面后就会变为中文，但还是会有问题。就是在图形展示时，图形下的说明文字会有乱码问题，解决方法如下：
 
 ```shell
-从windows系统中复制simkai.ttf字体到CentOS系统
+从windows系统中复制simkai.ttf（楷体）字体到CentOS系统
 [root@zabbix ~]# cp simkai.ttf /usr/share/fonts/
 # 将字体复制到/usr/share/fonts/
 [root@zabbix ~]# chmod +r /usr/share/fonts/simkai.ttf

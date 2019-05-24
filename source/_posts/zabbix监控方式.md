@@ -66,6 +66,8 @@ Zabbix中提供了一些标准的监控项可以使用Key，当你添加Zabbix a
 
 
 
+# 监控项
+
 ## Simple checks
 
 Zabbix 中simple checks是基于ICMP ping或者端口检测来确定主机是否在线或服务端口能否正常连接。这种方式下主机中不需要安装Zabbix agent，当我们检测主机或端口的可用性时simplechecks返回的值为1或者0，当我们检测性能时返回的是浮点数（如检测ping的响应时间时返回值0.02秒），如果检测失败则返回0。

@@ -2,7 +2,7 @@
 title: zookeeper概念
 date: 2019-01-18 22:07:12
 tags: zookeeper概念
-categories: zookeeper&kafka
+categories: 消息队列
 ---
 
 ## 概念

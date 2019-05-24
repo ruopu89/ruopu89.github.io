@@ -81,6 +81,7 @@ JavaGatewayPort=10052
 StartJavaPollers=50
 SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
 CacheSize=512M
+# 用于存储主机、项和触发器数据的共享内存大小。
 Timeout=10
 AlertScriptsPath=/usr/lib/zabbix/alertscripts
 ExternalScripts=/usr/lib/zabbix/externalscripts
@@ -136,16 +137,23 @@ CATALINA_OPTS="$CATALINA_OPTS
     -Dcom.sun.management.jmxremote.ssh=false
     -Djava.rmi.server.hostname=192.168.2.138"
     # 这里输入的是tomcat的监听地址
-# 这是一个脚本，在脚本的最后加入上面内容
+
 [root@zabbixagent ~]# systemctl start tomcat
 [root@zabbixagent ~]# ss -tln
-State       Recv-Q Send-Q                   Local Address:Port                                  Peer Address:Port              
-LISTEN      0      128                                  *:22                                               *:*                  
-LISTEN      0      100                          127.0.0.1:25                                               *:*                  
-LISTEN      0      100                                 :::8080                                            :::*                  
-LISTEN      0      128                                 :::22                                              :::*                  
-LISTEN      0      100                                ::1:25                                              :::*                  
-LISTEN      0      100                                 :::8009                                            :::*  
+State       Recv-Q Send-Q Local Address:Port               Peer Address:Port              
+LISTEN      0      128          *:22                       *:*                  
+LISTEN      0      100    127.0.0.1:25                       *:*                  
+LISTEN      0      128          *:10050                    *:*                  
+LISTEN      0      100         :::8080                    :::*                  
+LISTEN      0      128         :::22                      :::*                  
+LISTEN      0      50          :::12345                   :::*                  
+LISTEN      0      100        ::1:25                      :::*                  
+LISTEN      0      50          :::42204                   :::*                  
+LISTEN      0      50          :::35969                   :::*                  
+LISTEN      0      128         :::10050                   :::*                  
+LISTEN      0      1         ::ffff:127.0.0.1:8005                    :::*                  
+LISTEN      0      100         :::8009                    :::*   
+# 这时tomcat监听了12345端口
 [root@zabbixagent ~]# tomcat version
 Server version: Apache Tomcat/7.0.76
 Server built:   Mar 12 2019 10:11:36 UTC
@@ -172,7 +180,7 @@ JVM Vendor:     Oracle Corporation
 
 ![](/images/zabbix/monitortomcat2.png)
 
-3. 添加模板，先按链接指示器中select选择模板，选好后点Add，最后完成点Update 
+3. 添加模板，先按链接指示器中select选择模板，选好后点Add，最后完成点Update。在4.0版本中模板叫Template App Apache Tomcat JMX，Template App Generic Java JMX
 
 ![](/images/zabbix/monitortomcat3.png)
 

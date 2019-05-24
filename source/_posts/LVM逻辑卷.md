@@ -182,6 +182,7 @@ fdisk -l
 * VG
 [root@bogon ~]# vgcreate -s 16M ruopuvg /dev/sdb{1,2,3}
   Volume group "ruopuvg" successfully created
+# -s：卷组上的物理卷的PE大小；ruopuvg是vg的名称
 [root@bogon ~]# vgscan 
   Reading volume groups from cache.
   Found volume group "ruopuvg" using metadata type lvm2
@@ -700,7 +701,7 @@ Do you really want to remove active logical volume ruopuvg/ruopuss? [y/n]: y
 
 
 
-## 实例
+## 实例1
 
 ```shell
 # 完成一次磁盘从缩减到扩充的过程
@@ -732,5 +733,16 @@ lvextend -r -L +20G /dev/shouyu-vg/var
 lvextend -r -l +100%free /dev/shouyu-vg/home
 # 直接给分区扩容
 # 扩容也可能失败，需要将分区再次卸载之后再使用上面命令扩容，扩容后再挂载
+```
+
+
+
+## 实例2
+
+```shell
+pvcreate /dev/sd{b,c,d,e}1
+vgcreate -s 16M raid50 /dev/sd{b,c,d,e}1
+lvcreate -l 100%free -n storage raid50
+# 将所有空间分配给逻辑卷
 ```
 
