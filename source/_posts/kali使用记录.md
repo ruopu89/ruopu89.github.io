@@ -883,3 +883,21 @@ root@ruopu64:networks#virsh net-list
  default   active   yes         yes
 # 下面可以安装虚拟机
 ```
+
+
+
+### 安装Robo 3T
+
+```shell
+官网下载robo3t-1.3.1-linux-x86_64-7419c406.tar.gz
+解压文件，到目录中执行bin目录下的robo3t即可打开
+```
+
+
+
+### 安装JMeter
+
+```shell
+官网http://jmeter.apache.org/download_jmeter.cgi，下载Apache的JMeter的-5.1.1.tgz。解压文件，执行解压后的目录中的bin目录下的jmeter即可打开。
+```
+
