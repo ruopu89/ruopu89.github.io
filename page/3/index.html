@@ -350,6 +350,516 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/03/NFS配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/03/NFS配置使用/" itemprop="url">
+                  NFS配置使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-04-03 14:53:41 / 修改時間：17:53:23" itemprop="dateCreated datePublished" datetime="2019-04-03T14:53:41+08:00">2019-04-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>ext3、ext2等文件系統工作在內核空間，任何程序只要能夠執行都工作在用戶空間，如mke2fs命令工作在用戶空間，NFS是文件系統，工作在內核空間；內核空間中的程序只有內核自我能夠管理。</p>
+<p>向磁盤讀寫數據要通過內核調用也叫函數調用，如read()，write()，函數執行要經過一個過程，所以函數調用又叫過程調用；一般本地應用程序實現某個操作的時候都是通過本地的過程調用來完成的，叫作local procedure call，就是本地的兩個程序或程序與內核之間調用函數完成某種功能的過程；作爲程序員，如果想與某個程序交互，只要某個程序提供函數就可以交互了；</p>
+<p>LPC：本地過程調用，local procedure call</p>
+<p>RPC：遠程過程調用，Remote procedure call</p>
+<p>客戶端與遠程服務器端通過一個RPC客戶端（RPC客戶端叫stub：存根客戶端）與服務器端（運行的是RPC server）聯系，實現數據的讀取，RPC服務器端監聽的套接字是隨機的。linux提供rpc服務的程序叫Portmap，監聽在111/tcp, 111/udp端口。</p>
+<p>RPC（框架）是一種編程技術，可以簡化分布式應用程序的開發。从RPC的客戶端向RPC的服務器端發起通信，RPC服務器端再將用戶請求真正轉給客戶端真正請求的服務器端。c –&gt; rpc c –&gt; rpc s –&gt; s</p>
+<p>NFS Client →  NFS Server</p>
+<p>RPC通信既可基於二進制也可基於文本格式進行數據交換，基於文本格式比較常見的叫XMLRPC，之後又發展出SOAP（Simple Object Access Protocol）簡單對象訪問協議。</p>
+<p>RPC是一種協議或編程技術，連接兩臺主機，像一臺主機一樣實現數據交換。</p>
+<p>將遠程的設備掛載到本地時，在本地才叫NFS系統。NFS也是一種協議，現在用NFSv3，NFSv4版本，服務器端只能驗證IP不能驗證用戶名</p>
+</blockquote>
+<h4 id="NFS對服務器來講有兩個組件"><a href="#NFS對服務器來講有兩個組件" class="headerlink" title="NFS對服務器來講有兩個組件"></a>NFS對服務器來講有兩個組件</h4><blockquote>
+<p>服務器端：nfs-utils，安裝此軟件包就可配置爲服務器端了。</p>
+<p>因爲NFS是基於RPC運行的，所以要確保RPC在linux上的服務portmap已經啓動。portmap是監聽在111/tcp, 111/udp端口的。還可以使用rpcinfo -p來查看一臺主機上的所有rpc進程所監聽的端口號，如：rpcinfo -p localhost，會查到有很多端口監聽，這些是NFS啓動時向RPC請求的端口，nfs會啓動三個進程：nfsd(nfs的主服務)，mountd（接受客戶端掛載請求的）, quotad（限定客戶端在本地只能使用多大磁盤空間的）；nfsd監聽在2049/tcp端口，這是注冊使用的；mountd，quotad會改變端口，是半隨機的端口，是RPC服務幫助選取的，因爲是RPC隨機選取的，所以叫半隨機的端口，可能使用其他服務的端口，所以最好配置一個固定端口給這兩個服務，默認是使用隨機端口。nfslock是分布式文件鎖，當一臺主機在讀取NFS磁盤數據時，要先加鎖，這樣其他主機就不能讀取磁盤數據了，避免磁盤崩潰。NFS配置文件/etc/exports，在此配置文件中定義共享哪個文件系統，哪些可以使用文件系統，讓其可被掛載到本地像使用本地磁盤一樣使用。</p>
+</blockquote>
+<h4 id="NFS工作流程"><a href="#NFS工作流程" class="headerlink" title="NFS工作流程"></a>NFS工作流程</h4><blockquote>
+<p>對於NFSv3來講，客戶端先去聯系服務器上的portmap（RPC服務器），RPC服務器會告訴客戶端rpc.mountd所監聽的端口號，當這個端口號回傳給客戶端以後，客戶端會重新連接rpc.mountd，rpc.mountd返回給用戶一個初始化文件句柄或叫訪問令牌，也就是在配置文件中定義的IP地址訪問時才會發給令牌，這時客戶端來找nfsd，nfsd監聽在2049端口上。這時就能訪問了。</p>
+<p>讓mountd和quotad等進程監聽在固定端口，編輯配置文件/etc/sysconfig/nfs，其中有MOUNTD_PORT=<strong><em>一項，定義好端口號即可。QUOTAD_PORT=</em></strong>也一樣。LOCKD_TCPPORT=<strong><em>,  LOCKD_UDPPORT=</em></strong>是啓動鎖進程要監聽的端口。</p>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[root@webdav ~]# yum install -y nfs-utils</span><br><span class="line">[root@webdav ~]# netstat -tlnp</span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    </span><br><span class="line">tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      1/systemd           </span><br><span class="line">tcp        0      0 0.0.0.0:20048           0.0.0.0:*               LISTEN      97455/rpc.mountd          </span><br><span class="line">tcp        0      0 0.0.0.0:43326           0.0.0.0:*               LISTEN      -                   </span><br><span class="line">tcp        0      0 0.0.0.0:2049            0.0.0.0:*               LISTEN      -                   </span><br><span class="line">tcp        0      0 0.0.0.0:42758           0.0.0.0:*               LISTEN      97452/rpc.statd   </span><br><span class="line">[root@webdav ~]# mkdir /shared</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(ro) 192.168.1.0/24(rw)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件中每一行包含一個共享出去的文件系統以及哪些客戶端可使用此文件系統；每個客戶端後必須跟一個小括號，小括號中定義了客戶端訪問此文件系統時所具有的屬性</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> /path/to/somedir共享哪個目錄，可以是獨立的分區或目錄，建議使用獨立分區，之後是客戶端列表CLIENT_LIST，多個客戶列表之間用空格分隔。每個客戶端後面必須跟一個小括號，裏面定義了此客戶訪問特性，如訪問權限等。如：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 172.16.0.0/16(ro,async) 192.16.0.0/24(rw,sync)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> async異步寫入，sync同步寫入，ro只讀，rw讀寫。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 客戶端可以是單個主機用FQDN或IP定義都可以；也可以用通配符，如*.example.com；也可以是IP/netmask的方式</span></span><br><span class="line">[root@webdav ~]# exportfs -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令重新导出</span></span><br><span class="line">[root@webdav ~]# showmount -e 192.168.2.128</span><br><span class="line">Export list for 192.168.2.128:</span><br><span class="line">192.168.1.0/24,192.168.2.0/24</span><br><span class="line"><span class="meta">#</span><span class="bash"> -e表示顯示共享了哪些目錄，也可以選程主機上使用此命令查看某主機共享了哪些目錄</span></span><br><span class="line"></span><br><span class="line">=================</span><br><span class="line">   debian系统挂载</span><br><span class="line">=================</span><br><span class="line">⚡ root@ruopu64  ~  apt install nfs-common</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 安装包，如果不安装此包，挂载时会提示<span class="string">"mount: /mnt: bad option; for several filesystems (e.g. nfs, cifs) you might need a /sbin/mount.&lt;type&gt; helper program."</span>。</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> 如果debian是服务端，要安装 nfs-kernel-server包</span></span><br><span class="line">⚡ root@ruopu64  ~  mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">⚡ root@ruopu64  ~  df -h</span><br><span class="line">文件系统                      容量  已用  可用 已用% 挂载点</span><br><span class="line">...</span><br><span class="line">192.168.2.128:/shared          17G  1.3G   16G    8% /mnt</span><br></pre></td></tr></table></figure>
+<h4 id="showmount命令"><a href="#showmount命令" class="headerlink" title="showmount命令"></a>showmount命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">showmount -e NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看NFS服務器“導出”的各文件系統，導出就是共享的意思</span></span><br><span class="line">showmount -a NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看NFS服務器所有被掛載的文件系統及其客戶端對應列表</span></span><br><span class="line">showmount -d NFS_SERVER</span><br><span class="line"><span class="meta">#</span><span class="bash"> 顯示NFS服務器所有導出的文件系統中被客戶端掛載了的文件系統列表</span></span><br></pre></td></tr></table></figure>
+<h4 id="exportfs命令"><a href="#exportfs命令" class="headerlink" title="exportfs命令"></a>exportfs命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-a：跟-r或-u選項同時使用，表示重新掛載所有文件系統或取消導出所有文件系統</span><br><span class="line">-r：重新導出</span><br><span class="line">-u：取消導出</span><br><span class="line">-v：顯示詳細信息</span><br><span class="line">exportfs -rav：不必重啓服務，重新導出</span><br></pre></td></tr></table></figure>
+<h4 id="设置访问权限"><a href="#设置访问权限" class="headerlink" title="设置访问权限"></a>设置访问权限</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# useradd hadoop</span><br><span class="line">[root@webdav ~]# id hadoop</span><br><span class="line">uid=1000(hadoop) gid=1000(hadoop) 组=1000(hadoop)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看用户与组ID</span></span><br><span class="line">[root@webdav ~]# setfacl -m u:hadoop:rwx /shared/</span><br><span class="line">[root@webdav ~]# su - hadoop</span><br><span class="line">[hadoop@webdav ~]$ cd /shared/</span><br><span class="line">[hadoop@webdav shared]$ touch a.hadoop</span><br><span class="line">[hadoop@webdav shared]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 Apr  3 16:24 a.hadoop</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# groupadd -g 1000 openstack</span><br><span class="line">[root@primary ~]# useradd -g 1000 -u 1000 openstack</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建用户与组ID与服务器端一样的用户，只是用户名不同</span></span><br><span class="line">[root@primary ~]# mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">[root@primary ~]# ll /mnt</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 4月   3 2019 a.hadoop</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在客户端挂载NFS系统后，因为用户与组ID与服务器端一样，所以用户和组都变成了openstack</span></span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[hadoop@webdav shared]$ exit</span><br><span class="line">logout</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw) 192.168.1.0/24(rw)</span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# su - openstack</span><br><span class="line">[openstack@primary ~]$ cd /mnt</span><br><span class="line">[openstack@primary mnt]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 a.hadoop</span><br><span class="line">[openstack@primary mnt]$ touch b.openstack</span><br><span class="line">[openstack@primary mnt]$ ll</span><br><span class="line">total 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 a.hadoop</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 b.openstack</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# ll /shared/</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 4月   3 16:24 a.hadoop</span><br><span class="line">-rw-rw-r-- 1 hadoop hadoop 0 4月   3 16:41 b.openstack</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[openstack@primary mnt]$ exit</span><br><span class="line">logout</span><br><span class="line">[root@primary ~]# rm /mnt/b.openstack </span><br><span class="line">rm：是否删除普通空文件 "/mnt/b.openstack"？y</span><br><span class="line">rm: 无法删除"/mnt/b.openstack": 权限不够</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時是不能刪除的，root用戶是不能操作遠程主機上的文件的。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   server</span><br><span class="line">========</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw,no_root_squash) 192.168.1.0/24(rw)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可用选项如下：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> no_root_squash：任何主機以root掛載此目錄都將是管理員了，这样root就可以删除远程文件了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> root_squash：將root用戶映射爲來賓賬號，這是默認功能，不加也會執行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> all_squash：無論是誰都轉換爲來賓帳號。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> anonuid, anongid：指定映射的來賓賬號的UID和GID</span></span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line"></span><br><span class="line">========</span><br><span class="line">   client</span><br><span class="line">========</span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# mount -t nfs 192.168.2.128:/shared /mnt</span><br><span class="line">[root@primary ~]# rm -rf /mnt/b.openstack</span><br><span class="line">[root@primary ~]# ll /mnt</span><br><span class="line">总用量 0</span><br><span class="line">-rw-rw-r-- 1 openstack openstack 0 4月   3 2019 a.hadoop</span><br><span class="line"><span class="meta">#</span><span class="bash"> 文件被删除了</span></span><br><span class="line">[root@primary ~]# vim /etc/fstab </span><br><span class="line">192.168.2.128:/shared   /mnt                    nfs     defaults,_rnetdev       0 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> mount的選項中有_rnetdev，表示如果主機不在或無法掛載就跳過</span></span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# mount -a</span><br><span class="line">[root@primary ~]# df -h</span><br><span class="line">Filesystem            Size  Used Avail Use% Mounted on</span><br><span class="line">192.168.2.128:/shared                       17G  1.3G   16G   8% /mnt</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/tmux使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/02/tmux使用/" itemprop="url">
+                  tmux使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-04-02 13:47:08 / 修改時間：15:13:06" itemprop="dateCreated datePublished" datetime="2019-04-02T13:47:08+08:00">2019-04-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>tmux采用C/S模型构建，输入tmux命令就相当于开启了一个服务器，此时默认将新建一个会话，然后会话中默认新建一个窗口，窗口中默认新建一个面板。会话、窗口、面板之间的联系如下： </p>
+<p>一个tmux session（会话）可以包含多个window（窗口），窗口默认充满会话界面，因此这些窗口中可以运行相关性不大的任务。 </p>
+<p>一个window又可以包含多个pane（面板），窗口下的面板，都处于同一界面下，这些面板适合运行相关性高的任务，以便同时观察到它们的运行情况。 </p>
+</blockquote>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">⚡ ⚙ root@ruopu64  ~  apt install tmux</span><br></pre></td></tr></table></figure>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="新建会话"><a href="#新建会话" class="headerlink" title="新建会话"></a>新建会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux</span><br><span class="line"><span class="meta">#</span><span class="bash"> 新建会话后，在屏幕的下方会有提示，如：<span class="string">"[0] 0:zsh*        "</span><span class="built_in">test</span><span class="string">" 13:51 02-4月-19"</span></span></span><br><span class="line"> ⚡ root@ruopu64  ~  exit</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 退出会话</span></span><br><span class="line">  ⚡ root@ruopu64  ~  tmux new -s abc</span><br><span class="line"><span class="meta">  #</span><span class="bash"> 创建一个叫做abc的会话，提示信息：<span class="string">"[abc] 0:zsh*      "</span><span class="built_in">test</span><span class="string">" 13:53 02-4月-19"</span></span></span><br></pre></td></tr></table></figure>
+<h4 id="断开当前会话"><a href="#断开当前会话" class="headerlink" title="断开当前会话"></a>断开当前会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux detach</span><br><span class="line"><span class="meta">#</span><span class="bash"> 断开会话，下次还可继续操作。会话会在后台运行</span></span><br><span class="line">也可以使用快捷键Ctrl + b松开，再按d</span><br></pre></td></tr></table></figure>
+<h4 id="进入断开的会话"><a href="#进入断开的会话" class="headerlink" title="进入断开的会话"></a>进入断开的会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">✘ ⚡ root@ruopu64  ~  tmux a -t abc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入名称为abc的会话</span></span><br><span class="line"> ⚡ root@ruopu64  ~  tmux attach-session</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 进入第一个会话，可以将attach-session简写为a或at</span></span><br></pre></td></tr></table></figure>
+<h4 id="查看会话"><a href="#查看会话" class="headerlink" title="查看会话"></a>查看会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux list-sessions </span><br><span class="line">1: 1 windows (created Tue Apr  2 13:55:52 2019) [70x21]</span><br><span class="line">2: 1 windows (created Tue Apr  2 13:56:05 2019) [70x21]</span><br><span class="line">abc: 1 windows (created Tue Apr  2 13:52:59 2019) [70x21]</span><br><span class="line"> ⚡ root@ruopu64  ~  tmux ls</span><br><span class="line">1: 1 windows (created Tue Apr  2 13:55:52 2019) [70x21]</span><br><span class="line">2: 1 windows (created Tue Apr  2 13:56:05 2019) [70x21]</span><br><span class="line">abc: 1 windows (created Tue Apr  2 13:52:59 2019) [70x21]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 两条命令是一样的，只是将list-sessions简写为了ls</span></span><br></pre></td></tr></table></figure>
+<h4 id="关闭会话"><a href="#关闭会话" class="headerlink" title="关闭会话"></a>关闭会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux kill-session -t 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭名称为2的会话</span></span><br><span class="line"> ⚡ root@ruopu64  ~  tmux kill-session </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 关闭所有会话</span></span><br></pre></td></tr></table></figure>
+<h4 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h4><blockquote>
+<p>快捷键需要使用Ctrl+b激活控制台，再按下面的按键操作</p>
+</blockquote>
+<h5 id="系统操作"><a href="#系统操作" class="headerlink" title="系统操作"></a>系统操作</h5><table>
+<thead>
+<tr>
+<th>?</th>
+<th>列出所有快捷键；按q返回</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>d</td>
+<td>脱离当前会话；这样可以暂时返回Shell界面，输入tmux attach能够重新进入之前的会话</td>
+</tr>
+<tr>
+<td>D</td>
+<td>选择要脱离的会话；在同时开启了多个会话时使用</td>
+</tr>
+<tr>
+<td>Ctrl+z</td>
+<td>挂起当前会话</td>
+</tr>
+<tr>
+<td>r</td>
+<td>强制重绘未脱离的会话</td>
+</tr>
+<tr>
+<td>s</td>
+<td>列出所有会话，选择并切换会话；在同时开启了多个会话时使用</td>
+</tr>
+<tr>
+<td>:</td>
+<td>进入命令行模式；此时可以输入支持的命令，例如kill-server可以关闭服务器</td>
+</tr>
+<tr>
+<td>[</td>
+<td>进入复制模式；此时的操作与vi/emacs相同，按q/Esc退出</td>
+</tr>
+<tr>
+<td>~</td>
+<td>列出提示信息缓存；其中包含了之前tmux返回的各种提示信息</td>
+</tr>
+<tr>
+<td>:new&lt;回车&gt;</td>
+<td>启动新会话</td>
+</tr>
+<tr>
+<td>$</td>
+<td>重命名当前会话</td>
+</tr>
+</tbody>
+</table>
+<h5 id="窗口操作"><a href="#窗口操作" class="headerlink" title="窗口操作"></a>窗口操作</h5><table>
+<thead>
+<tr>
+<th>c</th>
+<th>创建新窗口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&amp;</td>
+<td>关闭当前窗口</td>
+</tr>
+<tr>
+<td>数字键0~9</td>
+<td>切换至指定窗口</td>
+</tr>
+<tr>
+<td>p</td>
+<td>切换至上一窗口</td>
+</tr>
+<tr>
+<td>n</td>
+<td>切换至下一窗口</td>
+</tr>
+<tr>
+<td>l</td>
+<td>在前后两个窗口间互相切换</td>
+</tr>
+<tr>
+<td>w</td>
+<td>通过窗口列表切换窗口</td>
+</tr>
+<tr>
+<td>,</td>
+<td>重命名当前窗口；这样便于识别</td>
+</tr>
+<tr>
+<td>.</td>
+<td>修改当前窗口编号；相当于窗口重新排序</td>
+</tr>
+<tr>
+<td>f</td>
+<td>在所有窗口中查找指定文本</td>
+</tr>
+</tbody>
+</table>
+<h5 id="面板操作"><a href="#面板操作" class="headerlink" title="面板操作"></a>面板操作</h5><table>
+<thead>
+<tr>
+<th>”</th>
+<th>将当前面板平分为上下两块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%</td>
+<td>将当前面板平分为左右两块</td>
+</tr>
+<tr>
+<td>x</td>
+<td>关闭当前面板</td>
+</tr>
+<tr>
+<td>!</td>
+<td>将当前面板置于新窗口；即新建一个窗口，其中仅包含当前面板</td>
+</tr>
+<tr>
+<td>Ctrl+方向键</td>
+<td>以1个单元格为单位移动边缘以调整当前面板大小</td>
+</tr>
+<tr>
+<td>Alt+方向键</td>
+<td>以5个单元格为单位移动边缘以调整当前面板大小</td>
+</tr>
+<tr>
+<td>Space</td>
+<td>在预置的面板布局中循环切换；依次包括even-horizontal、even-vertical、main-horizontal、main-vertical、tiled</td>
+</tr>
+<tr>
+<td>q</td>
+<td>显示面板编号</td>
+</tr>
+<tr>
+<td>o</td>
+<td>在当前窗口中选择下一面板</td>
+</tr>
+<tr>
+<td>方向键</td>
+<td>移动光标以选择面板</td>
+</tr>
+<tr>
+<td>{</td>
+<td>向前置换当前面板</td>
+</tr>
+<tr>
+<td>}</td>
+<td>向后置换当前面板</td>
+</tr>
+<tr>
+<td>Alt+o</td>
+<td>逆时针旋转当前窗口的面板</td>
+</tr>
+<tr>
+<td>Ctrl+o</td>
+<td>顺时针旋转当前窗口的面板</td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/集群概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1981,521 +2491,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/17/搭建个人博客github-pages/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/17/搭建个人博客github-pages/" itemprop="url">
-                  搭建个人博客github-pages
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-17 22:03:29" itemprop="dateCreated datePublished" datetime="2019-03-17T22:03:29+08:00">2019-03-17</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-04-04 11:07:47" itemprop="dateModified" datetime="2019-04-04T11:07:47+08:00">2019-04-04</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="下载软件"><a href="#下载软件" class="headerlink" title="下载软件"></a>下载软件</h1><ol>
-<li>下载安装Node.js，官网地址：<a href="https://nodejs.org/en/download/" target="_blank" rel="noopener">https://nodejs.org/en/download/</a></li>
-<li>下载安装git，官网地址：<a href="https://git-scm.com/download/win" target="_blank" rel="noopener">https://git-scm.com/download/win</a></li>
-<li>下载安装githubDesktop，官网地址：<a href="https://desktop.github.com/" target="_blank" rel="noopener">https://desktop.github.com/</a></li>
-</ol>
-<p>注：实际git与githubDesktop安装一个就可以，只是不习惯使用命令行的人使用githubDesktop更方便。</p>
-<h1 id="注册github"><a href="#注册github" class="headerlink" title="注册github"></a>注册github</h1><p>官方地址：<a href="https://github.com/" target="_blank" rel="noopener">https://github.com/</a></p>
-<p>注册后登录，创建一个自己的github pages项目，项目名称一般与自己的登录名一致。</p>
-<h1 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">在本地创建一个Hexo目录，并进入目录，右键选择Git Bash Here</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">hexo init</span><br><span class="line">hexo generate</span><br><span class="line">hexo server</span><br><span class="line">访问localhost:4000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在执行hexo命令时提示：</span></span><br><span class="line">internal/modules/cjs/loader.js:596</span><br><span class="line">    throw err;</span><br><span class="line">    ^</span><br><span class="line"></span><br><span class="line">Error: Cannot find module 'D:\Git\node_modules\hexo-cli\bin\hexo'</span><br><span class="line">之后在C:\Users\r\AppData\Roaming\npm中找到node_modules，将其复制到D:\Git下后，可以正常使用hexo命令</span><br></pre></td></tr></table></figure>
-<h2 id="配置SSH密钥"><a href="#配置SSH密钥" class="headerlink" title="配置SSH密钥"></a>配置SSH密钥</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C "your_email@example.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这将按照你提供的邮箱地址，创建一对密钥。一直回车就可以完成</span></span><br><span class="line">cat ~/.ssh/id_rsa.pub</span><br><span class="line">复制公钥，将公钥放到github页面中的Settings中的SSH and GPG keys中</span><br><span class="line">ssh -T git@github.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试密钥是否生效，如果生效会有向用户打招呼的提示</span></span><br></pre></td></tr></table></figure>
-<h2 id="设置用户信息"><a href="#设置用户信息" class="headerlink" title="设置用户信息"></a>设置用户信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name "ryanlijianchang"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用户名</span></span><br><span class="line">git config --global user.email  "liji.anchang@163.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 填写自己的邮箱</span></span><br></pre></td></tr></table></figure>
-<h2 id="将本地的Hexo文件更新到Github的库中"><a href="#将本地的Hexo文件更新到Github的库中" class="headerlink" title="将本地的Hexo文件更新到Github的库中"></a>将本地的Hexo文件更新到Github的库中</h2><ol>
-<li>登录github</li>
-<li>打开自己的项目</li>
-<li>点击Clone or download，选择SSH，并复制地址</li>
-<li>打开本地创建的Hexo目录，打开_config.yml文件</li>
-<li><p>在配置文件中修改</p>
-</li>
-<li><p>执行命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo g -d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 完成远程部署，如果有报错 ERROR Deployer not found: git，可以删除node_modules目录，再重新执行下面的命令</span></span><br><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>访问name.github.io</p>
-</li>
-</ol>
-<h1 id="美化自己博客"><a href="#美化自己博客" class="headerlink" title="美化自己博客"></a>美化自己博客</h1><h2 id="安装主题"><a href="#安装主题" class="headerlink" title="安装主题"></a>安装主题</h2><ol>
-<li>进入<a href="https://hexo.io/themes/" target="_blank" rel="noopener">https://hexo.io/themes/</a></li>
-<li>选择自己喜欢的主题，并打开，打开后是一个github的页面，复制git地址</li>
-<li>到本地Hexo目录中的themes右键选择Git Hash Here</li>
-<li><p>克隆主题到本地<figure class="highlight plain"><figcaption><span>clone</span><a href="https://github.com/iissnan/hexo-theme-next```" target="_blank" rel="noopener">link</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">5. 修改Hexo配置文件，将_config.yml文件中的theme后的参数改为自己下载的主题的名字</span><br><span class="line">6. 部署主题，本地查看。</span><br><span class="line"></span><br><span class="line">```shell</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">访问localhost:4000</span><br></pre></td></tr></table></figure></p>
-</li>
-<li><p>部署到Github上</p>
-</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g -d</span><br></pre></td></tr></table></figure>
-<h2 id="主题设定"><a href="#主题设定" class="headerlink" title="主题设定"></a>主题设定</h2><ol>
-<li>打开主题配置文件</li>
-</ol>
-<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E:<span class="symbol">\G</span>itHub<span class="symbol">\r</span>uopu89.github.io<span class="symbol">\t</span>hemes<span class="symbol">\h</span>exo-theme-next<span class="symbol">\_</span>config.yml</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Schemes</span></span><br><span class="line"><span class="meta">#</span><span class="bash">scheme: Muse</span></span><br><span class="line"><span class="meta">#</span><span class="bash">scheme: Mist</span></span><br><span class="line"><span class="meta">#</span><span class="bash">scheme: Pisces</span></span><br><span class="line">scheme: Gemini</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在有四种风格，使用哪个就去掉其前面的注释</span></span><br></pre></td></tr></table></figure>
-<h2 id="设置语言"><a href="#设置语言" class="headerlink" title="设置语言"></a>设置语言</h2><ol>
-<li>打开站点配置文件</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\GitHub\ruopu89.github.io\_config.yml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意这里一定是在站点配置文件中设置</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">language: zh-TW</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在主题配置目录中有一个languages目录，在这里是可以使用的语言的文件。上面设置的语言应该和languages目录中的文件名是一样的。</span></span><br></pre></td></tr></table></figure>
-<h2 id="设置菜单"><a href="#设置菜单" class="headerlink" title="设置菜单"></a>设置菜单</h2><ol>
-<li>打开主题配置文件</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E:\GitHub\ruopu89.github.io\themes\hexo-theme-next\_config.yml</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: / || home	//主页</span><br><span class="line"><span class="meta">  #</span><span class="bash">about: /about/ || user	//关于页面</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">tags: /tags/ || tags</span></span><br><span class="line">  tags: /tags || tags	//标签页 </span><br><span class="line">  categories: /categories/ || th	//分类页 </span><br><span class="line">  archives: /archives/ || archive	//归档页</span><br><span class="line"><span class="meta">  #</span><span class="bash">schedule: /schedule/ || calendar</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">sitemap: /sitemap.xml || sitemap</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">commonweal: /404/ || heartbeat	//公益 404</span></span><br><span class="line">//这里最前面的name:表示在页面中显示的内容；后面是路径；最后的|| name表示显示的图标样式。除了主页与归档页外，其他需要手动创建这个页面</span><br></pre></td></tr></table></figure>
-<h2 id="设置侧栏"><a href="#设置侧栏" class="headerlink" title="设置侧栏"></a>设置侧栏</h2><blockquote>
-<p>默认情况下，侧栏仅在文章页面（拥有目录列表）时才显示，并放置于右侧位置。</p>
-</blockquote>
-<ol>
-<li>打开主题配置文件</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E:\GitHub\ruopu89.github.io\themes\hexo-theme-next\_config.yml</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置位置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sidebar:</span><br><span class="line">  position: left</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用的值有left和right</span></span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>设置侧栏显示的时机</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sidebar:</span><br><span class="line">  display: post</span><br><span class="line">//可选项：</span><br><span class="line">//post - 默认行为，在文章页面（拥有目录列表）时显示</span><br><span class="line">//always - 在所有页面中都显示</span><br><span class="line">//hide - 在所有页面中都隐藏（可以手动展开）</span><br><span class="line">//remove - 完全移除</span><br><span class="line">//已知侧栏在 use motion: false 的情况下不会展示。 影响版本5.0.0及更低版本。</span><br></pre></td></tr></table></figure>
-<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ol>
-<li>新建页面</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在项目目录中右键打开git</span><br><span class="line">hexo new page tags</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在项目目录中的<span class="built_in">source</span>创建一个tags目录，如果没有这个目录，在页面上就没法打开这个标签</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置页面类型</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在新建的tags目录中会自动生成一个叫index的文件，打开它</span><br><span class="line">---</span><br><span class="line">title: 标签</span><br><span class="line">date: 2014-12-22 12:39:04</span><br><span class="line">type: "tags"</span><br><span class="line">---</span><br><span class="line"><span class="meta">#</span><span class="bash"> index文件中的内容如上，添加<span class="built_in">type</span>: <span class="string">"tags"</span></span></span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>修改菜单</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">修改主题配置文件</span><br><span class="line">menu:</span><br><span class="line">  home: /</span><br><span class="line">  archives: /archives</span><br><span class="line">  tags: /tags</span><br><span class="line"><span class="meta">#</span><span class="bash"> tags一行要取消注释，这样在页面中才能显示tags标签</span></span><br></pre></td></tr></table></figure>
-<ol start="4">
-<li>写作</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在新建文章后，在文章头部会有如下内容</span><br><span class="line">---</span><br><span class="line">hetitle: 搭建个人博客github_pages</span><br><span class="line">date: 2018-08-30 08:32:00</span><br><span class="line">tags: hexo</span><br><span class="line">---</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要指定此文章的tags，这样就可以将文章加入上面创建的tags中了，打开页面时在tags标签中会有一个hexo，在hexo中有我们的文章</span></span><br></pre></td></tr></table></figure>
-<h2 id="添加分类页面"><a href="#添加分类页面" class="headerlink" title="添加分类页面"></a>添加分类页面</h2><ol>
-<li>新建页面</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在项目目录中右键打开git</span><br><span class="line">hexo new page categories</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在项目目录中的<span class="built_in">source</span>创建一个categories目录，如果没有这个目录，在页面上就没法打开这个标签</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>设置页面类型</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在新建的tags目录中会自动生成一个叫index的文件，打开它</span><br><span class="line">---</span><br><span class="line">title: 标签</span><br><span class="line">date: 2014-12-22 12:39:04</span><br><span class="line">type: "categories"</span><br><span class="line">---</span><br><span class="line"><span class="meta">#</span><span class="bash"> index文件中的内容如上，添加<span class="built_in">type</span>: <span class="string">"categories"</span></span></span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>修改菜单</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">修改主题配置文件</span><br><span class="line">menu:</span><br><span class="line">  home: /</span><br><span class="line">  archives: /archives</span><br><span class="line">  categories: /categories</span><br><span class="line"><span class="meta">#</span><span class="bash"> categories一行要取消注释，这样在页面中才能显示categories标签</span></span><br></pre></td></tr></table></figure>
-<ol start="4">
-<li>写作</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在新建文章后，在文章头部会有如下内容</span><br><span class="line">---</span><br><span class="line">hetitle: 搭建个人博客github_pages</span><br><span class="line">date: 2018-08-30 08:32:00</span><br><span class="line">categories: hexo</span><br><span class="line">---</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要指定此文章的tags，这样就可以将文章加入上面创建的tags中了，打开页面时在tags标签中会有一个hexo，在hexo中有我们的文章</span></span><br></pre></td></tr></table></figure>
-<h2 id="添加搜索功能"><a href="#添加搜索功能" class="headerlink" title="添加搜索功能"></a>添加搜索功能</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cd /home/ruopu/文档/Github/ruopu.github.io</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先到博客的根目录</span></span><br><span class="line">npm install hexo-generator-searchdb --save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装搜索插件</span></span><br><span class="line">vim /home/ruopu/文档/Github/ruopu.github.io/_config.yml</span><br><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  limit: 10000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在博客的配置文件中添加上述内容</span></span><br><span class="line">vim /home/ruopu/文档/Github/ruopu.github.io/theme/hexo-next/_config.yml</span><br><span class="line">local_search:</span><br><span class="line">    enable: true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置主题的功能，上面内容默认是flase，改为<span class="literal">true</span></span></span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上传后就可以看到搜索功能了。</span></span><br></pre></td></tr></table></figure>
-<h2 id="高亮显示代码"><a href="#高亮显示代码" class="headerlink" title="高亮显示代码"></a>高亮显示代码</h2><ol>
-<li>编辑主题配置文件E:\GitHub\ruopu89.github.io\themes\hexo-theme-next_config.yml</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">highlight_theme: night blue</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可选的选择有：normal，night， night blue， night bright， night eighties</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>编辑站点配置文件E:\GitHub\ruopu89.github.io</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">highlight:</span><br><span class="line">  enable: true</span><br><span class="line">  line_number: true</span><br><span class="line">  auto_detect: true</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里默认是<span class="literal">false</span></span></span><br><span class="line">  tab_replace:</span><br><span class="line"><span class="meta">  #</span><span class="bash"> 设置后，博客中的代码会有高亮显示，但显示的还是有问题。无论是否在代码中加入语言标记。</span></span><br></pre></td></tr></table></figure>
-<h2 id="添加图片"><a href="#添加图片" class="headerlink" title="添加图片"></a>添加图片</h2><blockquote>
-<p>图片默认被保存在主题目录中的source中的images中，如：E:\GitHub\ruopu89.github.io\themes\hexo-theme-next\source\images，我们可以在这个目录下新建目录，与博客名称相同，所有图片都保存在这里<br>使用图片的网络地址也可上传图片。这种方式的问题应该是，当图片的网络地址失效时，这个图片也就看不到了。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![](https://raw.githubusercontent.com/higoge/image/master/basic01/01.png)</span><br></pre></td></tr></table></figure></p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">使用markdown语法添加图片时可以使用下面的语法</span><br><span class="line">&lt;img src="/images/image.jpg"/&gt;</span><br><span class="line">![](/images/images.jpg)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面两种方法都可以添加图片，系统会自动到主题目录中的<span class="built_in">source</span>中的images中找图片。问题是，在markdown中是看不到图片的。因为提交后，系统会到images中找图片，所以要用这种格式，斜线也要用/。如果输入在windows中的路径，上传后是找不到图片的，所以也无法显示。</span></span><br></pre></td></tr></table></figure>
-<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><h3 id="github-Desktop提交时提示“Commit-failed-exit-code-1-received”"><a href="#github-Desktop提交时提示“Commit-failed-exit-code-1-received”" class="headerlink" title="github Desktop提交时提示“Commit failed - exit code 1 received”"></a>github Desktop提交时提示“Commit failed - exit code 1 received”</h3><p>解决：原因是不能提示的目录中也有.git目录，删除.git目录再上传就正常了。</p>
-<h3 id="在另一台ubuntu18-04系统上重新部署hexo"><a href="#在另一台ubuntu18-04系统上重新部署hexo" class="headerlink" title="在另一台ubuntu18.04系统上重新部署hexo"></a>在另一台ubuntu18.04系统上重新部署hexo</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">* 安装所需软件包</span><br><span class="line">apt install -y nodejs</span><br><span class="line">apt install -y npm</span><br><span class="line">apt install -y git</span><br><span class="line">npm install hexo-cli -g</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面安装的nodejs是一个8.10的版本，也可以升级nodejs</span></span><br><span class="line">ssh-keygen -t rsa -C "ruopu1989@hotmail.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成密钥</span></span><br><span class="line">cat .ssh/id_rsa.pub</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取密钥</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这两步在root和普通用户上都做了一遍。之后将得到的密钥复制到github上</span></span><br><span class="line">ssh -T git@github.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在两个帐户上都测试一下连接是否成功。如果成功会有下面的提示，测试发现只在root用户下执行成功，在普通用户上执行也可以通过，但提示github不提供shell访问</span></span><br><span class="line">    Hi ruopu89! You've successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line">git config --global user.name "ruopu1989"</span><br><span class="line">git config --global user.email "ruopu1989@hotmail.com"</span><br><span class="line">cd /media/rp/00E219519546E/MyFile/GitHub/rp.github.io</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果这一步报错，可以尝试使用hexo clean撤消hexo g生成的静态文件，再执行hexo g重新生成再部署。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试</span></span><br></pre></td></tr></table></figure>
-<h3 id="github个人博客多电脑使用"><a href="#github个人博客多电脑使用" class="headerlink" title="github个人博客多电脑使用"></a>github个人博客多电脑使用</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">cd /home/GitHub/ruopu.github.io</span><br><span class="line">ssh-keygen -t rsa -C "ruopu19@hotmail.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> -C后的是一些描述信息</span></span><br><span class="line">cat .ssh/id_rsa.pub</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将密钥复制到github上</span></span><br><span class="line">ssh -T git@github.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试与github连接是否成功</span></span><br><span class="line">git config --global user.name "ruopu1989"</span><br><span class="line">git config --global user.email "ruopu1989@hotmail.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 自报家门</span></span><br><span class="line">git init</span><br><span class="line">给源文件目录初始化git，虽然目录中已有内容，但这也不会报错的</span><br><span class="line">git remote add origin https://github.com/abc/abc.github.io.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 与远程的origin分支关联，最后的地址是github上项目的地址。使用git push时如果提示需要输入用户名和密码，可以删除远程地址，再试。命令：git remote remove origin。另外，这里也可以使用git@github.com:abc/abc.github.io.git地址。</span></span><br><span class="line">git checkout -b source</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建并切换分支，使用-b选择就是为了创建并切换。这与git branch <span class="built_in">source</span> &amp;&amp; git checkout <span class="built_in">source</span>两条命令的执行结果是一样的。</span></span><br><span class="line">git branch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在本地只有一个<span class="built_in">source</span>分支，这也就是主分支</span></span><br><span class="line">git add .</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加所有内容到暂存区</span></span><br><span class="line">git commit -m 'add source'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交</span></span><br><span class="line">git push origin source</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将本地的<span class="built_in">source</span>分支推送到远程的origin分支上</span></span><br><span class="line">在github上将source设置为主分支，这样之后clone的就都是这个source分支上的内容了。</span><br><span class="line">** 上传中会有一个问题，就是theme目录中的主题文件上传后可能是灰色的，这是因为获得主题文件时就是从另一个库clone来的，所以主题文件目录中也有.git文件。如果上传了目录，解决方法如下：</span><br><span class="line">1. 将主题文件目录剪切到另一个不相干的目录中</span><br><span class="line">2. git add .</span><br><span class="line">3. git commit -m 'delete theme'</span><br><span class="line">4. git push</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以上几步是为了将没有主题文件目录的信息再次提交，之后推送到远程库，也就删除了远程库上的主题文件目录</span></span><br><span class="line">5. 将主题文件目录中的.git、.gitignore、.gitattributes三个文件删除，之后将主题文件目录再剪切回github的theme目录中</span><br><span class="line">6. git add .</span><br><span class="line">7. git commit -m 'new theme'</span><br><span class="line">8. git push</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再次将没有.git文件的主题推送到远程库就没有问题了。</span></span><br><span class="line">==============================================================================================</span><br><span class="line">推送时出现问题，原因是想将本地的文件推送到远程，但与远程有很多不同。可以使用下面命令强行推送。但本地的文件可能丢失。推送前将文件备份，推送后将丢失的文再复制到相应目录，再推送就可以了。</span><br><span class="line">git push -f origin source</span><br><span class="line"></span><br><span class="line">另外还涉及一些常用命令</span><br><span class="line">git branch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前分支</span></span><br><span class="line">git checkout master</span><br><span class="line"><span class="meta">#</span><span class="bash"> 切换分支。加-b选项是创建并切换分支</span></span><br><span class="line">git merge source</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将<span class="built_in">source</span>分支内容合并到当前分支</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m "abc"</span><br><span class="line">git push origin source</span><br><span class="line">git diff</span><br><span class="line">git status</span><br><span class="line">git log</span><br><span class="line">git remote add origin https://github.com/abc/rab.github.io.git</span><br><span class="line">git reset --hard HEAD^</span><br><span class="line"><span class="meta">#</span><span class="bash"> 回退到上一个版本</span></span><br><span class="line">git reflog</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看提交与回退历史</span></span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/12/kali使用记录/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/12/kali使用记录/" itemprop="url">
-                  kali使用记录
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-12 08:53:20" itemprop="dateCreated datePublished" datetime="2019-03-12T08:53:20+08:00">2019-03-12</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-05-25 11:36:16" itemprop="dateModified" datetime="2019-05-25T11:36:16+08:00">2019-05-25</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/渗透测试/" itemprop="url" rel="index"><span itemprop="name">渗透测试</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="清理-boot-分区"><a href="#清理-boot-分区" class="headerlink" title="清理/boot/分区"></a>清理/boot/分区</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"> ✘ ⚡ ⚙ root@ruopu64  ~  df -h</span><br><span class="line">文件系统                      容量  已用  可用 已用% 挂载点</span><br><span class="line">udev                          7.7G     0  7.7G    0% /dev</span><br><span class="line">tmpfs                         1.6G  9.4M  1.6G    1% /run</span><br><span class="line">/dev/mapper/ruopu64--vg-root   53G   49G  2.0G   97% /</span><br><span class="line">tmpfs                         7.8G   13M  7.7G    1% /dev/shm</span><br><span class="line">tmpfs                         5.0M     0  5.0M    0% /run/lock</span><br><span class="line">tmpfs                         7.8G     0  7.8G    0% /sys/fs/cgroup</span><br><span class="line">/dev/sda1                     236M  227M     0  100% /boot</span><br><span class="line"><span class="meta">#</span><span class="bash"> boot分区没有空间了</span></span><br><span class="line">⚡ ⚙ root@ruopu64  ~  dpkg --get-selections|grep linux-image</span><br><span class="line">linux-image-4.14.0-kali3-amd64			install</span><br><span class="line">linux-image-4.18.0-kali2-amd64			install</span><br><span class="line">linux-image-4.18.0-kali3-amd64			install</span><br><span class="line">linux-image-4.19.0-kali1-amd64			install</span><br><span class="line">linux-image-4.19.0-kali3-amd64			install</span><br><span class="line">linux-image-amd64				install</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看已安装的内核</span></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  uname -a</span><br><span class="line">Linux ruopu64 4.19.0-kali3-amd64 #1 SMP Debian 4.19.20-1kali1 (2019-02-14) x86_64 GNU/Linux</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看正在使用的内核</span></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  apt autoremove linux-image-4.14.0-kali3-amd64</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 自动删除不用的内核，这除了删除4.14版本外，4.18版本也会自动删除</span></span><br><span class="line">  ⚡ ⚙ root@ruopu64  ~  dpkg --get-selections|grep linux-image       </span><br><span class="line">linux-image-4.14.0-kali3-amd64			deinstall</span><br><span class="line">linux-image-4.18.0-kali2-amd64			deinstall</span><br><span class="line">linux-image-4.18.0-kali3-amd64			deinstall</span><br><span class="line">linux-image-4.19.0-kali1-amd64			install</span><br><span class="line">linux-image-4.19.0-kali3-amd64			install</span><br><span class="line">linux-image-amd64				install</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除后查看，被删除的内核后标有deinstall，这表示有卸载残留</span></span><br><span class="line">⚡ ⚙ root@ruopu64  ~  dpkg -P linux-image-4.14.0-kali3-amd64 linux-image-4.18.0-kali2-amd64 linux-image-4.18.0-kali3-amd64</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清理卸载残留</span></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  dpkg --get-selections|grep linux-image</span><br><span class="line">linux-image-4.19.0-kali1-amd64			install</span><br><span class="line">linux-image-4.19.0-kali3-amd64			install</span><br><span class="line">linux-image-amd64				install</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再次查看就没有了</span></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  df -h</span><br><span class="line">文件系统                      容量  已用  可用 已用% 挂载点</span><br><span class="line">udev                          7.7G     0  7.7G    0% /dev</span><br><span class="line">tmpfs                         1.6G  9.4M  1.6G    1% /run</span><br><span class="line">/dev/mapper/ruopu64--vg-root   53G   47G  3.1G   94% /</span><br><span class="line">tmpfs                         7.8G   30M  7.7G    1% /dev/shm</span><br><span class="line">tmpfs                         5.0M     0  5.0M    0% /run/lock</span><br><span class="line">tmpfs                         7.8G     0  7.8G    0% /sys/fs/cgroup</span><br><span class="line">/dev/sda1                     236M  104M  120M   47% /boot</span><br><span class="line"><span class="meta">#</span><span class="bash"> boot分区也有空间了</span></span><br></pre></td></tr></table></figure>
-<h3 id="apt源"><a href="#apt源" class="headerlink" title="apt源"></a>apt源</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/apt/sources.list </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">中科大（加入这一个源即可） </span></span><br><span class="line">deb http://mirrors.ustc.edu.cn/kali kali-rolling main non-free contrib </span><br><span class="line">deb-src http://mirrors.ustc.edu.cn/kali kali-rolling main non-free contrib </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">阿里云 </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">清华大学 </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb http://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src https://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">浙大 </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">东软大学 </span></span><br><span class="line">deb http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib </span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">官方源 </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb http://http.kali.org/kali kali-rolling main non-free contrib </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src http://http.kali.org/kali kali-rolling main non-free contrib </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">重庆大学 </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb http://http.kali.org/kali kali-rolling main non-free contrib </span></span><br><span class="line"><span class="meta">#</span><span class="bash">deb-src http://http.kali.org/kali kali-rolling main non-free contrib </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入上面一行即可 </span></span><br><span class="line">apt update </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样就可使用源了。</span></span><br></pre></td></tr></table></figure>
-<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">1. 系统提示“KDEInit无法启动/usr/bin/systemsettings5”，这时桌面上的图标均不可点，鼠标左右键在桌面上也失灵。需要关闭有问题的程序，之后才会有上面的错误提示。使用中发现是“系统设置”出了问题，需要在系统设置的图标上右键--&gt;属性--&gt;应用程序--&gt;高级选项--&gt;D-Bus注册中要选择“无”。这样就解决问题了。如果其他图标也有此问题，也可按此方法解决。</span><br><span class="line"></span><br><span class="line">2. 新装系统后，无法安装fcitx输入法，提示有lib的软件版本不对，需要使用apt install命令按要求再装一次lib软件，千万不要使用apt autoremove命令卸载软件，或卸载任何软件，不然会出现其他问题。</span><br><span class="line"></span><br><span class="line">3. 新装系统后，安装完各种包后，重启无法进入系统，发现是登录页面的左上角的会话中没有了相应的图形环境。需要重新安装。如：apt install kali-defaults kali-root-login desktop-base kde-plasma-desktop，安装完之后重启即可解决。</span><br><span class="line">参考： https://www.52os.net/articles/kail-change-desktop-environment.html(kali切换桌面环境)</span><br><span class="line"></span><br><span class="line">4. 调整LVM后，开机启动有问题，无法正常进入图形界面，注释/etc/fstab文件中有问题的LVM卷自动挂载后正常，进入系统后修复。</span><br><span class="line"></span><br><span class="line">5. 挂载提示"The disk contains an unclean file system (0, 0).Metadata kept in Windows cache, refused to mount. Falling back to read-only mount because the NTFS partition is in an unsafe state. Please resume and shutdown Windows fully (no hibernation or fast restartin"</span><br><span class="line">root@ruopu64:~# ntfsfix /dev/sda4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修复有问题的分区即可</span></span><br><span class="line"></span><br><span class="line">6. 修改命令提示符</span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export PS1='\[\e]0;\u@\h: \w\a\]$&#123;debian_chroot:+($debian_chroot)&#125;\[\033[01;31    m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入这一行后，提示符只显示当前目录</span></span><br><span class="line"></span><br><span class="line">7. 报错"GLib-GIO-Message: 21:55:51.450: Using the 'memory' GSettings backend.  Your settings will not be saved or shared with other applications."</span><br><span class="line">vim ~/.zshrc</span><br><span class="line">export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules </span><br><span class="line">source  ~/.zshrc</span><br><span class="line"></span><br><span class="line">8. Opera浏览器无法启动</span><br><span class="line">解决：右键Opera图标 --&gt; 应用程序 --&gt; 在命令栏中的最后加入--no-sandbox</span><br><span class="line"></span><br><span class="line">9. 在没有全局代理的情况下让chrome登录google帐号</span><br><span class="line">root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/proxy.pac"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令启动google浏览器就可以连接到本地的端口</span></span><br><span class="line"></span><br><span class="line">10. 安装xfce4桌面后，启动electron-ssr看不到系统托盘中的图标，可以使用Ctrl + Shift + w 调出程序的窗口。</span><br><span class="line"></span><br><span class="line">11. 在系统托盘中没有网络图标时，可以使用nmtui进入启用连接中连接无线网络。</span><br><span class="line"></span><br><span class="line">12. 安装xfce4桌面系统后没有声音。</span><br><span class="line">apt install alsamixergui</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装此软件后部分解决声音问题</span></span><br></pre></td></tr></table></figure>
-<h3 id="VMWare问题解决"><a href="#VMWare问题解决" class="headerlink" title="VMWare问题解决"></a>VMWare问题解决</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1. 安装完VMware后，无法启动，提示“GNU C Compiler(gcc)version 7.3 was not found”</span><br><span class="line">gcc --version</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在是8.2版本</span></span><br><span class="line">apt install -y gcc-7</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装7版本</span></span><br><span class="line">rm /usr/bin/gcc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除软连接</span></span><br><span class="line">ln -s /usr/bin/gcc-7 /usr/bin/gcc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建新的软链接</span></span><br><span class="line">gcc --version</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时查看的版本就是7.3了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动提示linux headers不对</span></span><br><span class="line">apt install linux-headers-$(uname -r)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装后重启系统，就可以进入软件了。</span></span><br><span class="line"></span><br><span class="line">2. 安装vmware-workstation15，安装完成后启动提示“Kernel Headers for version X.X.XX-XX-XX were not found”</span><br><span class="line">解决办法</span><br><span class="line">apt install linux-headers-$(uname -r)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装这个头文件后，启动就正常了</span></span><br><span class="line"></span><br><span class="line">3. 安装VMWare-tools时报错:"there was a problem updating a software component. try again later and if the"，实际是下载有问题</span><br><span class="line">手动解决：</span><br><span class="line">下载地址：http://softwareupdate.vmware.com/cds/vmw-desktop/ws/15.0.4/12990004/windows/packages/，下载其中的tools-windows.tar，之后将其解压，在虚拟机中加载解压后的iso文件即可手动安装。</span><br><span class="line"></span><br><span class="line">4. 添加共享文件夹后，在虚拟机的网络中可以查看到，前提是安装了vmware-tools。</span><br></pre></td></tr></table></figure>
-<h3 id="安装监控软件netdata"><a href="#安装监控软件netdata" class="headerlink" title="安装监控软件netdata"></a>安装监控软件netdata</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">apt update</span><br><span class="line">apt install zlib1g-dev uuid-dev libmnl-dev gcc make autoconf autoconf-archive autogen automake pkg-config curl</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装Netdata的依赖项，其中包括gcc（一个C编译器），GNU Autoconf工具，GUID管理和Netdata内部Web服务器的压缩库。</span></span><br><span class="line">apt install python python-yaml python-mysqldb python-psycopg2 nodejs lm-sensors netcat</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下一组软件包是可选的，但Netdata推荐使用，包括Python，一些Python软件包和Node.JS。与系统包管理器捆绑在一起的稳定版Node.js适用于Netdata的要求。</span></span><br><span class="line">git clone https://github.com/firehol/netdata.git --depth=1 ~/netdata</span><br><span class="line">cd ~/netdata</span><br><span class="line">./netdata-installer.sh</span><br><span class="line">安装时执行回车即可，等待完成。脚本中有一步会使用curl -sSL 命令下载安装包，如果速度太慢，可以到netdata-installer.sh脚本中取消curl的这三个选项。</span><br></pre></td></tr></table></figure>
-<h3 id="安装微信"><a href="#安装微信" class="headerlink" title="安装微信"></a>安装微信</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/geeeeeeeeek/electronic-wechat/releases/download/v1.4.0/linux-x64.tar.gz</span><br><span class="line">tar xf linux-x64.tar.gz</span><br><span class="line">./electronic-wechat-linux-x64/electronic-wechat</span><br></pre></td></tr></table></figure>
-<h3 id="创建启动器"><a href="#创建启动器" class="headerlink" title="创建启动器"></a>创建启动器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Linux 系统中的Desktop Entry 文件以desktop为后缀名。Desktop Entry 文件是 Linux 桌面系统中用于描述程序启动配置信息的文件。</span></span><br><span class="line">wget https://raw.githubusercontent.com/geeeeeeeeek/electronic-wechat/master/assets/icon.png -O electronic-wechat.png</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载一个微信图标</span></span><br><span class="line">mv electronic-wechat.png works/ubuntutool/electronWechat/electronic-wechat-linux-x64/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将图标与执行程序放在一起</span></span><br><span class="line">vim /usr/share/applications/electronic-wechat.desktop</span><br><span class="line">[Desktop Entry]                                                                 </span><br><span class="line">Name=Electronic Wechat</span><br><span class="line">Name[zh_CN]=微信电脑版</span><br><span class="line">Name[zh_TW]=微信电脑版</span><br><span class="line">Exec=/root/works/ubuntutool/electronWechat/electronic-wechat-linux-x64/electronic-wechat</span><br><span class="line">Icon=/root/works/ubuntutool/electronWechat/electronic-wechat-linux-x64/electronic-wechat.png</span><br><span class="line">Terminal=false</span><br><span class="line"><span class="meta">#</span><span class="bash"> 软件打开时是否启动终端</span></span><br><span class="line">X-MultipleArgs=false</span><br><span class="line">Type=Application</span><br><span class="line">Encoding=UTF-8</span><br><span class="line">Categories=Application;Utility;Network;InstantMessaging;</span><br><span class="line">StartupNotify=false</span><br><span class="line">编辑完上面的文件，进入/usr/share/applications 目录就可以看到一个叫微信电脑版的图标，可以在图标上右键，将其发送至桌面，之后就可以双击这个图标启动微信了。</span><br></pre></td></tr></table></figure>
-<h3 id="linux下载工具motrix"><a href="#linux下载工具motrix" class="headerlink" title="linux下载工具motrix"></a>linux下载工具motrix</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">号称是一款全能的下载工具，使用上的确比以往的下载工具好用。下载地址：https://motrix.app/zh-CN/</span><br></pre></td></tr></table></figure>
-<h3 id="安装鼠标主题"><a href="#安装鼠标主题" class="headerlink" title="安装鼠标主题"></a>安装鼠标主题</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">到https://limitland.gitlab.io/flatbedcursors/下载主题，FlatbedCursors-0.5.tar.bz2 </span><br><span class="line">解压主题</span><br><span class="line">将解压的目录都放入/usr/share/icons/中</span><br></pre></td></tr></table></figure>
-<h3 id="解压缩"><a href="#解压缩" class="headerlink" title="解压缩"></a>解压缩</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install xarchiver</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以解压rar和zip文件</span></span><br></pre></td></tr></table></figure>
-<h3 id="查看网速"><a href="#查看网速" class="headerlink" title="查看网速"></a>查看网速</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  apt install -y nethogs</span><br><span class="line"><span class="meta">#</span><span class="bash"> nethogs可以查看实时进程网络占用</span></span><br><span class="line">⚡ root@ruopu64  ~  nethogs wlan0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看某网络状态</span></span><br><span class="line"></span><br><span class="line"> ⚡ root@ruopu64  ~  apt install ethstatus</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 可以监控实时的网卡带宽占用</span></span><br><span class="line"> ⚡ root@ruopu64  ~  ethstatus -i wlan0</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 查看网卡速度</span></span><br><span class="line"> </span><br><span class="line"> ⚡ root@ruopu64  ~  apt install bmon</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 监控网卡状态</span></span><br><span class="line"> ⚡ root@ruopu64  ~  bmon -p wlan0</span><br><span class="line">* 输入g控制流量面板的显示和隐藏 </span><br><span class="line">* 输入d控制详情信息的显示和隐藏 </span><br><span class="line">* 输入q退出面板 </span><br><span class="line">可以配合nginx部署通过浏览器监控网络</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Netspeed是拥有GUI界面实时显示网速的工具，未测试</span></span><br><span class="line">sudo add-apt-repository ppa:ferramroberto/linuxfreedomlucid &amp;&amp; sudo apt-get update </span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加源</span></span><br><span class="line">sudo apt-get install netspeed</span><br></pre></td></tr></table></figure>
-<h3 id="安装xfce4桌面"><a href="#安装xfce4桌面" class="headerlink" title="安装xfce4桌面"></a>安装xfce4桌面</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install xfce4 xfce4-goodies kali-desktop-xfce</span><br><span class="line"><span class="meta">#</span><span class="bash"> xfce4是基础的包，xfce4-goodies是很多插件的包，kali-desktop-xfce安装后才能看到系统托盘中的网络图标。但最后还是有一些图标在系统托盘中看不到，原因不明。</span></span><br></pre></td></tr></table></figure>
-<h3 id="清理家目录中的-cache文件"><a href="#清理家目录中的-cache文件" class="headerlink" title="清理家目录中的.cache文件"></a>清理家目录中的.cache文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> ⚡ root@ruopu64  ~  df -h</span><br><span class="line">文件系统                      容量  已用  可用 已用% 挂载点</span><br><span class="line">udev                          7.7G     0  7.7G    0% /dev</span><br><span class="line">tmpfs                         1.6G  9.8M  1.6G    1% /run</span><br><span class="line">/dev/mapper/ruopu64--vg-root   53G   48G  2.8G   95% /</span><br><span class="line"><span class="meta">#</span><span class="bash"> root目录增长太大</span></span><br><span class="line"> ⚡ root@ruopu64  ~  find ~/.cache -size +100M -delete</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 清理大于100M的文件</span></span><br><span class="line">  ⚡ root@ruopu64  ~  find ~/.cache -type f -atime +365</span><br><span class="line"><span class="meta">  #</span><span class="bash"> 清理日期大于365天的文件</span></span><br></pre></td></tr></table></figure>
-<h3 id="设置开机启动"><a href="#设置开机启动" class="headerlink" title="设置开机启动"></a>设置开机启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"> ⚡ ⚙ root@ruopu64  ~  vim /lib/systemd/system/rc.local.service</span><br><span class="line"><span class="meta"> #</span><span class="bash">  SPDX-License-Identifier: LGPL-2.1+</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash">  This file is part of systemd.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash">  systemd is free software; you can redistribute it and/or modify it</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  under the terms of the GNU Lesser General Public License as published by</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  the Free Software Foundation; either version 2.1 of the License, or</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  (at your option) any later version.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> This unit gets pulled automatically into multi-user.target by</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> systemd-rc-local-generator <span class="keyword">if</span> /etc/rc.local is executable.</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=/etc/rc.local Compatibility</span><br><span class="line">Documentation=man:systemd-rc-local-generator(8)</span><br><span class="line">ConditionFileIsExecutable=/etc/rc.local</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=forking</span><br><span class="line">ExecStart=/etc/rc.local start</span><br><span class="line">TimeoutSec=0</span><br><span class="line">RemainAfterExit=yes</span><br><span class="line">GuessMainPID=no</span><br><span class="line"></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  vim /etc/rc.local</span><br><span class="line"><span class="meta"> #</span><span class="bash">!/bin/sh -e</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> rc.local</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> This script is executed at the end of each multiuser runlevel.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Make sure that the script will <span class="string">"exit 0"</span> on success or any other</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> value on error.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> In order to <span class="built_in">enable</span> or <span class="built_in">disable</span> this script just change the execution</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> bits.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> By default this script does nothing.</span></span><br><span class="line"></span><br><span class="line">electron-ssr</span><br><span class="line">/bin/bash /root/sh/Typora.sh</span><br><span class="line"></span><br><span class="line">exit 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此文件需要手动创建。服务启动后，将要启动的命令或脚本放入此文件即可。</span></span><br><span class="line"></span><br><span class="line"> ⚡ ⚙ root@ruopu64  ~  systemctl start rc-local.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务</span></span><br><span class="line">  ⚡ ⚙ root@ruopu64  ~  systemctl status rc-local.service</span><br><span class="line">  ● rc-local.service - /etc/rc.local Compatibility</span><br><span class="line">   Loaded: loaded (/lib/systemd/system/rc-local.service; static; vendo</span><br><span class="line">  Drop-In: /lib/systemd/system/rc-local.service.d</span><br><span class="line">           └─debian.conf</span><br><span class="line">   Active: active (exited) since Fri 2019-03-22 08:15:42 CST; 7min ago</span><br><span class="line">     Docs: man:systemd-rc-local-generator(8)</span><br><span class="line">  Process: 4063 ExecStart=/etc/rc.local start (code=exited, status=0/S</span><br><span class="line"></span><br><span class="line">3月 22 08:15:42 ruopu64 systemd[1]: Starting /etc/rc.local Compatibili</span><br><span class="line">3月 22 08:15:42 ruopu64 systemd[1]: Started /etc/rc.local Compatibilit</span><br><span class="line">lines 1-10/10 (END)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态应该是active</span></span><br><span class="line">⚡ ⚙ root@ruopu64  ~  systemctl enable rc-local</span><br><span class="line">⚡ ⚙ root@ruopu64  ~  systemctl list-unit-files</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看开机启动项</span></span><br></pre></td></tr></table></figure>
-<h3 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu64:~#useradd -m python</span><br><span class="line">root@ruopu64:~#passwd python</span><br><span class="line">root@ruopu64:~#vim /etc/passwd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将用户的shell改为/bin/bash，默认是sh，切换到用户后没有自动补全，命令提示符也有问题，改为bash后就正常了。</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改命令提示符显示效果"><a href="#修改命令提示符显示效果" class="headerlink" title="修改命令提示符显示效果"></a>修改命令提示符显示效果</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.bashrc</span><br><span class="line">export PS1='\[\e]0;\u@\h: \w\a\]$&#123;debian_chroot:+($debian_chroot)&#125;    \[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里就是将最后的小写w改为大写W，这条PS1的命令也是从.bashrc文件内容中的一部分复制过来的</span></span><br></pre></td></tr></table></figure>
-<h3 id="apt使用"><a href="#apt使用" class="headerlink" title="apt使用"></a>apt使用</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get包管理在卸载软件后不要轻易使用apt-get autoremove，否则极容易各种悲剧。如果真想卸载干净，可以用apt-get purge</span><br></pre></td></tr></table></figure>
-<h3 id="pycharm安装"><a href="#pycharm安装" class="headerlink" title="pycharm安装"></a>pycharm安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">将pycharm- 2018.3.4 .tar.gz复制 到所需的安装位置（确保您具有该目录的rw权限）</span><br><span class="line">使用以下命令将pycharm- 2018.3.4 .tar.gz文件解压缩到空目录： </span><br><span class="line">tar -xzf pycharm- 2018.3.4 .tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash"> 新的实例必须不超过现有的提取。目标文件夹必须为空。</span></span><br><span class="line">删除pycharm- 2018.3.4 .tar.gz以节省磁盘空间（可选）</span><br><span class="line">从bin子目录运行pycharm.sh</span><br></pre></td></tr></table></figure>
-<h3 id="anaconda3安装"><a href="#anaconda3安装" class="headerlink" title="anaconda3安装"></a>anaconda3安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">下载https://www.anaconda.com/download/，下载后是一个shell脚本，执行即可，回答都是yes或回车。使用root用户安装没有问题，使用其他用户安装时无法连接图形界面。这里有一个问题，就是要安装anaconda3后，python命令会变成anaconda3中bin目录中的python命令，这修改了系统的默认python版本，建议删除anaconda目录中bin目录下的python软链接，bin目录中的jupyter-noteboot打开后，修改第一行的内容，在python后加上3.7，也就是使用anaconda目录中bin目录下的python3.7打开jupyter-notebook，这样就可以使用jupyter-notebook了。</span><br></pre></td></tr></table></figure>
-<h3 id="安装视频录制软件obs"><a href="#安装视频录制软件obs" class="headerlink" title="安装视频录制软件obs"></a>安装视频录制软件obs</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu64:~#apt install ffmpeg</span><br><span class="line">root@ruopu64:~#apt install obs-studio</span><br></pre></td></tr></table></figure>
-<h3 id="安装输入法"><a href="#安装输入法" class="headerlink" title="安装输入法"></a>安装输入法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">apt install fcitx-* -y </span><br><span class="line">im-config</span><br><span class="line"><span class="meta">#</span><span class="bash"> 选择fcitx作为默认输入法</span></span><br><span class="line">vim /etc/default/im-config </span><br><span class="line">    IM_CONFIG_DEFAULT_MODE=fcitx</span><br><span class="line"><span class="meta">	#</span><span class="bash">  原来的值是auto，将其改为fcitx。这一步非常关键。重启后可以使用fcitx输入法，但右上角没有输入法的显示，不明原因。</span></span><br><span class="line">fcitx-config-gtk3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置输入法</span></span><br><span class="line"></span><br><span class="line">apt install kde-config-fcitx </span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装后就可以执行im-config，如果没有此命令就先下载 </span></span><br><span class="line">vim /etc/X11/xinit/xinputrc</span><br><span class="line">    run_im fcitx</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 这项也一定要改</span></span><br><span class="line"></span><br><span class="line">*** 下面可以不用设置</span><br><span class="line">vim ~/.bashrc  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在最下方添加</span></span><br><span class="line">export XMODIFIERS=@im=fcitx</span><br><span class="line">export QT_IM_MODULE=xim</span><br><span class="line">export GTK_IM_MODULE=xim</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">export</span> XMODIFIERS=@im=ibus</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">export</span> QT_IM_MODULE=ibus</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">export</span> GTK_IM_MODULE=ibus</span></span><br></pre></td></tr></table></figure>
-<h3 id="安装老版本firefox"><a href="#安装老版本firefox" class="headerlink" title="安装老版本firefox"></a>安装老版本firefox</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 因为需要连接VPN，且在linux主机上只能安装在老版本的firefox上，所以不得不先安装老版本的firefox</span></span><br><span class="line">首先在https://pkgs.org/download/firefox中找到了一个debian7上安装的firefox-esr_52.8.0esr-1~deb7u1_amd64.deb。安装时还会依赖一些包，也需要从这个网址下载，所需包有libhunspell-1.3-0_1.3.3-3_amd64.deb、libevent-2.0-5_2.0.21-stable-3_amd64.deb、libjsoncpp0_0.6.0_rc2-3.1_amd64.deb、libffi5_3.0.10-3_amd64.deb、libpango1.0-0_1.40.5-1_amd64.deb。</span><br><span class="line"> ⚡ root@ruopu64  ~  apt remove firefox-esr</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 首先卸载之前安装的firefox</span></span><br><span class="line"> ⚡ root@ruopu64  ~  find / -name firefox</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 找一下是否还有残留的文件，发现只在用户家目录中有一些缓存文件，都删除即可</span></span><br><span class="line"> ⚡ root@ruopu64  ~  gdebi firefox-esr_52.8.0esr-1\~deb7u1_amd64.deb</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 安装老版本的firefox，如果有依赖问题，就先安装依赖包</span></span><br><span class="line"> 安装好之后，打开firefox，在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。</span><br><span class="line"> 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份执行解压后目录中的install.sh脚本，之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，登录后就可以访问内网了。</span><br></pre></td></tr></table></figure>
-<h3 id="忽略某个可以升级的包"><a href="#忽略某个可以升级的包" class="headerlink" title="忽略某个可以升级的包"></a>忽略某个可以升级的包</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">⚡ ⚙ root@ruopu64  ~  apt-mark hold firefox-esr </span><br><span class="line">firefox-esr 设置为保留。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令可以忽略某个可以升级的包，再使用apt upgrade时就不会升级此包了。</span></span><br><span class="line">apt-mark unhold firefox-esr</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此命令可以解除忽略的包</span></span><br></pre></td></tr></table></figure>
-<h3 id="连接VPN网络"><a href="#连接VPN网络" class="headerlink" title="连接VPN网络"></a>连接VPN网络</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">当宿主机的firefox连接到VPN后，虚拟机使用NAT方式联网，就可以连接到VPN网络内，无需设置。</span><br></pre></td></tr></table></figure>
-<h3 id="安装oh-my-zsh及问题解决"><a href="#安装oh-my-zsh及问题解决" class="headerlink" title="安装oh-my-zsh及问题解决"></a>安装oh-my-zsh及问题解决</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">apt install -y zsh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装zsh</span></span><br><span class="line">echo $SHELL</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前shell</span></span><br><span class="line">cat /etc/shell</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看系统安装的shell</span></span><br><span class="line">chsh -s /bin/zsh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改用户shell，修改后在/etc/passwd中的用户shell也会变为/bin/zsh</span></span><br><span class="line">重启系统用户shell生效</span><br><span class="line">wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装oh-my-zsh，前提是要先安装过git</span></span><br><span class="line">vim ~/.zshrc</span><br><span class="line">ZSH_THEME="agnoster"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改为这个主题，个人喜欢</span></span><br><span class="line">source .zshrc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加载文件生效</span></span><br><span class="line">ls ~/.oh-my-zsh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是安装后的目录，其中的lib提供了核心功能的脚本库，tools提供安装、升级等功能的快捷工具、plugins自带插件的存放位置，templates是自带的zshrc模板，也就是家目录中的.zshrc文件，temes是主题存放位置，custom是个性化配置目录，自安装的插件和主题存在这里。</span></span><br><span class="line">主题效果查看地址：https://github.com/robbyrussell/oh-my-zsh/wiki/Themes</span><br><span class="line">zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/</span><br><span class="line"></span><br><span class="line">===============================</span><br><span class="line">  在zsh中使用find命令不能使用星号</span><br><span class="line">===============================</span><br><span class="line"> ⚡ root@ruopu64  ~  vim .zshrc </span><br><span class="line"> setopt no_nomatch</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 在使用find / -name *.txt命令时，提示<span class="string">"zsh : no matchs found: *.txt"</span>，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。</span></span><br></pre></td></tr></table></figure>
-<h3 id="vim配置"><a href="#vim配置" class="headerlink" title="vim配置"></a>vim配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">在用户家目录中创建的.vimrc文件只对当前用户生效，配置后不用重新加载，立即生效。但/etc下的vimrc配置会失效，所以这个文件中要将需要的功能都写入。</span><br><span class="line">vim ~/.vimrc</span><br><span class="line">set nocompatible</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不与 Vi 兼容（采用 Vim 自己的操作命令）</span></span><br><span class="line">set nu      </span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示行号                                                                </span></span><br><span class="line">set hlsearch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 搜索时，高亮显示匹配结果。</span></span><br><span class="line">set showmatch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 光标遇到圆括号、方括号、大括号时，自动高亮对应的另一个圆括号、方括号和大括号。</span></span><br><span class="line">set history=1000</span><br><span class="line"><span class="meta">#</span><span class="bash"> Vim 需要记住多少次历史操作。</span></span><br><span class="line">syntax on</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打开语法高亮。自动识别代码，使用多种颜色显示。即使加载时报错，也要加入此行</span></span><br><span class="line">set cursorline</span><br><span class="line"><span class="meta">#</span><span class="bash"> 光标所在的当前行高亮。</span></span><br><span class="line">set showcmd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令模式下，在底部显示，当前键入的指令。比如，键入的指令是2y3d，那么底部就会显示2y3，当键入d的时候，操作完成，显示消失。</span></span><br><span class="line">set autoindent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 按下回车键后，下一行的缩进会自动跟上一行的缩进保持一致。</span></span><br><span class="line">set expandtab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 由于 Tab 键在不同的编辑器缩进不一致，该设置自动将 Tab 转为空格。</span></span><br><span class="line">set wrap</span><br><span class="line"><span class="meta">#</span><span class="bash"> 自动折行，即太长的行分成几行显示。</span></span><br><span class="line">set incsearch</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输入搜索模式时，每输入一个字符，就自动跳到第一个匹配的结果。</span></span><br><span class="line">set ignorecase</span><br><span class="line"><span class="meta">#</span><span class="bash"> 搜索时忽略大小写。</span></span><br><span class="line">colorscheme slate 即使加载时报错，也要加入此行</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调整配色方案，还有default、blue、darkblue、delek、desert、elflord、evening、industry、koehler、morning、murphy、pablo、peachpuff、ron、shine、slate、torte、zellner</span></span><br><span class="line">highlight StatusLine guifg=SlateBlue guibg=Yellow </span><br><span class="line">highlight StatusLineNC guifg=Gray guibg=White</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态行颜色，不使用</span></span><br><span class="line">set tabstop=4 </span><br><span class="line">＃ 制表符为4</span><br><span class="line">set softtabstop=4 </span><br><span class="line">set shiftwidth=4</span><br><span class="line">＃ 统一缩进为4 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建.vimrc文件后就可以在命令行中使用鼠标右键了，这是抵消了/etc/vimrc文件中的设置。</span></span><br><span class="line"></span><br><span class="line">vim命令粘贴带数字或符号的信息时格式混乱解决</span><br><span class="line">使用vim打开文件时，使用:set paste命令关闭缩进功能就可以解决了。如果要开启缩进功能，使用命令:set nopaste。或一种方法是，打开.vimrc文件，加入set pastetoggle=&lt;F9&gt;，之后可以使用F9键来切换缩进功能了。配置文件中的&lt;F9&gt;是按F9键录入的。</span><br><span class="line"></span><br><span class="line">在vim中，使用%表示全文</span><br><span class="line"></span><br><span class="line">关闭高亮</span><br><span class="line">:nohl</span><br></pre></td></tr></table></figure>
-<h3 id="GitKraken"><a href="#GitKraken" class="headerlink" title="GitKraken"></a>GitKraken</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">官网：https://www.gitkraken.com/，首页左侧有git客户端下载，安装即可。</span><br></pre></td></tr></table></figure>
-<h3 id="tilix"><a href="#tilix" class="headerlink" title="tilix"></a>tilix</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">apt install -y tilix</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一款不错的linux终端仿真器</span></span><br><span class="line">下载配色方案，https://www.ctolib.com/Gogh.html，这里提供了一个配色方法，大根提供进200种方案，如果选择ALL，表示全部安装，或只输入要安装的方案的编号即可。如果安装全部，可能会比较慢。在https://mayccoll.github.io/Gogh/中有配色方案的样例。</span><br><span class="line">bash -c  "$(wget -qO- https://git.io/vQgMr)"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 运行此命令即可安装配色方案。个人比较喜欢Mona Lisa这个方案，还有google的，github的，方案号有50，52，53，89，</span></span><br><span class="line">apt install dconf-cli</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装配色方案前要安装此包。</span></span><br><span class="line"></span><br><span class="line">配色方案支持的终端</span><br><span class="line">Supported terminals:</span><br><span class="line">   mintty and deriviates</span><br><span class="line">   guake</span><br><span class="line">   iTerm2</span><br><span class="line">   elementary terminal (pantheon/elementary)</span><br><span class="line">   mate-terminal</span><br><span class="line">   gnome-terminal</span><br><span class="line">   tilix</span><br></pre></td></tr></table></figure>
-<h3 id="mate-terminal"><a href="#mate-terminal" class="headerlink" title="mate-terminal"></a>mate-terminal</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">apt install mate-terminal</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个终端使用起来更好用一些</span></span><br><span class="line">bash -c  "$(wget -qO- https://git.io</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在选择安装后，可以试着选n来安装使用，这需要尝试，当使用y会有dconf的错误提示的时候可以这样试一下。</span></span><br><span class="line">安装主题后，这个终端是通过新建配置文件来修改终端主题的，安装一个主题后就可以创建一个新的配置文件了。但在设置时还是会有一些混乱的问题，需要反复测试。</span><br><span class="line">root@ruopu:~# mv /usr/bin/konsole&#123;,.bak&#125;</span><br><span class="line">root@ruopu:~# mv /usr/bin/mate-terminal.wrapper /usr/bin/konsole</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这只是修改默认终端的权宜之计，还没有找到更好的办法。另外，一定要修改mate-terminal.wrapper，如果修改的是mate-terminal是打不开终端的。</span></span><br></pre></td></tr></table></figure>
-<h3 id="修改程序默认终端模拟器"><a href="#修改程序默认终端模拟器" class="headerlink" title="修改程序默认终端模拟器"></a>修改程序默认终端模拟器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu64:~#mv /usr/bin/konsole&#123;,.bak&#125;</span><br><span class="line">root@ruopu64:~#ln -sv /usr/bin/tilix.wrapper /usr/bin/konsole</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样打开终端时就会使用tilix了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 尝试使用root@ruopu64:~<span class="comment">#update-alternatives --config x-terminal-emulator命令修改没有成功</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在设置中的应用程序中修改默认打开的终端也没有成功</span></span><br></pre></td></tr></table></figure>
-<h3 id="网易云音乐"><a href="#网易云音乐" class="headerlink" title="网易云音乐"></a>网易云音乐</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">直接无法启动，没有反应</span><br><span class="line"> vim /usr/share/applications/netease-cloud-music.desktop</span><br><span class="line">    ...</span><br><span class="line">    Exec=netease-cloud-music --no-sandbox %U</span><br><span class="line">    ...</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改上面一行的设置</span></span><br><span class="line">如果上面的设置不起作用，就需要使用sudo启动软件了</span><br><span class="line">sudo netease-cloud-music</span><br></pre></td></tr></table></figure>
-<h3 id="启动盘制作软件"><a href="#启动盘制作软件" class="headerlink" title="启动盘制作软件"></a>启动盘制作软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">官网：https://unetbootin.github.io/linux_download.html</span><br><span class="line">下载binary文件</span><br><span class="line">chmod +x unetbootin-linux</span><br><span class="line">./unetbootin-linux</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在官网上有安装的方法可以查看</span></span><br></pre></td></tr></table></figure>
-<h3 id="截图软件"><a href="#截图软件" class="headerlink" title="截图软件"></a>截图软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apt install flameshot</span><br><span class="line">设置&gt;工作区&gt;快捷键&gt;全局快捷键，之后选择加号，然后选择要使用快捷键的程序，在右侧设置此程序的快捷键。</span><br><span class="line"></span><br><span class="line">⚡ root@ruopu64  ~  apt install deepin-screenshot</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个软件在xfce4环境下更管用，在xfce4环境中安装上面的软件打不开。</span></span><br></pre></td></tr></table></figure>
-<h3 id="固态硬盘优化"><a href="#固态硬盘优化" class="headerlink" title="固态硬盘优化"></a>固态硬盘优化</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo hdparm -I /dev/sdx | grep "TRIM supported"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看固态硬盘是否支持trim</span></span><br><span class="line">vim fstrim.sh</span><br><span class="line">    #!/bin/sh</span><br><span class="line">    LOG=/var/log/trim.log</span><br><span class="line">    echo "*** $(date -R) ***" &gt;&gt; $LOG</span><br><span class="line">    fstrim -v / &gt;&gt; $LOG</span><br><span class="line">    fstrim -v /home &gt;&gt; $LOG</span><br><span class="line">chmod +x fstrim.sh</span><br><span class="line">crontab -e</span><br><span class="line">    0 9 * * * /bin/bash /root/sh/fstrim.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每天9点定时执行</span></span><br></pre></td></tr></table></figure>
-<h3 id="kali启动盘制作"><a href="#kali启动盘制作" class="headerlink" title="kali启动盘制作"></a>kali启动盘制作</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">U盘安装KaliLinux时，用win32diskimager将镜像拷到U盘中，用软碟通拷到U盘后，安装时提示启动失败。</span><br></pre></td></tr></table></figure>
-<h3 id="區域，不然會是英文，即使選了中文安裝"><a href="#區域，不然會是英文，即使選了中文安裝" class="headerlink" title="區域，不然會是英文，即使選了中文安裝"></a>區域，不然會是英文，即使選了中文安裝</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo LANG="zh_CN.UTF-8" &gt; /etc/default/locale </span><br><span class="line">reboot </span><br><span class="line">apt update</span><br></pre></td></tr></table></figure>
-<h3 id="安装SecureCRT"><a href="#安装SecureCRT" class="headerlink" title="安装SecureCRT"></a>安装SecureCRT</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. 安装secureCRT7.3.3 </span><br><span class="line">vim /etc/apt/sources.list </span><br><span class="line">deb http://ftp.de.debian.org/debian jessie main </span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为安装secureCRT7.3.3需要先安装libssl1.0.0，但kalilinux中安装的是1.0.2版本，所以要加入一个源地址。这个源很关键，对于之后安装如google，很有用。 </span></span><br><span class="line">apt update </span><br><span class="line">apt install libssl1.0.0 </span><br><span class="line">gdebi scrt-7.3.3-779.ubuntu13-64.x86_64.deb </span><br><span class="line"><span class="meta">#</span><span class="bash"> 要用gdebi，用dpkg不能安装 </span></span><br><span class="line">perl securecrt_linux_crack.pl /usr/bin/SecureCRT </span><br><span class="line"></span><br><span class="line">2. 启动SecureCRT </span><br><span class="line"></span><br><span class="line">3. 将perl命令的执行结果输入到SecureCRT中即可</span><br><span class="line"></span><br><span class="line">4. options-&gt; session Options -&gt; Terminal -&gt; audio bell （删除勾选）</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭SecureCRT输入命令时按Tab的声音</span></span><br></pre></td></tr></table></figure>
-<h3 id="安装tofrodos"><a href="#安装tofrodos" class="headerlink" title="安装tofrodos"></a>安装tofrodos</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install tofrodos</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此包安装后有两个命令，todos和fromdos，相当于unix2dos和dos2unix。</span></span><br></pre></td></tr></table></figure>
-<h3 id="文件对比软件"><a href="#文件对比软件" class="headerlink" title="文件对比软件"></a>文件对比软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install -y meld</span><br></pre></td></tr></table></figure>
-<h3 id="安装jq命令"><a href="#安装jq命令" class="headerlink" title="安装jq命令"></a>安装jq命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install jq</span><br><span class="line"><span class="meta">#</span><span class="bash"> jq命令可以将json格式文件格式化</span></span><br></pre></td></tr></table></figure>
-<h3 id="google-chrome不能启动"><a href="#google-chrome不能启动" class="headerlink" title="google-chrome不能启动"></a>google-chrome不能启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">下载chrome：wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb</span><br><span class="line"></span><br><span class="line">從官網下載瀏覽器，启动時會有報錯，但可以使用google-chrome-stable --no-sandbox啟動。 </span><br><span class="line"></span><br><span class="line">vim /usr/bin/google-chrome </span><br><span class="line">    exec -a "$0" "$HERE/chrome" "$@" --user-data-dir --no-sandbox</span><br><span class="line"><span class="meta">#</span><span class="bash"> 无法直接启动谷歌浏览器，要在启动文件中修改上面一行，在配置文件的最后一行 </span></span><br><span class="line">或者 </span><br><span class="line">google-chrome --no-sandbox </span><br><span class="line"><span class="meta">#</span><span class="bash"> 用此种方法也可以启动 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动chromium浏览器也可用此方法</span></span><br></pre></td></tr></table></figure>
-<h3 id="远程连接软件"><a href="#远程连接软件" class="headerlink" title="远程连接软件"></a>远程连接软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install remmina*</span><br></pre></td></tr></table></figure>
-<h3 id="视频播放软件"><a href="#视频播放软件" class="headerlink" title="视频播放软件"></a>视频播放软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install -y smplayer</span><br></pre></td></tr></table></figure>
-<h3 id="记录软件"><a href="#记录软件" class="headerlink" title="记录软件"></a>记录软件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install -y keepnote</span><br></pre></td></tr></table></figure>
-<h3 id="邮件客户端"><a href="#邮件客户端" class="headerlink" title="邮件客户端"></a>邮件客户端</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install thunderbird evolution</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这两个客户端都可以使用</span></span><br></pre></td></tr></table></figure>
-<h3 id="everynote云笔记"><a href="#everynote云笔记" class="headerlink" title="everynote云笔记"></a>everynote云笔记</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">apt install nixnote2</span><br><span class="line"></span><br><span class="line">tusk是另一款evernote第三方客户端，下载地址：https://github.com/klaussinani/tusk/releases/tag/v0.22.0</span><br><span class="line">使用中发现两个问题，一是打开软件需要等待较长时间，才能登录evernote，大概三至五分钟。第二是复制到软件内的图片无法显示，如果单独再复制一次，在网页版的evernote上就会看到两张同样的图片。</span><br><span class="line"></span><br><span class="line">whatever是一款evernote第三方客户端，下载地址：https://sourceforge.net/projects/whatever-evernote-client/files/v1.0.0/Whatever_1.0.0_amd64.deb/download。登录缓慢，登录后无法打开，一片空白。</span><br></pre></td></tr></table></figure>
-<h3 id="vmware虚拟机自动挂起"><a href="#vmware虚拟机自动挂起" class="headerlink" title="vmware虚拟机自动挂起"></a>vmware虚拟机自动挂起</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">挂起是虚拟机的操作本身的休眠功能，关闭即可。如win7的休眠功能</span><br></pre></td></tr></table></figure>
-<h3 id="kali制作启动盘工具"><a href="#kali制作启动盘工具" class="headerlink" title="kali制作启动盘工具"></a>kali制作启动盘工具</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">安装live-usb-install-2.5.12-all.deb</span><br><span class="line">下载地址：http://live.learnfree.eu/wp-content/uploads/2017/12/wp-static-html-output-1-lokster/download/</span><br></pre></td></tr></table></figure>
-<h3 id="PDF阅读器"><a href="#PDF阅读器" class="headerlink" title="PDF阅读器"></a>PDF阅读器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt install okular</span><br><span class="line">按F6快捷键打开注释功能</span><br><span class="line">参考：https://blog.csdn.net/yangzhongxuan/article/details/8242740</span><br></pre></td></tr></table></figure>
-<h3 id="安装kvm"><a href="#安装kvm" class="headerlink" title="安装kvm"></a>安装kvm</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">root@ruopu64:~#apt install -y qemu-kvm  bridge-utils virt-manager python-libvirt</span><br><span class="line"><span class="meta">#</span><span class="bash"> python-libvirt一定要安装，不然安装时会报错。</span></span><br><span class="line">root@ruopu64:~#systemctl start libvirtd</span><br><span class="line">root@ruopu64:~#systemctl status libvirtd</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面安装网桥</span></span><br><span class="line">root@ruopu64:~#vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span><span class="bash"> This file describes the network interfaces available on your system                 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> and how to activate them. For more information, see interfaces(5).</span></span><br><span class="line"></span><br><span class="line">source /etc/network/interfaces.d/*</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> The loopback network interface</span></span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto bridge0</span><br><span class="line">iface bridge0 inet static</span><br><span class="line">address 192.168.1.9</span><br><span class="line">broadcast 192.168.1.255</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.1.1</span><br><span class="line">bridge_ports eth1</span><br><span class="line">bridge_stp off</span><br><span class="line">bridge_waitport 0</span><br><span class="line">bridge_fd 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加网桥</span></span><br><span class="line">root@ruopu64:win7#/etc/init.d/networking restart</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启网卡</span></span><br><span class="line">root@ruopu64:win7#vim /etc/resolv.conf</span><br><span class="line">nameserver 114.114.114.114</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置网卡后，网桥与桥接的网卡都要启动才行。</span></span><br><span class="line">重启电脑</span><br><span class="line">root@ruopu64:networks#virsh net-list </span><br><span class="line"> Name      State    Autostart   Persistent</span><br><span class="line">--------------------------------------------</span><br><span class="line"> default   active   yes         yes</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面可以安装虚拟机</span></span><br></pre></td></tr></table></figure>
-<h3 id="安装Robo-3T"><a href="#安装Robo-3T" class="headerlink" title="安装Robo 3T"></a>安装Robo 3T</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">官网下载robo3t-1.3.1-linux-x86_64-7419c406.tar.gz</span><br><span class="line">解压文件，到目录中执行bin目录下的robo3t即可打开</span><br></pre></td></tr></table></figure>
-<h3 id="安装JMeter"><a href="#安装JMeter" class="headerlink" title="安装JMeter"></a>安装JMeter</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">官网http://jmeter.apache.org/download_jmeter.cgi，下载Apache的JMeter的-5.1.1.tgz。解压文件，执行解压后的目录中的bin目录下的jmeter即可打开。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -2538,7 +2538,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">130</span>
+                    <span class="site-state-item-count">132</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2820,7 +2820,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">100</span>
+                      
+                    
+                    <span class="site-state-item-count">101</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
