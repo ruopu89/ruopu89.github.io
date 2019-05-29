@@ -426,6 +426,40 @@ tar -xzf pycharm- 2018.3.4 .tar.gz
 
 
 
+### 安装java-jdk
+
+```shell
+下载地址：https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+下载前需要先登录
+cd works/ubuntutool/java-jdk
+# 进入下载目录
+tar xf jdk-8u211-linux-x64.tar.gz
+mv jdk1.8.0_211 /usr/local/jdk1.8
+# 移动到/usr/local目录下
+vim /etc/profile.d/java.sh
+export JAVA_HOME=/usr/local/jdk1.8                                         
+export JRE_HOME=${JAVA_HOME}/jre
+source /etc/profile
+$ java -version
+java version "1.8.0_211"
+Java(TM) SE Runtime Environment (build 1.8.0_211-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.211-b12, mixed mode)
+```
+
+
+
+### VirtualBox共享文件夹
+
+```shell
+因为使用apt安装的VirtualBox在安装增强功能时会有网络问题，无法下载安装，所以采用下载安装包的方法安装，另外，安装6.0版本时会有包依赖问题，所以使用了5.2.20版本
+下载地址：http://download.virtualbox.org/virtualbox/5.2.20/
+下载 Oracle_VM_VirtualBox_Extension_Pack-5.2.20-125813.vbox-extpack包，此为增强功能的包，virtualbox-5.2_5.2.20-125813~Ubuntu~bionic_amd64.deb为程序安装包
+安装好程序包后，打开页面左上解的管理，之后选择全局设定，在其中的扩展中选择添加刚才下载的增强功能包，之后就可以自动安装了。下面需要在已安装操作系统的页面上点击上方设备中的安装增强功能，之后就可以看到虚拟机操作系统中的光驱中挂载了光盘，打开安装后就可以使用VirtualBox的共享文件夹功能了。
+进入虚拟机后可以在网络中看到共享的文件夹。
+```
+
+
+
 ### 安装视频录制软件obs
 ```shell
 root@ruopu64:~#apt install ffmpeg

@@ -27,7 +27,7 @@ categories: git
 
 ![](/images/gitkraken/createauth.png)
 
-6. 这里需要创建一个GitKraken的密钥。使用root的密钥不能成功上传
+6. 这里需要创建一个GitKraken的密钥，创建密钥后会自动被添加到github中。使用root的密钥不能成功上传
 
 ![](/images/gitkraken/createauth2.png)
 

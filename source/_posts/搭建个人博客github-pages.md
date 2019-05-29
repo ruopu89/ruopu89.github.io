@@ -411,6 +411,10 @@ hexo d
 ### github个人博客多电脑使用
 
 ```shell
+apt install nodejs
+apt install npm
+npm install hexo-cli -g
+npm install hexo-deployer-git --save
 cd /home/GitHub/ruopu.github.io
 ssh-keygen -t rsa -C "ruopu19@hotmail.com"
 # -C后的是一些描述信息
@@ -422,7 +426,7 @@ git config --global user.name "ruopu1989"
 git config --global user.email "ruopu1989@hotmail.com"
 # 自报家门
 git init
-给源文件目录初始化git，虽然目录中已有内容，但这也不会报错的
+# 给源文件目录初始化git，虽然目录中已有内容，但这也不会报错的
 git remote add origin https://github.com/abc/abc.github.io.git
 # 与远程的origin分支关联，最后的地址是github上项目的地址。使用git push时如果提示需要输入用户名和密码，可以删除远程地址，再试。命令：git remote remove origin。另外，这里也可以使用git@github.com:abc/abc.github.io.git地址。
 git checkout -b source
@@ -451,6 +455,7 @@ git push origin source
 推送时出现问题，原因是想将本地的文件推送到远程，但与远程有很多不同。可以使用下面命令强行推送。但本地的文件可能丢失。推送前将文件备份，推送后将丢失的文再复制到相应目录，再推送就可以了。
 git push -f origin source
 
+==============================================================================================
 另外还涉及一些常用命令
 git branch
 # 查看当前分支
@@ -469,4 +474,5 @@ git reset --hard HEAD^
 # 回退到上一个版本
 git reflog
 # 查看提交与回退历史
+==============================================================================================
 ```
