@@ -207,6 +207,9 @@ echo $a
 #!/bin/bash
 
 #mbm - 04/16/2012 - add additional routes
+
+tablenum=100
+
 for int_name in {eno2,ens1f0,ens1f1,enp96s0f1,enp24s0f0,enp24s0f1,enp216s0f0,enp216s0f1} ;do
   if  [ -f /etc/sysconfig/network-scripts/ifcfg-${int_name} ]; then
   . /etc/sysconfig/network-scripts/ifcfg-${int_name}
@@ -214,16 +217,16 @@ for int_name in {eno2,ens1f0,ens1f1,enp96s0f1,enp24s0f0,enp24s0f1,enp216s0f0,enp
   IFS=. read -r i1 i2 i3 i4 <<< ${network} 
   ROUTER=${i1}.${i2}.${i3}.$((i4+1))
   prefix=$(ipcalc -p ${IPADDR} ${NETMASK} | awk -F= '{print $2}')
-  tablenum=$(echo ${DEVICE} | sed 's/eth//g')
+  tablenum=$((tablenum+1))
   else 
         continue
   fi
   if [ ${ONBOOT} != 'yes' ] ;then
     continue
   fi
-  #if ! grep "^${tablenum} ${DEVICE}$" /etc/iproute2/rt_tables >/dev/null ;then
-   # echo "${tablenum} ${DEVICE}" >>/etc/iproute2/rt_tables
-  #fi
+  if ! grep "^${tablenum} ${DEVICE}$" /etc/iproute2/rt_tables >/dev/null ;then
+    echo "${tablenum} ${DEVICE}" #>>/etc/iproute2/rt_tables
+  fi
   echo "ip route add ${network}/${prefix} dev ${DEVICE} src ${IPADDR} table ${DEVICE}"
   echo "ip route add default via ${ROUTER} dev ${DEVICE} table ${DEVICE}"
   echo "ip rule add from ${IPADDR}/32 table ${DEVICE}"

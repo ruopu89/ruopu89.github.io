@@ -92,10 +92,12 @@ ip address add - add new protocol address
 ip addr add IFADDR dev IFACE
     [label NAME]：为额外添加的地址指明接口别名；
     [broadcast ADDRESS]：广播地址；会根据IP和NETMASK自动计算得到；
-    [scope SCOPE_VALUE]：
+    [scope SCOPE_VALUE]：路由的范围，主要是 link ，是与本设备有关的直接连接。
         global：全局可用；
         link：接口可用；
         host：仅本机可用；
+    [proto]：此路由的路由协定，主要有 redirect, kernel, boot, static, ra 等， 其中 kernel 指的是直接由核心判断自动设定。 
+
         
 ip address delete - delete protocol address
 ip addr  delete  IFADDR  dev  IFACE 
@@ -181,5 +183,75 @@ ip route flush 10/8
 
 
 
+## 策略路由
 
+### 设置策略路由
+
+```shell
+问题：在某服务器上安装CentOS7.3系统，配置两个网段的IP地址，一为10.129.14.16/27，一为10.129.14.40/27。客户端使用10.129.27/27，网关10.129.14.1。使用客户端ping服务器两地址时，只能ping能10.129.14.16/27，ping10.129.14.40/27时页面停住不动，查看服务器，应该是ping包可以到达服务器，但无法返回。
+
+解决：
+1. 配置服务器网卡
+vim /etc/sysconfig/network-scripts/ifcfg-enp96s0f0
+TYPE="Ethernet"
+BOOTPROTO=none
+DEFROUTE="yes"
+NAME="enp96s0f0"
+UUID="5f90c86f-c21f-489e-ae8f-cf36e6eac588"
+DEVICE="enp96s0f0"
+ONBOOT="yes"
+DNS1="202.96.209.6"
+DNS2="202.96.209.133"
+IPADDR=10.129.14.16
+PREFIX=27
+#GATEWAY=10.129.14.1
+# 注释网卡配置中的GATEWAY一项，多块网卡都要注释
+
+2. 配置策略路由表
+vim /etc/iproute2/rt_tables 
+252 enp96s0f1-32
+251 enp96s0f0-0
+# 加入上面两行，前面的数字是路由表的编号，后面是自定义的表名。路由表的编号是自定义的，但linux最多可管理255个表，不要超过这个数字，另外，rt_table中原有的编号不要动，自定义的表编号也不要与原有的编号冲突。
+
+3. 配置策略路由
+# 将路由规则加入CentOS7中的/etc/rc.d/init.d/network中可以使重启网卡时路由依然生效，方法如下
+vim /etc/rc.d/init.d/network
+ip route flush table enp96s0f0-0
+# 先清空策略路由表
+ip route add default via 10.129.14.1 dev enp96s0f0 src 10.129.14.16 table enp96s0f0-0
+# 添加一条策略路由规则，下一跳到10.129.14.1，网卡是enp96s0f0，源地址为10.129.14.16，添加到策略路由表enp96s0f0-0
+ip rule add from 10.129.14.16 table enp96s0f0-0
+# 将从10.129.14.16经过的数据包都从enp96s0f0-0策略路由表中走
+ip route flush table enp96s0f1-32
+ip route add default via 10.129.14.33 dev enp96s0f1 src 10.129.14.40 table enp96s0f1-32
+ip rule add from 10.129.14.40 table enp96s0f1-32
+
+ip route add default via 10.129.14.1 dev enp96s0f0
+
+exit $rc
+# 这里要注意，一定要添加在最后一行的exit $rc之上。
+systemctl daemon-reload
+systemctl restart network
+ip route
+# 查看路由，加入的默认路由生效了
+ip rule
+# 查看生效的策略路由表
+# 最后，测试的机器上也要加一条到某网段的路由，如sudo ip route add 10.129.14.32/27 via 10.129.14.1。因为默认会从无线走如果不加这条路由规则，就要将无线断开或删除这条默认路由
+# 这时客户端就可以ping通服务器的两个ip地址了
+```
+
+
+
+### 查看策略
+
+```shell
+ip route show table all
+# 显示所有路由表
+ip rule
+# 显示所有转发策略
+ip route list table eno2
+# 显示某个策略路由表的规则
+ip route list table all
+# 显示全部策略路由表
+```
 

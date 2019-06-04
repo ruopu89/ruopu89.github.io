@@ -147,6 +147,9 @@ apt install alsamixergui
 ### VMWare问题解决
 
 ```shell
+* 安装vmware-workstation前一定要先安装build-essential。Built Essential包含对编译Ubuntu二进制安装包所需的所有包的引用。
+sudo apt install build-essential
+
 1. 安装完VMware后，无法启动，提示“GNU C Compiler(gcc)version 7.3 was not found”
 gcc --version
 # 现在是8.2版本
@@ -172,6 +175,9 @@ apt install linux-headers-$(uname -r)
 下载地址：http://softwareupdate.vmware.com/cds/vmw-desktop/ws/15.0.4/12990004/windows/packages/，下载其中的tools-windows.tar，之后将其解压，在虚拟机中加载解压后的iso文件即可手动安装。
 
 4. 添加共享文件夹后，在虚拟机的网络中可以查看到，前提是安装了vmware-tools。
+
+5. 卸载VMware-Workstation
+sudo vmware-installer -u vmware-workstation
 ```
 
 
@@ -188,6 +194,17 @@ git clone https://github.com/firehol/netdata.git --depth=1 ~/netdata
 cd ~/netdata
 ./netdata-installer.sh
 安装时执行回车即可，等待完成。脚本中有一步会使用curl -sSL 命令下载安装包，如果速度太慢，可以到netdata-installer.sh脚本中取消curl的这三个选项。
+```
+
+
+
+### 安装fiddler
+
+```shell
+1. sudo apt install mono-complete
+# 安装这个包是为了在linux环境中运行fiddler.exe程序，这个包可以跨平台跑.NET的程序
+2. mono Fiddler.exe
+# 运行程序
 ```
 
 
@@ -674,6 +691,51 @@ root@ruopu64:~#ln -sv /usr/bin/tilix.wrapper /usr/bin/konsole
 # 这样打开终端时就会使用tilix了。
 # 尝试使用root@ruopu64:~#update-alternatives --config x-terminal-emulator命令修改没有成功
 # 在设置中的应用程序中修改默认打开的终端也没有成功
+
+====================================================
+gsettings set org.gnome.desktop.default-applications.terminal exec /usr/bin/mate-terminal
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg "-x"
+# 上面是设置默认打开的终端命令与选项。但这只可以设置使用Ctrl + Alt + t打开的默认终端。使用鼠标右键打开的终端并不会变。
+# gsettings的使用为，先使用list-schemas查看有哪些schemas，再通过list-keys查看schemas有哪些key，再通过get可以获取key的值，使用set可以设置key的值。
+====================================================
+gsettings命令使用
+GConf是在基于 GNOME2 的 Linux 操作系统中实现对应用程序的配置及管理功能的工具。
+我们可以把 GConf 理解为 Linux 操作系统中的注册表。然而，它克服了 Windows 注册表的一些缺点，比如 Windows 注册表遭到破坏，可能会导致操作系统崩溃，而且 GConf 的配置信息存储于纯文本的文件中，可读性很好。
+在 GNOME3 中，GConf 已经被 DConf/Gsettings 替代，但还是用些应用在使用 GConf。
+
+1.dconf-editor 的使用
+
+还可以用 dconf 进行操作，明细请通过 man dconf 查看，而 dconf-editor 是 dconf 的一个图形化操作程序。
+
+2.使用 gsettings 编辑设置,如下示例在Ubuntu16.04上的效果
+
+1.显示系统都安装了哪些不可重定位的schema
+gsettings list-schemas
+
+2.查看org.mate.applications-office都有哪些子schema
+gsettings list-children  org.mate.applications-office
+
+3.查看org.mate.applications-office.calendar的schema下都有哪些项(key)
+gsettings list-keys org.mate.applications-office.calendar
+
+4.查看org.mate.applications-office.calendar的schema下所有项的取值
+gsettings list-recursively  org.mate.applications-office.calendar
+
+5.查看org.mate.applications-office.calendar的schema下的项needs-term的值
+gsettings get org.mate.applications-office.calendar needs-term
+
+6.查看org.mate.applications-office.calendar的schema下的项needs-term的取值范围
+gsettings range  org.mate.applications-office.calendar needs-term
+
+7.修改设置org.mate.media-handling的schema下的项automount-open的值为true
+gsettings set org.mate.media-handling automount-open  false
+gsettings get org.mate.media-handling automount-open 
+
+8. 恢复org.mate.media-handling的schema下的项automount-open的值为默认值
+gsettings reset org.mate.media-handling automount-open
+
+9. 修改org.mate.media-handling的schema下的多项值后，恢复整个schema的所有项为默认值
+gsettings list-recursively org.mate.media-handling
 ```
 
 
@@ -766,6 +828,24 @@ perl securecrt_linux_crack.pl /usr/bin/SecureCRT
 
 4. options-> session Options -> Terminal -> audio bell （删除勾选）
 # 关闭SecureCRT输入命令时按Tab的声音
+
+==============================================================================================
+安装SecureCRT8.3.4、SecureFX8.3.4。这里的安装与上面一样，只要注意，在注册软件时，如果.pl文件中的内容与下面的内容不附，请修改.pl文件中的内容与下面内容一致，不然无法注册。安装时主要是SecureFX8.3.4的注册文件有问题。
+# SecureCRT8.3.4
+License:
+	Name:		xiaobo_l
+	Company:	www.boll.me
+	Serial Number:	03-94-294583
+	License Key:	ABJ11G 85V1F9 NENFBK RBWB5W ABH23Q 8XBZAC 324TJJ KXRE5D
+	Issue Date:	04-20-2017
+
+# SecureFX8.3.4
+License:
+	Name:	ygeR
+	Company:	TEAM ZWT
+	Serial Number:	06-70-001589
+	License Key:	ACUYJV Q1V2QU 1YWRCN NBYCYK ABU767 D4PQHA S1C4NQ GVZDQF
+	Issue Date:	03-10-2017
 ```
 
 
