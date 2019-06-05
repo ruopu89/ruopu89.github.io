@@ -182,6 +182,14 @@ sudo vmware-installer -u vmware-workstation
 
 
 
+### 安装微软字体
+
+```shell
+sudo apt install ttf-mscorefonts-installer
+```
+
+
+
 ### 安装监控软件netdata
 
 ```shell
@@ -760,7 +768,14 @@ sudo netease-cloud-music
 下载binary文件
 chmod +x unetbootin-linux
 ./unetbootin-linux
-# 在官网上有安装的方法可以查看
+# 在官网上有安装的方法可以查看。执行时可能界面显示有问题
+
+sudo add-apt-repository ppa:gezakovacs/ppa
+sudo apt-get update
+sudo apt-get install unetbootin
+# 使用此方法也可以安装
+sudo QT_X11_NO_MITSHM=1 /usr/bin/unetbootin
+# 执行软件时会提示必须以root用户执行，并使用上面命令
 ```
 
 
@@ -768,7 +783,7 @@ chmod +x unetbootin-linux
 ### 截图软件
 ```shell
 apt install flameshot
-设置>工作区>快捷键>全局快捷键，之后选择加号，然后选择要使用快捷键的程序，在右侧设置此程序的快捷键。
+设置>工作区>快捷键>全局快捷键，之后选择加号，然后选择要使用快捷键的程序，命令使用 flameshot gui，在右侧设置此程序的快捷键。
 
 ⚡ root@ruopu64  ~  apt install deepin-screenshot
 # 这个软件在xfce4环境下更管用，在xfce4环境中安装上面的软件打不开。
