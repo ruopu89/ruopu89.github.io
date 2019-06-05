@@ -350,6 +350,178 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/nginx功能测试二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/17/nginx功能测试二/" itemprop="url">
+                  nginx功能测试二
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-17 11:10:22" itemprop="dateCreated datePublished" datetime="2018-09-17T11:10:22+08:00">2018-09-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-09-29 16:25:46" itemprop="dateModified" datetime="2018-09-29T16:25:46+08:00">2018-09-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="https"><a href="#https" class="headerlink" title="https"></a>https</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">* 创建CA服务器</span><br><span class="line">cd /etc/pki/CA</span><br><span class="line">(umask 077;openssl genrsa -out private/cakey.pem 2048)</span><br><span class="line">openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 365</span><br><span class="line">touch index.txt serial</span><br><span class="line">echo 01 &gt; serial</span><br><span class="line">* 到web服务器</span><br><span class="line">mkdir /etc/nginx/ssl</span><br><span class="line">cd /etc/nginx/ssl</span><br><span class="line">(umask 077;openssl genrsa -out nginx.key 2048)</span><br><span class="line">openssl req -new -key http.key -out nginx.csr</span><br><span class="line">scp nginx.csr 192.168.1.2:/tmp</span><br><span class="line">* 到CA服务器</span><br><span class="line">openssl ca -in /tmp/nginx.csr -out /etc/pki/CA/certs/nginx.crt -days 365</span><br><span class="line"><span class="meta">#</span><span class="bash">newcerts中的也是证书，是pem格式的</span></span><br><span class="line">scp certs/nginx.crt 192.168.1.3:/etc/nginx/ssl</span><br><span class="line">* 到web服务器</span><br><span class="line">cp conf.d/vhost1.conf conf.d/vhost1_ssl.conf</span><br><span class="line">vim conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 443 ssl;</span><br><span class="line">        server_name www.ruopu.com;</span><br><span class="line">        root /data/nginx/vhost1;</span><br><span class="line">        access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">        #当前虚拟主机使用PEM格式的证书文件</span><br><span class="line">        ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">        #当前虚拟主机上与其证书匹配的私钥文件</span><br><span class="line">        ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">        #支持ssl协议版本，默认为后三个</span><br><span class="line">        ssl_session_cache shared:SSL:10m;</span><br><span class="line">        #在各worker之间使用一个共享的缓存。SSL是自定义的名字，1m内存空间可以缓存4000个会话，这里定义10M。</span><br><span class="line">    &#125;    </span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">ss -tln</span><br><span class="line">访问https://www.ruopu.com，将cacert.pem传到主机，这里定义的CA服务器与客户端的主机名是一样的，访问时通过了。</span><br></pre></td></tr></table></figure>
+<h1 id="重写"><a href="#重写" class="headerlink" title="重写"></a><strong>重写</strong></h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">    	rewrite /(.*)\.png$ /$1.jpg;</span><br><span class="line">    	#rewrite放在server中，另外放在location或if中也可以。上面配置表示，所有以.png结尾的文件都转成.jpg格式的。括号是为了后面的$1引用，/是根，png前面的点需要转义，后面的.jpg的点不需要转义</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/images/fish.png，这里实际访问的是一个叫fish.jpg的文件，名字一样但格式不同。</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       error_page 404 /notfound.html;</span><br><span class="line">    #   rewrite /(.*)$ https://www.ruopu.com/$1;</span><br><span class="line">       rewrite /(.*)\.png$ https://www.ruopu.com/$1.jpg;</span><br><span class="line">       #用户请求任何内容，都转到https的页面上。但两条不要一起写，如果一起写，在访问www.ruopu.com/images/night.png时会先匹配上面的规则，下面的规则就不会生效了。</span><br><span class="line">       location = /notfound.html &#123;</span><br><span class="line">            root /data/nginx/error_pages;</span><br><span class="line">       &#125;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* ^/(admin|login) &#123;</span><br><span class="line">            auth_basic "admin area or login url";</span><br><span class="line">            auth_basic_user_file /etc/nginx/.ngxpasswd;</span><br><span class="line">       &#125;</span><br><span class="line">       location /ngxstatus &#123;</span><br><span class="line">            stub_status;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">vim /etc/nginx/conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 443 ssl;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">       ssl on;</span><br><span class="line">       ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">       ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">       ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">       ssl_session_cache shared:SSL:10m;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">vhost1_ssl.conf配置文件中也要有与vhost1.conf中相同的配置，这样才能正常访问，这里是定义的别名与vhost1.conf中是一样的，也就是要有相同的访问路径，不然不能正常访问，会有404的错误提示。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">上面的重写要写在监听80端口的server中，不能写在监听在443端口的server中，如果写在监听在443端口的server中，那么请求会无限重定向，最后是无法访问的。监听80端口与监听443端口的两个server中定义的内容应该是一样的。不然访问80端口时能访问的路径被重定向到443端口时就访问不到了。如果想让访问80端口的任何以png结尾的文件，都被重定向到443端口的.jpg文件，那么就要在监听443端口的配置文件中加入 rewrite /(.*)\.png$ /<span class="variable">$1</span>.jpg;，如果在监听80端口的server中定义是不起作用的。这是在要将所有访问的内容都重定向到443端口，并且还要让访问png文件的请求重定向到443端口的jpg文件，这两个条件都存在的情况下需要的配置。但如果只是将访问80端口的以png结尾的文件重定向到443端口的jpg文件的话，只要在监听80端口的server中写入 rewrite /(.*)\.png$ https://www.ruopu.com/<span class="variable">$1</span>.jpg; 就行了。</span></span><br><span class="line">nginx -s reload</span><br><span class="line">访问https://www.ruopu.com/images/night.png，rewrite规则可以写多条，rewrite匹配并重写url后会以新的url地址重新匹配配置文件或重新检查location的规则，如果可以匹配到，就会再重写一遍，直到匹配不到。默认的行为是last，就是重写的url会被重新再匹配一遍规则。还有break、redirect、permanent</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">		rewrite /(.*)\.png$ /$1.jpg redirect;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">redirect是重定向，客户端要重新发起请求。如果是permanent就是永久重定向，也需要客户端重新发请求。last和<span class="built_in">break</span>是不需要客户端重新发请求的，只是服务器内部做了转换</span></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">[flag]：</span></span><br><span class="line">	last：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后对新的URI启动新一轮重写检查；提前重启新一轮循环；</span><br><span class="line">    break：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后直接跳转至重写规则配置块之后的其它配置；结束循环；</span><br><span class="line">    redirect：重写完成后以临时重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；不能以http://或https://开头；302</span><br><span class="line">    permanent：重写完成后以永久重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；301</span><br></pre></td></tr></table></figure>
+<h1 id="反代"><a href="#反代" class="headerlink" title="反代"></a>反代</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">* 准备三台主机，一台反代，两台web服务，反代服务器的地址有两个，一个外网192.168.1.90，一个内网172.16.0.1。web服务器有两个内网地址，一个172.16.0.2，一个172.16.0.3。设置内网地址，就是将虚拟机网卡改为仅主机，然后设置仅主机的IP地址</span><br><span class="line">yum install httpd mod_ssl</span><br><span class="line">//到web服务器上安装httpd，mod_ssl，并提供主页，最后改为内网网卡并配置地址。改为内网地址172.16.0.2</span><br><span class="line">vim /var/www/html/index.html</span><br><span class="line">	&lt;h1&gt;Real Server 1&lt;/h1&gt;</span><br><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-eno16777736</span><br><span class="line">    IPADDR=172.16.0.2</span><br><span class="line">    NETMASK=255.255.0.0</span><br><span class="line">systemctl start httpd</span><br><span class="line">setenforce 0</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">* 到反代服务器</span><br><span class="line">vim /etc/yum.repos.d/nginx.repo</span><br><span class="line">    [nginx]</span><br><span class="line">    name=nginx repository</span><br><span class="line">    baseurl=http://nginx.org/packages/centos/7/$basearch/</span><br><span class="line">    gpgcheck=0</span><br><span class="line">    enabled=1</span><br><span class="line">yum install nginx</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.conf</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        server_name www.ruopu.com</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://172.16.0.2:80；</span><br><span class="line">        //这里要看web服务器是基于什么做的虚拟主机，是IP，port还是FQDN，是哪个就在http后输入哪个</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">systemctl start nginx</span><br><span class="line">* 修改客户端hosts文件，让主机可以解析nginx的域名</span><br><span class="line">* 访问测试</span><br><span class="line">* 到web服务器上</span><br><span class="line">tcpdump -i eno16777736 tcp port 80</span><br><span class="line">//监听80端口，看一下请求是否为反代服务器发来的</span><br><span class="line">* 到第二台web服务器上</span><br><span class="line">yum install httpd</span><br><span class="line">改为内网地址172.16.0.3</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">setenforce 0</span><br><span class="line">vim /var/www/html/index.html</span><br><span class="line">	&lt;h1&gt;Real Server 2&lt;/h1&gt;</span><br><span class="line">find /usr/share -iname "*.jpg" -exec cp &#123;&#125; /var/www/html \;</span><br><span class="line">//这一次准备将图片文件都反代到这台服务器</span><br><span class="line">systemctl start httpd</span><br><span class="line">* 到反代服务器，加入</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.conf</span><br><span class="line">    location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">        proxy_pass http://172.16.0.3:80;</span><br><span class="line">    //将访问图片的请求代理到另一台服务器上</span><br><span class="line">    &#125;</span><br><span class="line">* 到客户端访问，如果是访问域名就返回第一台web服务器的内容，如果访问域名/*.jpg就返回第二台服务器的内容。在配置文件中，如果location中用了正则表达式，在proxy_pass指向的地址中的80端口后是不能加斜线/的，如果没用正则表达式，可以加斜线。像上边的第一个location设置，如果80后有斜线，表示将location中的斜线替换成80后的斜线，如果没有斜线，表示将location中的斜线补在80后</span><br><span class="line">* 测试斜线的功能，到反代服务器上</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.com</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        server_name www.ruopu.com;</span><br><span class="line">        location / &#123;</span><br><span class="line">        	root /data/nginx/html;</span><br><span class="line">        &#125;</span><br><span class="line">        location /admin/ &#123;</span><br><span class="line">            proxy_pass http://172.16.0.2:80;</span><br><span class="line">            //这个反代的意思是在172.16.0.2的根目录下找admin目录，下面的反代是在访问以jpg等为后缀名的文件时到172.16.0.3:80的根目录下找</span><br><span class="line">        &#125;</span><br><span class="line">        location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">        	proxy_pass http://172.16.0.3:80;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //修改配置文件，将admin代理过去</span><br><span class="line">mkdir -pv /data/nginx/html</span><br><span class="line">nginx -s reload</span><br><span class="line">* 到客户端访问www.ruopu.com/admin，提示Not Found，因为web服务器上没有admin目录。但是，如果location /admin/中的80后有斜线，那么访问的就是172.16.0.2的根目录，也就是/var/www/html/index.html文件。也就是，没有斜线，就将/admin补在80后，因为172.16.0.2中没有admin目录，所以提示Not Found。如果有斜线，就表示访问http://172.16.0.2/admin就是在访问172.16.0.2的根目录，/admin/就等于/。</span><br><span class="line">* 到web服务器上</span><br><span class="line">mkdir /var/www/html/admin</span><br><span class="line">vim /var/www/html/admin/index.html</span><br><span class="line">	admin</span><br><span class="line">* 到客户端测试，这时显示admin</span><br><span class="line">* 到反代服务器上加一个斜线</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.com</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       location / &#123;</span><br><span class="line">            root /data/nginx/html;</span><br><span class="line">       &#125;</span><br><span class="line">       location /admin/ &#123;</span><br><span class="line">            proxy_pass http://10.5.5.204:80/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">            proxy_pass http://10.5.5.205:80;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">* 到客户端访问www.ruopu.com/admin，这时显示的是Real Server 1，也就是web服务器上html中定义的内容，配置的意思就是，当访问admin时，就替换成web服务器根下的内容。当location中定义的是根时，这个斜线就没有意义了，因为访问的都是根</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/14/阿里云数据库连接与设置阿里云RDS字符集/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1955,7 +2127,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-02-15 14:53:57" itemprop="dateModified" datetime="2019-02-15T14:53:57+08:00">2019-02-15</time>
+                <time title="修改時間：2019-06-02 19:49:29" itemprop="dateModified" datetime="2019-06-02T19:49:29+08:00">2019-06-02</time>
               
             
           </span>
@@ -2008,264 +2180,215 @@
       
         
           
-            <h1 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h1><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>python中单行注释采用 # 开头。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="comment"># 文件名：test.py</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 第一个注释</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Hello, Python!"</span>;  <span class="comment"># 第二个注释</span></span><br></pre></td></tr></table></figure>
-<p>输出结果：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello, Python!</span><br></pre></td></tr></table></figure>
-<p>注释可以在语句或表达式行末：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name = <span class="string">"Madisetti"</span> <span class="comment"># 这是一个注释</span></span><br></pre></td></tr></table></figure>
-<p>python 中多行注释使用三个单引号(‘’’)或三个双引号(“””)。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="comment"># 文件名：test.py</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">这是多行注释，使用单引号。</span></span><br><span class="line"><span class="string">这是多行注释，使用单引号。</span></span><br><span class="line"><span class="string">这是多行注释，使用单引号。</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">这是多行注释，使用双引号。</span></span><br><span class="line"><span class="string">这是多行注释，使用双引号。</span></span><br><span class="line"><span class="string">这是多行注释，使用双引号。</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
-<h2 id="标准数据类型"><a href="#标准数据类型" class="headerlink" title="标准数据类型"></a>标准数据类型</h2><p>在内存中存储的数据可以有多种类型。</p>
-<p>例如，person.s年龄作为一个数值存储和他或她的地址是字母数字字符存储。</p>
-<p>Python有一些标准类型用于定义操作上，他们和为他们每个人的存储方法可能。</p>
-<p>Python有五个标准的数据类型：</p>
-<ul>
-<li>Numbers（数字）</li>
-<li>String（字符串）</li>
-<li>List（列表）</li>
-<li>Tuple（元组）</li>
-<li>Dictionary（字典）</li>
+            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="编程基础"><a href="#编程基础" class="headerlink" title="编程基础"></a>编程基础</h2><ul>
+<li>计算机语言<ul>
+<li>人与计算机之间交互的语言</li>
 </ul>
-<h2 id="数字"><a href="#数字" class="headerlink" title="数字"></a>数字</h2><p>数字数据类型用于存储数值。</p>
-<p>他们是不可改变的数据类型，这意味着改变数字数据类型会分配一个新的对象。</p>
-<p>当你指定一个值时，Number对象就会被创建：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">var1</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">var2</span> = <span class="number">10</span></span><br></pre></td></tr></table></figure>
-<p>您也可以使用del语句删除一些对象引用。</p>
-<p>del语句的语法是：</p>
-<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">del var1<span class="comment">[,var2<span class="comment">[,var3<span class="comment">[....,varN]</span>]</span>]</span>]</span><br></pre></td></tr></table></figure>
-<p>您可以通过使用del语句删除单个或多个对象。例如：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">del</span> var</span><br><span class="line"><span class="selector-tag">del</span> var_a, var_b</span><br></pre></td></tr></table></figure>
-<p>Python支持四种不同的数值类型：</p>
-<ul>
-<li>int（有符号整型）</li>
-<li>long（长整型[也可以代表八进制和十六进制]）</li>
-<li>float（浮点型）</li>
-<li>complex（复数）</li>
+</li>
+<li>机器语言<ul>
+<li>一定位数组成二进制的0和1的序列，称为机器指令。机器指令的集合就是机器语言</li>
+<li>与自然语言差异太大，难学、难懂、难写、难记、难查错</li>
 </ul>
-<p>实例</p>
-<p>一些数值类型的实例：</p>
-<table>
-<thead>
-<tr>
-<th>int</th>
-<th>long</th>
-<th>float</th>
-<th>complex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10</td>
-<td>51924361L</td>
-<td>0.0</td>
-<td>3.14j</td>
-</tr>
-<tr>
-<td>100</td>
-<td>-0x19323L</td>
-<td>15.20</td>
-<td>45.j</td>
-</tr>
-<tr>
-<td>-786</td>
-<td>0122L</td>
-<td>-21.9</td>
-<td>9.322e-36j</td>
-</tr>
-<tr>
-<td>080</td>
-<td>0xDEFABCECBDAECBFBAEl</td>
-<td>32.3+e18</td>
-<td>.876j</td>
-</tr>
-<tr>
-<td>-0490</td>
-<td>535633629843L</td>
-<td>-90.</td>
-<td>-.6545+0J</td>
-</tr>
-<tr>
-<td>-0x260</td>
-<td>-052318172735L</td>
-<td>-32.54e100</td>
-<td>3e+26J</td>
-</tr>
-<tr>
-<td>0x69</td>
-<td>-4721885298529L</td>
-<td>70.2-E12</td>
-<td>4.53e-7j</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>长整型也可以使用小写”L”，但是还是建议您使用大写”L”，避免与数字”1”混淆。Python使用”L”来显示长整型。</li>
-<li>Python还支持复数，复数由实数部分和虚数部分构成，可以用a + bj,或者complex(a,b)表示， 复数的实部a和虚部b都是浮点型</li>
+</li>
+<li>汇编语言<ul>
+<li>用一些助记符号替代机器指令，称为汇编语言。ADD A,B指的是将寄存器A的数与寄存器B的数相加得到的数放到寄存器A中</li>
+<li>汇编语言写好的程序需要汇编程序转换成机器指令</li>
+<li>汇编语言只是稍微好记了些，可以认为就是机器指令对应的助记符。只是符号本身接近自然语言</li>
 </ul>
-<h3 id="整数"><a href="#整数" class="headerlink" title="整数"></a>整数</h3><blockquote>
-<p>不区分long和int。进制有二进制，八进制，十六进制，如：0xa、0o10、0b10。bool布尔值有两个True、False</p>
-</blockquote>
-<h3 id="浮点数"><a href="#浮点数" class="headerlink" title="浮点数"></a>浮点数</h3><blockquote>
-<p>1.2、3.1415、-0.12、1.46e9等价于1.46*10的9次方</p>
-</blockquote>
-<h3 id="复数"><a href="#复数" class="headerlink" title="复数"></a>复数</h3><blockquote>
-<p>1+2j</p>
-</blockquote>
-<h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><blockquote>
-<p>使用 ‘ “ 单双引号引用的字符的序列；’’’和”””单双三引号，可以跨行、可以在其中自由的使用单双引号；在字符串前面加上r或者R前缀，表示该字符串不做特殊的处理<br>字符串或串(String)是由数字、字母、下划线组成的一串字符。</p>
-</blockquote>
-<p>一般记为 :</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">s</span>=<span class="string">"a1a2···an"</span>(n&gt;=<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
-<p>它是编程语言中表示文本的数据类型。</p>
-<p>python的字串列表有2种取值顺序:</p>
-<ul>
-<li>从左到右索引默认0开始的，最大范围是字符串长度少1</li>
-<li>从右到左索引默认-1开始的，最大范围是字符串开头</li>
+</li>
 </ul>
-<p>如果你的实要取得一段子串的话，可以用到变量[头下标:尾下标]，就可以截取相应的字符串，其中下标是从0开始算起，可以是正数或负数，下标可以为空表示取到头或尾。</p>
-<p>比如:</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">s</span> = <span class="string">'ilovepython'</span></span><br></pre></td></tr></table></figure>
-<p><strong>s[1:5]</strong>的结果是love。</p>
-<p>当使用以冒号分隔的字符串，python返回一个新的对象，结果包含了以这对偏移标识的连续的内容，左边的开始是包含了下边界。</p>
-<p>上面的结果包含了s[1]的值l，而取到的最大范围不包括上边界，就是s[5]的值p。</p>
-<p>加号（+）是字符串连接运算符，星号（*）是重复操作。如下实例：</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#coding=utf<span class="number">-8</span></span></span><br><span class="line"><span class="meta">#!/usr/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">str</span> = <span class="string">'Hello World!'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span> <span class="meta"># 输出完整字符串</span></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span>[<span class="number">0</span>] <span class="meta"># 输出字符串中的第一个字符</span></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span>[<span class="number">2</span>:<span class="number">5</span>] <span class="meta"># 输出字符串中第三个至第五个之间的字符串</span></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span>[<span class="number">2</span>:] <span class="meta"># 输出从第三个字符开始的字符串</span></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span> * <span class="number">2</span> <span class="meta"># 输出字符串两次</span></span><br><span class="line"><span class="keyword">print</span> <span class="keyword">str</span> + <span class="string">"TEST"</span> <span class="meta"># 输出连接的字符串</span></span><br></pre></td></tr></table></figure>
-<p>以上实例输出结果：</p>
-<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Hello World!</span><br><span class="line">H</span><br><span class="line">llo</span><br><span class="line">llo World!</span><br><span class="line">Hello World!Hello World!</span><br><span class="line">Hello World!TEST</span><br></pre></td></tr></table></figure>
-<h2 id="Python保留字符"><a href="#Python保留字符" class="headerlink" title="Python保留字符"></a>Python保留字符</h2><p>下面的列表显示了在Python中的保留字。这些保留字不能用作常数或变数，或任何其他标识符名称。</p>
-<p>所有Python的关键字只包含小写字母。</p>
-<table>
-<thead>
-<tr>
-<th>and</th>
-<th>exec</th>
-<th>not</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>assert</td>
-<td>finally</td>
-<td>or</td>
-</tr>
-<tr>
-<td>break</td>
-<td>for</td>
-<td>pass</td>
-</tr>
-<tr>
-<td>class</td>
-<td>from</td>
-<td>print</td>
-</tr>
-<tr>
-<td>continue</td>
-<td>global</td>
-<td>raise</td>
-</tr>
-<tr>
-<td>def</td>
-<td>if</td>
-<td>return</td>
-</tr>
-<tr>
-<td>del</td>
-<td>import</td>
-<td>try</td>
-</tr>
-<tr>
-<td>elif</td>
-<td>in</td>
-<td>while</td>
-</tr>
-<tr>
-<td>else</td>
-<td>is</td>
-<td>with</td>
-</tr>
-<tr>
-<td>except</td>
-<td>lambda</td>
-<td>yield</td>
-</tr>
-</tbody>
-</table>
-<h2 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a>转义字符</h2><blockquote>
-<p>\（打印出\，不再当转义符用）、\t(Tab键)、\r(回车)、\n(新行或回车换行符)、\’(代表单引号)、\”(代表双引号)<br>前缀r，把里面的所有字符当普通字符对待</p>
-</blockquote>
-<h2 id="缩进"><a href="#缩进" class="headerlink" title="缩进"></a>缩进</h2><p>学习Python与其他语言最大的区别就是，Python的代码块不使用大括号（{}）来控制类，函数以及其他逻辑判断。python最具特色的就是用缩进来写模块。</p>
-<p>缩进的空白数量是可变的，但是所有代码块语句必须包含相同的缩进空白数量，这个必须严格执行。如下所示：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="builtin-name">print</span> <span class="string">"True"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">  <span class="builtin-name">print</span> <span class="string">"False"</span></span><br></pre></td></tr></table></figure>
-<p>以下代码将会执行错误：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="comment"># 文件名：test.py</span></span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="builtin-name">print</span> <span class="string">"Answer"</span></span><br><span class="line">    <span class="builtin-name">print</span> <span class="string">"True"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="builtin-name">print</span> <span class="string">"Answer"</span></span><br><span class="line">    # 没有严格缩进，在执行时保持</span><br><span class="line">  <span class="builtin-name">print</span> <span class="string">"False"</span></span><br></pre></td></tr></table></figure>
-<p>执行以上代码，会出现如下错误提醒：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">python</span> test.<span class="keyword">py</span>  </span><br><span class="line">  File <span class="string">"test.py"</span>, <span class="built_in">line</span> <span class="number">5</span></span><br><span class="line">    <span class="keyword">if</span> True:</span><br><span class="line">    ^</span><br><span class="line">IndentationError: unexpected <span class="built_in">indent</span></span><br></pre></td></tr></table></figure>
-<p><strong>IndentationError: unexpected indent</strong> 错误是python编译器是在告诉你”Hi，老兄，你的文件里格式不对了，可能是tab和空格没对齐的问题”，所有python对格式要求非常严格。</p>
-<p>如果是 <strong>IndentationError: unindent does not match any outer indentation level</strong>错误表明，你使用的缩进方式不一致，有的是 tab 键缩进，有的是空格缩进，改为一致即可。</p>
-<p>因此，在Python的代码块中必须使用相同数目的行首缩进空格数。</p>
-<p>建议你在每个缩进层次使用 <strong>单个制表符</strong> 或 <strong>两个空格</strong> 或 <strong>四个空格</strong> , 切记不能混用</p>
-<h2 id="续行"><a href="#续行" class="headerlink" title="续行"></a>续行</h2><blockquote>
-<p>在行尾使用\<br>如果使用各种括号，认为括号内是一个整体，内部跨行不用\</p>
-</blockquote>
-<h2 id="标识符"><a href="#标识符" class="headerlink" title="标识符"></a>标识符</h2><p>在python里，标识符有字母、数字、下划线组成。</p>
-<p>在python中，所有标识符可以包括英文、数字以及下划线（_），但不能以数字开头。</p>
-<p>python中的标识符是区分大小写的。</p>
-<p>以下划线开头的标识符是有特殊意义的。以单下划线开头（_foo）的代表不能直接访问的类属性，需通过类提供的接口进行访问，不能用”from xxx import *”而导入；</p>
-<p>以双下划线开头的（<strong>foo）代表类的私有成员；以双下划线开头和结尾的（</strong>foo__）代表python里特殊方法专用的标识，如<strong>init</strong>（）代表类的构造函数。</p>
-<p>约定：</p>
-<ul>
-<li>不允许使用中文</li>
-<li>不允许使用歧义单词，使用class_</li>
-<li>在python中不要随便使用下划线开头的标识符</li>
+<h2 id="语言分类"><a href="#语言分类" class="headerlink" title="语言分类"></a>语言分类</h2><ul>
+<li>低级语言<ul>
+<li>面向机器的语言，包括机器语言、汇编语言</li>
+<li>不同的机器不能通用，不同的机器需要不同的机器指令或者汇编程序</li>
 </ul>
-<p>Python 可以同一行显示多条语句，方法是用分号 ; 分开，如：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">print</span> <span class="string">'hello'</span>;<span class="keyword">print</span> <span class="string">'Python'</span>;</span><br><span class="line">hello</span><br><span class="line">Python</span><br></pre></td></tr></table></figure>
-<h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><blockquote>
-<p>一旦赋值就不能改变值的标识符，python中无法定义常量</p>
-</blockquote>
-<h2 id="字面常量"><a href="#字面常量" class="headerlink" title="字面常量"></a>字面常量</h2><blockquote>
-<p>一个单独的量，例如12、”abc”、’234142324.03e-9’</p>
-</blockquote>
-<h2 id="Python-变量类型"><a href="#Python-变量类型" class="headerlink" title="Python 变量类型"></a>Python 变量类型</h2><p>变量存储在内存中的值。这就意味着在创建变量时会在内存中开辟一个空间。</p>
-<p>基于变量的数据类型，解释器会分配指定内存，并决定什么数据可以被存储在内存中。</p>
-<p>因此，变量可以指定不同的数据类型，这些变量可以存储整数，小数或字符。</p>
-<hr>
-<h3 id="变量赋值"><a href="#变量赋值" class="headerlink" title="变量赋值"></a>变量赋值</h3><p>Python中的变量不需要声明，变量的赋值操作既是变量声明和定义的过程。</p>
-<p>每个变量在内存中创建，都包括变量的标识，名称和数据这些信息。</p>
-<p>每个变量在使用前都必须赋值，变量赋值以后该变量才会被创建。</p>
-<p>等号（=）用来给变量赋值。</p>
-<p>等号（=）运算符左边是一个变量名,等号（=）运算符右边是存储在变量中的值。例如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"> <span class="comment">#!/usr/bin/python</span></span><br><span class="line"> </span><br><span class="line"> counter = 100 <span class="comment"># 赋值整型变量</span></span><br><span class="line"> miles = 1000.0 <span class="comment"># 浮点型</span></span><br><span class="line"> name = <span class="string">"John"</span> <span class="comment"># 字符串</span></span><br><span class="line"> </span><br><span class="line"> <span class="built_in">print</span> counter</span><br><span class="line"> <span class="built_in">print</span> miles</span><br><span class="line"> <span class="built_in">print</span> name</span><br></pre></td></tr></table></figure>
-<p>以上实例中，100，1000.0和”John”分别赋值给counter，miles，name变量。</p>
-<p>执行以上程序会输出如下结果：</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100</span></span><br><span class="line"><span class="number">1000.0</span></span><br><span class="line">John</span><br></pre></td></tr></table></figure>
-<hr>
-<h3 id="多个变量赋值"><a href="#多个变量赋值" class="headerlink" title="多个变量赋值"></a>多个变量赋值</h3><p>Python允许你同时为多个变量赋值。例如：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">a</span> = <span class="selector-tag">b</span> = c = <span class="number">1</span></span><br></pre></td></tr></table></figure>
-<p>以上实例，创建一个整型对象，值为1，三个变量被分配到相同的内存空间上。</p>
-<p>您也可以为多个对象指定多个变量。例如：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">a</span>, <span class="selector-tag">b</span>, c = <span class="number">1</span>, <span class="number">2</span>, <span class="string">"john"</span></span><br></pre></td></tr></table></figure>
-<p>以上实例，两个整型对象1和2的分配给变量a和b，字符串对象”john”分配给变量c。</p>
-<h1 id="Python的语言类型"><a href="#Python的语言类型" class="headerlink" title="Python的语言类型"></a>Python的语言类型</h1><blockquote>
-<p>python是动态语言、强类型语言</p>
-</blockquote>
-<h2 id="静态编译语言"><a href="#静态编译语言" class="headerlink" title="静态编译语言"></a>静态编译语言</h2><blockquote>
-<p>事先声明变量类型，类型不能再改变</p>
-<p>编译时检查</p>
-</blockquote>
-<h2 id="动态编译语言"><a href="#动态编译语言" class="headerlink" title="动态编译语言"></a>动态编译语言</h2><blockquote>
-<p>不用事先声明类型，随时可以赋值为其他类型</p>
-<p>编程时不知道是什么类型，很难推断</p>
-<p>动态编译语言需要先编译成自解码，再给本地CPU执行代码</p>
-</blockquote>
-<h2 id="强类型语言"><a href="#强类型语言" class="headerlink" title="强类型语言"></a>强类型语言</h2><blockquote>
-<p>不同类型之间操作，必须先强制类型转换为同一类型。print(‘a’+1)是不能执行的</p>
-</blockquote>
-<h2 id="弱类型语言"><a href="#弱类型语言" class="headerlink" title="弱类型语言"></a>弱类型语言</h2><blockquote>
-<p>不同类型间可以操作，自动隐式转换，JavaScript中console.log(1+’a’)可以执行</p>
-</blockquote>
-<h1 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h1><h2 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h2><p>以下假设变量： <strong>a=10，b=20</strong>：</p>
+</li>
+<li>高级语言<ul>
+<li>接近自然语言和数学语言的计算机语言</li>
+<li>高级语言首先要书写源程序，通过编译程序把源程序转换成机器指令的程序</li>
+<li>1954年正式发布的Fortran语言是最早的高级语言，本意是公式翻译</li>
+<li>人们只需要关心怎么书写源程序，针对不同机器的编译的事 交给编译器关心处理</li>
+</ul>
+</li>
+</ul>
+<h2 id="低级语言到高级语言"><a href="#低级语言到高级语言" class="headerlink" title="低级语言到高级语言"></a>低级语言到高级语言</h2><ul>
+<li>语言越高级，越接近人类的自然语言和数学语言</li>
+<li>语言越低级，越能让机器理解</li>
+<li>高级语言和低级语言之间需要一个转换的工具：编译器、解释器</li>
+<li>C、C++等语言的源代码需要本地编译</li>
+<li>Java、Python、C#的源代码需要被解释器编译成中间代码(Bytecode)，在虚拟机上运行</li>
+<li>编译语言，把源代码转换成目标机器的CPU指令</li>
+<li>解释语言，解释后转换成字节码，运行在虚拟机上，解释器执行中间代码</li>
+</ul>
+<h2 id="高级语言的发展"><a href="#高级语言的发展" class="headerlink" title="高级语言的发展"></a>高级语言的发展</h2><ul>
+<li>非结构化语言<ul>
+<li>编号或标签、GOTO、子程序可以有多个入口和出口</li>
+<li>有分支、循环</li>
+</ul>
+</li>
+<li>结构化语言<ul>
+<li>任何基本结构只允许是唯一入口和唯一出口</li>
+<li>顺序、分支、循环，废弃GOTO</li>
+</ul>
+</li>
+<li>面向对象语言<ul>
+<li>更加接近人类认知世界的方式，万事万物抽象成对象，对象间关系抽象成类和继承</li>
+<li>封装、继承、多态</li>
+</ul>
+</li>
+<li>函数式语言<ul>
+<li>古老的编程范式，应用在数学计算、并行处理的场景。引入到了很多现代高级语言中</li>
+<li>函数是”一等公民”，高阶函数</li>
+</ul>
+</li>
+</ul>
+<h2 id="程序Program"><a href="#程序Program" class="headerlink" title="程序Program"></a>程序Program</h2><ul>
+<li>程序<ul>
+<li>算法 + 数据结构 = 程序</li>
+<li>数据是一切程序的核心</li>
+<li>数据结构是数据在计算机中的类型和组织方式</li>
+<li>算法是处理数据的方式，算法有优劣之分</li>
+</ul>
+</li>
+<li>写程序难点<ul>
+<li>理不清数据</li>
+<li>搞不清处理方法</li>
+<li>无法把数据设计转换成数据结构，无法把处理方法转换成算法</li>
+<li>无法用设计范式来进行程序设计</li>
+<li>世间程序皆有bug，但不会debug</li>
+</ul>
+</li>
+</ul>
+<h2 id="Python解释器"><a href="#Python解释器" class="headerlink" title="Python解释器"></a>Python解释器</h2><ul>
+<li>官方CPython<ul>
+<li>C语言开发，最广泛的Python解释器</li>
+</ul>
+</li>
+<li>IPython<ul>
+<li>一个交互式、功能增强的CPython</li>
+</ul>
+</li>
+<li>PyPy<ul>
+<li>Python语言写的Python解释器，JIT技术，动态编译Python代码。JIT指动态编译，实时编译，动态优化。</li>
+</ul>
+</li>
+<li>Jython<ul>
+<li>Python的源代码编译成Java的字节码，跑在JVM上</li>
+</ul>
+</li>
+<li>IronPython<ul>
+<li>与Jython类似，运行在.Net平台上的解释器，Python代码被编译成.Net的字节码</li>
+</ul>
+</li>
+</ul>
+<h2 id="Python的语言类型"><a href="#Python的语言类型" class="headerlink" title="Python的语言类型"></a>Python的语言类型</h2><p>python是动态语言、强类型语言</p>
+<ul>
+<li><p>静态编译语言</p>
+<ul>
+<li><p>事先声明变量类型，类型不能再改变</p>
+</li>
+<li><p>编译时检查</p>
+</li>
+</ul>
+</li>
+<li><p>动态编译语言</p>
+<ul>
+<li><p>不用事先声明类型，随时可以赋值为其他类型</p>
+</li>
+<li><p>编程时不知道是什么类型，很难推断</p>
+</li>
+<li><p>动态编译语言需要先编译成自解码，再给本地CPU执行代码</p>
+</li>
+</ul>
+</li>
+<li><p>强类型语言</p>
+<ul>
+<li>不同类型之间操作，必须先强制类型转换为同一类型。print(‘a’+1)是不能执行的</li>
+</ul>
+</li>
+<li><p>弱类型语言</p>
+<ul>
+<li>不同类型间可以操作，自动隐式转换，JavaScript中console.log(1+’a’)可以执行</li>
+</ul>
+</li>
+</ul>
+<h1 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h1><ul>
+<li>注释：python中单行注释采用 # 开头。<ul>
+<li>python 中多行注释使用三个单引号(‘’’)或三个双引号(“””)。</li>
+</ul>
+</li>
+<li><p>数字</p>
+<ul>
+<li><p>整数，不区分long和int。</p>
+<ul>
+<li>进制有二进制，八进制，十六进制，如：0xa、0o10、0b10。bool布尔值有两个True、False</li>
+</ul>
+</li>
+<li><p>浮点数</p>
+<ul>
+<li>1.2、3.1415、-0.12、1.46e9等价于1.46*10的9次方</li>
+</ul>
+</li>
+<li><p>复数</p>
+<ul>
+<li>1+2j</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>字符串<ul>
+<li>使用 ‘ “ 单双引号引用的字符的序列</li>
+<li>‘’’和”””单双三引号，可以跨行、可以在其中自由的使用单双引号</li>
+<li>在字符串前面加上r或者R前缀，表示该字符串不做特殊的处理</li>
+<li>字符串或串(String)是由数字、字母、下划线组成的一串字符。</li>
+</ul>
+</li>
+<li><p>转义序列</p>
+<ul>
+<li><p>\\    \t     \r     \n     \‘     \“</p>
+</li>
+<li><p>前缀r，把里面的所有字符当普通字符对待</p>
+</li>
+</ul>
+</li>
+<li><p>缩进</p>
+<ul>
+<li>未使用C等语言的花括号，而是采用缩进的方式表示层次关系</li>
+<li>约定使用4个空格缩进</li>
+</ul>
+</li>
+<li><p>续行</p>
+<ul>
+<li>在行尾使用 \</li>
+<li>如果使用各种括号，认为括号内是一个整体，内部跨行不用 \</li>
+</ul>
+</li>
+<li><p>标识符</p>
+<ul>
+<li>一个名字，用来指化一个值</li>
+<li>只能用字母、下划线和数字</li>
+<li>只能以字母或下划线开头</li>
+<li>不能是python的关键字，例如def、class就不能作为标识符</li>
+<li>Python是大小写敏感的</li>
+<li>约定：不允许使用中文；不允许使用歧义单词，例如class_；在python中不要随便使用下划线开头的表示符</li>
+</ul>
+</li>
+<li><p>常量</p>
+<ul>
+<li>一旦赋值就不能改变值的标识符</li>
+<li>python中无法定义常量</li>
+</ul>
+</li>
+<li>字面常量<ul>
+<li>一个单独的量，例如12、”abc”、’242356613.03e-9’</li>
+</ul>
+</li>
+<li>变量<ul>
+<li>赋值后，可以改变值的标识符</li>
+</ul>
+</li>
+</ul>
+<h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><h3 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h3><p>以下假设变量： <strong>a=10，b=20</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -2312,8 +2435,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"></span><br><span class="line">a = <span class="number">21</span></span><br><span class="line">b = <span class="number">10</span></span><br><span class="line">c = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">c = a + b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"1 - c 的值为："</span>, c</span><br><span class="line"></span><br><span class="line">c = a - b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"2 - c 的值为："</span>, c </span><br><span class="line"></span><br><span class="line">c = a * b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"3 - c 的值为："</span>, c </span><br><span class="line"></span><br><span class="line">c = a / b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"4 - c 的值为："</span>, c </span><br><span class="line"></span><br><span class="line">c = a % b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"5 - c 的值为："</span>, c</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改变量 a 、b 、c</span></span><br><span class="line">a = <span class="number">2</span></span><br><span class="line">b = <span class="number">3</span></span><br><span class="line">c = a**b </span><br><span class="line"><span class="keyword">print</span> <span class="string">"6 - c 的值为："</span>, c</span><br><span class="line"></span><br><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">5</span></span><br><span class="line">c = a//b </span><br><span class="line"><span class="keyword">print</span> <span class="string">"7 - c 的值为："</span>, c</span><br></pre></td></tr></table></figure>
-<h2 id="位-bit-运算符"><a href="#位-bit-运算符" class="headerlink" title="位(bit)运算符"></a>位(bit)运算符</h2><p>按位运算符是把数字看作二进制来进行计算的。Python中的按位运算法则如下：</p>
+<h3 id="位-bit-运算符"><a href="#位-bit-运算符" class="headerlink" title="位(bit)运算符"></a>位(bit)运算符</h3><p>按位运算符是把数字看作二进制来进行计算的。Python中的按位运算法则如下：</p>
 <p>下表中变量 a 为 60，b 为 13，二进制格式如下：</p>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">0011</span> <span class="number">1100</span></span><br><span class="line"></span><br><span class="line">b = <span class="number">0000</span> <span class="number">1101</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line"></span><br><span class="line">a&amp;b = <span class="number">0000</span> <span class="number">1100</span></span><br><span class="line"></span><br><span class="line">a|b = <span class="number">0011</span> <span class="number">1101</span></span><br><span class="line"></span><br><span class="line">a^b = <span class="number">0011</span> <span class="number">0001</span></span><br><span class="line"></span><br><span class="line">~a  = <span class="number">1100</span> <span class="number">0011</span></span><br></pre></td></tr></table></figure>
 <table>
@@ -2359,12 +2481,16 @@
 </tr>
 </tbody>
 </table>
-<h3 id="原码、反码、补码，负数表示法"><a href="#原码、反码、补码，负数表示法" class="headerlink" title="原码、反码、补码，负数表示法"></a>原码、反码、补码，负数表示法</h3><blockquote>
-<p><strong>原码：正数是其二进制本身；负数是符号位为1,数值部分取X绝对值的二进制。</strong></p>
-<p><strong>反码：正数的反码和原码相同；负数是符号位为1,其它位是原码取反。</strong></p>
-<p><strong>补码：正数的补码和原码，反码相同；负数是符号位为1，其它位是原码取反，未位加1。（或者说负数的补码是其绝对值反码未位加1）</strong></p>
-<p><strong>移码：将符号位取反的补码（不区分正负）</strong></p>
-</blockquote>
+<h4 id="原码、反码、补码，负数表示法"><a href="#原码、反码、补码，负数表示法" class="headerlink" title="原码、反码、补码，负数表示法"></a>原码、反码、补码，负数表示法</h4><ul>
+<li><p>原码：正数是其二进制本身；负数是符号位为1,数值部分取X绝对值的二进制。</p>
+</li>
+<li><p>反码：正数的反码和原码相同；负数是符号位为1,其它位是原码取反。</p>
+</li>
+<li><p>补码：正数的补码和原码，反码相同；负数是符号位为1，其它位是原码取反，未位加1。（或者说负数的补码是其绝对值反码未位加1）</p>
+</li>
+<li><p>移码：将符号位取反的补码（不区分正负）</p>
+</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -2397,30 +2523,7 @@
 </tbody>
 </table>
 <p>注：这里的原码、反码、补码表示计算机在存储数据时形式。</p>
-<h4 id="为何要使用原码-反码和补码"><a href="#为何要使用原码-反码和补码" class="headerlink" title="为何要使用原码, 反码和补码"></a>为何要使用原码, 反码和补码</h4><p>在开始深入学习前, 我的学习建议是先”死记硬背”上面的原码, 反码和补码的表示方式以及计算方法.</p>
-<p>现在我们知道了计算机可以有三种编码方式表示一个数. 对于正数因为三种编码方式的结果都相同:</p>
-<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
-<p>所以不需要过多解释. 但是对于负数:</p>
-<p>[-1] = [10000001]原= [11111110]反= [11111111]补</p>
-<p>可见原码, 反码和补码是完全不同的. 既然原码才是被人脑直接识别并用于计算表示方式, 为何还会有反码和补码呢?</p>
-<p>首先, 因为人脑可以知道第一位是符号位, 在计算的时候我们会根据符号位, 选择对真值区域的加减. (补码的绝对值称为真值即去掉符号位的二进制数字). 但是对于计算机, 加减乘数已经是最基础的运算, 要设计的尽量简单. 计算机辨别”符号位”显然会让计算机的基础电路设计变得十分复杂! 于是人们想出了将符号位也参与运算的方法. 我们知道, 根据运算法则减去一个正数等于加上一个负数, 即: 1-1 = 1 + (-1) = 0 , 所以机器可以只有加法而没有减法, 这样计算机运算的设计就更简单了.</p>
-<p>于是人们开始探索 将符号位参与运算, 并且只保留加法的方法. 首先来看原码:</p>
-<p>计算十进制的表达式: 1-1=0</p>
-<p>1 - 1 = 1 + (-1) = [00000001]原 + [10000001]原= [10000010]原 = -2</p>
-<p>如果用原码表示, 让符号位也参与计算, 显然对于减法来说, 结果是不正确的.这也就是为何计算机内部不使用原码表示一个数.</p>
-<p>为了解决原码做减法的问题, 出现了反码:</p>
-<p>计算十进制的表达式: 1-1=0</p>
-<p>1 - 1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原= [0000 0001]反+ [1111 1110]反= [1111 1111]反= [1000 0000]原= -0</p>
-<p>发现用反码计算减法, 结果的真值部分是正确的. 而唯一的问题其实就出现在”0”这个特殊的数值上. 虽然人们理解上+0和-0是一样的, 但是0带符号是没有任何意义的. 而且会有[0000 0000]原和[1000 0000]原两个编码表示0.</p>
-<p>于是补码的出现, 解决了0的符号以及两个编码的问题:</p>
-<p>1-1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原 = [0000 0001]补+ [1111 1111]补= [0000 0000]补=[0000 0000]原</p>
-<p>这样0用[0000 0000]表示, 而以前出现问题的-0则不存在了.而且可以用[1000 0000]表示-128:</p>
-<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补+ [1000 0001]补= [1000 0000]补</p>
-<p>-1-127的结果应该是-128, 在用补码运算的结果中, [1000 0000]补就是-128. 但是注意因为实际上是使用以前的-0的补码来表示-128, 所以-128并没有原码和反码表示.(对-128的补码表示[1000 0000]补算出来的原码是[0000 0000]原, 这是不正确的)</p>
-<p>使用补码, 不仅仅修复了0的符号以及存在两个编码的问题, 而且还能够多表示一个最低数. 这就是为什么8位二进制, 使用原码或反码表示的范围为[-127, +127], 而使用补码表示的范围为[-128, 127].</p>
-<p>因为机器使用补码, 所以对于编程中常用到的32位int类型, 可以表示范围是: [-231, 231-1] 因为第一位表示的是符号位.而使用补码表示时又可以多保存一个最小值.</p>
-<h3 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">60</span>            <span class="comment"># 60 = 0011 1100 </span></span><br><span class="line">b = <span class="number">13</span>            <span class="comment"># 13 = 0000 1101 </span></span><br><span class="line">c = <span class="number">0</span></span><br><span class="line"> </span><br><span class="line">c = a &amp; b;        <span class="comment"># 12 = 0000 1100</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"1 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c = a | b;        <span class="comment"># 61 = 0011 1101 </span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"2 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c = a ^ b;        <span class="comment"># 49 = 0011 0001</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"3 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c = ~a;           <span class="comment"># -61 = 1100 0011</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"4 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c = a &lt;&lt; <span class="number">2</span>;       <span class="comment"># 240 = 1111 0000</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"5 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c = a &gt;&gt; <span class="number">2</span>;       <span class="comment"># 15 = 0000 1111</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"6 - c 的值为："</span>, c</span><br></pre></td></tr></table></figure>
-<h2 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h2><p>以下假设变量a为10，变量b为20：</p>
+<h3 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h3><p>以下假设变量a为10，变量b为20：</p>
 <table>
 <thead>
 <tr>
@@ -2467,8 +2570,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">21</span></span><br><span class="line">b = <span class="number">10</span></span><br><span class="line">c = <span class="number">0</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a == b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - a 等于 b"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - a 不等于 b"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a != b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - a 不等于 b"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - a 等于 b"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a &lt;&gt; b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - a 不等于 b"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - a 等于 b"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a &lt; b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - a 小于 b"</span> </span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - a 大于等于 b"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a &gt; b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"5 - a 大于 b"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"5 - a 小于等于 b"</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 修改变量 a 和 b 的值</span></span><br><span class="line">a = <span class="number">5</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line"><span class="keyword">if</span> ( a &lt;= b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"6 - a 小于等于 b"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"6 - a 大于  b"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( b &gt;= a ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"7 - b 大于等于 a"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"7 - b 小于 a"</span></span><br></pre></td></tr></table></figure>
-<h2 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h2><p>Python语言支持逻辑运算符，以下假设变量 a 为 10, b为 20:</p>
+<h3 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h3><p>Python语言支持逻辑运算符，以下假设变量 a 为 10, b为 20:</p>
 <table>
 <thead>
 <tr>
@@ -2499,8 +2601,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">and</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - 变量 a 和 b 都为 true"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - 变量 a 和 b 有一个不为 true"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">or</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - 变量 a 和 b 都为 true，或其中一个变量为 true"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - 变量 a 和 b 都不为 true"</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 修改变量 a 的值</span></span><br><span class="line">a = <span class="number">0</span></span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">and</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - 变量 a 和 b 都为 true"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - 变量 a 和 b 有一个不为 true"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">or</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - 变量 a 和 b 都为 true，或其中一个变量为 true"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - 变量 a 和 b 都不为 true"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span>( a <span class="keyword">and</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"5 - 变量 a 和 b 都为 false，或其中一个变量为 false"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"5 - 变量 a 和 b 都为 true"</span></span><br></pre></td></tr></table></figure>
-<h2 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h2><p>以下假设变量a为10，变量b为20：</p>
+<h3 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h3><p>以下假设变量a为10，变量b为20：</p>
 <table>
 <thead>
 <tr>
@@ -2552,8 +2653,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">21</span></span><br><span class="line">b = <span class="number">10</span></span><br><span class="line">c = <span class="number">0</span></span><br><span class="line"> </span><br><span class="line">c = a + b</span><br><span class="line"><span class="keyword">print</span> <span class="string">"1 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c += a</span><br><span class="line"><span class="keyword">print</span> <span class="string">"2 - c 的值为："</span>, c </span><br><span class="line"> </span><br><span class="line">c *= a</span><br><span class="line"><span class="keyword">print</span> <span class="string">"3 - c 的值为："</span>, c </span><br><span class="line"> </span><br><span class="line">c /= a </span><br><span class="line"><span class="keyword">print</span> <span class="string">"4 - c 的值为："</span>, c </span><br><span class="line"> </span><br><span class="line">c = <span class="number">2</span></span><br><span class="line">c %= a</span><br><span class="line"><span class="keyword">print</span> <span class="string">"5 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c **= a</span><br><span class="line"><span class="keyword">print</span> <span class="string">"6 - c 的值为："</span>, c</span><br><span class="line"> </span><br><span class="line">c //= a</span><br><span class="line"><span class="keyword">print</span> <span class="string">"7 - c 的值为："</span>, c</span><br></pre></td></tr></table></figure>
-<h2 id="成员运算符"><a href="#成员运算符" class="headerlink" title="成员运算符"></a>成员运算符</h2><p>除了以上的一些运算符之外，Python还支持成员运算符，测试实例中包含了一系列的成员，包括字符串，列表或元组。</p>
+<h3 id="成员运算符"><a href="#成员运算符" class="headerlink" title="成员运算符"></a>成员运算符</h3><p>除了以上的一些运算符之外，Python还支持成员运算符，测试实例中包含了一系列的成员，包括字符串，列表或元组。</p>
 <table>
 <thead>
 <tr>
@@ -2575,8 +2675,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例-5"><a href="#实例-5" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">10</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line">list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> ];</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">in</span> list ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - 变量 a 在给定的列表中 list 中"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - 变量 a 不在给定的列表中 list 中"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( b <span class="keyword">not</span> <span class="keyword">in</span> list ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - 变量 b 不在给定的列表中 list 中"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - 变量 b 在给定的列表中 list 中"</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 修改变量 a 的值</span></span><br><span class="line">a = <span class="number">2</span></span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">in</span> list ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - 变量 a 在给定的列表中 list 中"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - 变量 a 不在给定的列表中 list 中"</span></span><br></pre></td></tr></table></figure>
-<h2 id="身份运算符"><a href="#身份运算符" class="headerlink" title="身份运算符"></a>身份运算符</h2><p>身份运算符用于比较两个对象的存储单元</p>
+<h3 id="身份运算符"><a href="#身份运算符" class="headerlink" title="身份运算符"></a>身份运算符</h3><p>身份运算符用于比较两个对象的存储单元</p>
 <table>
 <thead>
 <tr>
@@ -2599,11 +2698,15 @@
 </tbody>
 </table>
 <p><strong>注：</strong> <a href="https://www.runoob.com/python/python-func-id.html" target="_blank" rel="noopener">id()</a> 函数用于获取对象内存地址。</p>
-<h3 id="实例-6"><a href="#实例-6" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">20</span></span><br><span class="line">b = <span class="number">20</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">is</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - a 和 b 有相同的标识"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"1 - a 和 b 没有相同的标识"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">is</span> <span class="keyword">not</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - a 和 b 没有相同的标识"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"2 - a 和 b 有相同的标识"</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 修改变量 b 的值</span></span><br><span class="line">b = <span class="number">30</span></span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">is</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - a 和 b 有相同的标识"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"3 - a 和 b 没有相同的标识"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> ( a <span class="keyword">is</span> <span class="keyword">not</span> b ):</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - a 和 b 没有相同的标识"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">   <span class="keyword">print</span> <span class="string">"4 - a 和 b 有相同的标识"</span></span><br></pre></td></tr></table></figure>
 <p>is 与 == 区别：</p>
 <p>is 用于判断两个变量引用对象是否为同一个， == 用于判断引用变量的值是否相等。</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="selector-tag">a</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> = a</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> is <span class="selector-tag">a</span> </span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> == a</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> = <span class="selector-tag">a</span>[:]</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> is a</span><br><span class="line">False</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">b</span> == a</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
-<h2 id="运算符的优先级"><a href="#运算符的优先级" class="headerlink" title="运算符的优先级"></a>运算符的优先级</h2><p>以下表格列出了从最高到最低优先级的所有运算符：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b = a</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b <span class="keyword">is</span> a </span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b == a</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b = a[:]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b <span class="keyword">is</span> a</span><br><span class="line"><span class="keyword">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b == a</span><br><span class="line"><span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="运算符的优先级"><a href="#运算符的优先级" class="headerlink" title="运算符的优先级"></a>运算符的优先级</h3><ul>
+<li>算术运算符 &gt; 位运算符 &gt; 身份运算符 &gt; 成员运算符 &gt; 逻辑运算符</li>
+<li>记不住，用括号</li>
+<li>长表达式，多用括号，易懂、易读</li>
+</ul>
+<p>以下表格列出了从最高到最低优先级的所有运算符：</p>
 <table>
 <thead>
 <tr>
@@ -2667,17 +2770,103 @@
 </tr>
 </tbody>
 </table>
-<h3 id="实例-7"><a href="#实例-7" class="headerlink" title="实例"></a>实例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">a = <span class="number">20</span></span><br><span class="line">b = <span class="number">10</span></span><br><span class="line">c = <span class="number">15</span></span><br><span class="line">d = <span class="number">5</span></span><br><span class="line">e = <span class="number">0</span></span><br><span class="line"> </span><br><span class="line">e = (a + b) * c / d       <span class="comment">#( 30 * 15 ) / 5</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a + b) * c / d 运算结果为："</span>,  e</span><br><span class="line"> </span><br><span class="line">e = ((a + b) * c) / d     <span class="comment"># (30 * 15 ) / 5</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"((a + b) * c) / d 运算结果为："</span>,  e</span><br><span class="line"> </span><br><span class="line">e = (a + b) * (c / d);    <span class="comment"># (30) * (15/5)</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"(a + b) * (c / d) 运算结果为："</span>,  e</span><br><span class="line"> </span><br><span class="line">e = a + (b * c) / d;      <span class="comment">#  20 + (150/5)</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"a + (b * c) / d 运算结果为："</span>,  e</span><br></pre></td></tr></table></figure>
-<h1 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h1><p>由数字、符号、括号、变量等的组合</p>
-<p>算术表达式</p>
-<p>逻辑表达式</p>
-<p>赋值表达式</p>
-<p>python中，赋值即定义，如果一个变量已经定义，赋值相当于重新定义</p>
+<h2 id="Python保留字符"><a href="#Python保留字符" class="headerlink" title="Python保留字符"></a>Python保留字符</h2><p>下面的列表显示了在Python中的保留字。这些保留字不能用作常数或变数，或任何其他标识符名称。</p>
+<p>所有Python的关键字只包含小写字母。</p>
+<table>
+<thead>
+<tr>
+<th>and</th>
+<th>exec</th>
+<th>not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>assert</td>
+<td>finally</td>
+<td>or</td>
+</tr>
+<tr>
+<td>break</td>
+<td>for</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>class</td>
+<td>from</td>
+<td>print</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>global</td>
+<td>raise</td>
+</tr>
+<tr>
+<td>def</td>
+<td>if</td>
+<td>return</td>
+</tr>
+<tr>
+<td>del</td>
+<td>import</td>
+<td>try</td>
+</tr>
+<tr>
+<td>elif</td>
+<td>in</td>
+<td>while</td>
+</tr>
+<tr>
+<td>else</td>
+<td>is</td>
+<td>with</td>
+</tr>
+<tr>
+<td>except</td>
+<td>lambda</td>
+<td>yield</td>
+</tr>
+</tbody>
+</table>
+<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><ul>
+<li>由数字、符号、括号、变量等的组合<ul>
+<li>算术表达式</li>
+<li>逻辑表达式</li>
+<li>赋值表达式<ul>
+<li>python中，赋值即定义，如果一个变量已经定义，赋值相当于重新定义</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <h1 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h1><ol>
 <li>计算~12</li>
 </ol>
 <p>这是对12取反，首先，12保存到计算机中时要转为二进制，也就是0000 1100，按题目要求对12取反后，得到1111 0011，取反后的数是计算机使用的，如果要给人看还要将此数转换为十进制数，又因为取反后的最高位是1，表示这是一个负数，负数保存到计算机中时使用的是取反的二进制数或说是二进制数的补数，在计算机中保存的是数字的补数，所以转换为十进制时也要取这个二进制数的补数。这里取1111 0011的补数是1000 1101，也就是-13了。</p>
-<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="比特和字节"><a href="#比特和字节" class="headerlink" title="比特和字节"></a>比特和字节</h2><p>Bit，比特，也叫二进制位，是信息的最小单位。一个比特可以理解为一个开关量，0就是关，1就是开。<br>Byte，字节，由8个Bit组成。它通常用作计算机信息计量单位。字节在一些规范中称作Octet。<br>Bit简写为b，Byte简写为B。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> -1的补码如下</span></span><br><span class="line">1000 0001      # 原码</span><br><span class="line">1111 1110 + 1 = 1111 1111       # 负数的补码是最高位不变，其余位取反，最后再加1，所以是1111 1111，内存中是0xff</span><br><span class="line">0000 0101     # 这是5，和上面的1111 1111相与得到下面</span><br><span class="line">0000 0100 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里用原码的5与补码的1计算，用二进制的5最后的1先与正面的1111 1111相加，得到1 0000 0000，最前面的1溢出了，所以抛弃，得到0000 0000。之后就变成了二进制的0000 0100 + 0000 0000，也就是4了。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 12取反如下</span></span><br><span class="line">0000 1100      # 这是12</span><br><span class="line">1111 0011       # 这是取反，这是计算机存储的值，也是给计算机看的，如果要给人看，还要将其转为原码。因为计算机中要存补码，所以这个数在计算机看来就是补码，要转为原码才是给人看的，补码的补码就是原码，所以要求这个数的补码。</span><br><span class="line">1000 1101       # 这是上面数字的补码，转为原码时最高位不变，之后按位取反再加1。所以12取反是-13</span><br><span class="line"><span class="meta">#</span><span class="bash"> 正数的补码还是正数本身，所以不会变。负数的补码要转换为原码时，要按上面的方法求补码的补码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1. 计算机中存储的只会是补码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 正数的补码还是正数本身，负数的补码最高位不变，其余位按位取反再加1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 计算机中存储的负数要显示出来时，要按负数的补码求一次才是要显示的内容</span></span><br></pre></td></tr></table></figure>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="为何要使用原码-反码和补码"><a href="#为何要使用原码-反码和补码" class="headerlink" title="为何要使用原码, 反码和补码"></a>为何要使用原码, 反码和补码</h2><p>在开始深入学习前, 我的学习建议是先”死记硬背”上面的原码, 反码和补码的表示方式以及计算方法.</p>
+<p>现在我们知道了计算机可以有三种编码方式表示一个数. 对于正数因为三种编码方式的结果都相同:</p>
+<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
+<p>所以不需要过多解释. 但是对于负数:</p>
+<p>[-1] = [10000001]原= [11111110]反= [11111111]补</p>
+<p>可见原码, 反码和补码是完全不同的. 既然原码才是被人脑直接识别并用于计算表示方式, 为何还会有反码和补码呢?</p>
+<p>首先, 因为人脑可以知道第一位是符号位, 在计算的时候我们会根据符号位, 选择对真值区域的加减. (补码的绝对值称为真值即去掉符号位的二进制数字). 但是对于计算机, 加减乘数已经是最基础的运算, 要设计的尽量简单. 计算机辨别”符号位”显然会让计算机的基础电路设计变得十分复杂! 于是人们想出了将符号位也参与运算的方法. 我们知道, 根据运算法则减去一个正数等于加上一个负数, 即: 1-1 = 1 + (-1) = 0 , 所以机器可以只有加法而没有减法, 这样计算机运算的设计就更简单了.</p>
+<p>于是人们开始探索 将符号位参与运算, 并且只保留加法的方法. 首先来看原码:</p>
+<p>计算十进制的表达式: 1-1=0</p>
+<p>1 - 1 = 1 + (-1) = [00000001]原 + [10000001]原= [10000010]原 = -2</p>
+<p>如果用原码表示, 让符号位也参与计算, 显然对于减法来说, 结果是不正确的.这也就是为何计算机内部不使用原码表示一个数.</p>
+<p>为了解决原码做减法的问题, 出现了反码:</p>
+<p>计算十进制的表达式: 1-1=0</p>
+<p>1 - 1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原= [0000 0001]反+ [1111 1110]反= [1111 1111]反= [1000 0000]原= -0</p>
+<p>发现用反码计算减法, 结果的真值部分是正确的. 而唯一的问题其实就出现在”0”这个特殊的数值上. 虽然人们理解上+0和-0是一样的, 但是0带符号是没有任何意义的. 而且会有[0000 0000]原和[1000 0000]原两个编码表示0.</p>
+<p>于是补码的出现, 解决了0的符号以及两个编码的问题:</p>
+<p>1-1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原 = [0000 0001]补+ [1111 1111]补= [0000 0000]补=[0000 0000]原</p>
+<p>这样0用[0000 0000]表示, 而以前出现问题的-0则不存在了.而且可以用[1000 0000]表示-128:</p>
+<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补+ [1000 0001]补= [1000 0000]补</p>
+<p>-1-127的结果应该是-128, 在用补码运算的结果中, [1000 0000]补就是-128. 但是注意因为实际上是使用以前的-0的补码来表示-128, 所以-128并没有原码和反码表示.(对-128的补码表示[1000 0000]补算出来的原码是[0000 0000]原, 这是不正确的)</p>
+<p>使用补码, 不仅仅修复了0的符号以及存在两个编码的问题, 而且还能够多表示一个最低数. 这就是为什么8位二进制, 使用原码或反码表示的范围为[-127, +127], 而使用补码表示的范围为[-128, 127].</p>
+<p>因为机器使用补码, 所以对于编程中常用到的32位int类型, 可以表示范围是: [-231, 231-1] 因为第一位表示的是符号位.而使用补码表示时又可以多保存一个最小值.</p>
+<h2 id="比特和字节"><a href="#比特和字节" class="headerlink" title="比特和字节"></a>比特和字节</h2><p>Bit，比特，也叫二进制位，是信息的最小单位。一个比特可以理解为一个开关量，0就是关，1就是开。<br>Byte，字节，由8个Bit组成。它通常用作计算机信息计量单位。字节在一些规范中称作Octet。<br>Bit简写为b，Byte简写为B。</p>
 <h2 id="字节的进制"><a href="#字节的进制" class="headerlink" title="字节的进制"></a>字节的进制</h2><p>字节一般以1024(2^10)为进制，目前常用的进制如下。</p>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>byte=<span class="number">8</span>bit	<span class="comment">//bit就是位，也叫比特位，是计算机表示数据最小的单位</span></span><br><span class="line"><span class="number">1</span>B(byte字节)	<span class="comment">//byte就是字节</span></span><br><span class="line"><span class="number">1</span>KB(Kilobyte千) = <span class="number">2</span>^<span class="number">10</span> B = <span class="number">1024</span> B</span><br><span class="line"><span class="number">1</span>MB(Megabyte兆) = <span class="number">2</span>^<span class="number">10</span> KB = <span class="number">1024</span> KB = <span class="number">2</span>^<span class="number">20</span> B</span><br><span class="line"><span class="number">1</span>GB(Gigabyte吉) = <span class="number">2</span>^<span class="number">10</span> MB = <span class="number">1024</span> MB = <span class="number">2</span>^<span class="number">30</span> B</span><br><span class="line"><span class="number">1</span>TB(Trillionbyte太) = <span class="number">2</span>^<span class="number">10</span> GB = <span class="number">1024</span> GB = <span class="number">2</span>^<span class="number">40</span> B</span><br><span class="line"><span class="number">1</span>PB(Petabyte拍) = <span class="number">2</span>^<span class="number">10</span> TB = <span class="number">1024</span> TB = <span class="number">2</span>^<span class="number">50</span> B</span><br><span class="line"><span class="number">1</span>EB(Exabyte艾) = <span class="number">2</span>^<span class="number">10</span> PB = <span class="number">1024</span> PB = <span class="number">2</span>^<span class="number">60</span> B</span><br><span class="line"><span class="number">1</span>ZB(Zettabyte泽) = <span class="number">2</span>^<span class="number">10</span> EB = <span class="number">1024</span> EB = <span class="number">2</span>^<span class="number">70</span> B</span><br><span class="line"><span class="number">1</span>YB(YottaByte尧) = <span class="number">2</span>^<span class="number">10</span> ZB = <span class="number">1024</span> ZB = <span class="number">2</span>^<span class="number">80</span> B</span><br><span class="line"><span class="number">1</span>BB(Brontobyte) = <span class="number">2</span>^<span class="number">10</span> YB = <span class="number">1024</span> YB = <span class="number">2</span>^<span class="number">90</span> B</span><br><span class="line"><span class="number">1</span>NB(NonaByte) = <span class="number">2</span>^<span class="number">10</span> BB = <span class="number">1024</span> BB = <span class="number">2</span>^<span class="number">100</span> B</span><br><span class="line"><span class="number">1</span>DB(DoggaByte) = <span class="number">2</span>^<span class="number">10</span> NB = <span class="number">1024</span> NB = <span class="number">2</span>^<span class="number">110</span> B</span><br></pre></td></tr></table></figure>
 <h2 id="容易混淆的情景"><a href="#容易混淆的情景" class="headerlink" title="容易混淆的情景"></a>容易混淆的情景</h2><p><strong>情景1</strong> 看各种协议时，要看清楚是比特还是字节<br>例：以太帧格式与IPv4包格式。</p>
@@ -2696,180 +2885,6 @@
 <p>参考：<a href="https://www.jianshu.com/p/abbdae4f3841" target="_blank" rel="noopener">https://www.jianshu.com/p/abbdae4f3841</a></p>
 <p>参考：<a href="https://higoge.github.io/2015/06/23/basic01/" target="_blank" rel="noopener">https://higoge.github.io/2015/06/23/basic01/</a></p>
 
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/05/Python安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/05/Python安装/" itemprop="url">
-                  Python安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-05 14:36:56" itemprop="dateCreated datePublished" datetime="2018-09-05T14:36:56+08:00">2018-09-05</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-02-16 01:35:15" itemprop="dateModified" datetime="2019-02-16T01:35:15+08:00">2019-02-16</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h1><p>建议使用3.5以上版本。开发环境使用pyenv，可以管理python解释器、管理python版本、管理python的虚拟环境。可以使多版本共存。pyenv是一个虚拟环境。也有其他的环境可以实现。</p>
-<h2 id="测试安装"><a href="#测试安装" class="headerlink" title="测试安装"></a>测试安装</h2><p>使用CentOS6.5-64</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line">yum install git</span><br><span class="line">vim /etc/yum.repos.d/python.repo</span><br><span class="line">    [updates]</span><br><span class="line">    name=CentOS-Updates</span><br><span class="line">    baseurl=https://mirrors.aliyun.com/centos/6.9/os/x86_64</span><br><span class="line">    gpgcheck=0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入yum源</span></span><br><span class="line">yum repolist</span><br><span class="line">yum update nss</span><br><span class="line"><span class="meta">#</span><span class="bash"> 更新此包，如果不更新此包，在安装pyenv时可能会报错，提示“curl:(35) SSL connect error”</span></span><br><span class="line">yum install gcc make patch gdbm-devel openssl-devel sqlite-devel readline-devel zlib-devel bzip2-devel</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是pyenv在安装python时要用到的包，pyenv是就地编译的，在编译时要用到这些包。</span></span><br><span class="line">useradd python</span><br><span class="line">passwd python</span><br><span class="line">su - python</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要用此用户登录开发</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pythonoffline.tar.gz是在线连接的时候出现问题，再解压此包进行配置</span></span><br><span class="line">curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 访问安装pyenv，安装好后会输出三行信息，要加入.bash_profile文件中。使用-L参数，curl就会跳转到新的网址。</span></span><br><span class="line">vim ~/.bash_profile</span><br><span class="line">    export PATH="/home/python/.pyenv/bin:$PATH"</span><br><span class="line">    eval "$(pyenv init -)"	</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化pyenv这个工具</span></span><br><span class="line">    eval "$(pyenv virtualenv-init -)"	</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化virtualenv这个插件，因为开发都用虚拟环境</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">eval</span>会对后面的cmdLine进行两遍扫描，如果在第一遍扫面后cmdLine是一个普通命令，则执行此命令；如果cmdLine中含有变量的间接引用，则保证简介引用的语义。</span></span><br><span class="line">source ~/.bash_profile</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看python版本，显示是2.6.6版本。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意：不要升级系统本身的python版本，因为有软件依赖，升级会使系统混乱，比如yum可能无法使用。所有工作都应该在pyenv这个多版本工具里进行</span></span><br><span class="line">pyenv</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看可用到的命令，如install等</span></span><br><span class="line">pyenv install -l</span><br><span class="line"><span class="meta">#</span><span class="bash"> 列出可用的python版本</span></span><br><span class="line">pyenv install 3.5.3 -v</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装python3.5.3版本，并输出详细信息。但连接非常慢</span></span><br><span class="line">cd ~/.pyenv</span><br><span class="line">ll</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里是python家目录下的.pyenv目录，里面有上面刚安装过的插件</span></span><br><span class="line">mkdir cache</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在.pyenv目录中创建一个目录，下面准备使用离线安装的方式。</span></span><br><span class="line">cd cache</span><br><span class="line">将python-3.5.3.tar.xz、python-3.5.3.tgz三个文件放入cache目录中。这三个文件是在安装过程中可能依赖的包，下载地址：https://www.python.org/ftp/python/3.5.3/</span><br><span class="line">cd ..</span><br><span class="line">pyenv install 3.5.3 -v</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在cache上一层目录执行安装</span></span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示还是2.6.6版本</span></span><br><span class="line">pyenv version</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前的python版本的位置</span></span><br><span class="line">[python@bogon .pyenv]$ pyenv versions</span><br><span class="line">* system (set by /home/python/.pyenv/version)</span><br><span class="line">  3.5.3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看由pyenv管理的所有python版本，这里有3.5.3版本，但没有*标记</span></span><br><span class="line"></span><br><span class="line">* global</span><br><span class="line">pyenv global 3.5.3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 改全局使用的python为3.5.3版本</span></span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看依然是2.6.6版本</span></span><br><span class="line">pyenv versions</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时3.5.3前已经有标记了，表示当前使用版本</span></span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看依然是2.6.6版本</span></span><br><span class="line">pyenv version</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里显示当前使用版本也是3.5.3</span></span><br><span class="line">再打开一个新的窗口用python用户登录，执行python -V，这时就是3.5.3版本了。如果用root用户这样操作，影响会非常大</span><br><span class="line">pyenv global system</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调回2.6.6，再次登录就都调回来了。global会影响当前用户。不建议使用global</span></span><br><span class="line">pyenv install 3.6.3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装一个3.6.3版本</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pyenv version是显示当前的python版本；pyenv versions显示所有可用的python版本，和当前版本。</span></span><br><span class="line">pyenv versions</span><br><span class="line"></span><br><span class="line">* shell只设定当前的会话级别，如果会话变了，版本的调整也就失效了</span><br><span class="line">pyenv shell 3.5.3</span><br><span class="line">pyenv versions</span><br><span class="line">python -v</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用shell命令设置后，发现版本都有了变化</span></span><br><span class="line">再打开一个窗口</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示的是2.6.6版本</span></span><br><span class="line">pyenv versions</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里还是system版本</span></span><br><span class="line"></span><br><span class="line">* local</span><br><span class="line">mkdir magedu/projects/web</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在python家目录中创建目录</span></span><br><span class="line">cd magedu/projects/web</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示的是2.6.6版本</span></span><br><span class="line">pyenv local 3.5.3</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示的是3.5.3版本</span></span><br><span class="line">cd ..</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到上一级目录查看版本是2.6.6，也就是版本与目录绑定了，进入特定的目录就会到一个不同的版本中</span></span><br><span class="line">mkdir /home/python/magedu/profects/web/html</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在web中创建html目录</span></span><br><span class="line">cd html</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里也是3.5.3版本，<span class="built_in">local</span>的特性是子目录继承的，所以web和html中都会显示3.5.3版本</span></span><br><span class="line">mkdir projects/cmdb</span><br><span class="line">cd projects/cmdb</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时显示的是2.6.6.版本</span></span><br><span class="line">pyenv local 3.6.3</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示3.6.3版本</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有一个问题，这个版本是大家共用的</span></span><br></pre></td></tr></table></figure>
-<h2 id="虚拟环境"><a href="#虚拟环境" class="headerlink" title="虚拟环境"></a>虚拟环境</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">cd /home/python/magedu/projects/cmdb</span><br><span class="line">pyenv virtualenv 3.5.3 my353</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给3.5.3版本制作一个虚拟版本，叫my353</span></span><br><span class="line">pyenv versions</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时多了一个my353的版本</span></span><br><span class="line">cd ..</span><br><span class="line">mkdir test</span><br><span class="line">cd test</span><br><span class="line">[python@bogon test]$ pyenv local my353</span><br><span class="line">(my353) [python@bogon test]$</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时提示符有了变化，多了一个(my353)</span></span><br><span class="line">cd ..</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到上一级目录就不会有(my353)</span></span><br><span class="line">cd test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时就有了(my353)</span></span><br><span class="line">cd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到家目录</span></span><br><span class="line">cd .pyenv</span><br><span class="line">ls</span><br><span class="line">cd versions</span><br><span class="line">ll</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有一个my353的软链接</span></span><br><span class="line">cd 3.5.3</span><br><span class="line">[python@bogon 3.5.3]$ ls</span><br><span class="line">bin  envs  include  lib  share</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有几个重要的目录，lib目录下有一个python3.5目录，其中有一个site-packages，这个目录有开发中安装的所有的包。如果大家都用3.5.3版本，那么包会全部放到这个目录里</span></span><br><span class="line">cd ../..</span><br><span class="line">cd versions/3.5.3/envs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在3.5.3目录下有一个envs目录，在envs中有my353目录，这是my353的虚拟环境，通过pyenv versions也可以看到这个信息。这个目录中也有一个lib目录，lib目录下有python3.5，再下面也有site-packages目录。如果使用虚拟环境，所有包都会装到这里。</span></span><br><span class="line">cd</span><br><span class="line">cd magedu/projects/web</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 是3.5.3版本</span></span><br><span class="line">cd ../test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进虚拟环境，要安装ipython</span></span><br><span class="line">cd</span><br><span class="line">mkdir .pip</span><br><span class="line">cd .pip</span><br><span class="line">touch pip.conf</span><br><span class="line">vim pip.conf</span><br><span class="line">    [global]</span><br><span class="line">    index-url=https://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">    trusted-host=mirrors.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这一步主要是为了使用pip的国内镜像</span></span><br><span class="line">pip</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提示找不到此命令，因为使用了pyenv管理这个版本，而目前的版本是system，system默认是没有安装pip命令的</span></span><br><span class="line">cd</span><br><span class="line">cd magedu/projects/test</span><br><span class="line">pip</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在是3.5.3版本，这里是有pip命令的</span></span><br><span class="line">pip install ipython</span><br><span class="line"><span class="meta">#</span><span class="bash"> pip就是python install packge，也就是安装包的缩写，pip是安装的管理器，与yum相似。ipython是一个与python交互的工具</span></span><br><span class="line">pip install --upgrade pip</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上一步执行完会提示要升级pip</span></span><br><span class="line">ipython</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提示没有ipython命令，再登录一下就可以使用了</span></span><br><span class="line">pip install jupyter</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是一个可视化界面</span></span><br><span class="line">cd</span><br><span class="line">cd .pyenv/versions/3.5.3/envs</span><br><span class="line">cd my353/lib/python3.5/site-packages/</span><br><span class="line">ll</span><br><span class="line"><span class="meta">#</span><span class="bash"> 包都装在了这里</span></span><br><span class="line">cd .pyenv/versions/3.5.3/lib/python3.5/site-packages/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里没有什么东西</span></span><br><span class="line">cd</span><br><span class="line">cd magedu/projects/test</span><br><span class="line">jupyter notebook --help</span><br><span class="line">jupyter notebook password</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置密码，如果不设置，会要求输入一长串东西才能使用</span></span><br><span class="line">jupyter notebook</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动，但因为没有图形接口，所以会有不能运行的提示</span></span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时会监听127.0.0.1:8888端口，但不能使用</span></span><br><span class="line">jupyter notebook --ip=0.0.0.0 --no-browser</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样启动可以监听所有地址，从外部就可以访问了。--no-browser表示不启动浏览器</span></span><br><span class="line">浏览器访问IP:8888，密码是上面设置的。如果没有设置密码，要输入启动时出现的一长串字符</span><br><span class="line">cd magedu/projects/test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入相应版本的目录，不然不能使用pip</span></span><br><span class="line">pip list</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看管理的包</span></span><br><span class="line">pip help</span><br><span class="line">pip freeze &gt; requirement</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把当前环境中的pip所安装的文件列表以及版本号全部导入reguiremeot， reguiremeot是自定义的名字</span></span><br><span class="line">cat  requiremeot</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这就是导出包的过程</span></span><br><span class="line">cd ../web</span><br><span class="line">python -V</span><br><span class="line"><span class="meta">#</span><span class="bash"> 3.5.3版本</span></span><br><span class="line">pip list</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在包很少</span></span><br><span class="line">pip install -r ../test/requiremeot</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样可以保证两个环境安装的包是一样的。另外将一个环境中的site-packages中的包复制到另一个环境的相同目录下也可以实现这个效果</span></span><br><span class="line">pip list</span><br><span class="line">windows安装python是要选择"Add Python 3.6 to PATH"</span><br></pre></td></tr></table></figure>
-<h2 id="离线安装"><a href="#离线安装" class="headerlink" title="离线安装"></a>离线安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/pyenv/pyenv.git ~/.pyenv</span><br><span class="line">git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv</span><br><span class="line">git clone https://github.com/pyenv/pyenv-update.git ~/.pyenv/plugins/pyenv-update</span><br><span class="line">git clone https://github.com/pyenv/pyenv-which-ext.git ~/.pyenv/plugins/pyenv-which-ext</span><br><span class="line">//可以把克隆的目录打包，方便以后离线使用</span><br><span class="line">vim ~/.bash_profile</span><br><span class="line">export PATH="/home/python/.pyenv/bin:$PATH"</span><br><span class="line">eval "$(pyenv init -)"	//初始化pyenv这个工具</span><br><span class="line">eval "$(pyenv virtualenv-init -)"	//初始化virtualenv这个插件，因为开发都用虚拟环境</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure>
-<h1 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h1>
           
         
       
@@ -2954,7 +2969,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">132</span>
+                    <span class="site-state-item-count">133</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3238,7 +3253,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">101</span>
+                      
+                    
+                    <span class="site-state-item-count">102</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

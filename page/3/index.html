@@ -350,6 +350,258 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/04/logrotate配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/04/logrotate配置使用/" itemprop="url">
+                  logrotate配置使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-04-04 10:33:06 / 修改時間：11:00:26" itemprop="dateCreated datePublished" datetime="2019-04-04T10:33:06+08:00">2019-04-04</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>logrotate是个十分有用的日志切割工具，它可以自动对日志进行截断（或轮循）、压缩以及删除旧的日志文件。</p>
+</blockquote>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">[root@webdav ~]# vim /etc/logrotate.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> see <span class="string">"man logrotate"</span> <span class="keyword">for</span> details</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> rotate <span class="built_in">log</span> files weekly  </span></span><br><span class="line">weekly</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每周轮替一次，也就是多久生成一个新的日志文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> keep 4 weeks worth of backlogs</span></span><br><span class="line">rotate 4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 保留4个轮替日志 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> create new (empty) <span class="built_in">log</span> files after rotating old ones</span></span><br><span class="line">create</span><br><span class="line"><span class="meta">#</span><span class="bash"> 轮替后创建新的日志文件 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> use date as a suffix of the rotated file</span></span><br><span class="line">dateext</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用时间作为轮替文件的后缀 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> uncomment this <span class="keyword">if</span> you want your <span class="built_in">log</span> files compressed</span></span><br><span class="line"><span class="meta">#</span><span class="bash">compress</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果需要压缩日志，去除注释</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> RPM packages drop <span class="built_in">log</span> rotation information into this directory</span></span><br><span class="line">include /etc/logrotate.d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让/etc/logrotate.d目录下面配置文件内容参与轮替 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> no packages own wtmp and btmp -- we<span class="string">'ll rotate them here</span></span></span><br><span class="line">/var/log/wtmp &#123;			# 轮替对象为/var/log/中的wtmp文件 </span><br><span class="line">    monthly			# 每个月轮替一次</span><br><span class="line">    create 0664 root utmp		#创建新的日志文件的权限，所属用户所属组 	</span><br><span class="line">        minsize 1M			# 日志大小大于1M后才能参与轮替</span><br><span class="line">    rotate 1			# 保留一个轮替日志文件 </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/var/log/btmp &#123;</span><br><span class="line">    missingok			#  如果日志文件不存在，继续进行下一个操作，不报错 </span><br><span class="line">    monthly</span><br><span class="line">    create 0600 root utmp</span><br><span class="line">    rotate 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>daily</td>
+<td>每天轮替一次</td>
+</tr>
+<tr>
+<td>weekly</td>
+<td>每周轮替一次</td>
+</tr>
+<tr>
+<td>monthly</td>
+<td>每月轮替一次</td>
+</tr>
+<tr>
+<td>yearly</td>
+<td>每年轮替一次</td>
+</tr>
+<tr>
+<td>rotate</td>
+<td>保留几个轮替日志文件</td>
+</tr>
+<tr>
+<td>ifempty</td>
+<td>不论日志是否空，都进行轮替</td>
+</tr>
+<tr>
+<td>notifempty</td>
+<td>若日志为空，则不进行轮替</td>
+</tr>
+<tr>
+<td>create</td>
+<td>旧日志文件轮替后创建新的日志文件</td>
+</tr>
+<tr>
+<td>size</td>
+<td>日志达到多少后进行rotate</td>
+</tr>
+<tr>
+<td>minsize</td>
+<td>文件容量一定要超过多少后才进行rotate</td>
+</tr>
+<tr>
+<td>nocompress</td>
+<td>轮替但不进行压缩</td>
+</tr>
+<tr>
+<td>compress</td>
+<td>压缩轮替文件</td>
+</tr>
+<tr>
+<td>dateext</td>
+<td>轮替旧日志文件时，文件名添加-%Y %m %d形式日期，可用dateformat选项扩展配置。</td>
+</tr>
+<tr>
+<td>nodateext</td>
+<td>旧日志文件不使用dateext扩展名，后面序数自增如”*.log.1”</td>
+</tr>
+<tr>
+<td>dateformat</td>
+<td>只允许%Y %m %d和%s指定符。注意：系统时钟需要设置到2001-09-09之后，%s才可以正确工作</td>
+</tr>
+<tr>
+<td>sharedscripts</td>
+<td>作用域下文件存在至少有一个满足轮替条件的时候，执行一次prerotate脚本和postrotate脚本。</td>
+</tr>
+<tr>
+<td>prerotate/endscript</td>
+<td>在轮替之前执行之间的命令，prerotate与endscript成对出现。</td>
+</tr>
+<tr>
+<td>postrotate/endscript</td>
+<td>在轮替之后执行之间的命令，postrotate与endscript成对出现。</td>
+</tr>
+<tr>
+<td>olddir</td>
+<td>将轮替的文件移至指定目录下</td>
+</tr>
+<tr>
+<td>missingok</td>
+<td>如果日志文件不存在，继续进行下一个操作，不报错</td>
+</tr>
+</tbody>
+</table>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@RBO1-POSTER3 ~]# vim /etc/logrotate.d/nginx</span><br><span class="line">/var/log/nginx/*.log &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一个对nginx的<span class="built_in">log</span>日志进行切割的脚本，上面是日志的地址，如果有多个路径可以使用空格或换行来分隔</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        daily			<span class="comment"># 这里注释的意义不大，因为如果不配置，也会使用logrotate.conf的默认配置</span></span></span><br><span class="line">        size = 50M			# 50M切割一次</span><br><span class="line">        missingok			# 如果日志文件不存在，继续进行下一个操作，不报错</span><br><span class="line">        rotate 5				# 保留5个日志文件，这并不包括本身的日志文件，只是切割后的日志文件</span><br><span class="line"><span class="meta">#</span><span class="bash">        compress</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        delaycompress</span></span><br><span class="line">        notifempty</span><br><span class="line"><span class="meta">#</span><span class="bash">        create 640 nginx adm</span></span><br><span class="line">        sharedscripts</span><br><span class="line">        postrotate</span><br><span class="line">                if [ -f /var/run/nginx.pid ]; then</span><br><span class="line">                        kill -USR1 `cat /var/run/nginx.pid`</span><br><span class="line">                fi</span><br><span class="line">        endscript</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个脚本的功能应该是先判断nginx.pid文件是否存在，如果存在证明nginx服务启动了，之后让nginx向新的日志文件中写入日志，<span class="built_in">kill</span>发送-USR1信号给nginx的pid。信号的具体作用没弄明白。</span></span><br><span class="line">&#125;</span><br><span class="line">[root@RBO1-POSTER3 ~]# /usr/sbin/logrotate --force /etc/logrotate.d/nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是强制执行一次脚本，使用logrotate命令加--force选项，最后指定要执行的脚本。</span></span><br><span class="line">[root@RBO1-POSTER3 ~]# ll /var/log/nginx/</span><br><span class="line">总用量 427804</span><br><span class="line">-rw-r--r--. 1 nginx root  34053285 4月   4 10:47 access.log</span><br><span class="line">-rw-r--r--. 1 nginx root  42083626 4月   4 10:00 access.log.1</span><br><span class="line">-rw-r--r--. 1 nginx root  39990852 4月   4 09:00 access.log.2</span><br><span class="line">-rw-r-----. 1 nginx root 276662461 4月   3 14:21 access.log-20190403</span><br><span class="line">-rw-r--r--. 1 nginx root  26968952 4月   4 08:00 access.log.3</span><br><span class="line">-rw-r--r--. 1 nginx root  12106704 4月   4 07:00 access.log.4</span><br><span class="line">-rw-r--r--. 1 nginx root   3937887 4月   4 06:00 access.log.5</span><br><span class="line">-rw-r--r--. 1 nginx root     14267 4月   4 10:47 error.log</span><br><span class="line">-rw-r--r--. 1 nginx root      5876 4月   4 09:56 error.log.1</span><br><span class="line">-rw-r--r--. 1 nginx root      3470 4月   4 08:45 error.log.2</span><br><span class="line">-rw-r-----. 1 root  root   2184157 4月   3 08:35 error.log-20190403</span><br><span class="line">-rw-r--r--. 1 nginx root      2762 4月   4 07:54 error.log.3</span><br><span class="line">-rw-r--r--. 1 nginx root       338 4月   4 06:51 error.log.4</span><br><span class="line">-rw-r--r--. 1 nginx root       337 4月   4 05:33 error.log.5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 强制执行多次后发现，会有一个以日志命名的日志，这是logrotate脚本正常执行的结果，以数字结尾的日志共有5个，这是强制执行脚本后产生的，还有一个本身的日志。所以强制执行脚本后，也不会按配置文件中定义的只保留5个轮替日志文件，正常产生的轮替日志是不会被删除的。另外，如果需要按小时执行轮替就需要使用crontab定时任务，logrotate最小只支持按天轮替。</span></span><br><span class="line">[root@RBO1-POSTER3 ~]# crontab -e</span><br><span class="line">*/60 * * * * /usr/sbin/logrotate --force /etc/logrotate.d/nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每60分钟执行一次，这与按每小时执行是不一样的。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/03/NFS配置使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2181,316 +2433,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/python基础学习-基础知识/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/20/python基础学习-基础知识/" itemprop="url">
-                  python基础学习-基础知识
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-20 09:04:26" itemprop="dateCreated datePublished" datetime="2019-03-20T09:04:26+08:00">2019-03-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-03-26 16:33:01" itemprop="dateModified" datetime="2019-03-26T16:33:01+08:00">2019-03-26</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h4><blockquote>
-<p>算法是流程或菜谱的时髦说法，详尽地描述了如何完成某项任务。算法由对象（原料）和语句（操作说明）组成。从本质上说，编写计算机程序就是使用计算机能够理解的语言(如Python)描述一种算法。这种对机器友好的描述被称为程序，主要由表达式和语句组成。</p>
-</blockquote>
-<h4 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h4><blockquote>
-<p>表达式为程序的一部分，结果为一个值。例如：2 + 2就是一个表达式，结果为4 。简单表达式是使用运算符(如+或% )和函数(如pow)将字面值(如2或”Hello” )组合起来得到的。通过组合简单的表达式，可创建复杂的表达式，如(2 + 2) *(3 - 1)。表达式还可能包含变量。</p>
-<p>圆整，是科技术语，通常理解为因满足某种要求而进行的数据修正。按照修正后的数据在数值上是否比原数据大，又可分为向上圆整和向下圆整。</p>
-<p>整除符号：//，当结果为整数时向下圆整，如：10 // 3。如果余数为0，就不会向下圆整了，如：9 // 3。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">10</span> % <span class="number">3</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">10</span> % <span class="number">-3</span></span><br><span class="line"><span class="number">-2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">-10</span> % <span class="number">3</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">-10</span> % <span class="number">-3</span></span><br><span class="line"><span class="number">-1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">10</span> // <span class="number">3</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">10</span> // <span class="number">-3</span></span><br><span class="line"><span class="number">-4</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">-10</span> // <span class="number">3</span></span><br><span class="line"><span class="number">-4</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">-10</span> // <span class="number">-3</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="comment"># 对于整数运算，结果是向下圆整的。在结果是负数时，圆整后将离0更远。</span></span><br></pre></td></tr></table></figure>
-<h4 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h4><blockquote>
-<p>变量是表示值的名称。通过赋值,可将新值赋给变量,如x = 2。赋值是一种语句。</p>
-<p>使用python变量前必须给它赋值，因此python变量没有默认值。在python中，名称（标识符）只能由字母、数字和下划线(_)构成，且不能以数字开头。最好也不要以下划线开头。</p>
-</blockquote>
-<h4 id="语句"><a href="#语句" class="headerlink" title="语句"></a>语句</h4><blockquote>
-<p>语句是让计算机执行特定操作的指示。这种操作可能是修改变量(通过赋值) 、将信息打印到屏幕上(如print(“Hello, world!”))、导入模块或执行众多其他任务。</p>
-<p>表达式是一些东西，而语句是一些事情。上面介绍的都是表达式。如表达式：2 <em> 2，语句：print(2 </em> 2)</p>
-<p>语句的特征是执行修改操作。赋值语句可以改变变量，print语句改变屏幕的外观。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = input(<span class="string">"x: "</span>)</span><br><span class="line">x: <span class="number">34</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = input(<span class="string">"y: "</span>)</span><br><span class="line">y: <span class="number">42</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(int(x) * int(y))</span><br><span class="line"><span class="number">1428</span></span><br><span class="line"><span class="comment"># int可以将字符串转换为整数。</span></span><br></pre></td></tr></table></figure>
-<h4 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h4><blockquote>
-<p>Python函数类似于数学函数，它们可以接受参数，并返回结果。函数犹如小型程序，可用来执行特定的操作。通常将标准函数称为内置函数。使用函数称为调用函数，可以向函数提供实参，之后函数返回一个值。因为函数调用返回一个值，因此它们也是表达式。可以结合使用函数调用和运算符来编写更复杂的表达式。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">2</span> ** <span class="number">3</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>pow(<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># pow函数是计算幂运算的。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">10</span> + pow(<span class="number">2</span>,<span class="number">3</span>*<span class="number">5</span>) / <span class="number">3.0</span></span><br><span class="line"><span class="number">10932.6666666</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>abs(<span class="number">-10</span>)</span><br><span class="line"><span class="comment"># abs函数计算绝对值</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>round(<span class="number">2</span> / <span class="number">3</span>)</span><br><span class="line"><span class="comment"># round将浮点数圆整为与之最接近的整数。</span></span><br><span class="line"><span class="comment"># 整数总是向下圆整，而round圆整到最接近的整数，并在两个整数一样近时圆整到偶数。</span></span><br></pre></td></tr></table></figure>
-<h4 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h4><blockquote>
-<p>模块是扩展，可通过导入它们来扩展Python的功能。例如：模块math包含多个很有用的函数。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.floor(<span class="number">32.9</span>)</span><br><span class="line"><span class="number">32</span></span><br><span class="line"><span class="comment"># 使用import导入模块，再以module.function的方式使用模块中的函数。floor函数与上面的round函数相反，可以将浮点数向下圆整</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.ceil(<span class="number">32.3</span>)</span><br><span class="line"><span class="number">33</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.ceil(<span class="number">32</span>)</span><br><span class="line"><span class="number">32</span></span><br><span class="line"><span class="comment"># ceil与floor相反，返回大于或等于给定数的最小整数。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> math <span class="keyword">import</span> sqrt</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sqrt(<span class="number">9</span>)</span><br><span class="line"><span class="number">3.0</span></span><br><span class="line"><span class="comment"># sqrt函数用于计算平方根。如果确定不会从不同模块导入多个同名函数，可使用from math import function的方法调用函数，之后就不用再指定模块前缀了。一般还是不使用此种方法，容易出现无法使用常规函数的问题</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>foo = math.sqrt</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>foo(<span class="number">4</span>)</span><br><span class="line"><span class="comment"># 可以将函数赋值给变量，之后变量就有了函数的功能</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> math <span class="keyword">import</span> sqrt</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sqrt(<span class="number">-1</span>)</span><br><span class="line">nan</span><br><span class="line"><span class="comment"># nan具有特殊含义，指的是"非数值"(not a number)。</span></span><br><span class="line"><span class="comment"># 如果将值域限定为实数，并使用其近似的浮点数实现，就无法计算负数的平方根。负数的平方根是虚数，而由实部和虚部组成的数为复数</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> cmath</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>cmath.sqrt(<span class="number">-1</span>)</span><br><span class="line"><span class="number">1j</span></span><br><span class="line"><span class="comment"># 1j是个虚数，虚数都以j（或J）结尾。复数算术运算都基于如下定义：-1的平方根为1j。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="number">1</span> + <span class="number">3j</span>) * (<span class="number">9</span> + <span class="number">4j</span>)</span><br><span class="line">(<span class="number">-3</span> + <span class="number">31j</span>)</span><br><span class="line"><span class="comment"># python提供了对复数的支持。</span></span><br><span class="line"><span class="comment"># python没有专门表示虚数的类型，而将虚数视为实部为零的复数。</span></span><br></pre></td></tr></table></figure>
-<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><blockquote>
-<p>字符串的主要用途是表示一段文本。在Python 3中，所有的字符串都是Unicode字符串。</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Let's go!"</span></span><br><span class="line"><span class="string">"Let's go!"</span></span><br><span class="line"><span class="comment"># 这里用了一个单引号，因此不能用单引号再将整个字符串括起，否则解释器将报错。如下：</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">'Let'</span>s go!<span class="string">'</span></span><br><span class="line"><span class="string">SyntaxError: invalid syntax</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&gt;&gt;&gt; '</span><span class="string">"Hello, world!"</span> she said<span class="string">'</span></span><br><span class="line"><span class="string">'</span><span class="string">"Hello, world!"</span> she said<span class="string">'</span></span><br><span class="line"><span class="string"># 因为字符串包含双引号，因此必须使用单引号将整个字符串括起</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&gt;&gt;&gt; '</span>Let\<span class="string">'s go!'</span></span><br><span class="line"><span class="string">"Let's go!"</span></span><br><span class="line"><span class="comment"># 可使用反斜杠( \ )对引号进行转义</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"\"Hello, world!\" she said"</span></span><br><span class="line"><span class="string">'"Hello, world!" she said'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Let's say "</span> <span class="string">'"Hello, world!"'</span></span><br><span class="line"><span class="string">'Let\'s say "Hello, world!"'</span></span><br><span class="line"><span class="comment"># Python可以自动将字符串拼接起来</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Hello, "</span> + <span class="string">"world!"</span></span><br><span class="line"><span class="string">'Hello, world!'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = <span class="string">"Hello, "</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = <span class="string">"world!"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x + y</span><br><span class="line"><span class="string">'Hello, world!'</span></span><br><span class="line"><span class="comment"># 拼接字符串的方法</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">'''This is a very long string. It continues here.</span></span><br><span class="line"><span class="string">And it's not over yet. "Hello, world!"</span></span><br><span class="line"><span class="string">Still here.'''</span>)</span><br><span class="line"><span class="comment"># 表示长字符串时可以使用三个单引号或三个双引号，这让解释器能够识别表示字符串开始和结束位置的引号，因此字符串本身可包含单引号和双引号，无需使用反斜杠进行转义。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">1</span> + <span class="number">2</span> + \</span><br><span class="line"><span class="number">4</span> + <span class="number">5</span></span><br><span class="line"><span class="number">12</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">print</span> \</span><br><span class="line">(<span class="string">'Hello, world'</span>)</span><br><span class="line">Hello, world</span><br><span class="line"><span class="comment"># 常规字符串也可横跨多行。只要在行尾加上反斜杠,反斜杠和换行符将被转义,即被忽略。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">r'C:\nowhere'</span>)</span><br><span class="line">C:\nowhere</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">r'C:\Program Files\fnord\foo\bar\baz\frozz\bozz'</span>)</span><br><span class="line">C:\Program Files\fnord\foo\bar\baz\frozz\bozz</span><br><span class="line"><span class="comment"># 原始字符串用前缀r表示。看起来可在原始字符串中包含任何字符，这大致是正确的。一个例外是，引号需要像通常那样进行转义，但这意味着用于执行转义的反斜杠也将包含在最终的字符串中。如下：</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">r'Let\'s go!'</span>)</span><br><span class="line">Let\<span class="string">'s go!</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&gt;&gt;&gt; print(r"This is illegal\")</span></span><br><span class="line"><span class="string">SyntaxError: EOL while scanning string literal</span></span><br><span class="line"><span class="string"># 原始字符串不能以单个反斜杠结尾。除非你对其进行转义(但进行转义时,用于转义的反斜杠也将是字符串的一部分) 。</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; print(r'</span>C:\Program Files\foo\ba<span class="string">r' '</span>\\<span class="string">')</span></span><br><span class="line"><span class="string">C:\Program Files\foo\bar\</span></span><br><span class="line"><span class="string"># 可以将反斜杠单独作为一个字符串</span></span><br></pre></td></tr></table></figure>
-<h4 id="函数表"><a href="#函数表" class="headerlink" title="函数表"></a>函数表</h4><table>
-<thead>
-<tr>
-<th style="text-align:left">函数</th>
-<th style="text-align:left">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">abs(number)</td>
-<td style="text-align:left">返回指定数的绝对值</td>
-</tr>
-<tr>
-<td style="text-align:left">bytes(string, encoding[, errors])</td>
-<td style="text-align:left">对指定的字符串进行编码，并以指定的方式处理错误</td>
-</tr>
-<tr>
-<td style="text-align:left">cmath.sqrt(number)</td>
-<td style="text-align:left">返回平方根；可用于负数</td>
-</tr>
-<tr>
-<td style="text-align:left">float(object)</td>
-<td style="text-align:left">将数字转换为浮点数</td>
-</tr>
-<tr>
-<td style="text-align:left">help([object])</td>
-<td style="text-align:left">提供交互式帮助</td>
-</tr>
-<tr>
-<td style="text-align:left">input(prompt)</td>
-<td style="text-align:left">以字符串的方式获取用户输入</td>
-</tr>
-<tr>
-<td style="text-align:left">int(object)</td>
-<td style="text-align:left">将字符串或数转换为整数</td>
-</tr>
-<tr>
-<td style="text-align:left">math.ceil(number)</td>
-<td style="text-align:left">以浮点数的方式返回向上圆整的结果</td>
-</tr>
-<tr>
-<td style="text-align:left">math.floor(number)</td>
-<td style="text-align:left">以浮点数的方式返回向下圆整的结果</td>
-</tr>
-<tr>
-<td style="text-align:left">math.sqrt(number)</td>
-<td style="text-align:left">返回平方根；不能用于负数</td>
-</tr>
-<tr>
-<td style="text-align:left">pow(x, y[, z])</td>
-<td style="text-align:left">返回x的y次方对z求模的结果</td>
-</tr>
-<tr>
-<td style="text-align:left">print(object, …)</td>
-<td style="text-align:left">将提供的实参打印出来,并用空格分隔</td>
-</tr>
-<tr>
-<td style="text-align:left">repr(object)</td>
-<td style="text-align:left">返回指定值的字符串表示</td>
-</tr>
-<tr>
-<td style="text-align:left">round(number[, ndigits])</td>
-<td style="text-align:left">四舍五入为指定的精度，正好为5时舍入到偶数</td>
-</tr>
-<tr>
-<td style="text-align:left">str(object)</td>
-<td style="text-align:left">将指定的值转换为字符串。用于转换 bytes 时，可指定编码和错误处理方式</td>
-</tr>
-<tr>
-<td style="text-align:left">len(seq)</td>
-<td style="text-align:left">返回序列的长度</td>
-</tr>
-<tr>
-<td style="text-align:left">list(seq)</td>
-<td style="text-align:left">将序列转换为列表</td>
-</tr>
-<tr>
-<td style="text-align:left">max(args)</td>
-<td style="text-align:left">返回序列或一组参数中的最大值</td>
-</tr>
-<tr>
-<td style="text-align:left">min(args)</td>
-<td style="text-align:left">返回序列和一组参数中的最小值</td>
-</tr>
-<tr>
-<td style="text-align:left">reversed(seq)</td>
-<td style="text-align:left">让你能够反向迭代序列</td>
-</tr>
-<tr>
-<td style="text-align:left">sorted(seq)</td>
-<td style="text-align:left">返回一个有序列表，其中包含指定序列中的所有元素</td>
-</tr>
-<tr>
-<td style="text-align:left">tuple(seq)</td>
-<td style="text-align:left">将序列转换为元组</td>
-</tr>
-<tr>
-<td style="text-align:left">string.capwords(s[, sep])</td>
-<td style="text-align:left">使用split 根据sep拆分s，将每项的首字母大写，再以空格为分隔符将它们合并起来</td>
-</tr>
-<tr>
-<td style="text-align:left">ascii(obj)</td>
-<td style="text-align:left">创建指定对象的ASCII表示</td>
-</tr>
-<tr>
-<td style="text-align:left">dict(seq)</td>
-<td style="text-align:left">从键值对、映射或关键字参数创建字典</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2538,7 +2480,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">132</span>
+                    <span class="site-state-item-count">133</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2822,7 +2764,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">101</span>
+                      
+                    
+                    <span class="site-state-item-count">102</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
