@@ -350,6 +350,193 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/16/docker学习一：基本概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/16/docker学习一：基本概念/" itemprop="url">
+                  docker学习一：基本概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-16 11:11:26" itemprop="dateCreated datePublished" datetime="2018-11-16T11:11:26+08:00">2018-11-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-02-02 09:57:30" itemprop="dateModified" datetime="2019-02-02T09:57:30+08:00">2019-02-02</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ol>
+<li><p>Docker 和传统虚拟化方式的不同之处在于传统虚拟机技术是虚拟出一套硬件后,在其上运行一个完整操作系统,在该系统上再运行所需应用进程;而容器内的应用进程直接运行于宿主的内核,容器内没有自己的内核,而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便。</p>
+</li>
+<li><p>Docker 镜像(Image),就相当于是一个root文件系统。Docker 镜像是一个特殊的文件系统,除了提供容器运行时所需的程序、库、资源、配置等文件外,还包含了一些为运行时准备的一些配置参数(如匿名卷、环境变量、用户等)。镜像不包含任何动态数据,其内容在构建之后也不会被改变。</p>
+</li>
+<li><p>因为镜像包含操作系统完整的root文件系统,其体积往往是庞大的,因此在 Docker 设计时,就充分利用 Union FS 的技术,将其设计为分层存储的架构。所以严格来说,镜像并非是像一个 ISO 那样的打包文件,镜像只是一个虚拟的概念,其实际体现并非由一个文件组成,而是由一组文件系统组成,或者说,由多层文件系统联合组成。镜像构建时,会一层层构建,前一层是后一层的基础。每一层构建完就不会再发生改变,后一层上的任何改变只发生在自己这一层。比如,删除前一层文件的操作,实际不是真的删除前一层的文件,而是仅在当前层标记为该文件已删除。在最终容器运行的时候,虽然不会看到这个文件,但是实际上该文件会一直跟随镜像。因此,在构建镜像的时候,需要额外小心,每一层尽量只包含该层需要添加的东西,任何额外的东西应该在该层构建结束前清理掉。分层存储的特征还使得镜像的复用、定制变的更为容易。甚至可以用之前构建好的镜像作为基础层,然后进一步添加新的层,以定制自己所需的内容,构建新的镜像。</p>
+</li>
+<li><p>镜像(Image)和容器(Container)的关系,就像是面向对象程序设计中的类和实例一样,镜像是静态的定义,容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。<br>容器的实质是进程,但与直接在宿主执行的进程不同,容器进程运行于属于自己的独立的命名空间。因此容器可以拥有自己的root文件系统、自己的网络配置、自己的进程空间,甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里,使用起来,就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。<br>前面讲过镜像使用的是分层存储,容器也是如此。每一个容器运行时,是以镜像为基础层,在其上创建一个当前容器的存储层,我们可以称这个为容器运行时读写而准备的存储层为容器存储层。<br>容器存储层的生存周期和容器一样,容器消亡时,容器存储层也随之消亡。因此,任何保存于容器存储层的信息都会随容器删除而丢失。<br>按照 Docker 最佳实践的要求,容器不应该向其存储层内写入任何数据,容器存储层要保持无状态化。所有的文件写入操作,都应该使用 数据卷(Volume)、或者绑定宿主目录,在这些位置的读写会跳过容器存储层,直接对宿主(或网络存储)发生读写,其性能和稳定性更高。<br>数据卷的生存周期独立于容器,容器消亡,数据卷不会消亡。因此,使用数据卷后,容器删除或者重新运行之后,数据却不会丢失。</p>
+</li>
+<li><p>Docker Registry</p>
+<p>镜像构建完成后,可以很容易的在当前宿主机上运行,但是,如果需要在其它服务器上使用这个镜像,我们就需要一个集中的存储、分发镜像的服务,Docker Registry 就是这样的服务。<br>一个 Docker Registry 中可以包含多个仓库(Repository);每个仓库可以包含多个标签(Tag);每个标签对应一个镜像。<br>通常,一个仓库会包含同一个软件不同版本的镜像,而标签就常用于对应该软件的各个版本。我们可以通过&lt;仓库名&gt;:&lt;标签&gt;的格式来指定具体是这个软件哪个版本的镜像。如果不给出标签,将以latest作为默认标签。<br>以 Ubuntu 镜像为例,ubuntu是仓库的名字,其内包含有不同的版本标签,如,14.04、16.04。我们可以通过 ubuntu:14.04,或者ubuntu:16.04。来具体指定所需哪个版本的镜像。如果忽略了标签,比如ubuntu,那将视为ubuntu:latest。<br>仓库名经常以两段式路径形式出现,比如jwilder/nginx-proxy,前者往往意味着 Docker Registry 多用户环境下的用户名,后者则往往是对应的软件名。但这并非绝对,取决于所使用的具体 Docker Registry 的软件或服务。</p>
+</li>
+<li><p>Docker Registry 公开服务<br>Docker Registry 公开服务是开放给用户使用、允许用户管理镜像的 Registry 服务。一般这类公开服务允许用户免费上传、下载公开的镜像,并可能提供收费服务供用户管理私有镜像。<br>最常使用的 Registry 公开服务是官方的 Docker Hub,这也是默认的 Registry,并拥有大量的高质量的官方镜像。除此以外,还有 CoreOS 的 Quay.io,CoreOS 相关的镜像存储在这里;Google 的 Google Container Registry,Kubernetes 的镜像使用的就是这个服务。<br>由于某些原因,在国内访问这些服务可能会比较慢。国内的一些云服务商提供了针对 Docker Hub 的镜像服务(<br>Registry Mirror),这些镜像服务被称为加速器。常见的有 阿里云加速器、DaoCloud 加速器等。使用加速器会直接从国内的地址下载 Docker Hub 的镜像,比直接从 Docker Hub 下载速度会提高很多。<br>国内也有一些云服务商提供类似于 Docker Hub 的公开服务。比如时速云镜像仓库、网易云镜像服务、DaoCloud 镜像市场、阿里云镜像库等。</p>
+</li>
+<li><p>私有 Docker Registry<br>除了使用公开服务外,用户还可以在本地搭建私有Docker Registry。Docker 官方提供了Docker Registry 镜像,可以直接使用做为私有Registry服务。<br>开源的 Docker Registry 镜像只提供了 Docker Registry API 的服务端实现,足以支持docker命令,不影响使用。但不包含图形界面,以及镜像维护、用户管理、访问控制等高级功能。在官方的商业化版本 Docker Trusted Registry 中,提供了这些高级功能。</p>
+<p>除了官方的 Docker Registry 外,还有第三方软件实现了 Docker Registry API,甚至提供了用户界面以及一些高级功能。比如,VMWare Harbor 和 Sonatype Nexus。</p>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/阿里云调整/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2738,185 +2925,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/17/awk动作/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/17/awk动作/" itemprop="url">
-                  awk动作
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-10-17 14:13:32" itemprop="dateCreated datePublished" datetime="2018-10-17T14:13:32+08:00">2018-10-17</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-15 15:49:54" itemprop="dateModified" datetime="2019-01-15T15:49:54+08:00">2019-01-15</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="awk动作"><a href="#awk动作" class="headerlink" title="awk动作"></a>awk动作</h3><ul>
-<li>输出语句</li>
-<li>组合语句</li>
-<li>条件判断控制语句</li>
-<li>循环控制语句</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# awk '&#123;print $0&#125;' test2</span><br><span class="line">hey</span><br><span class="line">heey</span><br><span class="line">heeey</span><br><span class="line">heeeey</span><br><span class="line"><span class="meta">#</span><span class="bash"> &#123;&#125;与<span class="built_in">print</span> <span class="variable">$0</span>是两个动作。<span class="string">"print"</span>属于<span class="string">"输出语句"</span>类型的动作，<span class="string">"输出语句"</span>类型的动作的作用就是输出、打印信息。<span class="string">"&#123;  &#125;"</span>属于<span class="string">"组合语句"</span>类型的动作，组合语句<span class="string">"类型的动作的作用就是将多个代码组合成代码块。</span></span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# cat test</span><br><span class="line">abc 345 ssd asdf lkj;l</span><br><span class="line">123 klj adf daff adeills adsfei</span><br><span class="line">[root@bogon ~]# awk '&#123;print $1&#125;&#123;print $2&#125;' test</span><br><span class="line">abc</span><br><span class="line">345</span><br><span class="line">123</span><br><span class="line">klj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用了两个大括号<span class="string">"&#123;  &#125;"</span>，它们属于<span class="string">"组合语句"</span>类型的动作，它们分别将两个<span class="built_in">print</span>括住，表示这两个<span class="built_in">print</span>动作分别作为两个独立的个体。先打印<span class="variable">$1</span>再打印<span class="variable">$2</span></span></span><br><span class="line">[root@bogon ~]# awk '&#123;print $1;print $2&#125;' test</span><br><span class="line">abc</span><br><span class="line">345</span><br><span class="line">123</span><br><span class="line">klj</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将上面的动作组合在一起。当我们把多个动作（多段代码）组合成一个代码块的时候，每段动作（每段代码）之间需要用分号<span class="string">";"</span>隔开</span></span><br></pre></td></tr></table></figure>
-<h4 id="条件判断控制语句"><a href="#条件判断控制语句" class="headerlink" title="条件判断控制语句"></a>条件判断控制语句</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">    if(条件)</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk '&#123;if(NR == 1)&#123;print $0&#125;&#125;' test</span><br><span class="line">abc 345 ssd asdf lkj;l</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要将动作写在&#123;&#125;中，控制语句也要有&#123;&#125;，所以这里有两个&#123;&#125;，<span class="keyword">if</span>语句中的大括号中，也可以执行多个动作。将行号是1的行打印出来。</span></span><br><span class="line">[root@bogon ~]# awk '&#123;if(NR == 1)&#123;print $1;print $2&#125;&#125;' test</span><br><span class="line">abc</span><br><span class="line">345</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果行号是1，就打印第一列再打印第二列</span></span><br><span class="line">[root@bogon ~]# awk '&#123;if(NR == 1)print $1&#125;' test</span><br><span class="line">abc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果<span class="keyword">if</span>后的动作只有一个，那么也可以不写&#123;&#125;</span></span><br><span class="line"></span><br><span class="line">* 语法</span><br><span class="line">    "if...else..."的语法如下：</span><br><span class="line">    if(条件)</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    "if...else if...else"的语法如下：</span><br><span class="line">    if(条件1)</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line">    else if(条件2)</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">    语句1;</span><br><span class="line">    语句2;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -F":" '&#123;if($3 &lt; 1000)&#123;print $1,"系统用户"&#125;else&#123;print $1,"普通用户"&#125;&#125;' /etc/passwd</span><br><span class="line">root 系统用户</span><br><span class="line">bin 系统用户</span><br><span class="line">daemon 系统用户</span><br><span class="line">adm 系统用户</span><br><span class="line">lp 系统用户</span><br><span class="line">sync 系统用户</span><br><span class="line">shutdown 系统用户</span><br><span class="line">halt 系统用户</span><br><span class="line">mail 系统用户</span><br><span class="line">operator 系统用户</span><br><span class="line">games 系统用户</span><br><span class="line">ftp 系统用户</span><br><span class="line">nobody 系统用户</span><br><span class="line">systemd-network 系统用户</span><br><span class="line">dbus 系统用户</span><br><span class="line">polkitd 系统用户</span><br><span class="line">postfix 系统用户</span><br><span class="line">sshd 系统用户</span><br><span class="line">openvpn 系统用户</span><br><span class="line">ruopu 普通用户</span><br><span class="line"><span class="meta">#</span><span class="bash"> 对/etc/passwd文件中的用户做判断，用户ID小于1000的为系统用户，否则就是普通用户</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# cat test7</span><br><span class="line">姓名	年龄</span><br><span class="line">aaa	18</span><br><span class="line">bbb	66</span><br><span class="line">ccc	36</span><br><span class="line">[root@bogon ~]# awk 'NR !=1&#123;if($2&lt;=30)&#123;print $1,"年轻人"&#125;else if($2&gt;=30 &amp;&amp; $2&lt;=50)&#123;print $1,"中年人"&#125;else&#123;print $1,"老年人"&#125;&#125;' test7</span><br><span class="line">aaa 年轻人</span><br><span class="line">bbb 老年人</span><br><span class="line">ccc 中年人</span><br><span class="line"><span class="meta">#</span><span class="bash"> 首先忽略第一行，然后判断文件中第二列的年龄，最后打印出结果</span></span><br></pre></td></tr></table></figure>
-<h5 id="三元运算"><a href="#三元运算" class="headerlink" title="三元运算"></a>三元运算</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">条件?结果1:结果2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果条件成立，则返回结果1，如果条件不成立，则返回结果2。</span></span><br><span class="line"></span><br><span class="line">表达式1 ? 表达式2 : 表达式3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果表达式1为真，则执行表达式2，如果表达式1为假，则执行表达式3</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -F: '&#123;if($3 &lt; 1000)&#123;usertype="系统用户"&#125;else&#123;usertype="普通用户"&#125;;print $1,usertype&#125;' /etc/passwd</span><br><span class="line">root 系统用户</span><br><span class="line">bin 系统用户</span><br><span class="line">daemon 系统用户</span><br><span class="line">adm 系统用户</span><br><span class="line">lp 系统用户</span><br><span class="line">sync 系统用户</span><br><span class="line">shutdown 系统用户</span><br><span class="line">halt 系统用户</span><br><span class="line">mail 系统用户</span><br><span class="line">operator 系统用户</span><br><span class="line">games 系统用户</span><br><span class="line">ftp 系统用户</span><br><span class="line">nobody 系统用户</span><br><span class="line">systemd-network 系统用户</span><br><span class="line">dbus 系统用户</span><br><span class="line">polkitd 系统用户</span><br><span class="line">postfix 系统用户</span><br><span class="line">sshd 系统用户</span><br><span class="line">openvpn 系统用户</span><br><span class="line">ruopu 普通用户</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"if...else"</span>结构，对usertype变量进行了赋值，如果用户的UID小于1000，则对usertype变量赋值为<span class="string">"系统用户"</span>，否则赋值usertype变量为<span class="string">"普通用户"</span>，最后打印出用户名所在的列与usertype变量的值。</span></span><br><span class="line">[root@bogon ~]# awk -F: '&#123;usertype=$3&lt;1000?"系统用户":"普通用户";print $1,usertype&#125;' /etc/passwd</span><br><span class="line">root 系统用户</span><br><span class="line">bin 系统用户</span><br><span class="line">daemon 系统用户</span><br><span class="line">adm 系统用户</span><br><span class="line">lp 系统用户</span><br><span class="line">sync 系统用户</span><br><span class="line">shutdown 系统用户</span><br><span class="line">halt 系统用户</span><br><span class="line">mail 系统用户</span><br><span class="line">operator 系统用户</span><br><span class="line">games 系统用户</span><br><span class="line">ftp 系统用户</span><br><span class="line">nobody 系统用户</span><br><span class="line">systemd-network 系统用户</span><br><span class="line">dbus 系统用户</span><br><span class="line">polkitd 系统用户</span><br><span class="line">postfix 系统用户</span><br><span class="line">sshd 系统用户</span><br><span class="line">openvpn 系统用户</span><br><span class="line">ruopu 普通用户</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"<span class="variable">$3</span>&lt;1000"</span>就是语法中的<span class="string">"条件"</span>，<span class="string">"系统用户"</span>就是语法中<span class="string">"?"</span>后面的<span class="string">"结果1"</span>，<span class="string">"普通用户"</span>就是语法中<span class="string">":"</span>后面的<span class="string">"结果2"</span> ，同时，在上例中我们使用usertype变量接收了三元运算后的返回值，所以，当条件成立时，usertype变量被赋值为<span class="string">"系统用户"</span>，当条件不成立时，usertype变量被赋值为<span class="string">"普通用户"</span>。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk -F: '&#123;$3&lt;1000?a++:b++&#125;END&#123;print a,b&#125;' /etc/passwd</span><br><span class="line">19 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"<span class="variable">$3</span>&lt;1000"</span>即为表达式1，<span class="string">"a++"</span>即为表达式2，<span class="string">"b++"</span>即为表达式3。当每遇到一个UID小于1000的用户，我就对变量a加1，否则我就对变量b加1，从而算出了系统用户与普通用户的数量，最后再END模式中输出了变量a与变量b的值。</span></span><br></pre></td></tr></table></figure>
-<h4 id="循环控制语句"><a href="#循环控制语句" class="headerlink" title="循环控制语句"></a>循环控制语句</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">    # for循环语法格式1</span><br><span class="line">    for(初始化; 布尔表达式; 更新) &#123;</span><br><span class="line">    //代码语句</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # for循环语法格式2</span><br><span class="line">    for(变量 in 数组) &#123;</span><br><span class="line">    //代码语句</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # while循环语法</span><br><span class="line">    while( 布尔表达式 ) &#123;</span><br><span class="line">    //代码语句</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # do...while循环语法</span><br><span class="line">    do &#123;</span><br><span class="line">    //代码语句</span><br><span class="line">    &#125;while(条件)</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;for(i=1;i&lt;=6;i++)&#123;print i&#125;&#125;'</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">[root@bogon ~]# awk -v i=1 'BEGIN&#123;while(i&lt;=5)&#123;print i;i++&#125;&#125;'</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;i=1;while(i&lt;=5)&#123;print i;i++&#125;&#125;'</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;i=1;do&#123;print "test";i++&#125;while(i&lt;1)&#125;'</span><br><span class="line">test</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;i=1;do&#123;print "test";i++&#125;while(i&lt;11)&#125;'</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line">test</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不论如何，先执行一次<span class="keyword">do</span>后面的动作</span></span><br><span class="line"></span><br><span class="line">* 跳出循环语法</span><br><span class="line">	continue的作用：跳出"当前"循环</span><br><span class="line">	break的作用：跳出"整个"循环</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;for(i=0;i&lt;6;i++)&#123;if(i==3)&#123;continue&#125;;print i&#125;&#125;'</span><br><span class="line">0</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先设置i在0到6之前循环，再判断，如果i等于3就跳过此次循环。<span class="keyword">if</span>动作是<span class="keyword">for</span>循环的一部分。也就是<span class="function"><span class="title">for</span></span>()&#123;<span class="function"><span class="title">if</span></span>()&#123;&#125;&#125;</span></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;for(i=0;i&lt;6;i++)&#123;if(i==3)&#123;break&#125;;print i&#125;&#125;'</span><br><span class="line">0</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">break</span>可以跳出整个循环</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">continue</span>与<span class="built_in">break</span>同样可以用于<span class="keyword">while</span>循环与do...while循环，此处就不再赘述了。</span></span><br><span class="line"></span><br><span class="line">* 退出</span><br><span class="line">	exit</span><br><span class="line">	next</span><br><span class="line">	</span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print 1;exit;print 2;print 3&#125;'</span><br><span class="line">1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="built_in">exit</span>会跳出整个脚本，所以没有打印2和3</span></span><br><span class="line">[root@bogon ~]# awk 'BEGIN&#123;print "start";exit&#125;&#123;print $0&#125;END&#123;print "over"&#125;' test</span><br><span class="line">start</span><br><span class="line">over</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">exit</span>并不会跳出awk命令，遇到<span class="built_in">exit</span>后，之后的命令都不执行，它会直接执行END模式的动作。如果没有END模式，将直接退出整个awk命令。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# cat test8</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">[root@bogon ~]# awk '&#123;if(NR==2)&#123;next&#125;;print $0&#125;' test8</span><br><span class="line">1</span><br><span class="line">3</span><br><span class="line"><span class="meta">#</span><span class="bash"> next命令可以促使awk不对当前行执行对应的动作，而是直接处理下一行。next与<span class="built_in">continue</span>有些类似，只是，<span class="built_in">continue</span>是针对<span class="string">"循环"</span>而言的，<span class="built_in">continue</span>的作用是结束<span class="string">"本次循环"</span>，而next是针对<span class="string">"逐行处理"</span>而言的，next的作用是结束<span class="string">"对当前行的处理"</span>，从而直接处理<span class="string">"下一行"</span></span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2964,7 +2972,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">133</span>
+                    <span class="site-state-item-count">134</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
