@@ -350,7 +350,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/05/Untitled/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/11/mysql问题解决/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ruopu">
@@ -369,8 +369,8 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/06/05/Untitled/" itemprop="url">
-                  未命名
+                <a class="post-title-link" href="/2019/06/11/mysql问题解决/" itemprop="url">
+                  mysql问题解决
                 </a>
               
             
@@ -396,12 +396,34 @@
                 
               
 
-              <time title="創建時間：2019-06-05 22:31:13" itemprop="dateCreated datePublished" datetime="2019-06-05T22:31:13+08:00">2019-06-05</time>
+              <time title="創建時間：2019-06-11 16:59:50 / 修改時間：17:08:18" itemprop="dateCreated datePublished" datetime="2019-06-11T16:59:50+08:00">2019-06-11</time>
             
 
+            
+              
+
+              
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -432,7 +454,8 @@
       
         
           
-            
+            <h3 id="登录数据库后无法对数据库操作"><a href="#登录数据库后无法对数据库操作" class="headerlink" title="登录数据库后无法对数据库操作"></a>登录数据库后无法对数据库操作</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 登录数据库后无法对数据库操作，使用任何命令都会提示“You must reset your password using ALTER USER statement before executing this statement.”</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有一说是因为密码过期，所以会这样。解决方法如下：</span></span><br><span class="line">vim /usr/lib/systemd/system/mysqld.service </span><br><span class="line">ExecStart=/usr/sbin/mysqld --daemonize --skip-grant-tables --skip-networking --pid-file=/var/run/mysqld/mysqld.pid $MYSQLD_OPTS</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入--skip-grant-tables --skip-networking，可以免密码登录</span></span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 登录</span></span><br><span class="line">use mysql；</span><br><span class="line">desc user；</span><br><span class="line">authentication_string  | text                              | YES  |     | NULL                  |       |</span><br><span class="line">| password_expired       | enum('N','Y')                     | NO   |     | N </span><br><span class="line"><span class="meta">#</span><span class="bash"> 说是从上面两条信息可以看出password_expired过期。</span></span><br><span class="line">UPDATE user SET authentication_string=PASSWORD('DaaS_mysql_201!'),password_expired='N' WHERE User='root'; </span><br><span class="line">select authentication_string,password_expired from user where user='root';</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">| authentication_string                     | password_expired |</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">| *5ECB9CC025100F03131724B02A092F02D9417C96 | N                |</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">desc user;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令又看了一次，与上面查询的没有区别。所以不知道如何证明是过期了？</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 之后将上面的免密码登录恢复回去。再操作就正常了。</span></span><br></pre></td></tr></table></figure>
+
           
         
       
@@ -531,12 +554,24 @@
                 
               
 
-              <time title="創建時間：2019-05-30 16:02:47 / 修改時間：18:03:56" itemprop="dateCreated datePublished" datetime="2019-05-30T16:02:47+08:00">2019-05-30</time>
+              <time title="創建時間：2019-05-30 16:02:47" itemprop="dateCreated datePublished" datetime="2019-05-30T16:02:47+08:00">2019-05-30</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-06-11 11:33:01" itemprop="dateModified" datetime="2019-06-11T11:33:01+08:00">2019-06-11</time>
               
             
           </span>
@@ -1046,7 +1081,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-05-29 13:54:17" itemprop="dateModified" datetime="2019-05-29T13:54:17+08:00">2019-05-29</time>
+                <time title="修改時間：2019-06-11 11:32:42" itemprop="dateModified" datetime="2019-06-11T11:32:42+08:00">2019-06-11</time>
               
             
           </span>
@@ -2434,7 +2469,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">102</span>
+                      
+                    
+                    <span class="site-state-item-count">103</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
