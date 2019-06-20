@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="测试安装123yum install epel-releaseyum install -y varnish yum install -y varnish-docs.x86_64 配置123456789101112131415161718192021222324252627282930vim /etc/sysconfig/varnish:NFILES=131072        # 所能够打开的最大">
+<meta name="keywords" content="varnish">
+<meta property="og:type" content="article">
+<meta property="og:title" content="varnish使用">
+<meta property="og:url" content="http://yoursite.com/2019/06/20/varnish使用/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="测试安装123yum install epel-releaseyum install -y varnish yum install -y varnish-docs.x86_64 配置123456789101112131415161718192021222324252627282930vim /etc/sysconfig/varnish:NFILES=131072        # 所能够打开的最大">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/varnish/varnish子程序return返回值.png">
+<meta property="og:updated_time" content="2019-06-20T03:54:26.436Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="varnish使用">
+<meta name="twitter:description" content="测试安装123yum install epel-releaseyum install -y varnish yum install -y varnish-docs.x86_64 配置123456789101112131415161718192021222324252627282930vim /etc/sysconfig/varnish:NFILES=131072        # 所能够打开的最大">
+<meta name="twitter:image" content="http://yoursite.com/images/varnish/varnish子程序return返回值.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/06/20/varnish使用/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>varnish使用 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/20/varnish使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">varnish使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-06-20 10:16:40 / 修改時間：11:54:26" itemprop="dateCreated datePublished" datetime="2019-06-20T10:16:40+08:00">2019-06-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/缓存服务/" itemprop="url" rel="index"><span itemprop="name">缓存服务</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install epel-release</span><br><span class="line">yum install -y varnish </span><br><span class="line">yum install -y varnish-docs.x86_64</span><br></pre></td></tr></table></figure>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysconfig/varnish:</span><br><span class="line">NFILES=131072        # 所能够打开的最大文件数</span><br><span class="line">MEMLOCK=82000       # 用多大内存空间保存日志信息</span><br><span class="line">NPROCS="unlimited"</span><br><span class="line">DAEMON_COREFILE_LIMIT="unlimited"    # 进程核心转储所使用的内存空间，unlimited表示无上限</span><br><span class="line">RELOAD_VCL=1        # 重新启动服务时是否重新读取VCL并重新编译的</span><br><span class="line">VARNISH_VCL_CONF=/etc/varnish/config/default.vcl        # 默认读取的VCL文件</span><br><span class="line">VARNISH_LISTEN_PORT=6081        # 监听的端口，默认监听6081</span><br><span class="line">VARNISH_ADMIN_LISTEN_ADDRESS=127.0.0.1        # 管理接口监听的地址</span><br><span class="line">VARNISH_ADMIN_LISTEN_PORT=6082        # 管理接口监听的端口</span><br><span class="line">VARNISH_SECRET_FILE=/etc/varnish/secret        # 使用的密钥文件</span><br><span class="line">VARNISH_MIN_THREADS=50        # 最少线程数</span><br><span class="line">VARNISH_MAX_THREADS=1000        # 最大线程数</span><br><span class="line">VARNISH_THREAD_TIMEOUT=120        # 线程的超时时间</span><br><span class="line">VARNISH_STORAGE_SIZE=2046M        # 存储文件的大小</span><br><span class="line">VARNISH_STORAGE="malloc,$&#123;VARNISH_STORAGE_SIZE&#125;"        # 存储的文件格式</span><br><span class="line"><span class="meta">#</span><span class="bash"> file：单个文件，不支持持久机制</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> malloc：内存</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> persistent：基于文件的持久存储</span></span><br><span class="line">VARNISH_TTL=120       # 联系后端服务器的超时时间</span><br><span class="line">DAEMON_OPTS="-a $&#123;VARNISH_LISTEN_ADDRESS&#125;:$&#123;VARNISH_LISTEN_PORT&#125; \</span><br><span class="line">             -f $&#123;VARNISH_VCL_CONF&#125; \</span><br><span class="line">             -T $&#123;VARNISH_ADMIN_LISTEN_ADDRESS&#125;:$&#123;VARNISH_ADMIN_LISTEN_PORT&#125; \</span><br><span class="line">             -t $&#123;VARNISH_TTL&#125; \</span><br><span class="line">             -p thread_pool_min=$&#123;VARNISH_MIN_THREADS&#125; \</span><br><span class="line">             -p thread_pool_max=$&#123;VARNISH_MAX_THREADS&#125; \</span><br><span class="line">             -p thread_pool_timeout=$&#123;VARNISH_THREAD_TIMEOUT&#125; \</span><br><span class="line">             -u varnish -g varnish \</span><br><span class="line">             -S $&#123;VARNISH_SECRET_FILE&#125; \</span><br><span class="line">             -s $&#123;VARNISH_STORAGE&#125;"       # 使用定义的各高级配置的参数</span><br></pre></td></tr></table></figure>
+<h4 id="vcl文件"><a href="#vcl文件" class="headerlink" title="vcl文件"></a>vcl文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/varnish/default.vcl</span><br><span class="line">vcl 4.0;</span><br><span class="line"></span><br><span class="line">backend default &#123;</span><br><span class="line">    .host = "192.168.1.109";		# 后端服务器地址</span><br><span class="line">    .port = "80";		# 后端服务器端口</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 目前只测试varnish是否可以正常工作，尚未定义缓存属性信息</span></span><br><span class="line">systemctl start varnish</span><br></pre></td></tr></table></figure>
+<h4 id="安装配置web服务"><a href="#安装配置web服务" class="headerlink" title="安装配置web服务"></a>安装配置web服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">yum install -y httpd php php-mysql</span><br><span class="line">vim /var/www/html/index.html</span><br><span class="line">&lt;h1&gt;www.abc.com and varnish of backend&lt;/h1&gt;</span><br><span class="line">&lt;h2&gt;node1.abc.com&lt;/h2&gt;</span><br><span class="line">systemctl start httpd</span><br><span class="line">访问IP:80</span><br><span class="line">访问IP:6081</span><br></pre></td></tr></table></figure>
+<h4 id="设置响应是否命中"><a href="#设置响应是否命中" class="headerlink" title="设置响应是否命中"></a>设置响应是否命中</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">vim default.vcl</span><br><span class="line">sub vcl_deliver &#123;</span><br><span class="line">    if (obj.hits &gt; 0)&#123;</span><br><span class="line">        set resp.http.X-Cache = "HIT from";</span><br><span class="line">        # 判断如果命中了就在http响应首部设置X-Cache为HIT</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        set resp.http.X-Cache = "MISS";</span><br><span class="line">        # 否则就在http响应首部设置X-Cache为MISS</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里的语法是<span class="keyword">if</span>(条件)&#123;方法&#125;<span class="keyword">else</span>&#123;方法&#125;，如果满足<span class="keyword">if</span>后面小括号中的条件，就执行小括号后面大括号中的方法，否则执行<span class="keyword">else</span>后面大括号中的方法。</span></span><br><span class="line">varnishadm -S /etc/varnish/secret -T 127.0.0.1:6082</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接varnish，进入varnish的命令操作</span></span><br><span class="line">vcl.load test1 /etc/varnish/default.vcl</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在命令行中输入上面命令，加载default.vcl文件，test1是自定义的名称，这应该是一个策略的名称，策略的名称每次都不能一样。</span></span><br><span class="line">vcl.list</span><br><span class="line">vcl.show test1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看test1的策略内容</span></span><br><span class="line">访问IP:6081，之后按F12查看是否有X-Cache一项，如果没有此项，可以重启一下varnish。之后可以看到X-Cache一项为MISS，再次刷新后，此项变为HIT。</span><br></pre></td></tr></table></figure>
+<h4 id="指定某些文件不能查缓存"><a href="#指定某些文件不能查缓存" class="headerlink" title="指定某些文件不能查缓存"></a>指定某些文件不能查缓存</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">vim default.vcl</span><br><span class="line">vcl 4.0;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Default backend definition. Set this to point to your content server.</span></span><br><span class="line">backend default &#123;</span><br><span class="line">    .host = "192.168.1.109";</span><br><span class="line">    .port = "80";</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_recv &#123;</span><br><span class="line"> if (req.url ~ "test.html")&#123;</span><br><span class="line">   return(pass);</span><br><span class="line"> &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">return</span>(lookup);</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里不可以加<span class="built_in">return</span>(lookup)，因为varnish4中使用<span class="built_in">return</span>(<span class="built_in">hash</span>)代替了<span class="built_in">return</span>(lookup)。</span></span><br><span class="line">vcl.load test2 /etc/varnish/default.vcl</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加载策略</span></span><br><span class="line">访问IP:6081/test.html，无论如何刷新，F12中的x-cache都是MISS</span><br></pre></td></tr></table></figure>
+<h4 id="vcl配置文件"><a href="#vcl配置文件" class="headerlink" title="vcl配置文件"></a>vcl配置文件</h4><h5 id="VCL中内置预设变量"><a href="#VCL中内置预设变量" class="headerlink" title="VCL中内置预设变量"></a>VCL中内置预设变量</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">req：The request object，请求到达时可用的变量(客户端发送的请求对象)</span><br><span class="line">bereq：The backend request object，向后端主机请求时可用的变量</span><br><span class="line">beresp：The backend response object，从后端主机获取内容时可用的变量(后端响应请求对象)</span><br><span class="line">resp：The HTTP response object，对客户端响应时可用的变量(返回给客户端的响应对象)</span><br><span class="line">obj：存储在内存中时对象属性相关的可用的变量(高速缓存对象，缓存后端响应请求内容)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">预设变量是系统固定的，请求进入对应的vcl子程序后便生成，这些变量可以方便子程序提取，当然也可以自定义一些全局变量。</span><br><span class="line">当前时间：</span><br><span class="line">now :作用：返回当前时间戳。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">客户端：（客户端基本信息）</span><br><span class="line">client.ip：返回客户端IP地址。</span><br><span class="line">注：原client.port已经弃用，如果要取客户端请求端口号使用 std.port(client.ip)，需要import std;才可以使用std</span><br><span class="line">client.identity：用于装载客户端标识码。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">服务器：（服务器基本信息）</span><br><span class="line">注：原server.port已经弃用，如果要取服务器端口号使用 std.port(server.ip)，需要import std;才可以使用std</span><br><span class="line">server.hostname：服务器主机名。</span><br><span class="line">server.identity：服务器身份标识。</span><br><span class="line">server.ip：返回服务器端IP地址。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">req :（客户端发送的请求对象）</span><br><span class="line">req：整个HTTP请求数据结构</span><br><span class="line">req.backend_hint：指定请求后端节点，设置后 bereq.backend 才能获取后端节点配置数据</span><br><span class="line">req.can_gzip：客户端是否接受GZIP传输编码。</span><br><span class="line">req.hash_always_miss：是否强制不命中高速缓存，如果设置为true，则高速缓存不会命中，一直会从后端获取新数据。</span><br><span class="line">req.hash_ignore_busy：忽略缓存中忙碌的对象，多台缓存时可以避免死锁。</span><br><span class="line">req.http：对应请求HTTP的header。</span><br><span class="line">req.method：请求类型（如 GET , POST）。</span><br><span class="line">req.proto：客户端使用的HTTP协议版本。</span><br><span class="line">req.restarts：重新启动次数。默认最大值是4</span><br><span class="line">req.ttl：缓存有剩余时间。</span><br><span class="line">req.url：请求的URL。</span><br><span class="line">req.xid：唯一ID。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">bereq：（发送到后端的请求对象，基于req对象）</span><br><span class="line">bereq：整个后端请求后数据结构。</span><br><span class="line">bereq.backend：所请求后端节点配置。</span><br><span class="line">bereq.between_bytes_timeout：从后端每接收一个字节之间的等待时间（秒）。</span><br><span class="line">bereq.connect_timeout：连接后端等待时间（秒），最大等待时间。</span><br><span class="line">bereq.first_byte_timeout：等待后端第一个字节时间（秒），最大等待时间。</span><br><span class="line">bereq.http：对应发送到后端HTTP的header信息。</span><br><span class="line">bereq.method：发送到后端的请求类型（如：GET , POST）。</span><br><span class="line">bereq.proto：发送到后端的请求的HTTP版本。</span><br><span class="line">bereq.retries：相同请求重试计数。</span><br><span class="line">bereq.uncacheable：无缓存这个请求。</span><br><span class="line">bereq.url：发送到后端请求的URL。</span><br><span class="line">bereq.xid：请求唯一ID。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">beresp：（后端响应请求对象）</span><br><span class="line">beresp：整个后端响应HTTP数据结构。</span><br><span class="line">beresp.backend.ip：后端响应的IP。</span><br><span class="line">beresp.backend.name：响应后端配置节点的name。</span><br><span class="line">beresp.do_gunzip：默认为 false 。缓存前解压该对象</span><br><span class="line">beresp.do_gzip：默认为 false 。缓存前压缩该对象</span><br><span class="line">beresp.grace：设置当前对象缓存过期后可额外宽限时间，用于特殊请求加大缓存时间，当并发量巨大时，不易设置过大否则会堵塞缓存，一般可设置 1m 左右，当beresp.ttl=0s时该值无效。</span><br><span class="line">beresp.http：对应的HTTP请求header</span><br><span class="line">beresp.keep：对象缓存后带保持时间</span><br><span class="line">beresp.proto：响应的HTTP版本</span><br><span class="line">beresp.reason：由服务器返回的HTTP状态信息</span><br><span class="line">beresp.status：由服务器返回的状态码</span><br><span class="line">beresp.storage_hint：指定保存的特定存储器</span><br><span class="line">beresp.ttl：该对象缓存的剩余时间，指定统一缓存剩余时间。</span><br><span class="line">beresp.uncacheable：继承bereq.uncacheable，是否不缓存</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">OBJ ：（高速缓存对象，缓存后端响应请求内容）</span><br><span class="line">obj.grace：该对象额外宽限时间</span><br><span class="line">obj.hits：缓存命中次数，计数器从1开始，当对象缓存该值为1，一般可以用于判断是否有缓存，当前该值大于0时则为有缓存。</span><br><span class="line">obj.http：对应HTTP的header</span><br><span class="line">obj.proto：HTTP版本</span><br><span class="line">obj.reason：服务器返回的HTTP状态信息</span><br><span class="line">obj.status：服务器返回的状态码</span><br><span class="line">obj.ttl：该对象缓存剩余时间（秒）</span><br><span class="line">obj.uncacheable：不缓存对象</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resp :（返回给客户端的响应对象）</span><br><span class="line">resp：整个响应HTTP数据结构。</span><br><span class="line">resp.http：对应HTTP的header。</span><br><span class="line">resp.proto：编辑响应的HTTP协议版本。</span><br><span class="line">resp.reason：将要返回的HTTP状态信息。</span><br><span class="line">resq.status：将要返回的HTTP状态码。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">存储 ：</span><br><span class="line">storage.&lt;name&gt;.free_space：存储可用空间（字节数）。</span><br><span class="line">storage.&lt;name&gt;.used_space：存储已经使用空间（字节数）。</span><br><span class="line">storage.&lt;name&gt;.happy：存储健康状态。</span><br></pre></td></tr></table></figure>
+<h5 id="特定功能性语句"><a href="#特定功能性语句" class="headerlink" title="特定功能性语句"></a>特定功能性语句</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">ban(expression)：清除指定对象缓存</span><br><span class="line">call(subroutine)：调用子程序，如：call(name);</span><br><span class="line">hash_data(input)：生成hash键，用于制定hash键值生成结构，只能在vcl_hash子程序中使用。调用hash_data(input) 后，即这个hash为当前页面的缓存hash键值，无需其它获取或操作，如:</span><br><span class="line">=======================================================================================</span><br><span class="line">sub vcl_hash&#123;</span><br><span class="line">       hash_data(client.ip);</span><br><span class="line">       return(lookup);</span><br><span class="line">&#125;</span><br><span class="line">=======================================================================================</span><br><span class="line">注意：return(lookup);是默认返回值，所以可以不写。</span><br><span class="line">new()：创建一个vcl对象，只能在vcl_init子程序中使用。</span><br><span class="line">return()：结束当前子程序，并指定继续下一步动作，如：return (ok); 每个子程序可指定的动作均有不同。</span><br><span class="line">rollback()：恢复HTTP头到原来状态，已经弃用，使用 std.rollback() 代替。</span><br><span class="line">synthetic(STRING)：合成器，用于自定义一个响应内容，比如当请求出错时，可以返回自定义 404 内容，而不只是默认头信息，只能在 vcl_synth 与 vcl_backend_error 子程序中使用，如：</span><br><span class="line">=======================================================================================</span><br><span class="line">sub vcl_synth &#123;</span><br><span class="line">    //自定义内容</span><br><span class="line">    synthetic (&#123;"</span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;</span><br><span class="line">&lt;html lang="zh-cn"&gt;</span><br><span class="line">   &lt;head&gt;</span><br><span class="line">   &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/&gt;</span><br><span class="line">      &lt;title&gt;error&lt;/title&gt;</span><br><span class="line">   &lt;/head&gt;</span><br><span class="line">   &lt;body&gt;</span><br><span class="line">      &lt;h1&gt;Error&lt;/h1&gt;</span><br><span class="line">      &lt;h3&gt;这只是一个测试自定义响应异常内容&lt;/h3&gt;</span><br><span class="line">   &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">    "&#125;);</span><br><span class="line">    //只交付自定义内容</span><br><span class="line">    return(deliver);</span><br><span class="line">=======================================================================================</span><br><span class="line">regsub(str, regex, sub)：使用正则替换第一次出现的字符串，第一个参数为待处理字符串，第二个参数为正则表达式，第三个为替换为字符串。</span><br><span class="line">regsuball(str, regex, sub)：使用正则替换所有匹配字符串。参数与regsuball相同。</span><br><span class="line">具体变量详见：</span><br><span class="line">https://www.varnish-cache.org/docs/4.0/reference/vcl.html#reference-vcl</span><br></pre></td></tr></table></figure>
+<h5 id="return-语句"><a href="#return-语句" class="headerlink" title="return 语句"></a>return 语句</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">return 语句是终止子程序并返回动作，所有动作都根据不同的vcl子程序限定来选用。</span><br><span class="line">https://www.varnish-cache.org/docs/4.0/users-guide/vcl-built-in-subs.html</span><br><span class="line"></span><br><span class="line">语法：return(action);</span><br><span class="line">常用的动作：</span><br><span class="line">abandon  放弃处理，并生成一个错误。</span><br><span class="line">deliver  交付处理</span><br><span class="line">fetch  从后端取出响应对象</span><br><span class="line">hash  哈希缓存处理</span><br><span class="line">lookup 查找缓存对象</span><br><span class="line">ok 继续执行</span><br><span class="line">pass  进入pass非缓存模式</span><br><span class="line">pipe 进入pipe非缓存模式</span><br><span class="line">purge 清除缓存对象，构建响应</span><br><span class="line">restart 重新开始</span><br><span class="line">retry 重试后端处理</span><br><span class="line">synth(status code,reason) 合成返回客户端状态信息</span><br></pre></td></tr></table></figure>
+<h5 id="varnish中内置子程序"><a href="#varnish中内置子程序" class="headerlink" title="varnish中内置子程序"></a>varnish中内置子程序</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">注意：varnish内置子程序均有自己限定的返回动作  return （动作）;  不同的动作将调用对应下一个子程序。</span><br><span class="line"></span><br><span class="line">vcl_recv子程序：</span><br><span class="line">开始处理请求，通过 return (动作); 选择varnish处理模式，默认进入hash缓存模式（即return(hash);），缓存时间为配置项default_ttl（默认为 120秒）过期保持时间default_grace（默认为10秒）。该子程序一般用于模式选择，请求对象缓存及信息修改，后端节点修改，终止请求等操作。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line">pass  进入pass模式，并进入vcl_pass子程序。</span><br><span class="line">pipe  进入pipe模式，并进入vcl_pipe子程序。</span><br><span class="line">hash  进入hash缓存模式，并进入vcl_hash子程序，默认返回值。</span><br><span class="line">purge  清除缓存等数据，子程序先从vcl_hash再到vcl_purge。</span><br><span class="line"></span><br><span class="line">vcl_pipe子程序：</span><br><span class="line">pipe模式处理，该模式主要用于直接取后端响应内容返回客户端，可定义响应内容返回客户端。该子程序一般用于需要及时且不作处理的后端信息，取出后端响应内容后直接交付到客户端不进入vcl_deliver子程序处理。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，bereq，req，storage</span><br><span class="line">写：client，bereq，req</span><br><span class="line">返回值：</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line">pipe  继续pipe模式，进入后端vcl_backend_fetch子程序，默认返回值。</span><br><span class="line"></span><br><span class="line">vcl_pass子程序：</span><br><span class="line">pass模式处理，该模式类似hash缓存模式，仅不做缓存处理。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line">fetch  继续pass模式，进入后端vcl_backend_fetch子程序，默认返回值。</span><br><span class="line"></span><br><span class="line">vcl_hit子程序：</span><br><span class="line">hash缓存模式时，存在hash缓存时调用，用于缓存处理，可放弃或修改缓存。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，obj，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">restart 重启请求。</span><br><span class="line">deliver 交付缓存内容，进入vcl_deliver子程序处理，默认返回值。</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line"></span><br><span class="line">vcl_miss子程序：</span><br><span class="line">hash缓存模式时，不存在hash缓存时调用，用于判断性的选择进入后端取响应内容，可以修改为pass模式。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">restart 重启请求。</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line">pass 切换到pass模式，进入vcl_pass子程序。</span><br><span class="line">fetch  正常取后端内容再缓存，进入vcl_backend_fetch子程序，默认返回值。</span><br><span class="line"></span><br><span class="line">vcl_hash子程序：</span><br><span class="line">hash缓存模式，生成hash值作为缓存查找键名提取缓存内容，主要用于缓存hash键值处理，可使用hash_data(string)指定键值组成结构，可在同一个页面通过IP或cookie生成不同的缓存键值。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">lookup 查找缓存对象，存在缓存进入vcl_hit子程序，不存在缓存进入vcl_miss子程序，当使用了purge清理模式时会进入vcl_purge子程序，默认返回值。</span><br><span class="line"></span><br><span class="line">vcl_purge子程序：</span><br><span class="line">清理模式，当查找到对应的缓存时清除并调用，用于请求方法清除缓存，并报告.</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，storage</span><br><span class="line">写：client，req</span><br><span class="line">返回值：</span><br><span class="line">synth(status code,reason);  定义响应内容。</span><br><span class="line">restart 重启请求。</span><br><span class="line"></span><br><span class="line">vcl_deliver子程序：</span><br><span class="line">客户端交付子程序，在vcl_backend_response子程序后调用（非pipe模式），或vcl_hit子程序后调用，可用于追加响应头信息，cookie等内容。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，resp，obj，storage</span><br><span class="line">写：client，req，resp</span><br><span class="line">返回值：</span><br><span class="line">deliver 正常交付后端或缓存响应内容，默认返回值。</span><br><span class="line">restart 重启请求。</span><br><span class="line"></span><br><span class="line">vcl_backend_fetch子程序：</span><br><span class="line">发送后端请求之前调用，可用于改变请求地址或其它信息，或放弃请求。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：server，bereq，storage</span><br><span class="line">写：bereq</span><br><span class="line">返回值：</span><br><span class="line">fetch 正常发送请求到到后端取出响应内容，进入vcl_backend_response子程序，默认返回值。</span><br><span class="line">abandon 放弃后端请求，并生成一个错误，进入vcl_backend_error子程序。</span><br><span class="line"></span><br><span class="line">vcl_backend_response子程序：</span><br><span class="line">后端响应后调用，可用于修改缓存时间及缓存相关信息。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：server，bereq，beresp，storage</span><br><span class="line">写：bereq，beresp</span><br><span class="line">返回值：</span><br><span class="line">deliver 正常交付后端响应内容，进入vcl_deliver子程序，默认返回值。</span><br><span class="line">abandon 放弃后端请求，并生成一个错误，进入vcl_backend_error子程序。</span><br><span class="line">retry 重试后端请求，重试计数器加1，当超过配置中max_retries值时会报错并进入vcl_backend_error子程序。</span><br><span class="line"></span><br><span class="line">vcl_backend_error子程序：</span><br><span class="line">后端处理失败调用，异常页面展示效果处理，可自定义错误响应内容，或修改beresp.status与beresp.http.Location重定向等。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：server，bereq，beresp，storage</span><br><span class="line">写：bereq，beresp</span><br><span class="line">返回值：</span><br><span class="line">deliver 只交付 sysnthetic(string) 自定义内容，默认返回后端异常标准错误内容。</span><br><span class="line">retry 重试后端请求，重试计数器加1，当超过配置中max_retries值时会报错并进入vcl_backend_error子程序。</span><br><span class="line"></span><br><span class="line">vcl_synth子程序：</span><br><span class="line">自定义响应内容。可以通过synthetic（）和返回值 synth调用，这里可以自定义异常显示内容，也可以修改resp.status与resp.http.Location重定向。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：client，server，req，resp，storage</span><br><span class="line">写：req，resp</span><br><span class="line">返回值：</span><br><span class="line">deliver 只交付 sysnthetic(string) 自定义内容，默认返回 sysnth 异常指定状态码与错误内容。</span><br><span class="line">restart 重启请求。</span><br><span class="line"></span><br><span class="line">vcl_init子程序：</span><br><span class="line">加载vcl时最先调用，用于初始化VMODs，该子程序不参与请求处理，仅在vcl加载时调用一次。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：server</span><br><span class="line">写：无</span><br><span class="line">返回值：</span><br><span class="line">ok 正常返回，进入vcl_recv子程序，默认返回值。</span><br><span class="line"></span><br><span class="line">vcl_fini子程序：</span><br><span class="line">卸载当前vcl配置时调用，用于清理VMODs，该子程序不参与请求处理，仅在vcl正常丢弃后调用。</span><br><span class="line">可操作对象：（部分或全部值）</span><br><span class="line">读：server</span><br><span class="line">写：无</span><br><span class="line">返回值：</span><br><span class="line">ok 正常返回，本次vcl将释放，默认返回值。</span><br></pre></td></tr></table></figure>
+<p>varnish子程序调用流程图，通过大部分子程序的return返回值进入下一步行动：</p>
+<p><img src="/images/varnish/varnish子程序return返回值.png" alt=""></p>
+<h5 id="优雅模式-Garce-mode"><a href="#优雅模式-Garce-mode" class="headerlink" title="优雅模式(Garce mode)"></a>优雅模式(Garce mode)</h5><p>Varnish中的请求合并</p>
+<p>当几个客户端请求同一个页面的时候，varnish只发送一个请求到后端服务器，然后让其他几个请求挂起并等待返回结果；获得结果后，其它请求再复制后端的结果发送给客户端；</p>
+<p>但如果同时有数以千计的请求，那么这个等待队列将变得庞大，这将导致2类潜在问题：</p>
+<p>惊群问题(thundering herd problem)，即突然释放大量的线程去复制后端返回的结果，将导致负载急速上升；没有用户喜欢等待；</p>
+<p>为了解决这类问题，可以配置varnish在缓存对象因超时失效后再保留一段时间，以给那些等待的请求返回过去的文件内容(stale content)，配置案例如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sub vcl_recv &#123;</span><br><span class="line">if (! req.backend.healthy) &#123;</span><br><span class="line">set req.grace = 5m;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">set req.grace = 15s;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">sub vcl_fetch &#123;</span><br><span class="line">set beresp.grace = 30m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上配置表示varnish将会将失效的缓存对象再多保留30分钟，此值等于最大的req.grace值即可；</p>
+<p>而根据后端主机的健康状况，varnish可向前端请求分别提供5分钟内或15秒内的过期内容</p>
+<h5 id="后端服务器地址池配置及后端服务器健康检查"><a href="#后端服务器地址池配置及后端服务器健康检查" class="headerlink" title="后端服务器地址池配置及后端服务器健康检查"></a>后端服务器地址池配置及后端服务器健康检查</h5><h6 id="后端服务器定义"><a href="#后端服务器定义" class="headerlink" title="后端服务器定义"></a>后端服务器定义</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">命令：backend。这个定义为最基本的反向入口定义，用于varnish连接对应的服务器，如果没有定义或定义错误则用户无法访问正常页面。</span><br><span class="line">语法格式：</span><br><span class="line">backend name&#123;</span><br><span class="line">    .attribute = "value";</span><br><span class="line">&#125;</span><br><span class="line">说明：backend 是定义后端关键字，name 是当前后端节点的别名，多个后端节点时，name 名不能重复，否则覆盖。花括号里面定义当前节点相关的属性（键=值）。除默认节点外其它节点定义后必需有调用，否则varnish无法启动。后端是否正常可以通过std.healthy(backend)判断。</span><br><span class="line"></span><br><span class="line">支持运算符:</span><br><span class="line">=   （赋值运算）</span><br><span class="line">==  （相等比较）</span><br><span class="line">~    （匹配，可以使用正则表达式，或访问控制列表）</span><br><span class="line">!~    （不匹配，可以使用正则表达式，或访问控制列表）</span><br><span class="line">！  （非）</span><br><span class="line">&amp;&amp;   （逻辑与）</span><br><span class="line">||   （逻辑或）</span><br><span class="line"></span><br><span class="line">属性列表：</span><br><span class="line">.host="xxx.xxx.xxx.xxx";      //要转向主机（即后端主机）的IP或域名，必填键/值对。</span><br><span class="line">.port="8080";        //主机连接端口号或协议名（HTTP等），默认80</span><br><span class="line">.host_header='';    //请示主机头追加内容</span><br><span class="line">.connect_timeout=1s;     //连接后端的超时时间</span><br><span class="line">.first_byte_timeout=5s;    //等待从后端返回的第一个字节时间</span><br><span class="line">.between_bytes_timeout=2s;     //每接收一个字节之间等待时间</span><br><span class="line">.probe=probe_name;        //监控后端主机的状态,指定外部监控name或者内部直接添加</span><br><span class="line">.max_connections=200;    //设置最大并发连接数，超过这个数后连接就会失败</span><br><span class="line"></span><br><span class="line">例：（下面两个例子结果是一样的，但第二个例子中更适用于集群，可以方便批量修改）</span><br><span class="line">backend web&#123;</span><br><span class="line">    .host="192.168.197.180";</span><br><span class="line">    .port="80";</span><br><span class="line">    .probe=&#123;          //直接追加监控块.probe是一个的参数</span><br><span class="line">        .url="/";</span><br><span class="line">        .timeout=2s;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">或</span><br><span class="line">probe web_probe&#123;   //监控必需定义在前面，否则后端调用找不到监控块。</span><br><span class="line">    .url="/";</span><br><span class="line">    .timeout=2s;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">backend web&#123;</span><br><span class="line">    .host="192.168.197.180";</span><br><span class="line">    .port="80";</span><br><span class="line">    .probe=web_probe;   //调用外部共用监控块</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="监视器定义"><a href="#监视器定义" class="headerlink" title="监视器定义"></a>监视器定义</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">命令：probe 。监控可以循环访问指定的地址，通过响应时间判定服务器是否空闲或正常。这类命令非常适用于集群中某些节点服务器崩溃或负载过重，而禁止访问这台节点服务器。</span><br><span class="line">语法格式：</span><br><span class="line">probe name&#123;</span><br><span class="line">    .attribute = "value";</span><br><span class="line">&#125;</span><br><span class="line">说明：probe 是定义监控关键字，name 是当前监控点的别名，多个监控节点时，name 名不能重复，否则覆盖。花括号里面定义当前节点相关的属性（键=值）。</span><br><span class="line">没有必填属性，因为默认值就可以正常执行操作。</span><br><span class="line"></span><br><span class="line">属性列表：</span><br><span class="line">.url="/";    //指定监控入口URL地址，默认为"/"</span><br><span class="line">.request="";   //指定监控请求入口地址，比 .url 优先级高。</span><br><span class="line">.expected_response="200";   //请求响应代码，默认是 200</span><br><span class="line">.timeout=2s;   //请求超时时间。</span><br><span class="line">.interval=5s;     //每次轮询请求间隔时间,默认为 5s 。</span><br><span class="line">.initial=-1;     //初始启动时以.window轮询次数中几次良好后续才能使用这个后端服务器节点，默认为 -1 ，则轮询完 .window 所有次数良好判定为正常。</span><br><span class="line">.window=8;   //指定多少轮询次数，用于判定服务器正常，默认是 8。</span><br><span class="line">.threshold=3;   //必须多少次轮询正常才算该后端节点服务器正常,默认是 3。</span><br><span class="line"></span><br><span class="line">例：创建健康监测，定义健康检查名称为backend_healthcheck</span><br><span class="line">probe backend_healthcheck &#123;</span><br><span class="line">        .url = "/";</span><br><span class="line">        .timeout = 1s;</span><br><span class="line">        .interval = 5s;</span><br><span class="line">        .window = 5;</span><br><span class="line">        .threshold = 3;</span><br><span class="line">    &#125;</span><br><span class="line">在上面的例子中varnish将每5s检测后端，超时设为1s。每个检测将会发送get /的请求。如果5个检测中大于3个是成功，varnish就认为后端是健康的，反之，后端就有问题了。</span><br></pre></td></tr></table></figure>
+<h6 id="集群负载均衡directors"><a href="#集群负载均衡directors" class="headerlink" title="集群负载均衡directors"></a>集群负载均衡directors</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">varnish可以定义多个后端，也可以将几个后端放在一个后端集群里面已达到负载均衡的目的。</span><br><span class="line">你也可以将几个后端组成一组后端。这个组被叫做Directors。可以提高性能和弹性。</span><br><span class="line">directors是varnish负载均衡模块，使用前必需引入directors模块，directors模块主要包含：</span><br><span class="line">round_robin，random，hash，fallback负载均衡模式。</span><br><span class="line">round_robin : 循环依次逐个选择后端服务器。</span><br><span class="line">random ： 随机选择后端服务器，可设置每个后端权重增加随机率。</span><br><span class="line">hash :  通过散列随机选择对应的后端服务器且保持选择对应关系，下次则直接找对应的后端服务器。</span><br><span class="line">Fallback:后备</span><br><span class="line">注意：random，hash有权重值设置，用于提高随机率。每个后端最好都配置监控器（后端服务器正常监测）以便directors自动屏蔽不正常后端而不进入均衡列队中。</span><br><span class="line">这些操作需要你载入VMOD（varnish module），然后在vcl_init中调用这个VMOD。</span><br><span class="line"></span><br><span class="line">import directors;                # load the directors</span><br><span class="line">backend web1 &#123;</span><br><span class="line">.host = "192.168.197.175";</span><br><span class="line">.port = "80";</span><br><span class="line">.probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">backend web2 &#123;</span><br><span class="line">.host = "192.168.197.176";</span><br><span class="line">.port = "80";</span><br><span class="line">.probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">//初始化处理</span><br><span class="line">sub vcl_init &#123;            //调用vcl_init初始化子程序创建后端主机组，即directors</span><br><span class="line">    new  web_cluster = directors.round_robin(); //使用new关键字创建drector对象,使用round_robin算法</span><br><span class="line">    web_cluster.add_backend(web1);   //添加后端服务器节点</span><br><span class="line">web_cluster.add_backend(web2);</span><br><span class="line">&#125;</span><br><span class="line">//开始处理请求</span><br><span class="line">sub vcl_recv &#123;                     //调用vcl_recv子程序，用于接收和处理请求</span><br><span class="line">    set  req.backend_hint = web_cluster.backend();     //选取后端</span><br><span class="line">&#125;</span><br><span class="line">说明：</span><br><span class="line">set命令是设置变量</span><br><span class="line">unset命令是删除变量</span><br><span class="line">web_cluster.add_backend( backend , real);  添加后端服务器节点，backend 为后端配置别名，real 为权重值，随机率计算公式：100 * (当前权重 / 总权重)。</span><br><span class="line">req.backend_hint是varnish的预定义变量，作用是指定请求后端节点</span><br><span class="line">vcl对象需要使用new关键字创建，所有可创建对象都是内定的，使用前必需import，所有new操作只能在vcl_init子程序中。</span><br><span class="line"></span><br><span class="line">扩展：varnish将不同的url发送到不同的后端server</span><br><span class="line">import directors;                # load the directors</span><br><span class="line">backend web1 &#123;</span><br><span class="line">.host = "192.168.197.175";</span><br><span class="line">.port = "80";</span><br><span class="line">.probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">backend web2 &#123;</span><br><span class="line">.host = "192.168.197.176";</span><br><span class="line">.port = "80";</span><br><span class="line">.probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">backend img1 &#123;</span><br><span class="line">    .host = "img1.lnmmp.com";</span><br><span class="line">    .port = "80";</span><br><span class="line">    .probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">backend img2 &#123;</span><br><span class="line">    .host = "img2.lnmmp.com";</span><br><span class="line">    .port = "80";</span><br><span class="line">    .probe = backend_healthcheck;</span><br><span class="line">&#125;</span><br><span class="line">//初始化处理</span><br><span class="line">sub vcl_init &#123;            //调用vcl_init初始化子程序创建后端主机组，即directors</span><br><span class="line">    new  web_cluster = directors.round_robin(); //使用new关键字创建drector对象,使用round_robin算法</span><br><span class="line">    web_cluster.add_backend(web1);   //添加后端服务器节点</span><br><span class="line">web_cluster.add_backend(web2);</span><br><span class="line">new img_cluster = directors.random();</span><br><span class="line">img_cluster.add_backend(img1,2);   //添加后端服务器节点，并且设置权重值</span><br><span class="line">img_cluster.add_backend(img2,5);</span><br><span class="line">&#125;</span><br><span class="line">//根据不同的访问域名，分发至不同的后端主机组</span><br><span class="line">sub vcl_recv &#123;</span><br><span class="line">if (req.http.host  ~  "(?i)^(www.)?benet.com$") &#123; </span><br><span class="line">        set  req.http.host = "www.benet.com";</span><br><span class="line">        set  req.backend_hint = web_cluster.backend();  //选取后端</span><br><span class="line">    &#125; elsif (req.http.host  ~  "(?i)^images.benet.com$") &#123;</span><br><span class="line">        set  req.backend_hint = img_cluster.backend();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">说明：中的i就是忽略大小写的意思。(?i)表示开启忽略大小写，而(?-i)表示关闭忽略大小写</span><br></pre></td></tr></table></figure>
+<h6 id="访问控制列表（ACL）"><a href="#访问控制列表（ACL）" class="headerlink" title="访问控制列表（ACL）"></a>访问控制列表（ACL）</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">创建一个地址列表，用于后面的判断，可以是域名或IP集合。这个可以用于指定某些地址请求入口，防止恶意请求等。</span><br><span class="line">语法格式：</span><br><span class="line">acl  purgers  &#123;</span><br><span class="line">    "127.0.0.1";</span><br><span class="line">"localhost";</span><br><span class="line">“192.168.134.0/24”</span><br><span class="line">    !"192.168.134.1";</span><br><span class="line">&#125;</span><br><span class="line">说明：acl 是访问列表关键字（必需小写），name 是该列表的别名用于调用，花括号内部是地址集。</span><br><span class="line">注意：如果列表中包含了无法解析的主机地址，它会匹配任何地址。</span><br><span class="line">如果不想让它匹配可以在前添加一个 ! 符号，如上面 !"192.168.134.1"; </span><br><span class="line">使用ACL只需要用匹配运算符 ~ 或 !~  如：</span><br><span class="line">sub  vcl_recv &#123;</span><br><span class="line">    if  (req.method == "PURGE") &#123;    //PURGE请求的处理</span><br><span class="line">         if  (client.ip  ~  purgers) &#123;     </span><br><span class="line">              return(purge);</span><br><span class="line">         &#125; else &#123;</span><br><span class="line">            return(synth(403, "Access denied."));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="缓存规则配置"><a href="#缓存规则配置" class="headerlink" title="缓存规则配置"></a>缓存规则配置</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">sub vcl_recv &#123;</span><br><span class="line">  // PURGE请求的处理</span><br><span class="line">  if (req.method == "PURGE") &#123;</span><br><span class="line">    if (!client.ip ~ purgers) &#123;</span><br><span class="line">      return (synth(405, "Not Allowed."));</span><br><span class="line">    &#125;</span><br><span class="line">    return (purge);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  set req.backend_hint = web.backend();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  //将php、asp等动态内容访问请求直接发给后端服务器，不缓存。</span><br><span class="line">  if (req.url ~ "\.(php|asp|aspx|jsp|do|ashx|shtml)($|\?)") &#123;</span><br><span class="line">    return (pass);</span><br><span class="line">  &#125;</span><br><span class="line">  //将非GET和HEAD访问请求直接发给后端服务器，不缓存。例如POST请求。</span><br><span class="line">  if (req.method != "GET" &amp;&amp; req.method != "HEAD") &#123;</span><br><span class="line">        return (pass);</span><br><span class="line">  &#125;</span><br><span class="line">  //如果varnish看到header中有'Authorization'头，它将pass请求。</span><br><span class="line">  if (req.http.Authorization) &#123;</span><br><span class="line">        return (pass);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  //带cookie首部的GET请求也缓存</span><br><span class="line">  if (req.url ~ "\.(css|js|html|htm|bmp|png|gif|jpg|jpeg|ico|gz|tgz|bz2|tbz|zip|rar|mp3|mp4|ogg|swf|flv)($|\?)") &#123;</span><br><span class="line">    unset req.http.cookie;</span><br><span class="line">    return (hash);</span><br><span class="line">  &#125;</span><br><span class="line">说明：默认情况，varnish不缓存从后端响应的http头中带有Set-Cookie的对象。如果客户端发送的请求带有Cookie header，varnish将忽略缓存，直接将请求传递到后端。</span><br><span class="line">为发往后端主机的请求添加X-Forward-For首部,首次访问增加X-Forwarded-For 头信息,方便后端程序获取客户端ip，而不是varnish地址</span><br><span class="line"></span><br><span class="line">if (req.restarts == 0) &#123;</span><br><span class="line">        if (req.http.x-forwarded-for) &#123;//如果设置过此header则要再次附加上用逗号隔开</span><br><span class="line">            set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;</span><br><span class="line">        &#125; else &#123;//如果只有一层代理的话,就无需设置了</span><br><span class="line">            set req.http.X-Forwarded-For = client.ip;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">说明：X-Forwarded-For是用来识别通过HTTP代理或负载均衡方式连接到Web服务器的客户端最原始的IP地址的HTTP请求头字段</span><br><span class="line">子程序：</span><br><span class="line">子程序是一种类似C的函数，但是程序没有调用参数，子程序以 sub 关键字定义。在VCL里子程序是用于管理程序。</span><br><span class="line">注意：所有VCL内置的程序都是以 vcl_ 开头，并已经预置好，在VCL文件中只要声明对应的内置子程序，都会在对应的流程中调用。</span><br></pre></td></tr></table></figure>
+<h5 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br></pre></td><td class="code"><pre><span class="line">vcl 4.0;		# 使用varnish版本4的格式.</span><br><span class="line">import std;		# 标准日志需要加载此模块</span><br><span class="line">import directors;		# 加载后端轮询模块，为了可以使用下面的vcl_init</span><br><span class="line"><span class="meta">#</span><span class="bash"> import表示加载varnish模块(VMODs)</span></span><br><span class="line">backend server1 &#123; # Define one backend。定义后端主机，server1是自定义的后端主机名称</span><br><span class="line">  .host = "10.129.14.4";    # Gateway on dl-gw-01</span><br><span class="line">  .port = "8090";           # Port Apache or whatever is listening</span><br><span class="line">  .max_connections = 30000; # That's it</span><br><span class="line"></span><br><span class="line">  .probe = &#123;</span><br><span class="line">    #.url = "/"; # short easy way (GET /)</span><br><span class="line">    # We prefer to only do a HEAD /</span><br><span class="line">    .request =</span><br><span class="line">      "HEAD / HTTP/1.1"</span><br><span class="line">      "Host: localhost"</span><br><span class="line">      "Connection: close"</span><br><span class="line">      "User-Agent: Varnish Health Probe";</span><br><span class="line"></span><br><span class="line">    .interval  = 5s; # check the health of each backend every 5 seconds</span><br><span class="line">    .timeout   = 1s; # timing out after 1 second.</span><br><span class="line">    .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is considered healthy, otherwise it will be marked as sick</span><br><span class="line">    .threshold = 3;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .first_byte_timeout     = 300s;   # How long to wait before we receive a first byte from our backend?</span><br><span class="line">  .connect_timeout        = 5s;     # How long to wait for a backend connection?</span><br><span class="line">  .between_bytes_timeout  = 2s;     # How long to wait between bytes received from our backend?</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">backend server2 &#123; # Define one backend</span><br><span class="line">  .host = "10.129.14.5";    #  Gateway on dl-gw-01</span><br><span class="line">  .port = "8090";           # Port Apache or whatever is listening</span><br><span class="line">  .max_connections = 30000; # That's it</span><br><span class="line"></span><br><span class="line">  .probe = &#123;</span><br><span class="line">    #.url = "/"; # short easy way (GET /)</span><br><span class="line">    # We prefer to only do a HEAD /</span><br><span class="line">    .request =</span><br><span class="line">      "HEAD / HTTP/1.1"</span><br><span class="line">      "Host: localhost"</span><br><span class="line">      "Connection: close"</span><br><span class="line">      "User-Agent: Varnish Health Probe";</span><br><span class="line"></span><br><span class="line">    .interval  = 5s; # check the health of each backend every 5 seconds</span><br><span class="line">    .timeout   = 1s; # timing out after 1 second.</span><br><span class="line">    .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is considered healthy, otherwise it will be marked as sick</span><br><span class="line">    .threshold = 3;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .first_byte_timeout     = 300s;   # How long to wait before we receive a first byte from our backend?</span><br><span class="line">  .connect_timeout        = 5s;     # How long to wait for a backend connection?</span><br><span class="line">  .between_bytes_timeout  = 2s;     # How long to wait between bytes received from our backend?</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">acl purge &#123;		# 定义允许清理缓存的IP</span><br><span class="line"><span class="meta">  #</span><span class="bash"> ACL we<span class="string">'ll use later to allow purges</span></span></span><br><span class="line">  "localhost";</span><br><span class="line">  "127.0.0.1";</span><br><span class="line">  "::1";</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_init &#123;		# 配置后端集群事件</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called when VCL is loaded, before any requests pass through it.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Typically used to initialize VMODs.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> 后端集群有4种模式 random, round-robin, fallback, <span class="built_in">hash</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> random         随机</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> round-robin    轮询</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> fallback        后备</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">hash</span>        固定后端 根据url(req.http.url) 或用户cookie(req.http.cookie) 或用户session(req.http.sticky)(这个还有其他要配合)</span></span><br><span class="line">  new vdir = directors.round_robin();</span><br><span class="line">  vdir.add_backend(server1);</span><br><span class="line">  vdir.add_backend(server2);</span><br><span class="line"><span class="meta">  #</span><span class="bash"> vdir.add_backend(server...);</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> vdir.add_backend(servern);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_recv &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called at the beginning of a request, after the complete request has been received and parsed.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Its purpose is to decide whether or not to serve the request, how to <span class="keyword">do</span> it, and, <span class="keyword">if</span> applicable,</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">which</span> backend to use.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> also used to modify the request</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> 请求入口，这里一般用作路由处理，判断是否读取缓存和指定该请求使用哪个后端</span></span><br><span class="line">  set req.backend_hint = vdir.backend(); # send all traffic to the vdir director</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Normalize the header, remove the port (<span class="keyword">in</span> <span class="keyword">case</span> you<span class="string">'re testing this on various TCP ports)</span></span></span><br><span class="line">  set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Remove the proxy header (see https://httpoxy.org/<span class="comment">#mitigate-varnish)</span></span></span><br><span class="line">  unset req.http.proxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Normalize the query arguments</span></span><br><span class="line">  set req.url = std.querysort(req.url);</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Allow purging</span></span><br><span class="line">  if (req.method == "PURGE") &#123;</span><br><span class="line">    if (!client.ip ~ purge) &#123; # purge is the ACL defined at the begining</span><br><span class="line">      # Not from an allowed IP? Then die with an error.</span><br><span class="line">      return (synth(405, "This IP is not allowed to send PURGE requests."));</span><br><span class="line">    &#125;</span><br><span class="line">    # If you got this stage (and didn't error out above), purge the cached result</span><br><span class="line">    return (purge);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不是指定IP执行PURGE方法会报错，否则就执行</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Only deal with <span class="string">"normal"</span> types</span></span><br><span class="line">  if (req.method != "GET" &amp;&amp;</span><br><span class="line">      req.method != "HEAD" &amp;&amp;</span><br><span class="line">      req.method != "PUT" &amp;&amp;</span><br><span class="line">      req.method != "POST" &amp;&amp;</span><br><span class="line">      req.method != "TRACE" &amp;&amp;</span><br><span class="line">      req.method != "OPTIONS" &amp;&amp;</span><br><span class="line">      req.method != "PATCH" &amp;&amp;</span><br><span class="line">      req.method != "DELETE") &#123;</span><br><span class="line">    /* Non-RFC2616 or CONNECT which is weird. */</span><br><span class="line">    /*Why send the packet upstream, while the visitor is using a non-valid HTTP method? */</span><br><span class="line">    return (synth(404, "Non-valid HTTP method!"));</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果使用上面指定的方法就报错。</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Only cache GET or HEAD requests. This makes sure the POST requests are always passed.</span></span><br><span class="line">  if (req.method != "GET" &amp;&amp; req.method != "HEAD") &#123;</span><br><span class="line">   return (pass);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (req.url ~ "/aquapaas/rest/usertags/") </span><br><span class="line">		&#123; return (hash); &#125;  </span><br><span class="line"><span class="meta">  #</span><span class="bash"> 如果请求的地址中包含/aquapaas/rest/usertags/，就缓存。</span></span><br><span class="line">  return (pass);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> The data on <span class="built_in">which</span> the hashing will take place</span></span><br><span class="line">sub vcl_hash &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called after vcl_recv to create a <span class="built_in">hash</span> value <span class="keyword">for</span> the request. This is used as a key</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> to look up the object <span class="keyword">in</span> Varnish.</span></span><br><span class="line"></span><br><span class="line">  hash_data(req.url);</span><br><span class="line"> </span><br><span class="line">  return (lookup);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Handle the HTTP request coming from our backend</span></span><br><span class="line">sub vcl_backend_response &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called after the response headers has been successfully retrieved from the backend.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Sometimes, a 301 or 302 redirect formed via Apache<span class="string">'s mod_rewrite can mess with the HTTP port that is being passed along.</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> This often happens with simple rewrite rules <span class="keyword">in</span> a scenario <span class="built_in">where</span> Varnish runs on :80 and Apache on :8080 on the same box.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> A redirect can <span class="keyword">then</span> often redirect the end-user to a URL on :8080, <span class="built_in">where</span> it should be :80.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> This may need finetuning on your setup.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> To prevent accidental replace, we only filter the 301/302 redirects <span class="keyword">for</span> now.</span></span><br><span class="line">  if (beresp.status == 301 || beresp.status == 302) &#123;</span><br><span class="line">    set beresp.http.Location = regsub(beresp.http.Location, ":[0-9]+", "");</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Don<span class="string">'t cache 50x responses</span></span></span><br><span class="line">  if (beresp.status == 500 || beresp.status == 502 || beresp.status == 503 || beresp.status == 504) &#123;</span><br><span class="line">    return (abandon);        # abandon  放弃处理，并生成一个错误。</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Set 2min cache <span class="keyword">if</span> <span class="built_in">unset</span> <span class="keyword">for</span> static files</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="keyword">if</span> (beresp.ttl &lt;= 0s || beresp.http.Set-Cookie || beresp.http.Vary == <span class="string">"*"</span>) &#123;</span></span><br><span class="line">    # set beresp.ttl = 120s; # Important, you shouldn't rely on this, SET YOUR HEADERS in the backend</span><br><span class="line">    # set beresp.uncacheable = true;</span><br><span class="line">    # return (deliver);</span><br><span class="line"><span class="meta">  #</span><span class="bash"> &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Allow stale content, <span class="keyword">in</span> <span class="keyword">case</span> the backend goes down.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> make Varnish keep all objects <span class="keyword">for</span> 24000 hours beyond their TTL</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">set</span> beresp.ttl = 5m;</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">set</span> beresp.grace = 24000h;</span></span><br><span class="line">  </span><br><span class="line">  if ( beresp.status == 200 ) &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash">只有返回状态为200 OK的数据才考虑缓存。</span></span><br><span class="line">	if (bereq.url ~ "/aquapaas/rest/usertags/") &#123; </span><br><span class="line"><span class="meta">		#</span><span class="bash">AAA数据缓存30秒，过期后缓存0秒。</span></span><br><span class="line">		set beresp.ttl = 30s;</span><br><span class="line">		set beresp.grace = 0s;</span><br><span class="line">		&#125; </span><br><span class="line"> &#125; else &#123;</span><br><span class="line"><span class="meta"> #</span><span class="bash">其余数据不缓存。</span></span><br><span class="line"> set beresp.ttl = 0s;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> return (deliver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> The routine when we deliver the HTTP request to the user</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Last chance to modify headers that are sent to the client</span></span><br><span class="line">sub vcl_deliver &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called before a cached object is delivered to the client.</span></span><br><span class="line"></span><br><span class="line">  if (obj.hits &gt; 0) &#123; # Add debug header to see if it's a HIT/MISS and the number of hits, disable when not needed</span><br><span class="line">    set resp.http.X-Cache = "HIT";</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    set resp.http.X-Cache = "MISS";</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Please note that obj.hits behaviour changed <span class="keyword">in</span> 4.0, now it counts per objecthead, not per object</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> and obj.hits may not be reset <span class="keyword">in</span> some cases <span class="built_in">where</span> bans are <span class="keyword">in</span> use. See bug 1492 <span class="keyword">for</span> details.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> So take hits with a grain of salt</span></span><br><span class="line">  set resp.http.X-Cache-Hits = obj.hits;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Remove some headers: PHP version</span></span><br><span class="line">  unset resp.http.X-Powered-By;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Remove some headers: Apache version &amp; OS</span></span><br><span class="line">  unset resp.http.Server;</span><br><span class="line">  unset resp.http.X-Drupal-Cache;</span><br><span class="line">  unset resp.http.X-Varnish;</span><br><span class="line">  unset resp.http.Via;</span><br><span class="line">  unset resp.http.Link;</span><br><span class="line">  unset resp.http.X-Generator;</span><br><span class="line"></span><br><span class="line">  return (deliver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_purge &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Only handle actual PURGE HTTP methods, everything <span class="keyword">else</span> is discarded</span></span><br><span class="line">  if (req.method == "PURGE") &#123;</span><br><span class="line">    # restart request</span><br><span class="line">    set req.http.X-Purge = "Yes";</span><br><span class="line">    return (restart);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_synth &#123;</span><br><span class="line">  if (resp.status == 720) &#123;</span><br><span class="line">    # We use this special error status 720 to force redirects with 301 (permanent) redirects</span><br><span class="line">    # To use this, call the following from anywhere in vcl_recv: return (synth(720, "http://host/new.html"));</span><br><span class="line">    set resp.http.Location = resp.reason;</span><br><span class="line">    set resp.status = 301;</span><br><span class="line">    return (deliver);</span><br><span class="line">  &#125; elseif (resp.status == 721) &#123;</span><br><span class="line">    # And we use error status 721 to force redirects with a 302 (temporary) redirect</span><br><span class="line">    # To use this, call the following from anywhere in vcl_recv: return (synth(720, "http://host/new.html"));</span><br><span class="line">    set resp.http.Location = resp.reason;</span><br><span class="line">    set resp.status = 302;</span><br><span class="line">    return (deliver);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return (deliver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_hit &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called when a cache lookup is successful.</span></span><br><span class="line"></span><br><span class="line">  if (obj.ttl &gt;= 0s) &#123;</span><br><span class="line">    # A pure unadultered hit, deliver it</span><br><span class="line">    return (deliver);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> https://www.varnish-cache.org/docs/trunk/users-guide/vcl-grace.html</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> When several clients are requesting the same page Varnish will send one request to the backend and place the others on hold <span class="keyword">while</span> fetching one copy from the backend. In some products this is called request coalescing and Varnish does this automatically.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> If you are serving thousands of hits per second the queue of waiting requests can get huge. There are two potential problems - one is a thundering herd problem - suddenly releasing a thousand threads to serve content might send the load sky high. Secondly - nobody likes to <span class="built_in">wait</span>. To deal with this we can instruct Varnish to keep the objects <span class="keyword">in</span> cache beyond their TTL and to serve the waiting requests somewhat stale content.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">if</span> (!std.healthy(req.backend_hint) &amp;&amp; (obj.ttl + obj.grace &gt; 0s)) &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   <span class="built_in">return</span> (deliver);</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   <span class="built_in">return</span> (miss);</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> We have no fresh fish. Lets look at the stale ones.</span></span><br><span class="line">  if (std.healthy(req.backend_hint)) &#123;</span><br><span class="line">    # Backend is healthy. Limit age to 10s.</span><br><span class="line">    if (obj.ttl + 10s &gt; 0s) &#123;</span><br><span class="line">      #set req.http.grace = "normal(limited)";</span><br><span class="line">      return (deliver);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      # No candidate for grace. Fetch a fresh object.</span><br><span class="line">      return (fetch);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    # backend is sick - use full grace</span><br><span class="line">      if (obj.ttl + obj.grace &gt; 0s) &#123;</span><br><span class="line">      #set req.http.grace = "full";</span><br><span class="line">      return (deliver);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      # no graced object.</span><br><span class="line">      return (fetch);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> fetch &amp; deliver once we get the result</span></span><br><span class="line">  return (fetch); # Dead code, keep as a safeguard</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_miss &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called after a cache lookup <span class="keyword">if</span> the requested document was not found <span class="keyword">in</span> the cache. Its purpose</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> is to decide whether or not to attempt to retrieve the document from the backend, and <span class="built_in">which</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> backend to use.</span></span><br><span class="line"></span><br><span class="line">  return (fetch);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub vcl_fini &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Called when VCL is discarded only after all requests have exited the VCL.</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Typically used to clean up VMODs.</span></span><br><span class="line"></span><br><span class="line">  return (ok);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/varnish/" rel="tag"># varnish</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/20/python基础练习/" rel="next" title="python基础练习">
+                <i class="fa fa-chevron-left"></i> python基础练习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">137</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">104</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">1.</span> <span class="nav-text">测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置"><span class="nav-number">1.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vcl文件"><span class="nav-number">1.3.</span> <span class="nav-text">vcl文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装配置web服务"><span class="nav-number">1.4.</span> <span class="nav-text">安装配置web服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置响应是否命中"><span class="nav-number">1.5.</span> <span class="nav-text">设置响应是否命中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定某些文件不能查缓存"><span class="nav-number">1.6.</span> <span class="nav-text">指定某些文件不能查缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vcl配置文件"><span class="nav-number">1.7.</span> <span class="nav-text">vcl配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#VCL中内置预设变量"><span class="nav-number">1.7.1.</span> <span class="nav-text">VCL中内置预设变量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#特定功能性语句"><span class="nav-number">1.7.2.</span> <span class="nav-text">特定功能性语句</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#return-语句"><span class="nav-number">1.7.3.</span> <span class="nav-text">return 语句</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#varnish中内置子程序"><span class="nav-number">1.7.4.</span> <span class="nav-text">varnish中内置子程序</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#优雅模式-Garce-mode"><span class="nav-number">1.7.5.</span> <span class="nav-text">优雅模式(Garce mode)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#后端服务器地址池配置及后端服务器健康检查"><span class="nav-number">1.7.6.</span> <span class="nav-text">后端服务器地址池配置及后端服务器健康检查</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#后端服务器定义"><span class="nav-number">1.7.6.1.</span> <span class="nav-text">后端服务器定义</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#监视器定义"><span class="nav-number">1.7.6.2.</span> <span class="nav-text">监视器定义</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#集群负载均衡directors"><span class="nav-number">1.7.6.3.</span> <span class="nav-text">集群负载均衡directors</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#访问控制列表（ACL）"><span class="nav-number">1.7.6.4.</span> <span class="nav-text">访问控制列表（ACL）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#缓存规则配置"><span class="nav-number">1.7.6.5.</span> <span class="nav-text">缓存规则配置</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#示例"><span class="nav-number">1.7.7.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -350,6 +350,603 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB备份与恢复/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB备份与恢复/" itemprop="url">
+                  MongoDB备份与恢复
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 15:33:28 / 修改時間：16:00:01" itemprop="dateCreated datePublished" datetime="2019-03-11T15:33:28+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">mongodump -h dbhost -d dbname -o dbdirectory</span><br><span class="line"><span class="meta">#</span><span class="bash"> -h：MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -d：需要备份的数据库实例，例如：<span class="built_in">test</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -o：备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个<span class="built_in">test</span>目录，这个目录里面存放该数据库实例的备份数据。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -u: 指定用户名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -p: 指定密码</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mkdir /tmp/mongodb</span><br><span class="line">[root@master ~]# mongodump -h 192.168.251.134:27017 -o /tmp/mongodb/ -u system -p centos</span><br><span class="line">2019-03-11T15:40:42.802+0800	writing admin.system.users to </span><br><span class="line">2019-03-11T15:40:42.803+0800	done dumping admin.system.users (2 documents)</span><br><span class="line">2019-03-11T15:40:42.803+0800	writing admin.system.version to </span><br><span class="line">2019-03-11T15:40:42.804+0800	done dumping admin.system.version (1 document)</span><br><span class="line">2019-03-11T15:40:42.804+0800	writing runoob.collection to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.col to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.test to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.runoob to </span><br><span class="line">2019-03-11T15:40:42.806+0800	done dumping runoob.collection (3 documents)</span><br><span class="line">2019-03-11T15:40:42.806+0800	writing runoob.mycol to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.col (3 documents)</span><br><span class="line">2019-03-11T15:40:42.807+0800	writing runoob.values to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.mycol (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	writing test.col to </span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping runoob.values (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping test.col (0 documents)</span><br><span class="line">2019-03-11T15:40:42.841+0800	done dumping runoob.test (1 document)</span><br><span class="line">2019-03-11T15:40:42.842+0800	done dumping runoob.runoob (0 documents)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备份所有库到/tmp/mongodb下</span></span><br><span class="line">[root@master ~]# ls /tmp/mongodb/</span><br><span class="line">admin  runoob  test</span><br></pre></td></tr></table></figure>
+<h3 id="数据恢复"><a href="#数据恢复" class="headerlink" title="数据恢复"></a>数据恢复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d admin /tmp/mongodb/admin/ -u system -p centos</span><br><span class="line">2019-03-11T15:48:44.761+0800	building a list of collections to restore from /tmp/mongodb/admin dir</span><br><span class="line">2019-03-11T15:48:44.764+0800	restoring users from /tmp/mongodb/admin/system.users.bson</span><br><span class="line">2019-03-11T15:48:44.825+0800	done</span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d test /tmp/mongodb/test/ -u system -p centos --authenticationDatabase admin，不然会报验证失败的错误。</span><br><span class="line"></span><br><span class="line">2019-03-11T15:52:39.194+0800	building a list of collections to restore from /tmp/mongodb/test dir</span><br><span class="line">2019-03-11T15:52:39.195+0800	reading metadata for test.col from /tmp/mongodb/test/col.metadata.json</span><br><span class="line">2019-03-11T15:52:39.196+0800	restoring test.col from /tmp/mongodb/test/col.bson</span><br><span class="line">2019-03-11T15:52:39.198+0800	restoring indexes for collection test.col from metadata</span><br><span class="line">2019-03-11T15:52:39.200+0800	finished restoring test.col (0 documents)</span><br><span class="line">2019-03-11T15:52:39.200+0800	done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令中必须加入--authenticationDatabase admin，不然会报验证失败的错误。</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 /tmp/mongodb/ -u system -p centos --authenticationDatabase admin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复所有数据库</span></span><br><span class="line"></span><br><span class="line">============================================================================================</span><br><span class="line">mongodump与mongoexport的区别：</span><br><span class="line">a. mongodump导出的是bson格式，是二进制形式，不过可以使用mongo自带的bsondump命令查看里面的数据，而mongoexport导出的则是文本，可以是csv、json格式。</span><br><span class="line">b. JSON可读性强但体积较大，BSON则是二进制文件，体积小但对人类几乎没有可读性。</span><br><span class="line">c. 在一些mongodb版本之间，BSON格式可能会随版本不同而有所不同，所以不同版本之间用mongodump/mongorestore可能不会成功，具体要看版本之间的兼容性。当无法使用BSON进行跨版本的数据迁移的时候，使用JSON格式即mongoexport/mongoimport是一个可选项。跨版本的mongodump/mongorestore个人并不推荐，实在要做请先检查文档看两个版本是否兼容（大部分时候是的）。</span><br><span class="line">d. JSON虽然具有较好的跨版本通用性，但其只保留了数据部分，不保留索引，账户等其他基础信息。使用时应该注意。</span><br><span class="line">============================================================================================</span><br></pre></td></tr></table></figure>
+<h3 id="恢复节点"><a href="#恢复节点" class="headerlink" title="恢复节点"></a>恢复节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1. 将复制集中要恢复的节点移除</span><br><span class="line">rs.remove("10.10.17.26:27000")</span><br><span class="line">2. 运行mongorestore --oplogReplay命令</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 --oplogReplay  /data/mongodbbackup/20150820/</span><br><span class="line">3. 创建oplog</span><br><span class="line">use local </span><br><span class="line">db.createCollection("oplog.rs", &#123;"capped" : true, "size" : 10000000&#125;)</span><br><span class="line">4. 恢复oplog</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 -d local -c oplog.rs  /data/mongodbbackup/20150820/oplog.bson</span><br><span class="line">5. 将该节点加入到复制集 </span><br><span class="line">rs.add("10.10.17.26:27000")</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB方法/" itemprop="url">
+                  MongoDB方法
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 14:22:10 / 修改時間：15:26:19" itemprop="dateCreated datePublished" datetime="2019-03-11T14:22:10+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Limit方法"><a href="#Limit方法" class="headerlink" title="Limit方法"></a>Limit方法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">db.COLLECTION_NAME.find().limit(NUMBER)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你需要在MongoDB中读取指定数量的数据记录，可以使用MongoDB的Limit方法，<span class="built_in">limit</span>()方法接受一个数字参数，该参数指定从MongoDB中读取的记录条数。</span></span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; use runoob</span><br><span class="line">switched to db runoob</span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;"title":&#123;$type:2&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;&#125;,&#123;"title":1,_id:0&#125;).limit(2)</span><br><span class="line">&#123; "title" : "PHP教程" &#125;</span><br><span class="line">&#123; "title" : "JAVA教程" &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br></pre></td></tr></table></figure>
+<h3 id="Skip方法"><a href="#Skip方法" class="headerlink" title="Skip方法"></a>Skip方法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用skip()方法跳过指定数量的数据，skip方法同样接受一个数字参数作为跳过的记录条数。</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;&#125;,&#123;"title":1,_id:0&#125;).limit(1).skip(1)</span><br><span class="line">&#123; "title" : "JAVA教程" &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 只显示第二条文档数据。skip()方法默认参数为 0 。</span></span><br></pre></td></tr></table></figure>
+<h3 id="createIndex方法"><a href="#createIndex方法" class="headerlink" title="createIndex方法"></a>createIndex方法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 索引通常能够极大的提高查询的效率，如果没有索引，MongoDB在读取数据时必须扫描集合中的每个文件并选取那些符合查询条件的记录。这种扫描全集合的查询效率是非常低的，特别在处理大量的数据时，查询可能要花费几十秒甚至几分钟，这对网站的性能是非常致命的。索引是特殊的数据结构，索引存储在一个易于遍历读取的数据集合中，索引是对数据库表中一列或多列的值进行排序的一种结构。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MongoDB使用 createIndex() 方法来创建索引。在 3.0.0 版本前创建索引方法为 db.collection.ensureIndex()，之后的版本使用了 db.collection.createIndex() 方法，ensureIndex() 还能用，但只是 createIndex() 的别名。</span></span><br><span class="line"></span><br><span class="line">语法：</span><br><span class="line">db.collection.createIndex(keys, options)</span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.createIndex(&#123;"title":1&#125;)</span><br><span class="line">&#123;</span><br><span class="line">	"createdCollectionAutomatically" : false,</span><br><span class="line">	"numIndexesBefore" : 1,</span><br><span class="line">	"numIndexesAfter" : 2,</span><br><span class="line">	"ok" : 1</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 语法中 Key 值为你要创建的索引字段，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.createIndex(&#123;"title":1,"description":-1&#125;)</span><br><span class="line">&#123;</span><br><span class="line">	"createdCollectionAutomatically" : false,</span><br><span class="line">	"numIndexesBefore" : 2,</span><br><span class="line">	"numIndexesAfter" : 3,</span><br><span class="line">	"ok" : 1</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> createIndex() 方法中你也可以设置使用多个字段创建索引（关系型数据库中称作复合索引）</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.values.createIndex(&#123;open:1,close:1&#125;,&#123;background:true&#125;)</span><br><span class="line">&#123;</span><br><span class="line">	"createdCollectionAutomatically" : true,</span><br><span class="line">	"numIndexesBefore" : 1,</span><br><span class="line">	"numIndexesAfter" : 2,</span><br><span class="line">	"ok" : 1</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 后台创建索引。通过在创建索引时加 background:<span class="literal">true</span> 的选项，让创建工作在后台执行</span></span><br></pre></td></tr></table></figure>
+<h4 id="createIndex-接收可选参数列表"><a href="#createIndex-接收可选参数列表" class="headerlink" title="createIndex() 接收可选参数列表"></a>createIndex() 接收可选参数列表</h4><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>background</td>
+<td>Boolean</td>
+<td>建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 “background” 可选参数。 “background” 默认值为<strong>false</strong>。</td>
+</tr>
+<tr>
+<td>unique</td>
+<td>Boolean</td>
+<td>建立的索引是否唯一。指定为true创建唯一索引。默认值为<strong>false</strong>.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。</td>
+</tr>
+<tr>
+<td>dropDups</td>
+<td>Boolean</td>
+<td>3.0+版本已废弃。在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 <strong>false</strong>.</td>
+</tr>
+<tr>
+<td>sparse</td>
+<td>Boolean</td>
+<td>对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 <strong>false</strong>.</td>
+</tr>
+<tr>
+<td>expireAfterSeconds</td>
+<td>integer</td>
+<td>指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。</td>
+</tr>
+<tr>
+<td>v</td>
+<td>index version</td>
+<td>索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。</td>
+</tr>
+<tr>
+<td>weights</td>
+<td>document</td>
+<td>索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。</td>
+</tr>
+<tr>
+<td>default_language</td>
+<td>string</td>
+<td>对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语</td>
+</tr>
+<tr>
+<td>language_override</td>
+<td>string</td>
+<td>对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aggregate方法"><a href="#aggregate方法" class="headerlink" title="aggregate方法"></a>aggregate方法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> MongoDB中聚合(aggregate)主要用于处理数据(诸如统计平均值,求和等)，并返回计算后的数据结果。有点类似sql语句中的 count(*)。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MongoDB中聚合的方法使用aggregate()。</span></span><br><span class="line"></span><br><span class="line">语法：</span><br><span class="line">db.COLLECTION_NAME.aggregate(AGGREGATE_OPERATION)</span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find()</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.aggregate([&#123;$group:&#123;_id:"$by",num_tutorial:&#123;$sum:1&#125;&#125;&#125;])</span><br><span class="line">&#123; "_id" : "cn", "num_tutorial" : 3 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 统计每个作者所写的文章数。以上实例类似sql语句：select by, count(*) from col group by by;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面的例子中，我们通过字段 by字段对数据进行分组，并计算 by字段相同值的总和。</span></span><br></pre></td></tr></table></figure>
+<h4 id="聚合的表达式"><a href="#聚合的表达式" class="headerlink" title="聚合的表达式"></a>聚合的表达式</h4><table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$sum</td>
+<td>计算likes的总和。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, num_tutorial : {$sum : “$likes”}}}])</td>
+</tr>
+<tr>
+<td>$avg</td>
+<td>计算likes的平均值</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, num_tutorial : {$avg : “$likes”}}}])</td>
+</tr>
+<tr>
+<td>$min</td>
+<td>获取集合中所有文档对应值得最小值。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, num_tutorial : {$min : “$likes”}}}])</td>
+</tr>
+<tr>
+<td>$max</td>
+<td>获取集合中所有文档对应值得最大值。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, num_tutorial : {$max : “$likes”}}}])</td>
+</tr>
+<tr>
+<td>$push</td>
+<td>在结果文档中插入值到一个数组中。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, url : {$push: “$url”}}}])</td>
+</tr>
+<tr>
+<td>$addToSet</td>
+<td>在结果文档中插入值到一个数组中，但不创建副本。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, url : {$addToSet : “$url”}}}])</td>
+</tr>
+<tr>
+<td>$first</td>
+<td>根据资源文档的排序获取第一个文档数据。</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, first_url : {$first : “$url”}}}])</td>
+</tr>
+<tr>
+<td>$last</td>
+<td>根据资源文档的排序获取最后一个文档数据</td>
+<td>db.col.aggregate([{$group : {_id : “$by”, last_url : {$last : “$url”}}}])</td>
+</tr>
+</tbody>
+</table>
+<h3 id="管道的概念"><a href="#管道的概念" class="headerlink" title="管道的概念"></a>管道的概念</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> MongoDB的聚合管道将MongoDB文档在一个管道处理完毕后将结果传递给下一个管道处理。管道操作是可以重复的。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 表达式：处理输入文档并输出。表达式是无状态的，只能用于计算当前聚合管道的文档，不能处理其它的文档。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里我们介绍一下聚合框架中常用的几个操作：</span></span><br><span class="line"><span class="meta">$</span><span class="bash">project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">match：用于过滤数据，只输出符合条件的文档。<span class="variable">$match</span>使用MongoDB的标准查询操作。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"><span class="built_in">limit</span>：用来限制MongoDB聚合管道返回的文档数。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">group：将集合中的文档分组，可用于统计结果。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">sort：将输入文档排序后输出。</span></span><br><span class="line"><span class="meta">$</span><span class="bash">geoNear：输出接近某一地理位置的有序文档。</span></span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.aggregate(&#123; $project:&#123; title:1, by:1, &#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "by" : "cn" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "by" : "cn" &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "by" : "cn" &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 结果中就只还有_id,tilte和by三个字段了，默认情况下_id字段是被包含的</span></span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.aggregate(&#123; $project:&#123; _id:0,title:1, by:1, &#125;&#125;)</span><br><span class="line">&#123; "title" : "PHP教程", "by" : "cn" &#125;</span><br><span class="line">&#123; "title" : "JAVA教程", "by" : "cn" &#125;</span><br><span class="line">&#123; "title" : "mongodb教程", "by" : "cn" &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不包含_id字段</span></span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.aggregate([&#123;$match:&#123;likes:&#123;$gt:100,$lte:200&#125;&#125;&#125;,&#123;$group:&#123;_id:null,count:&#123;$sum:1&#125;&#125;&#125;])</span><br><span class="line">&#123; "_id" : null, "count" : 2 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="variable">$match</span>用于获取likes大于100小于或等于200的记录，然后将符合条件的记录送到下一阶段<span class="variable">$group</span>管道操作符进行处理。</span></span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.aggregate(&#123;$skip:2&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 经过<span class="variable">$skip</span>管道操作符处理后，前两个文档被<span class="string">"过滤"</span>掉。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB条件操作符/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB条件操作符/" itemprop="url">
+                  MongoDB条件操作符
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 13:46:56 / 修改時間：14:22:14" itemprop="dateCreated datePublished" datetime="2019-03-11T13:46:56+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="大于操作符"><a href="#大于操作符" class="headerlink" title="大于操作符"></a>大于操作符</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">hqmongodb:PRIMARY&gt; db.col.remove(&#123;&#125;)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清空集合 <span class="string">"col"</span> 的数据。col是自定义的名称，只要在插入数据时插入到自定义的集合名中即可。</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.insert(&#123; title:'PHP教程', description:'PHP是一种脚本语言', by:'cn', url:'http://www.runoob.com', tags:['php'], likes:200 &#125;)</span><br><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 向col集合中插入数据</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.insert(&#123; title:'JAVA教程', description:'java是高级语言', by:'cn', url:'http://www.runoob.com', tags:['java'], likes:150 &#125;)</span><br><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.insert(&#123; title:'mongodb教程', description:'mongodb是Nosql', by:'cn', url:'http://www.runoob.com', tags:['mongodb'], likes:100 &#125;)</span><br><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 插入三个文档</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find()</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line"></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;likes:&#123;$gt:150&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取 <span class="string">"col"</span> 集合中 <span class="string">"likes"</span> 大于 150 的数据。类似SQL语句：Select * from col <span class="built_in">where</span> likes &gt; 150;</span></span><br></pre></td></tr></table></figure>
+<h3 id="大于等于操作符"><a href="#大于等于操作符" class="headerlink" title="大于等于操作符"></a>大于等于操作符</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;likes:&#123;$gte:150&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取 <span class="string">"col"</span> 集合中 <span class="string">"likes"</span> 大于等于 150 的数据。类似SQL语句：Select * from col <span class="built_in">where</span> likes &gt;= 150;</span></span><br></pre></td></tr></table></figure>
+<h3 id="小于操作符"><a href="#小于操作符" class="headerlink" title="小于操作符"></a>小于操作符</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;likes:&#123;$lt:150&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取 <span class="string">"col"</span> 集合中 <span class="string">"likes"</span> 小于 150 的数据。类似SQL语句：Select * from col <span class="built_in">where</span> likes &lt; 150;</span></span><br></pre></td></tr></table></figure>
+<h3 id="小于等于操作符"><a href="#小于等于操作符" class="headerlink" title="小于等于操作符"></a>小于等于操作符</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;likes:&#123;$lte:150&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取 <span class="string">"col"</span> 集合中 <span class="string">"likes"</span> 小于等于 150 的数据。类似SQL语句：Select * from col <span class="built_in">where</span> likes &lt;= 150;</span></span><br></pre></td></tr></table></figure>
+<h3 id="联合使用"><a href="#联合使用" class="headerlink" title="联合使用"></a>联合使用</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;likes:&#123;$lt:200,$gt:100&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取<span class="string">"col"</span>集合中 <span class="string">"likes"</span> 大于100，小于 200 的数据。类似SQL语句：Select * from col <span class="built_in">where</span> likes&gt;100 AND  likes&lt;200;</span></span><br></pre></td></tr></table></figure>
+<h3 id="type操作符"><a href="#type操作符" class="headerlink" title="$type操作符"></a>$type操作符</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="variable">$type</span>操作符是基于BSON类型来检索集合中匹配的数据类型，并返回结果。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MongoDB中可以使用的类型有：(1)Double、(2)String、(3)Object、(4)Array、(5)Binary data、(7)Object id、(8)Boolean、(9)Date、(10)Null、(11)Regular Expression、(13)JavaScript、(14)Symbol、(15)JavaScript(with scope)、(16)32-bit <span class="built_in">integer</span>、(17)Timestamp、(18)64-bit <span class="built_in">integer</span>、(255)Min key、(127)Max key</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find()</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;"title":&#123;$type:2&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里<span class="variable">$type</span>指定的是上面说明中类型前面的数字，也可以指定类型名称，如下</span></span><br><span class="line">hqmongodb:PRIMARY&gt; db.col.find(&#123;"title":&#123;$type:'string'&#125;&#125;)</span><br><span class="line">&#123; "_id" : ObjectId("5c85f81c95892d355859a619"), "title" : "PHP教程", "description" : "PHP是一种脚本语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "php" ], "likes" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f8f995892d355859a61a"), "title" : "JAVA教程", "description" : "java是高级语言", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "java" ], "likes" : 150 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5c85f93195892d355859a61b"), "title" : "mongodb教程", "description" : "mongodb是Nosql", "by" : "cn", "url" : "http://www.runoob.com", "tags" : [ "mongodb" ], "likes" : 100 &#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/使用Nginx搭建webdav服务/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1700,940 +2297,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/15/python概念及语法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/15/python概念及语法/" itemprop="url">
-                  python概念及语法
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-02-15 18:05:02" itemprop="dateCreated datePublished" datetime="2019-02-15T18:05:02+08:00">2019-02-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-03-07 09:51:44" itemprop="dateModified" datetime="2019-03-07T09:51:44+08:00">2019-03-07</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="编译器与解释器"><a href="#编译器与解释器" class="headerlink" title="编译器与解释器"></a>编译器与解释器</h4><blockquote>
-<p><strong>编译器</strong>是把源程序的每一条语句都编译成机器语言,并保存成二进制文件,这样运行时计算机可以直接以机器语言来运行此程序,速度很快；它把源代码转换成目标机器的CPU指令</p>
-<p>而<strong>解释器</strong>则是只在执行程序时,才一条一条的解释成机器语言给计算机来执行,所以运行速度是不如编译后的程序运行的快的。解释后转换成字节码，运行在虚拟机上，解释器执行中间代码。</p>
-<p>这是因为计算机不能直接认识并执行我们写的语句,它只能认识机器语言(是二进制的形式)。</p>
-</blockquote>
-<h4 id="编译型语言与解释型语言"><a href="#编译型语言与解释型语言" class="headerlink" title="编译型语言与解释型语言"></a>编译型语言与解释型语言</h4><blockquote>
-<ul>
-<li><p>编译型<br>优点：编译器一般会有预编译的过程对代码进行优化。因为编译只做一次，运行时不需要编译，所以编译型语言的程序执行效率高。可以脱离语言环境独立运行。<br>缺点：编译之后如果需要修改就需要整个模块重新编译。编译的时候根据对应的运行环境生成机器码，不同的操作系统之间移植就会有问题，需要根据运行的操作系统环境编译不同的可执行文件。</p>
-</li>
-<li><p>解释型<br>优点：有良好的平台兼容性，在任何环境中都可以运行，前提是安装了解释器（虚拟机）。灵活，修改代码的时候直接修改就可以，可以快速部署，不用停机维护。</p>
-<p>缺点：每次运行的时候都要解释一遍，性能上不如编译型语言。</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="低级语言与高级语言"><a href="#低级语言与高级语言" class="headerlink" title="低级语言与高级语言"></a>低级语言与高级语言</h4><blockquote>
-<ul>
-<li><p>低级语言</p>
-<p>面向机器的语言，包括机器语言、汇编语言</p>
-<p>不同的机器不能通用，不同的机器需要不同的机器指令或者汇编程序</p>
-</li>
-<li><p>高级语言</p>
-<p>接近自然语言和数学语言的计算机语言</p>
-<p>高级语言首先要书写源程序，通过编译程序把源程序转换成机器指令的程序</p>
-<p>人们只需要关心怎么书写源程序，针对不同机器的编译的事交给编译器处理</p>
-</li>
-</ul>
-<p>语言越高级，越接近人类的自然语言和数学语言。语言越低级，越能让机器理解。高级语言和低级语言之间需要一个转换的工具，就是编译器或解释器。</p>
-</blockquote>
-<h4 id="动态语言和静态语言"><a href="#动态语言和静态语言" class="headerlink" title="动态语言和静态语言"></a>动态语言和静态语言</h4><blockquote>
-<ul>
-<li><p>动态类型语言：动态类型语言是指在运行期间才去做数据类型检查的语言，也就是说，在用动态类型的语言编程时，永远也不用给任何变量指定数据类型，该语言会在你第一次赋值给变量时，在内部将数据类型记录下来。Python和Ruby就是一种典型的动态类型语言，其他的各种脚本语言如VBScript也多少属于动态类型语言。</p>
-</li>
-<li><p>静态类型语言：静态类型语言与动态类型语言刚好相反，它的数据类型是在编译其间检查的，也就是说在写程序时要声明所有变量的数据类型，C/C++是静态类型语言的典型代表，其他的静态类型语言还有C#、JAVA等。</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="强类型定义语言和弱类型定义语言"><a href="#强类型定义语言和弱类型定义语言" class="headerlink" title="强类型定义语言和弱类型定义语言"></a>强类型定义语言和弱类型定义语言</h4><blockquote>
-<ul>
-<li>强类型语言：不同类型之间操作，必须先强制类型转换为同一类型。print(‘a’+1)</li>
-<li>弱类型语言：不同类型间可以操作，自动隐式转换，JavaScript中console.log(1+’a’)</li>
-</ul>
-</blockquote>
-<h3 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h3><blockquote>
-<ul>
-<li><p>注释：# 标注的文本</p>
-</li>
-<li><p>数字：</p>
-<ul>
-<li>整数，不区分long和int。可使用二进制、十进制、十六进制。bool(布尔)有两个值True和False</li>
-<li>浮点数：1.2、3.1415、-0.12、1.46e9等价于1.46*10的9次方</li>
-<li>复数：1+2j</li>
-</ul>
-</li>
-<li><p>字符串：</p>
-<ul>
-<li>使用’ “ 单双引号引用的字符的序列</li>
-<li>‘’’和””” 单双三引号，可以跨行、可以在其中自由的使用单双引号</li>
-<li>在字符串前面加上r或R前缀，表示该字符串不做特殊的处理</li>
-</ul>
-</li>
-<li><p>转义序列</p>
-<ul>
-<li>\\    \t    \r    \n    \‘    \“</li>
-<li>前缀r，把里面的所有字符当普通字符对待</li>
-</ul>
-</li>
-<li><p>缩进</p>
-<ul>
-<li>未使用C等语言的花括号，而是采用缩进的方式表示层次关系</li>
-<li>约定使用4个空格缩进</li>
-</ul>
-</li>
-<li><p>续行</p>
-<ul>
-<li>在行尾使用\</li>
-<li>如果使用各种括号，认为括号内是一个整体，内部跨行不用\</li>
-</ul>
-</li>
-<li><p>标识符</p>
-<ol>
-<li>一个名字，用来指代一个值</li>
-<li>只能字母、下划线和数字</li>
-<li>只能以字母或下划线开头</li>
-<li>不能是python的关键字，如def、class就不能作为标识符</li>
-<li>python是大小写敏感的</li>
-</ol>
-<ul>
-<li>约定：<ul>
-<li>不允许使用中文</li>
-<li>不允许使用歧义单词，如class_</li>
-<li>在python中不要随便使用下划线开头的表示符</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>常量</p>
-<ul>
-<li>一旦赋值就不能改变值的标识符</li>
-<li>python中无法定义常量</li>
-</ul>
-</li>
-<li><p>字面常量</p>
-<ul>
-<li>一个单独的量，如12、”abc”、’234531.03e-9’</li>
-</ul>
-</li>
-<li><p>变量</p>
-<ul>
-<li>赋值后，可以改变值的标识符</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<h3 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h3><h4 id="算数运算符"><a href="#算数运算符" class="headerlink" title="算数运算符"></a>算数运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+</td>
-<td>两个对象相加</td>
-<td>a + b输出结果30</td>
-</tr>
-<tr>
-<td>-</td>
-<td>得到负数或是一个数减去另一个数</td>
-<td>a - b输出结果-10</td>
-</tr>
-<tr>
-<td>*</td>
-<td>两个数相乘或是返回一个被重复若干次的字符串</td>
-<td>a * b输出结果200</td>
-</tr>
-<tr>
-<td>/</td>
-<td>x除以y</td>
-<td>b / a输出结果2</td>
-</tr>
-<tr>
-<td>%</td>
-<td>返回除法的余数</td>
-<td>b % a输出结果0</td>
-</tr>
-<tr>
-<td>**</td>
-<td>返回x的y次幂</td>
-<td>a ** b为10的20次方，输出结果1000000000000000000</td>
-</tr>
-<tr>
-<td>//</td>
-<td>返回商的整数部分</td>
-<td>9 // 2输出结果4，9.0//2.0输出结果4.0</td>
-</tr>
-</tbody>
-</table>
-<h4 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>==</td>
-<td>比较两个对象是否相等</td>
-<td>(a == b)返回False</td>
-</tr>
-<tr>
-<td>!=</td>
-<td>比较两个对象是否不等</td>
-<td>(a != b)返回true</td>
-</tr>
-<tr>
-<td>&lt;&gt;</td>
-<td>比较两个对象是否不等</td>
-<td>(a &lt;&gt; b)返回true。这个运算符类似!=</td>
-</tr>
-<tr>
-<td>&gt;</td>
-<td>返回x是否大于y，返回一个bool值</td>
-<td>(a &gt; b)返回False；4&gt;3&gt;2或4&gt;mynumber&gt;=1是链式比较操作符</td>
-</tr>
-<tr>
-<td>&lt;</td>
-<td>返回x是否小于y。所有比较运算符返回1表示真，返回0表示假。这分别与特殊的变量True和False等价。注意，这些变量名的大写。</td>
-<td>(a &lt; b)返回true</td>
-</tr>
-<tr>
-<td>&gt;=</td>
-<td>返回x是否大于等于y</td>
-<td>(a &gt;= b)返回False</td>
-</tr>
-<tr>
-<td>&lt;=</td>
-<td>返回x是否小于等于y</td>
-<td>(a &lt;= b)返回true</td>
-</tr>
-</tbody>
-</table>
-<h4 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>=</td>
-<td>简单的赋值运算符</td>
-<td>c = a+b将a + b的运算结果赋值为c</td>
-</tr>
-<tr>
-<td>+=</td>
-<td>加法赋值运算符</td>
-<td>c += a等效于c = c + a</td>
-</tr>
-<tr>
-<td>-=</td>
-<td>减法赋值运算符</td>
-<td>c -= a等效于c = c - a</td>
-</tr>
-<tr>
-<td>*=</td>
-<td>乘法赋值运算符</td>
-<td>c *= a等效于c = c * a</td>
-</tr>
-<tr>
-<td>/=</td>
-<td>除法赋值运算符</td>
-<td>c /= a等效于c = c / a</td>
-</tr>
-<tr>
-<td>%=</td>
-<td>取模赋值运算符</td>
-<td>c %= a等效于c = c % a</td>
-</tr>
-<tr>
-<td>**=</td>
-<td>幂赋值运算符</td>
-<td>c **= a等效于c = c ** a</td>
-</tr>
-<tr>
-<td>//=</td>
-<td>取整除赋值运算符</td>
-<td>c //= a等效于c = c // a</td>
-</tr>
-</tbody>
-</table>
-<h4 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h4><blockquote>
-<p>短路运算符，可以把and当作乘法，把or当作加法，非是取反。and 如果第一个表达式为False，后面就没有必要计算了，这个逻辑表达式一定是False；or 如果第一个表达式为True，后面没有必要计算了，这个逻辑表达式一定是True</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>and</td>
-<td>布尔“与”，如果x为False，x and y返回False，否则它返回y的计算值</td>
-<td>(a and b)返回true</td>
-</tr>
-<tr>
-<td>or</td>
-<td>布尔“或”，如果x是True，它返回True，否则它返回y的计算值</td>
-<td>(a or b)返回true</td>
-</tr>
-<tr>
-<td>not</td>
-<td>布尔“非”，如果x为True，返回False。如果x为False，它返回True</td>
-<td>not(a and b)返回false</td>
-</tr>
-</tbody>
-</table>
-<h4 id="成员运算符"><a href="#成员运算符" class="headerlink" title="成员运算符"></a>成员运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>in</td>
-<td>如果在指定的序列中找到值返回True，否则返回False</td>
-<td>x在y序列中，如果x在y序列中返回True</td>
-</tr>
-<tr>
-<td>not in</td>
-<td>如果在指定的序列中没有找到值返回True，否则返回False</td>
-<td>x不在y序列中，如果x不在y序列中返回True</td>
-</tr>
-</tbody>
-</table>
-<h4 id="身份运算符"><a href="#身份运算符" class="headerlink" title="身份运算符"></a>身份运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>is</td>
-<td>is是判断两个标识符是不是引用自一个对象</td>
-<td>x is y，如果id(x)等于id(y)，is返回结果1</td>
-</tr>
-<tr>
-<td>is not</td>
-<td>is not是判断两个标识符是不是引用自不同对象</td>
-<td>x is not y，如果id(x)不等于id(y)，is not返回结果1</td>
-</tr>
-</tbody>
-</table>
-<h4 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&amp;</td>
-<td>按位与运算符</td>
-<td>(a &amp; b)输出结果12，二进制解释：0000 1100。只有1和1相与得1，其他相与都是0</td>
-</tr>
-<tr>
-<td>I</td>
-<td>按位或运算符</td>
-<td>(a I b)输出结果61，二进制解释：0011 1101</td>
-</tr>
-<tr>
-<td>^</td>
-<td>按位异或运算符</td>
-<td>(a ^ b)输出结果49，二进制解释：0011 0001</td>
-</tr>
-<tr>
-<td>~</td>
-<td>按位取反运算符</td>
-<td>(~a)输出结果-61，二进制解释：1100 0011，在一个有符号二进制数的补码形式</td>
-</tr>
-<tr>
-<td>&lt;&lt;</td>
-<td>左移动运算符</td>
-<td>a &lt;&lt; 2输出结果240，二进制解释：1111 0000</td>
-</tr>
-<tr>
-<td>&gt;&gt;</td>
-<td>右移动运算符</td>
-<td>a &gt;&gt; 2输出结果15，二进制解释：0000 1111</td>
-</tr>
-</tbody>
-</table>
-<h4 id="运算符优先级"><a href="#运算符优先级" class="headerlink" title="运算符优先级"></a>运算符优先级</h4><blockquote>
-<p>算数运算符 &gt; 位运算符 &gt; 身份运算符 &gt; 成员运算符 &gt; 逻辑运算符</p>
-<p>记不住，就用小括号</p>
-<p>长表达式，多用括号，易懂、易读</p>
-</blockquote>
-<h4 id="原码、反码、补码、负数表示法"><a href="#原码、反码、补码、负数表示法" class="headerlink" title="原码、反码、补码、负数表示法"></a>原码、反码、补码、负数表示法</h4><blockquote>
-<ul>
-<li><p>原码</p>
-<p>5 =&gt; 0b101，1 =&gt; 0b1，-1 =&gt; -0b1，bin(-1)</p>
-</li>
-<li><p>反码</p>
-<p>正数的反码与原码相同；负数的反码符号位不变其余按位取反</p>
-</li>
-<li><p>补码</p>
-<p>正数的补码与原码相同；负数的补码符号位不变其余按位取反后+1；补码的补码就是原码</p>
-</li>
-<li><p>负数表示法</p>
-<p>数字电路的CPU中的运算器实现了加法器，但是没有减法器，减法是转换成加法</p>
-<p>负数在计算机中使用补码存储，-1的补码为1111 1111</p>
-<p>5 - 1 =&gt; 5+(-1)直觉上是0b101-0b1，其实计算机中是0b101+0b11111111，溢出位舍弃</p>
-</li>
-</ul>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">例：<span class="number">5</span><span class="number">-1</span>保存为二进制</span><br><span class="line"><span class="number">0000</span> <span class="number">0101</span>		</span><br><span class="line"><span class="comment"># 5的二进制。原码是人比较习惯的方式，-0b1中的负号表示转换为二进制数字时在最高位是0还是1，1表示负号，0表示正号。-0b1是python中的写法。-0b1也就是原码</span></span><br><span class="line"><span class="number">1111</span> <span class="number">1111</span>		</span><br><span class="line"><span class="comment"># -1的二进制，因为计算机中保存的都是补码，而正数的原码与补码一样，所以上面的5不会变。-1的二进制是1000 0001，转换为补码后，除最高位的符号位不变外，还要加1，就是1111 1110 + 1，所以最后就是1111 1111</span></span><br><span class="line"><span class="number">1</span> <span class="number">0000</span> <span class="number">0100</span></span><br><span class="line"><span class="comment"># 这是5和-1的二进制相加后的结果，因为最高位的1溢出了，所以舍弃，最后就变成了0000 0100，也就是4了</span></span><br><span class="line"></span><br><span class="line">例：~<span class="number">12</span>为什么是<span class="number">-13</span></span><br><span class="line"><span class="number">0000</span> <span class="number">1100</span></span><br><span class="line"><span class="comment"># 这是12的二进制</span></span><br><span class="line"><span class="number">1111</span> <span class="number">0011</span></span><br><span class="line"><span class="comment"># 这是对12的二进制取反后的数，但最高位是1表示负数，并且保存在计算机中的应该是数字的补码，所以要取这个负数的补码</span></span><br><span class="line"><span class="number">1000</span> <span class="number">1101</span></span><br><span class="line"><span class="comment"># 这是对上面二进制数取的补码，因为上面表示负数，所以按照最高位不变最后加1的原则，取出的二进制数就是这个数，转换为十进制数就是-13了。</span></span><br></pre></td></tr></table></figure>
-<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><blockquote>
-<p>变量无须事先声明，也不需要指定类型</p>
-<p>编程中一般无须关心变量的存亡，也不用关心内存的管理</p>
-<p>python使用引用 计数记录所有对象的引用数。当对象引用数变为0,它就可以被垃圾回收（GC）了。</p>
-<p>计数增加：赋值给其它变量就增加引用计数，例如：x=3;y=x</p>
-<p>计数减少：函数运行结束时，局部变量就会被自动销毁，对象引用计数减少。变量被赋值给其它对象。例如：x=3;y=x;x=4</p>
-</blockquote>
-<h3 id="程序控制"><a href="#程序控制" class="headerlink" title="程序控制"></a>程序控制</h3><blockquote>
-<ul>
-<li><p>顺序</p>
-<p>按照先后顺序一条条执行</p>
-</li>
-<li><p>分支</p>
-<p>根据不同的情况判断，条件满足执行某条件下的语句</p>
-</li>
-<li><p>循环</p>
-<p>条件满足就反复执行，不满足就不执行或不再执行</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="单分支结构"><a href="#单分支结构" class="headerlink" title="单分支结构"></a>单分支结构</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>语句</span><br><span class="line"><span class="keyword">if</span> condition:</span><br><span class="line">		代码块</span><br><span class="line"><span class="comment"># condition必须是一个bool类型，这个地方有一个隐式转换bool(condition)</span></span><br><span class="line"><span class="keyword">if</span> <span class="number">1</span> &lt; <span class="number">2</span>:</span><br><span class="line">		print(<span class="string">'1 less than 2'</span>)</span><br><span class="line"><span class="comment"># 代码块：类似于if语句的冒号后面的就是一个语句块	</span></span><br><span class="line"></span><br><span class="line">============================================================================================</span><br><span class="line">真值表</span><br><span class="line"><span class="string">""</span>						   假</span><br><span class="line"><span class="string">"string"</span>			 真</span><br><span class="line"><span class="number">0</span>							假</span><br><span class="line">&gt;=<span class="number">1</span>						 真</span><br><span class="line">&lt;=<span class="number">-1</span>					 真</span><br><span class="line">()空元组			  假</span><br><span class="line">[]空列表			  假</span><br><span class="line">&#123;&#125;空字典			  假</span><br><span class="line"><span class="keyword">None</span>				  假</span><br><span class="line">============================================================================================</span><br></pre></td></tr></table></figure>
-<h4 id="多分支结构"><a href="#多分支结构" class="headerlink" title="多分支结构"></a>多分支结构</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>...<span class="keyword">elif</span>...<span class="keyword">else</span>语句</span><br><span class="line"><span class="keyword">if</span> condition1:</span><br><span class="line">		代码块<span class="number">1</span></span><br><span class="line"><span class="keyword">elif</span> condition2:</span><br><span class="line">		代码块<span class="number">2</span></span><br><span class="line"><span class="keyword">elif</span> condition3:</span><br><span class="line">		代码块<span class="number">3</span></span><br><span class="line"><span class="meta">... </span>...</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		代码块</span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line">a = <span class="number">5</span></span><br><span class="line"><span class="keyword">if</span> a &lt; <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'negative'</span>)</span><br><span class="line"><span class="keyword">elif</span> a == <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'zero'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		print(<span class="string">'positive'</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="分支嵌套"><a href="#分支嵌套" class="headerlink" title="分支嵌套"></a>分支嵌套</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">例：</span><br><span class="line">score = <span class="number">80</span></span><br><span class="line"><span class="keyword">if</span> score &lt; <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'wrong'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		<span class="keyword">if</span> sore == <span class="number">0</span>:</span><br><span class="line">				print(<span class="string">'egg'</span>)</span><br><span class="line">		<span class="keyword">elif</span> score &lt;= <span class="number">100</span>:</span><br><span class="line">				print(<span class="string">'right'</span>)</span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">				print(<span class="string">'too big'</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> condition:</span><br><span class="line">		block</span><br><span class="line"><span class="comment"># 当条件满足即condition为True，进入循环体，执行block</span></span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line">flag = <span class="number">10</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">		print(flag)</span><br><span class="line">		flag -= <span class="number">1</span></span><br><span class="line"><span class="comment"># lag是标记，while flag也就是while为真，flag会递减，等flag等于0时，while就会退出循环了</span></span><br><span class="line"><span class="comment"># while true是死循环，因为条件永远为真，不会变成假。如果 改为-10也会是死循环，可以使用return退出死循环</span></span><br></pre></td></tr></table></figure>
-<h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> iteratable:</span><br><span class="line">		block</span><br><span class="line"><span class="comment"># 当可迭代对象中有元素可以迭代，进入循环体，执行block</span></span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">		print(i+<span class="number">1</span>)</span><br><span class="line"><span class="comment"># range()函数类似seq命令，range(10)可以输出从0到9，共10个数字</span></span><br><span class="line"><span class="comment"># iteratable表示迭代的，element表示元素。</span></span><br><span class="line"></span><br><span class="line">In [1]: range?                                                                  </span><br><span class="line">Init signature: range(self, /, *args, **kwargs)</span><br><span class="line">Docstring:     </span><br><span class="line">range(stop) -&gt; range object</span><br><span class="line">range(start, stop[, step]) -&gt; range object</span><br><span class="line"></span><br><span class="line">Return an object that produces a sequence of integers <span class="keyword">from</span> start (inclusive)</span><br><span class="line">to stop (exclusive) by step.  range(i, j) produces i, i+<span class="number">1</span>, i+<span class="number">2</span>, ..., j<span class="number">-1.</span></span><br><span class="line">start defaults to <span class="number">0</span>, <span class="keyword">and</span> stop <span class="keyword">is</span> omitted!  range(<span class="number">4</span>) produces <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3.</span></span><br><span class="line">These are exactly the valid indices <span class="keyword">for</span> a list of <span class="number">4</span> elements.</span><br><span class="line">When step <span class="keyword">is</span> given, it specifies the increment (<span class="keyword">or</span> decrement).</span><br><span class="line">Type:           type</span><br><span class="line">Subclasses:     </span><br><span class="line"><span class="comment"># range?可以查看帮助</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>,<span class="number">5</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="comment"># 只会输出3和4</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>,<span class="number">6</span>,<span class="number">2</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="comment"># 还可以加上步长</span></span><br></pre></td></tr></table></figure>
-<h4 id="循环continue语句"><a href="#循环continue语句" class="headerlink" title="循环continue语句"></a>循环continue语句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">中断当前循环的当次执行，继续下一次循环</span><br><span class="line">例：</span><br><span class="line">In [<span class="number">7</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>): </span><br><span class="line">   ...:     <span class="keyword">if</span> <span class="keyword">not</span> i%<span class="number">2</span>: </span><br><span class="line">   ...:         print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># 这里会打印偶数是因为range中的数字与2取余后，如果是0就表示假，1表示真，但取余前加了not，所以假就变成了真，所以打印的是偶数，如果不加not，那么就会打印所有奇数。</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">10</span>,<span class="number">2</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># 直接使用range()函数就可以打印奇偶数</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">10</span>): </span><br><span class="line">    ...:     <span class="keyword">if</span> i &amp; <span class="number">1</span>: </span><br><span class="line">    ...:         <span class="keyword">continue</span> </span><br><span class="line">    ...:     print(i) </span><br><span class="line">    ...:                                                                        </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># range()函数内的数字和1按位与，如果为真，也就是1，就会中断当前循环，如果为假就会打印i</span></span><br></pre></td></tr></table></figure>
-<h4 id="循环break语句"><a href="#循环break语句" class="headerlink" title="循环break语句"></a>循环break语句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">终止当前循环，跳出循环</span><br><span class="line">例：计算<span class="number">1000</span>以内的被<span class="number">7</span>整除的前<span class="number">20</span>个数（<span class="keyword">for</span>循环）</span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">1000</span>,<span class="number">7</span>):</span><br><span class="line">    print(i)</span><br><span class="line">    count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> count == <span class="number">20</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="comment"># range必须从0开始，如果从1开始，那么永远到不了7的整数倍。但这样也会打印0</span></span><br></pre></td></tr></table></figure>
-<h4 id="continue和break语句总结"><a href="#continue和break语句总结" class="headerlink" title="continue和break语句总结"></a>continue和break语句总结</h4><blockquote>
-<ul>
-<li>continue和break是循环的控制语句，只影响当前循环，包括while、for循环</li>
-<li>如果循环嵌套，continue和break也只影响语句所在的那一层循环</li>
-<li>continue和break不是跳出语句块，所以if cond: break不是跳出if，而是终止if外的break所在的循环</li>
-</ul>
-</blockquote>
-<h4 id="循环else子句"><a href="#循环else子句" class="headerlink" title="循环else子句"></a>循环else子句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果循环正常的执行结束，就执行else子句；如果使用break终止，else子句不会执行</span></span><br><span class="line"><span class="keyword">while</span> condition:</span><br><span class="line">		block</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		block</span><br><span class="line">        </span><br><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> iteratable:</span><br><span class="line">    	block</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    	block</span><br></pre></td></tr></table></figure>
-<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 输入<span class="number">2</span>个数字，输出最大数</span><br><span class="line">a = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">b = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line"><span class="keyword">while</span> a == b:</span><br><span class="line">    print(<span class="string">'请重新输入'</span>)</span><br><span class="line">    a = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">    b = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">    <span class="keyword">if</span> a &gt; b:</span><br><span class="line">        print(a)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(b)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> 给定一个不超过<span class="number">5</span>位的正整数，判断其有几位</span><br><span class="line"><span class="comment"># 使用input函数，例：input函数获取键盘输入，input([prompt])。input()是内建函数，返回的是字符串。下划线在ipython中是一个特殊的字符，表示上一次output的结果。</span></span><br><span class="line">a = int(input(<span class="string">'&gt;&gt;&gt;'</span>))</span><br><span class="line"><span class="keyword">if</span> a // <span class="number">100000</span>:</span><br><span class="line">    print(<span class="string">'6位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">10000</span>:</span><br><span class="line">    print(<span class="string">'5位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">1000</span>:</span><br><span class="line">    print(<span class="string">'4位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">100</span>:</span><br><span class="line">    print(<span class="string">'3位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">10</span>:</span><br><span class="line">    print(<span class="string">'2位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">1</span>:</span><br><span class="line">    print(<span class="string">'1位数'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="number">3.</span> 给定一个不超过<span class="number">5</span>位的正整数，判断该数的位数，依次打印出个位、十位、百位、千位、万位的数字</span><br><span class="line"></span><br><span class="line"><span class="number">4.</span> 打印一个连长为n的正方形</span><br><span class="line"></span><br><span class="line"><span class="number">5.</span> 求<span class="number">100</span>内所有奇数的和(<span class="number">2500</span>)</span><br><span class="line"></span><br><span class="line"><span class="number">6.</span> 判断学生成绩，成绩等级A~E。其中，<span class="number">90</span>分以上为A，<span class="number">80</span>～<span class="number">89</span>分为B，<span class="number">70</span>～<span class="number">79</span>分为C，<span class="number">60</span>～<span class="number">69</span>分为D，<span class="number">60</span>分以下为E</span><br><span class="line"></span><br><span class="line"><span class="number">7.</span> 求<span class="number">1</span>到<span class="number">5</span>阶乘之和</span><br><span class="line"></span><br><span class="line"><span class="number">8.</span> 给一个数，判断它是否是素数（质数）。质数：一个大于<span class="number">1</span>的自然数只能被<span class="number">1</span>和它本身整除</span><br><span class="line"></span><br><span class="line"><span class="number">9.</span> 打印九九乘法表</span><br><span class="line"></span><br><span class="line"><span class="number">10.</span> 打印菱形</span><br><span class="line"></span><br><span class="line"><span class="number">11.</span> 打印<span class="number">100</span>以内的斐波那契数列</span><br><span class="line"></span><br><span class="line"><span class="number">12.</span> 求斐波那契数列第<span class="number">101</span>项</span><br><span class="line"></span><br><span class="line"><span class="number">13.</span> 求<span class="number">10</span>万内的所有素数</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/31/puppet的master-agent认证/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/31/puppet的master-agent认证/" itemprop="url">
-                  puppet的master&agent认证
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-01-31 22:06:41" itemprop="dateCreated datePublished" datetime="2019-01-31T22:06:41+08:00">2019-01-31</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-02-01 12:53:02" itemprop="dateModified" datetime="2019-02-01T12:53:02+08:00">2019-02-01</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编排工具/" itemprop="url" rel="index"><span itemprop="name">编排工具</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="mastar-amp-agent"><a href="#mastar-amp-agent" class="headerlink" title="mastar&amp;agent"></a>mastar&amp;agent</h3><h4 id="手动注册"><a href="#手动注册" class="headerlink" title="手动注册"></a>手动注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">手动注册是由Agent端先发起证书申请请求，然后由Puppetserver端确认，方可注册成功，这种注册方式安全系数中等，逐一注册（puppet cert --sign certnmame）在节点数量较大的情况下是比较麻烦的，效率也低，批量注册(puppet cert --sign --all)效率很高，一次性便可注册所有的Agent的请求，但是这种方式安全系数较低，因为错误的请求也会被注册上。</span><br><span class="line"></span><br><span class="line">环境</span><br><span class="line">master：192.168.1.70</span><br><span class="line">agent1：192.168.1.71</span><br><span class="line">agent2：192.168.1.72</span><br><span class="line">===========================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# hostnamectl set-hostname master.ruopu.com</span><br><span class="line">[root@master ~]# vim /etc/hosts</span><br><span class="line">192.168.1.70 master.ruopu.com</span><br><span class="line">192.168.1.71 node1.ruopu.com</span><br><span class="line">192.168.1.72 node2.ruopu.com</span><br><span class="line">[root@master ~]# rsync -e ssh -arvz --progress /etc/hosts 192.168.1.71:/etc</span><br><span class="line">[root@master ~]# rsync -e ssh -arvz --progress /etc/hosts 192.168.1.72:/etc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 主机名的修改非常重要，必须做。让三台主机可以互相解析</span></span><br><span class="line">[root@puppet ~]# yum install -y puppt puppet-server facter tree</span><br><span class="line">[root@puppet ~]# vim /etc/puppet/puppet.conf</span><br><span class="line">[main]</span><br><span class="line">    logdir = /var/log/puppet		# 默认日志存放路径</span><br><span class="line">    rundir = /var/run/puppet		# pid存放路径</span><br><span class="line">    ssldir = $vardir/ssl		 # 证书存放目录，默认$vardir为/var/lib/puppet</span><br><span class="line">[agent]</span><br><span class="line">    classfile = $vardir/classes.txt</span><br><span class="line">    localconfig = $vardir/localconfig</span><br><span class="line">    server = master.ruopu.com		# 设置agent认证连接master端的服务器名称，注意这个名字必须能够被节点解析</span><br><span class="line">    certname = master.ruopu.com		# 设置agent端certname名称</span><br><span class="line">[master]</span><br><span class="line">    certname = master.ruopu.com		# 设置puppetmaster认证服务器名</span><br><span class="line">[root@puppet ~]# touch /etc/puppet/manifests/site.pp</span><br><span class="line">[root@puppet ~]# systemctl start puppetmaster </span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务端，自动生成CA证书，并签署。</span></span><br><span class="line">[root@master ~]# ss -tln</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              </span><br><span class="line">LISTEN     0      128        *:8140                   *:*   </span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听在8140端口</span></span><br><span class="line">[root@puppet ~]# tree /var/lib/puppet/ssl/</span><br><span class="line">/var/lib/puppet/ssl/</span><br><span class="line">├── ca</span><br><span class="line">│   ├── ca_crl.pem</span><br><span class="line">│   ├── ca_crt.pem</span><br><span class="line">│   ├── ca_key.pem</span><br><span class="line">│   ├── ca_pub.pem</span><br><span class="line">│   ├── inventory.txt</span><br><span class="line">│   ├── private</span><br><span class="line">│   │   └── ca.pass</span><br><span class="line">│   ├── requests</span><br><span class="line">│   ├── serial</span><br><span class="line">│   └── signed</span><br><span class="line">│       └── master.ruopu.com.pem</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到，signed中已经有服务端了，证明服务器已被认证</span></span><br><span class="line">[root@puppet ~]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line"><span class="meta">#</span><span class="bash"> 有加号的证明是已被认证的主机</span></span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听日志</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  agent1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@puppettest1 ~]# hostnamectl set-hostname node1.ruopu.com</span><br><span class="line">[root@puppettest1 ~]# yum install -y puppet facter</span><br><span class="line">[root@node1 ~]# vim /etc/puppet/puppet.conf </span><br><span class="line">[main]</span><br><span class="line">    logdir = /var/log/puppet</span><br><span class="line">    rundir = /var/run/puppet</span><br><span class="line">    ssldir = $vardir/ssl</span><br><span class="line">[agent]</span><br><span class="line">    classfile = $vardir/classes.txt</span><br><span class="line">    localconfig = $vardir/localconfig</span><br><span class="line">    server = master.ruopu.com		# 指向puppetmaster端</span><br><span class="line">    certname = node1.ruopu.com		# 设置自己的certname名</span><br><span class="line">    listen = true		# 让puppet监听8139端口 </span><br><span class="line">[root@node1 ~]# vim /etc/puppet/auth.conf</span><br><span class="line">path /run</span><br><span class="line">method save</span><br><span class="line">auth any</span><br><span class="line">allow master.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在文件尾部path /的上方加入上面内容</span></span><br><span class="line">[root@puppettest1 ~]# systemctl start puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动客户端</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master ~]# puppet cert --list --all</span><br><span class="line">  "node1.ruopu.com"  (SHA256) F8:DF:B8:26:AE:92:5D:26:96:D9:21:AE:92:3F:84:40:6F:65:3F:B5:D0:C7:27:AC:12:44:E3:87:09:6B:19:0D</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line"><span class="meta">#</span><span class="bash">  这时可以看到客户端的请求，没有加号</span></span><br><span class="line">[root@master ~]# puppet cert --sign --all</span><br><span class="line">Notice: Signed certificate request for node1.ruopu.com</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/ca/requests/node1.ruopu.com.pem'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 签署请求</span></span><br><span class="line">[root@master ~]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 已被认证</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">  agent1&amp;2</span><br><span class="line">---------------</span><br><span class="line">[root@node1 ~]# ss -tln</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              </span><br><span class="line">LISTEN     0      128        *:8139                   *:* </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到客户端监听在8139端口了，在认证后需要等待一会儿才会监听地址。</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master ~]# puppet kick --all</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试推送是否成功</span></span><br><span class="line">[root@master ~]# cd /etc/puppet/modules/</span><br><span class="line">[root@master modules]# mkdir -pv &#123;jdk8,tomcat,nginx&#125;/&#123;manifests,files,templates,lib,spec,tests&#125;</span><br><span class="line">[root@master modules]# yum install -y nginx tomcat java-1.8.0-openjdk-devel</span><br><span class="line">[root@master modules]# vim /etc/nginx/nginx.conf</span><br><span class="line">		location / &#123;</span><br><span class="line">           proxy_pass http://192.168.1.72:8080;</span><br><span class="line">        &#125;</span><br><span class="line">[root@master modules]# cp /etc/nginx/nginx.conf /etc/puppet/modules/nginx/files/</span><br><span class="line">[root@master modules]# cp /etc/tomcat/server.xml /etc/puppet/modules/tomcat/files/</span><br><span class="line">[root@master modules]# vim nginx/manifests/init.pp</span><br><span class="line">class nginx &#123;</span><br><span class="line">   package&#123;'nginx':</span><br><span class="line">      name =&gt; 'nginx',</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125;</span><br><span class="line">   file&#123;'nginx.conf':</span><br><span class="line">      path =&gt; '/etc/nginx/nginx.conf',</span><br><span class="line">      source =&gt; "puppet:///modules/nginx/nginx.conf",</span><br><span class="line">   &#125;</span><br><span class="line">   service&#123;'nginx':</span><br><span class="line">      ensure =&gt; running,</span><br><span class="line">      enable =&gt; true,</span><br><span class="line">   &#125;</span><br><span class="line">   Package['nginx'] -&gt; File['nginx.conf'] ~&gt; Service['nginx']</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim tomcat/manifests/init.pp</span><br><span class="line">class tomcat &#123;</span><br><span class="line">   package&#123;['tomcat','tomcat-webapps','tomcat-admin-webapps','tomcat-docs-we</span><br><span class="line">bapp']:		# 安装多个包要用这种定义方式</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125; -&gt;</span><br><span class="line">   file&#123;'server.xml':</span><br><span class="line">      path =&gt; '/etc/tomcat/server.xml',</span><br><span class="line">      source =&gt; 'puppet:///modules/tomcat/server.xml',</span><br><span class="line">   &#125; ~&gt;</span><br><span class="line">   service&#123;'tomcat':</span><br><span class="line">      ensure =&gt; running,</span><br><span class="line">      enable =&gt; true,</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim jdk8/manifests/init.pp</span><br><span class="line">class jdk8 &#123;</span><br><span class="line">   package&#123;'jdk8':</span><br><span class="line">      name =&gt; 'java-1.8.0-openjdk-devel',</span><br><span class="line">      ensure =&gt; latest,</span><br><span class="line">   &#125;</span><br><span class="line">   file&#123;'java.sh':</span><br><span class="line">      path =&gt; '/etc/profile.d/java.sh',</span><br><span class="line">      source =&gt; "puppet:///modules/jdk8/java.sh",</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@master modules]# vim jdk8/files/java.sh</span><br><span class="line">export JAVA_HOME=/usr</span><br><span class="line">[root@master modules]# cd /etc/puppet/manifests/</span><br><span class="line">[root@master manifests]# vim site.pp		# 定义主机清单</span><br><span class="line">node 'node1.test.com' &#123;</span><br><span class="line">   include nginx</span><br><span class="line">&#125;</span><br><span class="line">node 'node2.test.com' &#123;</span><br><span class="line">   include jdk8</span><br><span class="line">   include tomcat</span><br><span class="line">&#125;</span><br><span class="line">[root@master manifests]# puppet module list</span><br><span class="line">/etc/puppet/modules</span><br><span class="line">├── jdk8 (???)</span><br><span class="line">├── nginx (???)</span><br><span class="line">└── tomcat (???)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看上面定义的三个模块tomcat、nginx、jdk8是否加载</span></span><br><span class="line">[root@master modules]# puppet kick --all</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提醒所有客户端进行同步，如果是单个主机，可以写为客户端的主机名，如node1.ruopu.com，不能写为node1，因为不是主机名，所以推送不过去。也可以写多个主机名，主机名之间用空格分隔。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个推送的过程很慢，测试中一起推送非常慢，使用了单个主机的推送</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@node1 ~]# rpm -q nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到安装了nginx</span></span><br><span class="line">[root@node1 ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务也启动了</span></span><br><span class="line">[root@node1 ~]# vim /etc/nginx/nginx.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件也被修改了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个过程有些慢，需要在服务端推送后等一会儿才会生效。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">===========================================================================================</span><br><span class="line">客户端认证出现问题或推送失败的解决方法</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# puppet cert --clean node1.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务端使用此命令将某个主机的认证清除</span></span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line">  agent</span><br><span class="line">----------</span><br><span class="line">[root@puppettest1 ~]# systemctl stop puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先停止服务</span></span><br><span class="line">[root@puppettest1 ~]# rm -rf /var/lib/puppet/ssl/*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除所有密钥</span></span><br><span class="line">[root@puppettest1 ~]# systemctl start puppetagent</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# puppet cert --list --all</span><br><span class="line">[root@puppet ~]# puppet cert --sign --all </span><br><span class="line"><span class="meta">#</span><span class="bash"> 签署认证</span></span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志</span></span><br><span class="line">[root@puppet ~]# tree /var/lib/puppet/ssl/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看认证</span></span><br><span class="line">===========================================================================================</span><br></pre></td></tr></table></figure>
-<h4 id="自动注册"><a href="#自动注册" class="headerlink" title="自动注册"></a>自动注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">这种注册方式简单来讲是通过Puppetmaster端的ACL列表进行控制的，安全系统较低，也就是说符合预先定义的ACL列表中的所有节点请求不需要确认都会被自动注册上，也就是说你只需要知道ACL列表要求，其次能和PuppetMaster端通信便可轻易注册成功。当然，它的最大优点就是效率非常高。</span><br><span class="line">============================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --clean node2.ruopu.com</span><br><span class="line">Notice: Revoked certificate with serial 5</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node2.ruopu.com at '/var/lib/puppet/ssl/ca/signed/node2.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node2.ruopu.com at '/var/lib/puppet/ssl/certs/node2.ruopu.com.pem'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除PuppetMaster端已经注册的agent2的证书</span></span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# rm -rf /var/lib/puppet/ssl/*</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# vim /etc/puppet/autosign.conf</span><br><span class="line">*.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在Puppetmaster端编写ACL列表</span></span><br><span class="line">[root@master modules]# systemctl restart puppetmaster.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启服务</span></span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# puppet agent --test</span><br><span class="line">Info: Creating a new SSL key for node2.ruopu.com</span><br><span class="line">Info: Caching certificate for ca</span><br><span class="line">Info: csr_attributes file loading from /etc/puppet/csr_attributes.yaml</span><br><span class="line">Info: Creating a new SSL certificate request for node2.ruopu.com</span><br><span class="line">Info: Certificate Request fingerprint (SHA256): 6E:0E:32:71:38:77:41:92:E6:55:B0:90:07:3B:42:BF:87:8A:A7:16:2F:C2:90:25:43:10:B6:8B:DF:0A:65:A8</span><br><span class="line">Info: Caching certificate for node2.ruopu.com</span><br><span class="line">Info: Caching certificate_revocation_list for ca</span><br><span class="line">Info: Caching certificate for ca</span><br><span class="line">Notice: Ignoring --listen on onetime run</span><br><span class="line">Info: Retrieving pluginfacts</span><br><span class="line">Info: Retrieving plugin</span><br><span class="line">Info: Caching catalog for node2.ruopu.com</span><br><span class="line">Warning: The package type's allow_virtual parameter will be changing its default value from false to true in a future release. If you do not want to allow virtual packages, please explicitly set allow_virtual to false.</span><br><span class="line">   (at /usr/share/ruby/vendor_ruby/puppet/type.rb:816:in `set_default')</span><br><span class="line">Info: Applying configuration version '1548985465'</span><br><span class="line">Notice: Finished catalog run in 4.31 seconds</span><br><span class="line"><span class="meta">#</span><span class="bash"> 申请证书</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node1.ruopu.com"  (SHA256) DC:8F:2C:D6:0C:97:6B:F7:1B:A6:48:55:E9:D9:3A:AA:C7:C5:C2:89:86:0E:45:C8:22:68:4B:B7:39:4B:B9:D3</span><br><span class="line">+ "node2.ruopu.com"  (SHA256) 3F:C1:1E:F7:4B:BA:2B:28:E0:79:49:AF:F3:96:BC:FE:78:A2:D2:F6:A4:9A:76:E6:29:BA:D9:09:29:D4:E0:79</span><br><span class="line"><span class="meta">#</span><span class="bash"> agent2已经自动注册成功</span></span><br><span class="line"></span><br><span class="line">[root@master modules]# puppet kick node2.ruopu.com   </span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node2.ruopu.com</span><br><span class="line">Error: Host node2.ruopu.com failed: SSL_connect returned=1 errno=0 state=error: certificate verify failed: [certificate revoked for /CN=node2.ruopu.com]</span><br><span class="line"></span><br><span class="line">node2.ruopu.com finished with exit code 2</span><br><span class="line">Failed: node2.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时向agent2推送可能会有问题，需要重启agent2的puppet服务</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# systemctl restart puppetagent</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# vim /root/puppetclient.txt</span><br><span class="line">node1.ruopu.com</span><br><span class="line">node2.ruopu.com</span><br><span class="line">[root@master modules]# puppet kick --host `cat /root/puppetclient.txt`</span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node1.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is success</span><br><span class="line">node1.ruopu.com finished with exit code 0</span><br><span class="line">Triggering node2.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is success</span><br><span class="line">node2.ruopu.com finished with exit code 0</span><br><span class="line">Finished</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用此种方法一起推送</span></span><br></pre></td></tr></table></figure>
-<h4 id="预签名注册"><a href="#预签名注册" class="headerlink" title="预签名注册"></a>预签名注册</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">预签名注册是在agent端未提出申请的情况下，预先在puppetmaster端生成agent端的证书，然后复制到节点对应的目录下即可注册成功，这种方式安全系数最高，但是操作麻烦，需要提前预知所有节点服务器的certname名称，其次需要将生成的证书逐步copy到所有节点上去。不过，如果你的系统中安装了kickstart或者cobbler这样的自动化工具，倒是可以将证书部分转换成脚本集成到统一自动化部署中</span><br><span class="line">== 生产环境中建议此方式进行注册，既安全又可靠！ ==</span><br><span class="line">============================================================================================</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet cert --clean node1.ruopu.com</span><br><span class="line">Notice: Revoked certificate with serial 4</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node1.ruopu.com at '/var/lib/puppet/ssl/ca/signed/node1.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::Certificate node1.ruopu.com at '/var/lib/puppet/ssl/certs/node1.ruopu.com.pem'</span><br><span class="line">[root@master modules]# puppet cert --list --all</span><br><span class="line">+ "master.ruopu.com" (SHA256) B5:A8:47:D4:FE:4E:FE:AC:5E:48:A2:C0:CF:7E:CB:1D:B9:03:26:8F:1F:66:6B:9A:29:E3:C7:39:E0:5E:D6:E0 (alt names: "DNS:master.ruopu.com", "DNS:puppet", "DNS:puppet.ruopu.com")</span><br><span class="line">+ "node2.ruopu.com"  (SHA256) 3F:C1:1E:F7:4B:BA:2B:28:E0:79:49:AF:F3:96:BC:FE:78:A2:D2:F6:A4:9A:76:E6:29:BA:D9:09:29:D4:E0:79</span><br><span class="line">[root@master modules]# mv /etc/puppet/autosign.conf&#123;,.bak&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除自动注册ACL列表</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# rm -rf /var/lib/puppet/*</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet ca generate node1.ruopu.com</span><br><span class="line">Notice: node1.ruopu.com has a waiting certificate request</span><br><span class="line">Notice: Signed certificate request for node1.ruopu.com</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/ca/requests/node1.ruopu.com.pem'</span><br><span class="line">Notice: Removing file Puppet::SSL::CertificateRequest node1.ruopu.com at '/var/lib/puppet/ssl/certificate_requests/node1.ruopu.com.pem'</span><br><span class="line">"-----BEGIN CERTIFICATE-----\nM...</span><br><span class="line"><span class="meta">#</span><span class="bash"> puppetserver端预先生成agent1证书</span></span><br><span class="line">============================================================================================</span><br><span class="line">[root@master modules]# puppet --version</span><br><span class="line">3.6.2</span><br><span class="line">[root@master modules]# puppet help</span><br><span class="line"><span class="meta">#</span><span class="bash"> 3.6.2版本中的命令与网上的一些教程已有很多不同，可以通过此命令查看帮助信息</span></span><br><span class="line">[root@master modules]# puppet help ca</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是查看ca模块的帮助命令</span></span><br><span class="line">============================================================================================</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# puppet agent --test --server=master.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点生成目录结构，最后是服务端的主机名</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/private_keys/node1.ruopu.com.pem node1.ruopu.com:/var/lib/puppet/ssl/private_keys/</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/certs/node1.ruopu.com.pem node1.ruopu.com:/var/lib/puppet/ssl/certs/</span><br><span class="line">[root@master modules]# scp /var/lib/puppet/ssl/certs/ca.pem node1.ruopu.com:/var/lib/puppet/ssl/certs/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 复制密钥到客户端</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">  agent1</span><br><span class="line">-------------</span><br><span class="line">[root@puppettest1 ~]# puppet agent --test</span><br><span class="line">Notice: Ignoring --listen on onetime run</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试。实际发现，在服务端生成客户端密钥时就已经完成客户端的认证了。</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@master modules]# puppet kick node1.ruopu.com      </span><br><span class="line">Warning: Puppet kick is deprecated. See http://links.puppetlabs.com/puppet-kick-deprecation</span><br><span class="line">Warning: Failed to load ruby LDAP library. LDAP functionality will not be available</span><br><span class="line">Triggering node1.ruopu.com</span><br><span class="line">Getting status</span><br><span class="line">status is running</span><br><span class="line">Host node1.ruopu.com is already running</span><br><span class="line">node1.ruopu.com finished with exit code 3</span><br><span class="line">Failed: node1.ruopu.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提示错误的原因是agent1节点每5秒与服务器同步一次，比较频繁，所以有此提示。如果将更新时间改为默认的1800秒，再次推送就不会有此提示了。</span></span><br></pre></td></tr></table></figure>
-<h4 id="客户端定时更新"><a href="#客户端定时更新" class="headerlink" title="客户端定时更新"></a>客户端定时更新</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">  agent2</span><br><span class="line">-------------</span><br><span class="line">[root@node2 ~]# puppet agent --configprint runinterval</span><br><span class="line">1800</span><br><span class="line"><span class="meta">#</span><span class="bash"> Puppet客户端定时更新时间默认为30分钟</span></span><br><span class="line">[root@node2  modules]# vim /etc/puppet/puppet.conf</span><br><span class="line">[agent]</span><br><span class="line">    runinterval = 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在agent段中加入上述内容，表示设置agent端5秒去同步。修改即可，无需重启服务</span></span><br><span class="line">[root@node2 ~]# puppet agent --configprint runinterval</span><br><span class="line">5</span><br><span class="line">------------</span><br><span class="line">  master</span><br><span class="line">------------</span><br><span class="line">[root@puppet ~]# tail -f /var/log/puppet/masterhttp.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志会频繁变动</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> runinterval=0，并不表示从来不运行，而是表示继续运行；如果想要puppet agent从不运行，应该使用--no-client选项来启动；如：puppet agent --no-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--no-client选项，会启动守护进程但不检测配置，除非它被puppet kick触发。而且只有当puppet.conf配置listen=<span class="literal">true</span>或启动时有带--listen选项时，它才生效；</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/29/查看用户登录信息/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/29/查看用户登录信息/" itemprop="url">
-                  查看用户登录信息
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-01-29 18:34:29 / 修改時間：19:21:19" itemprop="dateCreated datePublished" datetime="2019-01-29T18:34:29+08:00">2019-01-29</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="w"><a href="#w" class="headerlink" title="w"></a>w</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">查看当前登入系统的用户信息及用户当前的进程（而who命令只能看用户不能看进程）。该命令能查看的信息包括系统当前时间，系统运行时间，登陆系统用户总数及系统1、5、15分钟内的平均负载信息。后面的信息是用户，终端，登录源，login time，idle time，JCPU，PCPU，当前执行的进程等。w的信息来自两个文件：用户登录信息来自/var/run/utmp，进程信息来自/proc/。</span><br><span class="line"></span><br><span class="line">参数</span><br><span class="line">-h：不显示标题。</span><br><span class="line">-u：列出当前进程和CPU时间时忽略用户名。这主要是用于执行su命令后的情况。</span><br><span class="line">-s：使用短模式。不显示登录时间、JCPU(终端机阶段作业)和PCPU（程序消耗）时间。</span><br><span class="line">-f：切换显示FROM项，也就是远程主机名项。默认值是不显示远程主机名</span><br><span class="line">-V：显示版本信息。</span><br><span class="line">==============================================================================================</span><br><span class="line">[root@haproxy ~]# w</span><br><span class="line"> 18:33:57 up 11:19,  2 users,  load average: 0.00, 0.01, 0.05</span><br><span class="line">USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT</span><br><span class="line">root     tty1                      15:17    3:15m  0.07s  0.07s -bash</span><br><span class="line">root     pts/0    192.168.1.9      12:18    5.00s  0.70s  0.00s w</span><br><span class="line"><span class="meta">#</span><span class="bash"> User：登录用户名 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> TTY：登录后系统分配的终端号 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> From：远程主机名，即从哪登录的 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> login@：何时登录 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> IDLE：用户空闲时间。这是个计时器，一旦用户执行任何操作，改计时器就会被重置。 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> JCPU：和终端连接的所有进程占用时间。包括当前正在运行的后台作业占用时间 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> PCPU：当前进程所占用时间 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> WHAT：当前正在运行进程的命令行</span></span><br></pre></td></tr></table></figure>
-<h3 id="who"><a href="#who" class="headerlink" title="who"></a>who</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">查看当前登入系统的用户信息。其中who -m等效于whoami。</span><br><span class="line">==============================================================================================</span><br><span class="line">[root@haproxy ~]# who</span><br><span class="line">root     tty1         2019-01-29 15:17</span><br><span class="line">root     pts/0        2019-01-29 12:18 (192.168.1.9)</span><br></pre></td></tr></table></figure>
-<h3 id="last"><a href="#last" class="headerlink" title="last"></a>last</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">列出当前和曾经登入系统的用户信息，它默认读取的是/var/log/wtmp文件的信息。输出的内容包括：用户名、终端位置（pts/0伪终端，意味着从SSH或telnet等工具远程连接的用户，图形界面终端归于此类。tty0直接连接到计算机或本地连接的用户。后面的数字代表连接编号）、登录源信息、开始时间、结束时间（still login in尚未退出，down直到正常关机，crash直到强制关机）、持续时间。注意最后一行输出的是wtmp文件起始记录的时间。当然也可以通过last -f参数指定读取文件，可以是/var/log/btmp、/var/run/utmp</span><br><span class="line"></span><br><span class="line">参数</span><br><span class="line">-R 不显示登录系统或终端的主机名称或IP</span><br><span class="line">-a 将登录系统或终端的主机名过IP地址显示在最后一行</span><br><span class="line">-d 将IP地址转成主机名称</span><br><span class="line">-I 显示特定IP登录情况。</span><br><span class="line">-o 读取有linux-libc5应用编写的旧类型wtmp文件</span><br><span class="line">-x 显示系统关闭、用户登录和退出的历史</span><br><span class="line">-F 显示登录的完整时间</span><br><span class="line">-w 在输出中显示完整的用户名或域名</span><br><span class="line">==============================================================================================</span><br><span class="line">[root@haproxy ~]# last</span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 12:18   still logged in   </span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 15:22 - 12:18  (-3:-3)    </span><br><span class="line">root     tty1                          Tue Jan 29 15:17   still logged in   </span><br><span class="line">reboot   system boot  3.10.0-693.el7.x Tue Jan 29 15:13 - 18:41  (03:27)    </span><br><span class="line">root     tty1                          Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line">reboot   system boot  3.10.0-693.el7.x Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line"></span><br><span class="line">wtmp begins Wed Oct 24 05:42:31 2018</span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last -f /var/log/btmp </span><br><span class="line"></span><br><span class="line">btmp begins Wed Oct 24 05:42:34 2018</span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last -f /var/run/utmp </span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 12:18   still logged in   </span><br><span class="line">root     tty1                          Tue Jan 29 15:17   still logged in   </span><br><span class="line">reboot   system boot  3.10.0-693.el7.x Tue Jan 29 15:13 - 18:43  (03:29)    </span><br><span class="line"></span><br><span class="line">utmp begins Tue Jan 29 15:13:55 2019</span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last root</span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 12:18   still logged in   </span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 15:22 - 12:18  (-3:-3)    </span><br><span class="line">root     tty1                          Tue Jan 29 15:17   still logged in   </span><br><span class="line">root     tty1                          Wed Oct 24 05:42 - 05:50  (00:07)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定用户</span></span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last -n 1</span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 12:18   still logged in   </span><br><span class="line"></span><br><span class="line">wtmp begins Wed Oct 24 05:42:31 2018</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定输出记录的条数</span></span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last -10 -t 20190129000000</span><br><span class="line">root     tty1                          Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line">reboot   system boot  3.10.0-693.el7.x Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line"></span><br><span class="line">wtmp begins Wed Oct 24 05:42:31 2018</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示指定时间之前的记录</span></span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# last -10 -d</span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 12:18   still logged in   </span><br><span class="line">root     pts/0        192.168.1.9      Tue Jan 29 15:22 - 12:18  (-3:-3)    </span><br><span class="line">root     tty1         0.0.0.0          Tue Jan 29 15:17   still logged in   </span><br><span class="line">reboot   system boot  0.0.0.0          Tue Jan 29 15:13 - 18:56  (03:42)    </span><br><span class="line">root     tty1         0.0.0.0          Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line">reboot   system boot  0.0.0.0          Wed Oct 24 05:42 - 05:50  (00:07)    </span><br><span class="line"></span><br><span class="line">wtmp begins Wed Oct 24 05:42:31 2018</span><br><span class="line"><span class="meta">#</span><span class="bash">  将IP 地址转换为主机地址</span></span><br></pre></td></tr></table></figure>
-<h3 id="lastlog"><a href="#lastlog" class="headerlink" title="lastlog"></a>lastlog</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">列出所有用户最近登录的信息，或者指定用户的最近登录信息。lastlog引用的是/var/log/lastlog文件中的信息，包括login-name、port、last login time</span><br><span class="line">==============================================================================================</span><br><span class="line">[root@haproxy ~]# lastlog </span><br><span class="line">Username         Port     From             Latest</span><br><span class="line">root             pts/0    192.168.1.9      Tue Jan 29 12:18:32 +0800 2019</span><br><span class="line">bin                                        **Never logged in**</span><br><span class="line">daemon                                     **Never logged in**</span><br><span class="line">adm                                        **Never logged in**</span><br><span class="line">lp                                         **Never logged in**</span><br><span class="line">sync                                       **Never logged in**</span><br><span class="line">shutdown                                   **Never logged in**</span><br><span class="line">halt                                       **Never logged in**</span><br><span class="line">mail                                       **Never logged in**</span><br><span class="line">operator                                   **Never logged in**</span><br><span class="line">games                                      **Never logged in**</span><br><span class="line">ftp                                        **Never logged in**</span><br><span class="line">nobody                                     **Never logged in**</span><br><span class="line">systemd-network                            **Never logged in**</span><br><span class="line">dbus                                       **Never logged in**</span><br><span class="line">polkitd                                    **Never logged in**</span><br><span class="line"></span><br><span class="line">[root@haproxy ~]# lastlog -u 0</span><br><span class="line">Username         Port     From             Latest</span><br><span class="line">root             pts/0    192.168.1.9      Tue Jan 29 12:18:32 +0800 2019</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过用户的UID查看指定用户的登录信息</span></span><br></pre></td></tr></table></figure>
-<h3 id="lastb"><a href="#lastb" class="headerlink" title="lastb"></a>lastb</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">==============================================================================================</span><br><span class="line">列出失败尝试的登录信息，和last命令功能完全相同，只不过它默认读取的是/var/log/btmp文件的信息。当然也可以通过last -f参数指定读取文件，可以是/var/log/btmp、/var/run/utmp</span><br><span class="line">==============================================================================================</span><br><span class="line">[root@haproxy ~]# lastb</span><br><span class="line">root     ssh:notty    192.168.1.9      Tue Jan 29 19:05 - 19:05  (00:00)    </span><br><span class="line"></span><br><span class="line">btmp begins Tue Jan 29 19:05:21 2019</span><br></pre></td></tr></table></figure>
-<h3 id="登录日志"><a href="#登录日志" class="headerlink" title="登录日志"></a>登录日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. /var/run/utmp：记录当前正在登录系统的用户信息，默认由who和w记录当前登录用户的信息，uptime记录系统启动时间；</span><br><span class="line">2. /var/log/wtmp：记录当前正在登录和历史登录系统的用户信息，默认由last命令查看；</span><br><span class="line">3. /var/log/btmp：记录失败的登录尝试信息，默认由lastb命令查看。</span><br><span class="line">4. /var/log/lastlog：记录每个用户最后的登入信息</span><br></pre></td></tr></table></figure>
-<h3 id="清除登录日志"><a href="#清除登录日志" class="headerlink" title="清除登录日志"></a>清除登录日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@haproxy ~]# echo &gt; /var/log/wtmp </span><br><span class="line">[root@haproxy ~]# echo &gt; /var/log/btmp </span><br><span class="line">[root@haproxy ~]# echo &gt; /var/log/lastlog</span><br><span class="line">[root@haproxy ~]# history -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 导入当前用户家目录中的.bash_history</span></span><br><span class="line">[root@haproxy ~]# history -c</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除当前会话的历史记录</span></span><br><span class="line">[root@haproxy ~]# echo &gt; ~/.bash_history</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除所有历史记录</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2681,7 +2344,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">134</span>
+                    <span class="site-state-item-count">137</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2750,7 +2413,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">28</span>
+                      
+                    
+                    <span class="site-state-item-count">29</span>
                     <span class="site-state-item-name">分類</span>
                   </a>
                 </div>
@@ -2969,7 +2634,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">103</span>
+                      
+                    
+                    <span class="site-state-item-count">104</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
