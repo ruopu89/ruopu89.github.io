@@ -182,10 +182,52 @@ sudo vmware-installer -u vmware-workstation
 
 
 
+### 关闭 avahi-daemon 服务
+
+`avahi-daemon` 造成过网络异常，用处也不大，停止服务并关闭开机启动：
+
+```shell
+sudo systemctl stop avahi-daemon.socket
+sudo systemctl stop avahi-daemon.service
+sudo /lib/systemd/systemd-sysv-install disable avahi-daemon
+
+sudo systemctl disable avahi-daemon.socket
+sudo systemctl disable avahi-daemon.service
+```
+
+
+
 ### 安装微软字体
 
 ```shell
 sudo apt install ttf-mscorefonts-installer
+```
+
+
+
+### 安装mac字体
+
+```shell
+下载Monaco字体，地址：https://github.com/todylu/monaco.ttf/blob/master/monaco.ttf?raw=true
+https://github.com/cstrap/monaco-font
+sudo mkdir /usr/share/fonts/mac
+sudo cp -a MONACO.TTF /usr/share/fonts/mac
+cd /usr/share/fonts/mac
+sudo chmod 744 /usr/share/fonts/custom/Monaco.ttf
+sudo mkfontscale
+sudo mkfontdir
+sudo fc-cache -vf	# 刷新系统字体缓存
+sudo apt install gnome-tweak-tool
+gnome-tweaks
+# 使用此工具再设置一下默认字体，将字体大小均改为10更好一些
+```
+
+
+
+### 安装优客天气
+
+```shell
+sudo apt install indicator-china-weather
 ```
 
 
@@ -534,8 +576,8 @@ export GTK_IM_MODULE=xim
  # 找一下是否还有残留的文件，发现只在用户家目录中有一些缓存文件，都删除即可
  ⚡ root@ruopu64  ~  gdebi firefox-esr_52.8.0esr-1\~deb7u1_amd64.deb
  # 安装老版本的firefox，如果有依赖问题，就先安装依赖包
- 安装好之后，打开firefox，在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。
- 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份执行解压后目录中的install.sh脚本，之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，登录后就可以访问内网了。
+ 安装好之后，需要使用root权限打开firefox，在/usr/share/applications/firefox-esr.desktop中的Exec一项中，加入sudo即可。在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。
+ 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份执行解压后目录中的install.sh脚本，之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，这里一定要注意，不可以选择密码下面的保存配置，如果选择了此项，就无法连接到内网了。登录后就可以访问内网了。
 ```
 
 

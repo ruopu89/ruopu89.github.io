@@ -237,8 +237,7 @@ mysql> SELECT Host,User,Password FROM mysql.user;
 CentOS7
 [root@test ~]# systemctl stop mysql
 [root@test ~]# vim /usr/lib/systemd/system/mysqld.service
-ExecStart=/usr/bin/mysqld_safe --basedir=/usr --skip-grant-tables --skip-network
-ing
+ExecStart=/usr/bin/mysqld_safe --basedir=/usr --skip-grant-tables --skip-networking
 # 加入后面两个选项。实现跳过授权表和网络
 [root@test ~]# systemctl daemon-reload
 # 重新加载
@@ -249,7 +248,7 @@ Your MySQL connection id is 2
 mysql> UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';
 Query OK, 1 row affected (0.00 sec)
 Rows matched: 2  Changed: 1  Warnings: 0
-# 修改所有地址的root用户密码
+# 修改所有地址的root用户密码。从5.7版本开始，user表中不再有PASSWORD字段，改为了authentication_string，所以上面的命令要改为authentication_string=PASSWORD('centos')
 [root@test ~]# systemctl stop mysql
 # 一定要先停止mysql服务再修改
 [root@test ~]# vim /usr/lib/systemd/system/mysqld.service

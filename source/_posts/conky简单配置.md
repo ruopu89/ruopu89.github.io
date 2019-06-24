@@ -10,6 +10,7 @@ categories: 基础
 ```shell
 apt install -y conky-all conky-manager
 到https://www.fontsquirrel.com/fonts/list/find_fonts?q%5Bterm%5D=dreams&q%5Bsearch_check%5D=Y下载CAVIAR DREAMS，解压缩下载的字体包，双击安装字体。安装这个字体是因为conky显示的效果中有方框，因为其他字体没有相应的字符。
+# ubuntu18.04下没有conky-manager，需要下载，地址：wget --no-check-certificate https://github.com/teejee2008/conky-manager/releases/download/v2.4/conky-manager-v2.4-amd64.run。之后给此文件执行权限，并执行：sudo ./conky-manager-v2.4-amd64.run
 ```
 
 #### 配置
@@ -61,5 +62,23 @@ ${voffset 10}${color EAEAEA}${font :pixelsize=120}${time %H:%M}${font}${voffset 
 
 ${voffset 1}${offset 12}${font :pixelsize=12}${color FFA300}HD ${offset 9}$color${fs_free /} / ${fs_size /}${offset 9}$color${fs_free /home} /home ${fs_size /home}${offset 30}${color FFA300}RAM ${offset 9}$color$mem / $memmax${offset 30}${color FFA300}
 # 这里配置了两部分，上面是效果中的日期，下面是电脑的配置如硬盘，内存等的信息。将font后面都改为caviar dreams。这里添加了一个home分区的监测情况，默认只会显示根目录的情况。但测试发现将${font caviar dreams:pixelsize=22}与${font caviar dreams:pixelsize=58}两项中的caviar dreams去掉为空时，才能正常显示中文，不然还是一个方框。第二行中的${font caviar dreams:pixelsize=12}中的caviar dreams也可以去掉，字体会好看一些。
+```
+
+
+
+#### 启动命令
+
+```shell
+# 在ubuntu中测试时，不会开机启动此程序，可以将下面命令加入ubuntu的“启动应用程序首选项”中。
+conky -c ~/.conky/Gotham/Gotham -d
+# 使用-c指定配置文件，-d表示在后台运行。这个方法在ubuntu18.04上测试失败了。
+
+# 下面使用另一种方法实现开机启动
+sudo vim .config/autostart/conky.desktop
+[Desktop Entry]
+Name=conky
+Type=Application
+Exec=conky -c /home/shouyu/.conky/Gotham/Gotham -d 
+# 用户家目录的.config是只有root才有权编辑的，在此目录的autostart目录中加入一个自启动的脚本。
 ```
 

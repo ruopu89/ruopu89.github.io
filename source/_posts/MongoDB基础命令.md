@@ -606,3 +606,55 @@ hqmongodb:PRIMARY> db.col.find({"likes":{$gt:50},$or:[{"by":"Runoob"},{"title":"
 # 常规 SQL 语句为： 'where likes>50 AND (by = '菜鸟教程' OR title = 'MongoDB 教程')'
 ```
 
+
+
+### 常用命令
+
+```shell
+1. 连接
+mongo 10.129.14.6:27017/admin -u xor-admin -p xor-admin
+# 连接时要使用admin库，因为这个库具有管理权限。
+# 如果指定username、password，连接并验证登陆指定数据库。若不指定，默认打开 test 数据库。
+
+2. 显示所有库
+show databases
+# 有一些数据库名是保留的，可以直接访问这些有特殊作用的数据库。
+# admin： 从权限的角度来看，这是"root"数据库。要是将一个用户添加到这个数据库，这个用户自动继承所有数据库的权限。一些特定的服务器端命令也只能从这个数据库运行，比如列出所有的数据库或者关闭服务器。
+# local: 这个数据永远不会被复制，可以用来存储限于本地单台服务器的任意集合
+# config: 当Mongo用于分片设置时，config数据库在内部使用，用于保存分片的相关信息。
+
+3. 查看版本
+db.version()
+
+4. 切换或创建数据库
+use admin
+db.auth("username","password")
+
+5. 查看所有表
+show collections
+show tables
+# 这两条命令显示的内容是一样的
+
+6. 查看表中的信息
+db.system.users.find()
+db.getCollection('system.users').find()
+# 这两条命令显示的内容是一样的
+
+7. 条件查询
+db.getCollection('system.users').find({'db':'aquapaas'})
+# find中的键值对两侧用单双引号都可以
+db.getCollection("system.version").find({"currentVersion":5})
+# 查看数字时，数字两侧不能有单双引号
+
+8. 模糊查询
+db.getCollection("system.users").find({"_id":/aquapaas/}).limit(20)
+# 使用//的方式模糊匹配，limit指定只显示20条
+
+9. 统计条数
+db.getCollection("system.users").find({"_id":/aquapaas/}).count()
+# 用count()统计条数
+
+10. 显示当前所在的库
+db
+```
+

@@ -79,9 +79,36 @@ include /etc/logrotate.d
 
 
 
+### 切割日志生效时间
+
+```shell
+[root@xor-paasjobworker ~]# cat /etc/anacrontab 
+# /etc/anacrontab: configuration file for anacron
+
+# See anacron(8) and anacrontab(5) for details.
+
+SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+# the maximal random delay added to the base delay of the jobs
+RANDOM_DELAY=45   # 随机延迟时间是45分钟
+# the jobs will be started during the following hours only
+START_HOURS_RANGE=3-22
+# 生效时间范围是3点到22点
+#period in days   delay in minutes   job-identifier   command
+1       5       cron.daily              nice run-parts /etc/cron.daily
+7       25      cron.weekly             nice run-parts /etc/cron.weekly
+@monthly 45     cron.monthly            nice run-parts /etc/cron.monthly
+```
+
+
+
 ### 实例
 
 ```shell
+[root@RBO1-POSTER3 ~]# yum install -y logrotate
+[root@RBO1-POSTER3 ~]# systemctl start rsyslog
+# 安装好logrotate后要启动rsyslog
 [root@RBO1-POSTER3 ~]# vim /etc/logrotate.d/nginx
 /var/log/nginx/*.log {
 # 定义一个对nginx的log日志进行切割的脚本，上面是日志的地址，如果有多个路径可以使用空格或换行来分隔
@@ -102,7 +129,7 @@ include /etc/logrotate.d
 # 这个脚本的功能应该是先判断nginx.pid文件是否存在，如果存在证明nginx服务启动了，之后让nginx向新的日志文件中写入日志，kill发送-USR1信号给nginx的pid。信号的具体作用没弄明白。
 }
 [root@RBO1-POSTER3 ~]# /usr/sbin/logrotate --force /etc/logrotate.d/nginx
-# 这是强制执行一次脚本，使用logrotate命令加--force选项，最后指定要执行的脚本。
+# 这是强制执行一次脚本，使用logrotate命令加--force选项，最后指定要执行的脚本。也可以使用短选项-f，再配以-v选项显示详细信息
 [root@RBO1-POSTER3 ~]# ll /var/log/nginx/
 总用量 427804
 -rw-r--r--. 1 nginx root  34053285 4月   4 10:47 access.log
@@ -120,9 +147,38 @@ include /etc/logrotate.d
 -rw-r--r--. 1 nginx root       338 4月   4 06:51 error.log.4
 -rw-r--r--. 1 nginx root       337 4月   4 05:33 error.log.5
 # 强制执行多次后发现，会有一个以日志命名的日志，这是logrotate脚本正常执行的结果，以数字结尾的日志共有5个，这是强制执行脚本后产生的，还有一个本身的日志。所以强制执行脚本后，也不会按配置文件中定义的只保留5个轮替日志文件，正常产生的轮替日志是不会被删除的。另外，如果需要按小时执行轮替就需要使用crontab定时任务，logrotate最小只支持按天轮替。
+
 [root@RBO1-POSTER3 ~]# crontab -e
 */60 * * * * /usr/sbin/logrotate --force /etc/logrotate.d/nginx
 # 每60分钟执行一次，这与按每小时执行是不一样的。
+
+[root@xor-paasjobadmin ~]# logrotate -d /etc/logrotate.d/nginx 
+reading config file /etc/logrotate.d/nginx
+Allocating hash table for state file, size 15360 B
+
+Handling 1 logs
+
+rotating pattern: /xor/data2/log/nginx/*log  after 1 days (30 rotations)
+empty log files are not rotated, old logs are removed
+considering log /xor/data2/log/nginx/4k_access.log
+  log does not need rotating (log has been rotated at 2019-6-20 12:0, that is not day ago yet)
+considering log /xor/data2/log/nginx/4k_error.log
+  log does not need rotating (log has been rotated at 2019-6-20 12:0, that is not day ago yet)
+not running postrotate script, since no logs were rotated
+# 使用‘-d’选项以预演方式运行logrotate。要进行验证，不用实际轮循任何日志文件，可以模拟演练日志轮循并显示其输出。
+
+[root@xor-paasjobadmin ~]# cat /etc/cron.daily/
+logrotate    man-db.cron  mlocate      
+[root@xor-paasjobadmin ~]# cat /etc/cron.daily/logrotate 
+#!/bin/sh
+
+/usr/sbin/logrotate -s /var/lib/logrotate/logrotate.status /etc/logrotate.conf
+EXITVALUE=$?
+if [ $EXITVALUE != 0 ]; then
+    /usr/bin/logger -t logrotate "ALERT exited abnormally with [$EXITVALUE]"
+fi
+exit 0
+#  logrotate定时任务。logrotate需要的cron任务应该在安装时就自动创建了
 ```
 
 
