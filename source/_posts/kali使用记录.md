@@ -220,6 +220,118 @@ sudo vmware-installer -u vmware-workstation
 
 
 
+### 命令行操作无线网络
+
+```shell
+# 因更新内核或其他原因，使网络设置的选项在设置中消失了。没有找到好的解决办法。无奈之下，只有使用命令行操作。不过，塞翁失马，焉知非福?
+1. 查看无线网络名称
+ ⚡ root@shouyu  ~  iwlist wlan0 scan|grep ESSID
+# 查找现在可以找到的无线网络的名称
+ ⚡ root@shouyu  ~  iw dev wlan0 scan|grep SSID
+# iw命令也可以查看，建议使用此命令
+
+2. 生成配置文件
+ ⚡ root@shouyu  ~  wpa_passphrase ruopu2.4 
+# 此命令可以输出配置文件信息，如下：
+network={                                                                                 
+    ssid="ruopu2.4"
+    #psk="X5kzxctScjn"
+    psk=7f06ac6de165b153ec899b9cc600678e92a68c5e53a044182ba9dcf50ddd153a
+}
+
+3. 保存配置信息
+ ⚡ root@shouyu  ~  vim ruopu24.conf
+# 保存的位置是自定义的
+
+4. 连接无线网络
+ ⚡ root@shouyu  ~  wpa_supplicant -i wlan0 -c ruopu24.conf
+# 用-i指定网卡，-c指定配置文件。连接的过程需要一些时间
+
+5. 查看连接状态
+ ⚡ root@shouyu  ~  iwconfig wlan0
+wlan0     IEEE 802.11  ESSID:"ruopu24"  
+          Mode:Managed  Frequency:2.412 GHz  Access Point: C0:C1:C0:D9:75:32   
+          Bit Rate=144.4 Mb/s   Tx-Power=22 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:on
+          Link Quality=55/70  Signal level=-55 dBm  
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:5   Missed beacon:0
+# 连接后可以看到是否连接成功
+# 参考：https://www.cnblogs.com/v5captain/p/8724850.html
+# 参考：https://blog.csdn.net/u010164190/article/details/68942070
+# 参考：https://pluhuxc.github.io/2018/08/19/use-wpa_supplicant-connect-wifi.html
+# 参考：http://rickgray.me/2015/08/03/useful-command-tool-for-wifi-connection/
+6. 查看已连接的wifi信息
+ ⚡ root@shouyu  ~  cd /etc/NetworkManager/system-connections
+# 在此目录中有已经连接的无线信息，以文件形式保存，文件中有密码等信息
+
+另一种方法：
+1. 创建配置文件
+ ⚡ root@shouyu  ~  vim /etc/wpa_supplicant/example.conf
+ctrl_interface=/run/wpa_supplicant                                                        
+update_config=1
+# 这样配置是为了后面可以使用 wpa_cli 命令来实时地扫描和配置网络，并能够保存配置信息。
+
+2. 初始化网卡
+ ⚡ root@shouyu  ~  wpa_supplicant -B -D nl80211 -i wlan0 -c /etc/wpa_supplicant/example.conf
+Successfully initialized wpa_supplicant
+ctrl_iface exists and seems to be in use - cannot override it
+Delete '/run/wpa_supplicant/wlan0' manually if it is not used anymore
+Failed to initialize control interface '/run/wpa_supplicant'.
+You may have another wpa_supplicant process already running or the file was
+left by an unclean termination of wpa_supplicant in which case you will need
+to manually remove this file before starting wpa_supplicant again.
+# 如果初始化如上面这样，是因为已经使用无线网卡连接了wifi，需要删除/run/wpa_supplicant/wlan0文件
+ ⚡ root@shouyu  ~  rm -rf /run/wpa_supplicant/wlan0
+ ⚡ root@shouyu  ~  wpa_supplicant -B -D nl80211 -i wlan0 -c /etc/wpa_supplicant/example.conf
+Successfully initialized wpa_supplicant
+nl80211: Could not set interface 'p2p-dev-wlan0' UP
+nl80211: deinit ifname=p2p-dev-wlan0 disabled_11b_rates=0
+p2p-dev-wlan0: Failed to initialize driver interface
+P2P: Failed to enable P2P Device interface
+# 再将初始化成功，-B参数表示后台运行。如果遇到驱动不支持所插入的无线网卡，可选择wired或者wext等，具体详情可使用 wpa_supplicant -h 进行查看。
+
+3. 使用交互式命令wpa_cli
+⚡ root@shouyu  ~  wpa_cli
+# 进入 wpa_cli 的交互界面后，它会自动地扫描周围的无线网络，你也可以使用 scan 命令进行手动扫描
+> scan
+OK
+<3>CTRL-EVENT-SCAN-STARTED 
+<3>CTRL-EVENT-SCAN-RESULTS 
+<3>WPS-AP-AVAILABLE 
+<3>CTRL-EVENT-NETWORK-NOT-FOUND 
+> scan_results 
+bssid / frequency / signal level / flags / ssid
+74:05:a5:7a:14:a0	5765	-58	[WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS]	TP-LINK_503
+8e:6d:77:87:b5:8c	5180	-70	[WPA-PSK-CCMP+TKIP][WPA2-PSK-CCMP+TKIP][WPS][ESS]ChinaNet-7MRq-5G-Q
+74:05:a5:7a:14:9e	2412	-53	[WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS]	TP-LINK_503
+d4:ee:07:60:88:00	2427	-53	[WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS]	ziroom602
+80:89:17:5a:9b:4a	2462	-68	[WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS]	dingdingdingding
+c0:c1:c0:d9:75:32	2412	-52	[WPA-PSK-CCMP+TKIP][WPA2-PSK-CCMP+TKIP][WPS][ESS]home2
+8c:6d:77:69:7f:58	2462	-69	[WPA-PSK-CCMP+TKIP][WPA2-PSK-CCMP+TKIP][WPS][ESS]ruopu2.4
+# 使用scan_results搜索到的无线网络
+
+4. 创建网络配置信息
+> add_network
+# 这条命令会生成一条网络配置信息的编号，从0开始，下面就对这个第0条配置信息进行配置
+> set_network 1 ssid "ruopu2.4"
+> set_network 1 psk "12345678"
+> set_network 1 key_mgmt WPA-PSK
+# 测试中这里只能这样配置，因为使用WPA2-PSK会提示FAIL。命令最后的Wifi的加密方式可以是WPA-PSK或WPA2-PSK
+> enable_network 0
+OK
+# 执行过此命令后就开始连接了，需要等待一段时间。再使用iwconfig查看是否连接到了目标网络。注意，这里输出的信息并不会停下来。所以直接使用下面的命令即可。
+> save_config
+OK
+# 保存配置信息到/etc/wpa_supplicant/example.conf
+> status
+# 查看状态
+```
+
+
+
 ### 需要安装的包
 
 ```shell
