@@ -337,7 +337,7 @@ OK
 ### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp 
 ```
 
 
@@ -814,7 +814,7 @@ export GTK_IM_MODULE=xim
  ⚡ root@ruopu64  ~  gdebi firefox-esr_52.8.0esr-1\~deb7u1_amd64.deb
  # 安装老版本的firefox，如果有依赖问题，就先安装依赖包
  安装好之后，需要使用root权限打开firefox，在/usr/share/applications/firefox-esr.desktop中的Exec一项中，加入sudo即可。在地址栏输入about:config，找到最下方的xpinstall.signatures.required，双击将此项改为false。这样就可以安装未验证的插件了。
- 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份执行解压后目录中的install.sh脚本，之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，这里一定要注意，不可以选择密码下面的保存配置，如果选择了此项，就无法连接到内网了。登录后就可以访问内网了。
+ 访问https://211.99.15.34:6443下载插件，之后解压，先以root身份到SSLVPNClientLinux目录中执行解压后目录中的install.sh脚本，如果不到SSLVPNClientLinux目录中执行脚本会报错。之后在firefox中选择Add-ons，在页面中上方有一个小齿轮，打开后有一个Install Add-ons From File...，点击后会打开电脑的目录，在其中找到解压后的插件，根据系统，这里要选择安装64位的插件，安装后再重启，这样就可以在VPN登录页面使用帐号登录了，这里一定要注意，不可以选择密码下面的保存配置，如果选择了此项，就无法连接到内网了。登录后就可以访问内网了。
 ```
 
 
