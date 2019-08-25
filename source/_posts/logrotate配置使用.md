@@ -115,7 +115,7 @@ START_HOURS_RANGE=3-22
 #        daily			# 这里注释的意义不大，因为如果不配置，也会使用logrotate.conf的默认配置
         size = 50M			# 50M切割一次
         missingok			# 如果日志文件不存在，继续进行下一个操作，不报错
-        rotate 5				# 保留5个日志文件，这并不包括本身的日志文件，只是切割后的日志文件
+        rotate 5			# 保留5个日志文件，这并不包括本身的日志文件，只是切割后的日志文件
 #        compress
 #        delaycompress
         notifempty
@@ -180,6 +180,76 @@ fi
 exit 0
 #  logrotate定时任务。logrotate需要的cron任务应该在安装时就自动创建了
 ```
+
+
+
+#### 在指定时间切割
+
+```shell
+# 日志转储流程
+# crond服务加载/etc/cron.d/0hourly --->在每小时的01分执行/etc/cron.hourly/0anacron脚本 --->执行anacron --->根据/etc/anacrontab的配置执行/etc/cron.daily，/etc/cron.weekly，/etc/cron.monthly --->执行/etc/cron.daily/下的logrotate脚本 --->执行logrotate --->根据/etc/logrotate.conf配置执行脚本/etc/logrotate.d/nginx --->转储nginx日志成功
+
+# 定义每天00点00分转储varnish日志
+---------
+  方法一
+---------
+vim /etc/anacrontab
+# /etc/anacrontab: configuration file for anacron
+
+# See anacron(8) and anacrontab(5) for details.
+
+SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+# the maximal random delay added to the base delay of the jobs
+#RANDOM_DELAY=45
+RANDOM_DELAY=0     # 表示延迟为0分钟
+# the jobs will be started during the following hours only
+#START_HOURS_RANGE=3-22
+START_HOURS_RANGE=0-22     # 执行从0点到22点
+
+#period in days   delay in minutes   job-identifier   command
+1       0       cron.daily              nice run-parts /etc/cron.daily    # 延迟为0分钟
+7       25      cron.weekly             nice run-parts /etc/cron.weekly
+@monthly 45     cron.monthly            nice run-parts /etc/cron.monthly
+# 修改红字部分
+# period in days 是表示1天、7天、1个月执行一次
+# delay in minutes 是延迟的分钟数
+# nice设置优先级为10，范围为-20（最高优先级）到19（最低优先级）
+# run-parts 是一个脚本，表示会执行它后面目录里的脚本
+
+vim /etc/cron.d/0hourly
+# Run the hourly jobs
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+00 * * * * root run-parts /etc/cron.hourly
+# 修改红字部分，表示每小时的每0分钟开始执行
+# 这种方法会影响到 /etc/cron.daily，/etc/cron.weekly，/etc/cron.monthly 下所有脚本的自动执行时间
+
+---------
+  方法二
+---------
+mkdir -p /etc/logrotate.daily.0
+mv /etc/logrotate.d/varnish /etc/logrotate.daily.0/
+# 新建一个目录，将varnish的logrotate任务放入，这样此目录中的任务就不受logrotate的配置文件控制了
+crontab -e
+00 00 * * * /usr/sbin/logrotate -f /etc/logrotate.daily.0/varnish > /dev/null 2>&1
+# 通过定时任务来执行这个logrotate任务。
+vim /etc/logrotate.daily.0/varnish
+/xor/data2/log/varnish/varnishncsa.log {
+	daily
+	rotate 30
+	compress
+	delaycompress
+	missingok
+	postrotate
+		/bin/kill -HUP `cat /var/run/varnishncsa.pid /run/varnishncsa/varnishncsa.pid 2>/dev/null` 2> /dev/null || true
+	endscript
+}
+```
+
+
 
 
 

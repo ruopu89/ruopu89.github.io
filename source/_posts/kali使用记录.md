@@ -140,6 +140,40 @@ root@shouyu:~# google-chrome-stable %U --proxy-pac-url="http://127.0.0.1:2333/pr
 12. 安装xfce4桌面系统后没有声音。
 apt install alsamixergui
 # 安装此软件后部分解决声音问题
+
+13. vscode显示中文乱码
+a. 点击右下解的编码模式，一般这时是UTF-8
+b. 之后软件上方弹出窗口，有两个选择，一个是Reopen with Encoding，一个是Save with Encoding。点击Reopen with Encoding
+c. 选择第一项Simplified Chinese(GB2312)。这样就解决中文乱码问题了。
+
+14. 使用gnome-tweaks工具取消桌面上的磁盘图标
+
+15. 系统报错，提示有问题
+sudo rm/var/crash/* 
+# 删除这些错误报告
+gksu gedit/etc/default/apport
+enable=0
+# 设置0表示禁用Apportw，或者1开启它。把enabled=1改为enabled=0。保存并关闭文件。完成之后你就再也不会看到弹窗报告错误了。很显然，如果我们想重新开启错误报告功能，只要再打开这个文件，把enabled设置为1就可以了。
+# gksu是linux下图形化的su/sudo工具
+
+16. 解决升级内核后无法使用无线网络问题
+# 问题：现象反映为电脑不停打开关闭飞行模式，无法使用无线网络。在电源中关闭无线后，打开关闭的现象停止了。查找问题原因是最难的，能想到的有两种情况，一种是驱动问题，一种是内核问题。还好是能想到的两种情况中的一种。
+a. 查看内核列表
+sudo dpkg --get-selections |grep linux-image
+b. 查看当前使用的内核
+uname -r
+c. 升级/安装内核
+sudo apt install linux-image-4.4.0-75-generic
+d. 删除内核
+sudo apt-get remove linux-image-4.4.0-75-generic
+# 卸载内核时，在图形画面要选择否。安装kali的新内核linux-image-5.2版本时有问题，会使无线网络无法使用。
+e. firmware-iwlwifi
+# 无线网卡驱动名称。
+# kde下载的是broadcom-wl-5.100.138.tar.bz2
+f. http://http.kali.org/kali/pool/main/l/linux/
+# kali内核下载地址。
+
+17. 安装钉钉时提示"/var/lib/dpkg/info/dtalk.postinst:行7: desktop-file-install：未找到命令"，需要安装desktop-file-utils。之后就可以正常安装了。
 ```
 
 
@@ -178,6 +212,74 @@ apt install linux-headers-$(uname -r)
 
 5. 卸载VMware-Workstation
 sudo vmware-installer -u vmware-workstation
+
+6. vmware或virtualbox无法启动，要求加载vmmon模块，用modprobe。但使用modprobe加载也会报错。可能是电脑开启了安全引导模式，关闭后就可以了。
+
+7. vmware使用NAT方式不能连接到网络，提示：Could not connect 'Ethernet0' to virtual network '/dev/vmnet8'. More information can be found in the vmware.log file. Failed to connect virtual device 'Ethernet0'. 将这个虚拟交换机删除，重新创建一个虚拟交换机，选择NAT方式即可解决。
+```
+
+
+
+### 需要安装的包
+
+```shell
+sudo apt install -y tmux fping mtr htop net-tools bind9utils
+```
+
+
+
+### wine的安装与使用
+
+```shell
+sudo apt install -y wine64
+# 安装系统自带的wine64位版本，也有32位版本的
+==============================================================================================
+# 也可用使用官方的最新版本
+wget -nc https://dl.winehq.org/wine-builds/winehq.key
+sudo apt-key add winehq.key
+sudo apt-add-repository https://dl.winehq.org/wine-builds/ubuntu/
+sudo apt-get install --install-recommends winehq-stable
+==============================================================================================
+sudo apt install --no-install-recommends winetricks
+#  安装winetricks（Wine的辅助配置工具，超级便利）。--no-install-recommends选项表示避免安装非必须的文件，
+# 从而减小镜像的体积
+winecfg
+# 初始化wine，也就是在家目录创建一个.wine目录，这个目录就相当于windows系统的C盘。
+==============================================================================================
+# 初始化的另一个方法 
+WINEARCH=win32 WINEPREFIX=~/.win32 winecfg 
+WINEPREFIX=~/.win64 winecfg
+# 对于64位用户，默认创建的系统目录是64位环境的。若想使用纯32位环境，修改WINEARCH 变量win32为即可： 
+# WINEARCH=win32 winecfg 这样就会生成32位Wine环境。若不设置 WINEARCH 得到的就是64位环境。
+# 或可以使用初始执行winecfg或wine或winetricks，这三个命令都可以。不必执行上面的命令也可以，这会生成
+# ~/.wine目录
+将windows中的\windows\Fonts下的所有字体复制到/opt/wine-stable/share/wine/fonts中，这样可以解决安装的软
+件有乱码的问题。
+==============================================================================================
+因为使用的是ubuntu官方提供的包，所以将字体复制到家目录中的.wine/drive_c/windows/Fonts目录中即可解决乱码问题。
+winetricks corefonts colorprofile
+winetricks fontfix fontsmooth-gray fontsmooth-rgb fontsmooth-bgr
+winetricks gdiplus
+winetricks d3dx9
+winetricks riched20 riched30
+winetricks mfc40 mfc42
+winetricks vcrun6 vb6run vcrun2003 vcrun2005 vcrun2008
+winetricks msxml3 msxml4 msxml6
+# 安装依赖库。测试中上面四条命令执行失败了
+wine uninstaller
+# 在打开的窗口中可以选择卸载已安装的程序
+# 安装的软件除了在~/.wine中外，在.local/share/applications中也有wine目录，安装的软件的图标就在这个wine目录中。
+
+# 参考：https://blog.csdn.net/buildcourage/article/details/80871141、https://ywnz.com/linuxjc/2553.html
+# 在使用中发现wine并不好用。不建议使用。
+```
+
+
+
+### history结果显示操作时间方法
+
+```shell
+让history命令显示时间，需要在/etc/profile中加入export HISTTIMEFORMAT="[%F %T]"。但在普通用户使用zsh时没有起作用，不明原因。
 ```
 
 
@@ -228,6 +330,16 @@ gnome-tweaks
 
 ```shell
 sudo apt install indicator-china-weather
+```
+
+
+
+### 安装钉钉
+
+```shell
+下载地址：https://pan.baidu.com/s/1NznYL5fV8sUWInmUgciXXQ。
+下载后打开压缩包，是一个dingding.deb文件，使用gdebi命令安装即可。
+dingding运行时的名称是dtalk，如果关闭了打开的钉钉，无法再打开钉钉，需要使用pkill dtalk杀死钉钉的进程，才能再打开钉钉。
 ```
 
 
@@ -482,6 +594,17 @@ tar -xzf pycharm- 2018.3.4 .tar.gz
 # 新的实例必须不超过现有的提取。目标文件夹必须为空。
 删除pycharm- 2018.3.4 .tar.gz以节省磁盘空间（可选）
 从bin子目录运行pycharm.sh
+
+# pycharm启动器
+[Desktop Entry]
+Type = Application      
+Name = Pycharm
+GenericName = Pycharm
+Comment = Pycharm:The Python IDE
+Exec = "your_dir/pycharm-2017.3.1/bin/pycharm.sh"
+Icon = your_dir/pycharm-2017.3.1/bin/pycharm.png
+Terminal = pycharm
+Categories = Pycharm
 ```
 
 
@@ -981,10 +1104,10 @@ apt install thunderbird evolution
 ```shell
 apt install nixnote2
 
+whatever是一款evernote第三方客户端，下载地址：https://sourceforge.net/projects/whatever-evernote-client/files/v1.0.0/Whatever_1.0.0_amd64.deb/download。登录有些慢，功能可以使用，问题还是图片粘贴有问题。
+
 tusk是另一款evernote第三方客户端，下载地址：https://github.com/klaussinani/tusk/releases/tag/v0.22.0
 使用中发现两个问题，一是打开软件需要等待较长时间，才能登录evernote，大概三至五分钟。第二是复制到软件内的图片无法显示，如果单独再复制一次，在网页版的evernote上就会看到两张同样的图片。
-
-whatever是一款evernote第三方客户端，下载地址：https://sourceforge.net/projects/whatever-evernote-client/files/v1.0.0/Whatever_1.0.0_amd64.deb/download。登录缓慢，登录后无法打开，一片空白。
 ```
 
 
@@ -1009,6 +1132,15 @@ whatever是一款evernote第三方客户端，下载地址：https://sourceforge
 apt install okular
 按F6快捷键打开注释功能
 参考：https://blog.csdn.net/yangzhongxuan/article/details/8242740
+```
+
+
+
+### 图形编辑器
+
+```shell
+# GIMP（GNU 图形操作程序）是 Ubuntu 上的自由开源的图像编辑器。无疑它是 Windows 上 Adobe Photoshop 的最好替代品。如果你过去经常用 Adobe Photoshop，会觉得很难习惯 GIMP，但是你可以自定义 GIMP 使它看起来与 Photoshop 非常相似。
+apt install -y gimp
 ```
 
 

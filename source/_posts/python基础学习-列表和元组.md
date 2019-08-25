@@ -22,6 +22,25 @@ categories: python
 ##### 列表
 
 ```python
+# 一个队列，一个排列整齐的队伍
+# 列表内的个体称作元素，由若干元素组成列表
+# 元素可以是任意对象（数字、字符串、对象、列表等）
+# 列表内元素有顺序，可以使用索引
+# 线性的数据结构
+# 使用[]表示
+# 列表是可变的
+# 列表list、链表、queue、stack的差异
+# 列表不能一开始就定义大小
+list()
+# 定义一个空列表
+list(iterable)
+# 从可交互项初始化的新列表
+例
+lst = list()
+lst = []
+lst = [2,6,9,'ab']
+lst = list(range(5))
+
 >>> edward = ['Edward Gumby', 42]
 # 使用列表来表示
 
@@ -35,11 +54,66 @@ categories: python
 
 
 
+#### 数字的处理函数
+
+```python
+round()
+# 这个函数是四舍六入五取偶的
+floor()
+# 这个函数是向下取整的
+ceil()
+# 这个函数是向上取整的
+int()
+# 这个函数是取整数部分的
+//
+# 整除且向下取整
+# python只有长整型，数值没有上限。int也是取整的，如int(1.5)，得1。floor是向下取整的。ceil是向上取整的。round是4舍6入5取偶。 bin是二进制，返回的是字符串。oct是八进制。pi是派。 
+bin()
+oct()
+hex()
+# 上面三个是进制函数，返回值是字符串
+math.pi
+# 派
+math.e
+# 自如常数
+```
+
+
+
+#### 类型判断
+
+```python
+type(a) == str 
+# 这是类型比较的方式
+type(obj)
+# 返回类型，而不是字符串
+isinstance(obj,class_or_tuple)
+# 返回布尔值
+例：
+type(a)
+type('abc')
+type(123)
+isinstance(6,str)
+isinstance(6,(str,bool,int))
+type(1+True)
+type(1+True+2.0)
+```
+
+
+
 ### 通用的序列操作
 
 #### 索引
 
 ```python
+# 索引，也叫下标
+# 正索引：从左至右，从0开始，为列表中每一个元素编号
+# 负索引：从右至左，从-1开始
+# 正负索引不可以超界，否则引发异常IndexError
+# 为了理解方便，可以认为列表是从左至右排列的，左边是头部，右边是尾部，左边是下界，右边是上界
+# 列表通过索引访问
+# list[index]，index就是索引，使用中括号访问
+
 >>> greeting = 'Hello'
 >>> greeting[0]
 'H'
@@ -165,6 +239,11 @@ Domain name: python
 #### 序列相加
 
 ```python
+# + -> list
+# 连接操作，将两个列表连接起来
+# 产生新的列表，原列表不变
+# 本质上调用的是__add__()方法
+
 >>> [1, 2, 3] + [4, 5, 6]
 [1, 2, 3, 4, 5, 6]
 >>> 'Hello,' + 'world!'
@@ -182,6 +261,9 @@ TypeError: can only concatenate list (not "string") to list
 #### 乘法
 
 ```python
+# * -> list
+# 重复操作，将本列表元素重复n次，返回新的列表。
+
 >>> 'python' * 5
 'pythonpythonpythonpythonpython'
 >>> [42] * 10
@@ -277,6 +359,22 @@ Access granted
 
 
 
+#### 随机数
+
+```python
+# random模块
+# randint(a,b)返回[a,b]之间的整数
+# choice(seq)从非空序列的元素中随机挑选一个元素，比如random.choice(range(10))，从0到9中随机挑选一个整数。random.choice([1,3,5,7])
+# randrange([start,]stop[,step])从指定范围内，按指定基数递增的集合中获取一个随机数，基数缺省值为1.random.randrange(1,7,2)
+# random.shuffle(list) -> None，就地打乱列表元素
+# sample(population,k)从样本空间或总体（序列或者集合类型）中随机取出k个不同的元素，返回一个新的列表
+import random
+random.sample(['a','b','c','d'],2)
+random.sample(['a','a'],2)
+```
+
+
+
 ### 列表
 
 #### 函数list
@@ -294,6 +392,8 @@ Access granted
 
 ```python
 * 修改列表：给元素赋值
+list[index] = value
+# 索引不要超界
 >>> x = [1, 1, 1]
 >>> x[1] = 2
 # 将索引为1的值改为2
@@ -350,6 +450,11 @@ Access granted
 ##### append
 
 ```python
+# append(object) -> None
+# 列表尾部追加元素，返回None
+# 返回None就意味着没有新的列表产生，就地修改
+# 时间复杂度是O(1)
+
 >>> lst = [1, 2, 3]
 >>> lst.append(4)
 >>> lst
@@ -362,6 +467,9 @@ Access granted
 ##### clear
 
 ```python
+# clear() -> None
+# 清除列表所有元素，剩下一个空列表
+
 >>> lst = [1, 2, 3]
 >>> lst.clear()
 >>> lst
@@ -374,6 +482,10 @@ Access granted
 ##### copy
 
 ```python
+# copy() -> list
+# shadow copy返回一个新的列表
+
+
 >>> a = [1, 2, 3]
 >>> b = a
 >>> b[1] = 4
@@ -386,6 +498,65 @@ Access granted
 >>> a
 [1, 2, 3]
 # 这类似于使用a[:]或list(a)，它们也都复制a。
+
+# shadow copy表示影子拷贝，也叫浅拷贝，遇到引用类型，只是复制了一个引用而已
+# 深浅拷贝测试
+lst0 = list(range(4))
+id(lst0)
+# 查看内存地址
+hash(lst0)
+# 列表是不可hash的，所以会报错
+hash(id(lst0))
+# 这样才行
+lst1 = list(range(4))
+id(lst1)
+# lst0和lst1在内存中的位置是不一样的。
+lst0 == lst1
+# 这里比较的是两个列表的值
+lst0 is lst1
+# 这里比较的是两个列表的内存地址。id就是查看内存地址的
+lst1 = lst0
+# 这里是将lst1的内存地址给了lst0，这时两个列表都指向了同一个内存地址，所以下面修改lst1的内容时，lst0也会改变
+lst1[2] = 10
+lst0
+lst0 = list(range(4))
+lst5 = lst0.copy()
+# 这里只是复制内容，内存地址是不一样的
+lst5
+lst5 == lst0
+# 返回True
+lst5 is lst0
+# 返回False
+id(lst0)
+id(lst5)
+# 内存地址不一样
+lst0 = [1,[2,3,4],5]
+lst5 = lst0.copy()
+# 这是一个影子拷贝或叫浅拷贝。当复制的内容比较复杂时，会复制内存地址，如下面的lst0和lst5的复制。
+lst5 == lst0
+# 返回True
+lst5[2] = 10
+lst5 == lst0
+# 返回False
+lst0
+lst5[2] = 5
+lst5 == lst0
+# 返回True
+lst5[1][1] = 20
+# 这里修改的是第一个元素中的第一个元素
+lst5 == lst0
+# 因为是浅拷贝，所以列表中的列表复制的是内存地址，所以会都改变。返回True
+lst0
+lst5
+# 两个列表中的值是一样的
+
+# 深拷贝
+# copy模块提供了deepcopy
+import copy
+lst0 = [1,[2,3,4],5]
+lst5 = copy.deepcopy(lst0)
+lst5[1][1] = 20
+lst5 == lst0
 ```
 
 
@@ -393,6 +564,9 @@ Access granted
 ##### count
 
 ```python
+# count(value)
+# 返回列表中匹配value的次数
+
 >>> ['to', 'be', 'or', 'not', 'to', 'be'].count('to')
 2
 >>> x = [[1, 2], 1, 1, [2, 1, [1, 2]]]
@@ -408,6 +582,10 @@ Access granted
 ##### extend
 
 ```python
+# extend(iteratable) -> None
+# 将可迭代对象的元素追加进来，返回None
+# 就地修改
+
 >>> a = [1, 2, 3]
 >>> b = [4, 5, 6]
 >>> a.extend(b)
@@ -431,6 +609,11 @@ Access granted
 ##### index
 
 ```python
+# index(value,[start,[stop]])
+# 通过值value，从指定区间查找列表内的元素是否匹配
+# 匹配第一个就立即返回索引
+# 匹配不到，抛出异常ValueError
+
 >>> knights = ['We', 'are', 'the', 'knights', 'who', 'say', 'ni']
 >>> knights.index('who')
 4
@@ -449,6 +632,13 @@ ValueError: list.index(x): x not in list
 ##### insert
 
 ```python
+# insert(index,object) -> None
+# 在指定的索引index处插入元素object
+# 返回None就意味着没有新的列表产生，就地修改
+# 时间复杂度是O(n)
+# 索引超载上界，尾部追加
+# 索引超越下界，头部追加
+
 >>> numbers = [1, 2, 3, 5, 6, 7]
 >>> numbers.insert(3, 'four')
 >>> numbers
@@ -466,6 +656,10 @@ ValueError: list.index(x): x not in list
 ##### pop
 
 ```python
+# pop([index]) -> item
+# 不指定索引index，就从列表尾部弹出一个元素
+# 指定索引index，就从索引处弹出一个元素，索引超界抛出IndexError错误
+
 >>> x = [1, 2, 3]
 >>> x.pop()
 3
@@ -492,6 +686,10 @@ ValueError: list.index(x): x not in list
 ##### remove
 
 ```python
+# remove(value) -> None
+# 从左至右查找第一个匹配value的值，移除该元素，返回None
+# 就地修改
+
 >>> x = ['to', 'be', 'or', 'not', 'to', 'be']
 >>> x.remove('be')
 >>> x
@@ -510,6 +708,10 @@ ValueError: list.remove(x): x not in list
 ##### reverse
 
 ```python
+# reverse() -> None
+# 将列表元素反转，返回None
+# 就地修改
+
 >>> x = [1, 2, 3]
 >>> x.reverse()
 >>> x
@@ -526,6 +728,12 @@ ValueError: list.remove(x): x not in list
 ##### sort
 
 ```python
+# sort(key=None,reverse=False) -> None
+# 对列表元素进行排序，就地修改，默认升序
+# reverse为True，反转，降序
+# key一个函数，指定key如何排序
+# lst.sort(key=functionname)
+
 >>> x = [4, 6, 2, 1, 7, 9]
 >>> x.sort()
 >>> x
@@ -576,9 +784,28 @@ None
 
 
 
-#### 元组
+##### 时间复杂度
 
-> 与列表一样，元组也是序列，唯一的差别在于元组是不能修改的。元组语法很简单，只要将一些值用逗号分隔，就能自动创建一个元组。
+```python
+index和count方法都是O(n)。随着列表数据规模的增大，而效率下降
+```
+
+
+
+##### 如何查帮助
+
+```python
+# 官方帮助文档，搜索关键字
+# IPython中
+help(keyword)
+# keyword可以是变量、对象、类名、函数名、方法名
+```
+
+
+
+### 元组
+
+> 与列表一样，元组也是序列，唯一的差别在于元组是不能修改的。元组语法很简单，只要将一些值用逗号分隔，就能自动创建一个元组。元组就是一个有序的元素组成的集合，使用小括号()表示。元组是不可变对象。
 
 ```python
 >>> 1, 2, 3
@@ -620,4 +847,118 @@ None
 ```
 
 
+
+#### 命名元组namedtuple
+
+```python
+# 帮助文档中，查阅namedtuple，有使用教程
+# 语法：
+	# namedtuple(typename,field_names,verbose=False,rename=False)
+    # 命名元组，返回一个元组的子类，并定义了字段
+    # typename表示此元组的名称
+    # field_names表示元组中元素的名称，此字段有多种表达方式，可以是空白符或逗号分隔的字段的字符串，可以是字段的列表
+    # rename表示如果元素名称中含有python的关键字，则必须设置为rename=True
+    # verbose使用默认就可以。
+from collections import namedtuple
+Point = namedtuple('_Point',['x','y'])
+# Point为返回的类
+p = Point(11,22)
+
+>>> from collections import namedtuple
+>>> Student = namedtuple('Student', ['name', 'age', 'sex', 'email'])
+>>> s = Student('Jim', 21, 'male', '123@qq.com')
+>>> s.name
+'Jim'
+>>> s.age
+21
+# namedtuple 函数这里接收两个参数，第一个参数为要创建类型的名称，第二个参数是一个列表，代表了每一个
+# 索引的名字。当建立完这个 Student 类之后，就可以使用正常的构造方法来构造新的对象如 s，并且可以直接
+# 通过访问属性的方式来访问所需要的值。
+# 此时使用isinstance函数对比内置的tuple：
+>>> isinstance(s, tuple)
+True
+# 可见用namedtuple构造出来的类其本质就是一个tuple元组，所以仍然可以使用下标的方式来访问属性。并且在
+# 任何要求类型为元组的地方都可以使用这个namedtuple。
+```
+
+
+
+### 冒泡法
+
+- 属于交换排序
+
+- 两两比较大小，交换位置。如同水泡咕嘟咕嘟往上冒
+- 结果分为升序和降序排列
+- 升序
+  - n个数从左至右，编号从0开始到n-1，索引0和1的值比较，如果索引0大，则交换两者位置，如果索引1大，则不交换。继续比较索引1和2的值，将大值放在右侧。直至n-2和n-1比较完，第一轮比较完成。第二轮从索引0比较到n-2，因为最右侧n-1位置上已经是最大值了。依次类推，每一轮都会减少最右侧的不参与比较，直至剩下最后2个数比较。
+- 降序
+  - 和升序相反
+
+```python
+# 冒泡法代码实现一，简单冒泡实现
+num_list = [[1,9,8,5,6,7,4,3,2],[1,2,3,4,5,6,7,8,9]]
+# 定义一个列表，这个列表中还有两个子列表
+nums = num_list[1]
+# 定义nums等于第2个子列表
+print(nums)
+# 先打印一次nums列表
+length = len(nums)
+# 计算nums列表的长度
+count_swap = 0
+# 交换
+count = 0
+# 统计次数
+for i in range(length):
+# 用length也就是列表长度来循环，length是一共要比较的次数，也就是要用每个数字与所有的数字比较一次，所有数字比较一遍的次数。i表示第几个数字
+    for j in range(length-i-1):
+# 这里j是长度减去之前比较的次数后，还要比较的次数。也就是每次每个数字要与列表中数字比较的次数，如第一次从第一个数字比较到最后一个数字，
+# 那么，第二次比较时就从第一个数字比较到倒数第一个数字了，因为第一次已经将最大的数字放到最后了。最后减1是因为i是从0开始的，所以要多减1.
+        count += 1
+# 计算比较的次数
+        if nums[j] > nums[j+1]:
+# 按循环每次比较，nums列表中的第j个元素是否与j+1个元素大，也就是前面的数字与后面的数字比较，如第一次是第1个和第2个数字比较，下一次就是第2个和第3个比较
+            tmp = nums[j]
+# 如果前面的数字大，就将数字给tmp
+            nums[j] = nums[j+1]
+# 之后将前面的数字向后移
+            nums[j+1] = tmp
+# 再把后面的数字放在临时空间中
+            count_swap += 1
+# 记录一次交换
+print(nums, count_swap, count)
+# 打印列表，交换次数，比较次数
+
+# 冒泡法代码实现二，优化实现
+num_list = [[1,9,8,5,6,7,4,3,2],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,9,8]]
+nums = num_list[2]
+print(nums)
+length = len(nums)
+count_swap = 0
+count = 0
+for i in range(length):
+    flag = False
+# 每次每个数比较之前都加一个标记
+    for j in range(length-i-1):
+        count += 1
+        if nums[j] > nums[j+1]:
+            tmp = nums[j]
+            nums[j] = nums[j+1]
+            nums[j+1] = tmp
+            flag = True
+            # 如果前面的数字比后面的大，进行了交换，就将flag改为True
+            count_swap += 1
+    if not flag:
+        break
+# 当flag为False时，证明没有交换，也就证明没必要再进行之后的动作，顺序已经排好了。
+print(nums, count_swap, count)
+```
+
+
+
+- 冒泡法总结
+  - 冒泡法需要数据一轮轮比较
+  - 可以设定一个标记判断此轮是否有数据交换发生，如果没有发生交换，可以结束排序，如果发生交换，继续下一轮排序
+  - 最差的排序情况是，初始顺序与目标顺序完全相反，遍历次数1,...,n-1之和n(n/1)/2
+  - 最好的排序情况是，初始顺序与目标顺序完全相同，遍历次数n-1
+  - 时间复杂度O(n**2)
 

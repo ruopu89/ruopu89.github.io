@@ -42,9 +42,9 @@ categories: ELK
 #### elk简单部署
 
 ```shell
-==============================================================================================
+======================================================================================
 收集单个日志
-==============================================================================================
+======================================================================================
 
 准备三台主机，做els集群，配置：双核处理器，2G内存。地址：192.168.1.20，192.168.1.21，192.168.1.22
 准备一台主机，安装nginx，地址：192.168.1.30
@@ -78,7 +78,7 @@ vim /etc/elasticsearch/elasticsearch.yml
     cluster.name: testelk
     # 集群的名称，名称相同的主机就是处于同一个集群
     node.name: node1
-    # 集群情况下，当前node的名字，每个node应该不一样
+    # 集群情况下，当前node的名字，每个node应该不一样。要将此文件复制到另两个节点
     path.data: /elkdata/data
     # 数据目录
     path.logs: /elkdata/logs
@@ -101,8 +101,8 @@ mkdir /elkdata/{data,logs} -pv
 chown elasticsearch.elasticsearch /elkdata/ -R
 systemctl start elasticsearch
 systemctl enable elasticsearch
-# 启动并查看状态
-==============================================================================================
+# 三台服务器启动并查看状态
+======================================================================================
 Master的职责：
 1. 节点状态信息
 2. 集群状态信息
@@ -113,14 +113,17 @@ Master的职责：
 Slave节点的职责：
 1. 同步数据
 2. 等待机会成为master
-==============================================================================================
-* node1上安装elasticsearch-head插件
+======================================================================================
+-----------------------------------
+  node1上安装elasticsearch-head插件
+-----------------------------------
 git clone git://github.com/mobz/elasticsearch-head.git
 # 下载elasticsearch-head插件，这个插件是为了实现简单的集群监控、主机信息显示和管理等功能
 yum install -y epel-release
 yum install npm -y
 cd elasticsearch-head/
 npm install grunt -save
+# 这里可能会有报错"npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference"，需要安装openssl即可解决。
 npm install
 npm run start &
 vim /etc/elasticsearch/elasticsearch.yml
@@ -150,20 +153,37 @@ vim conf/nginx.conf
 /usr/local/nginx/sbin/nginx
 # 启动
 访问http://192.168.1.30/test/测试
-==============================================================================================
+======================================================================================
 # 下面在nginx主机上安装logstash
-==============================================================================================
+======================================================================================
 yum -y install jdk-8u201-linux-x64.rpm
+vim /etc/profile.d/java.sh
+export JAVA_HOME=/usr
+. /etc/profile.d/java.sh
 yum -y install logstash-6.5.4.rpm
+systemctl start logstash
+systemctl enable logstash
 /usr/share/logstash/bin/logstash -e "input{stdin{}} output{stdout{ codec => "rydebug"}}"
-    hello
+# 执行此命令并不需要启动logstash服务，执行此命令就是启动服务，Ctrl + c可以关闭服务
+WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
+Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties. Using default config which logs errors to the console
+[WARN ] 2019-06-25 17:14:39.128 [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[INFO ] 2019-06-25 17:14:39.153 [LogStash::Runner] runner - Starting Logstash {"logstash.version"=>"6.5.4"}
+[INFO ] 2019-06-25 17:14:44.034 [Converge PipelineAction::Create<main>] pipeline - Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>2, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
+The stdin plugin is now waiting for input:
+[INFO ] 2019-06-25 17:14:44.444 [Converge PipelineAction::Create<main>] pipeline - Pipeline started successfully {:pipeline_id=>"main", :thread=>"#<Thread:0x71f559d3 run>"}
+[INFO ] 2019-06-25 17:14:44.603 [Ruby-0-Thread-1: /usr/share/logstash/lib/bootstrap/environment.rb:6] agent - Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
+[INFO ] 2019-06-25 17:14:45.472 [Api Webserver] agent - Successfully started Logstash API endpoint {:port=>9600}
+# 这是一条使用标准输入输出的命令，上面是执行命令后的正常输出。有时会报错，不明白原因，可能是没有调动logstash，可能是没有设置JAVA_HOME环境变量，修改后一定重启logstash。
+    hello    # 输入hello后会有下面信息
     {
-        "@timestamp" => 2019-01-24T08:47:22.515Z,
-        "message" => "hello",
-            "host" => "nginx1",
-        "@version" => "1"
+        "@timestamp" => 2019-01-24T08:47:22.515Z,    
+        #@timestamp，用来标记当前事件发生的时间
+        "message" => "hello",    #消息的具体内容
+            "host" => "nginx1",    #host标记事件发生在哪里
+        "@version" => "1"    #@version时间版本号，一个事件就是一个ruby对象
     }
-# 测试
+# 测试。这要等待一会儿才会有结果
 vim /etc/logstash/conf.d/system.conf
     input {
         file{
@@ -180,7 +200,7 @@ vim /etc/logstash/conf.d/system.conf
         }
         # 输出到一个文件，用file引导，下面写明路径。
         elasticsearch {
-            hosts => ["192.168.1.20:9200"]
+            hosts => ["192.168.1.20:9200"]    # 指定第一台logstash地址即可。
             index => "system-messages-%{+YYYY.MM.dd}"   # 索引的命名规则，后面加入日期
         }
         # 输出到elasticsearch，写明地址，索引的名称
@@ -193,16 +213,16 @@ systemctl start logstash
 # 启动logstash。也可以使用/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf在前台启动
 tail -f /tmp/123.txt
 # 这时可以看到输出的日志文件了
-访问192.168.1.20:9100，在其中的数据浏览中也可以看到一个叫system-messages-2019.01.24的索引了
+访问192.168.1.20:9100，在其中的数据浏览中修改上方的连接地址为第一台logstash的地址，之后就可以看到一个叫system-messages-2019.01.24的索引了
 
-==============================================================================================
+======================================================================================
 收集多个日志
-==============================================================================================
+======================================================================================
 cp /etc/logstash/conf.d/system.conf /etc/logstash/conf.d/nginx.conf -a
 vim /etc/logstash/conf.d/nginx.conf
 input {
    file{
-      type => "messagelog"      # type是自定义的？
+      type => "messagelog"      # type是自定义的，为了下面的if判断使用
       path => "/var/log/messages"
       start_position => "beginning"
    }
@@ -227,7 +247,7 @@ output {
       }
    }
 }
-/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf -t
+/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/nginx.conf -t
 systemctl restart logstash
 访问192.168.1.20:9100，在概览中可以看到传过来的nginxlog索引了
 
@@ -328,7 +348,7 @@ server {
 #### 日志收集
 
 ```shell
-==============================================================================================
+======================================================================================
 * 规划
 通过在要收集日志的服务器上安装filebeat进行日志收集，之后将收集到的数据写入到redis服务器，再通过logstash服务器取出数据并写入到elasticsearch集群中。也可以通过filebeat收集日志后转发给logstash服务器，再由logstash服务器写入到redis中，再由另一台logstash服务器从redis服务器中取出数据并写入到elasticsearch集群中。
 
@@ -348,7 +368,7 @@ server {
 6. filebeat:6.5.4 官方当前最新rpm
 7. nginx:1.12.2
 8. redis:5.0.3 官方最新源码包
-==============================================================================================
+======================================================================================
 -------------
      redis
 -------------
@@ -525,9 +545,9 @@ output {
 2) "system-rsyslog"
 # 可以看到从logstash传入新的键了
 
-==============================================================================================
+======================================================================================
 下面设置收集TCP/UDP日志
-==============================================================================================
+======================================================================================
 -------------
   haproxy
 -------------
@@ -636,7 +656,7 @@ output {
 #### filebeat收集日志
 
 ```shell
-==============================================================================================
+======================================================================================
 * 规划
 1. 在web端安装filebeat进行对日志的收集，之后将日志发送给logstash。
 2. 配置一台logstash服务器，将收到的日志转发到redis
@@ -652,7 +672,7 @@ output {
 准备一台主机，安装redis，地址：192.168.1.24
 准备一台主机，安装logstash负责将日志转发到redis，地址：192.168.1.30
 准备一台主机，安装logstash负责从redis中读取数据并写入elasticsearch集群，地址：192.168.1.31。需要从redis中取出数据，所以再配置一台logstash服务器
-==============================================================================================
+======================================================================================
 
 -------------------------------------
   nginx+tomcat+logstash30
@@ -689,13 +709,13 @@ nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
 [root@nginx1 ~]# /usr/local/nginx/sbin/nginx -s reload
 [root@nginx1 ~]# yum install -y filebeat-6.5.4-x86_64.rpm
 # 安装filebeat，这个软件可以在web端实时收集日志并传递给logstash进一步处理
-==============================================================================================
+======================================================================================
 为什么不用logstash在web端收集
 1. 依赖java环境，一旦java出问题，可能影响到web服务
 2. 系统资源占用率高，且存在bug风险
 3. 配置比较复杂，支持匹配过滤
 4. filebeat挺好的，专注日志收集，语法简单，安装快捷，配置方便
-==============================================================================================
+======================================================================================
 [root@nginx1 ~]# vim /etc/filebeat/filebeat.yml
 #filebeat.inputs:
 #- type: log
@@ -1068,7 +1088,7 @@ output {
 ### 将日志写入数据库
 
 ```shell
-==============================================================================================
+=======================================================================================
 规划
 1. 安装数据库并授权
 2. 创建表
@@ -1078,7 +1098,7 @@ output {
 环境
 准备一台主机，安装mariadb，地址：192.168.1.25
 logstash地址：192.168.1.30
-==============================================================================================
+=======================================================================================
 --------------
   mariadb
 --------------
