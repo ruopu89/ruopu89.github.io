@@ -292,6 +292,7 @@ nl80211: deinit ifname=p2p-dev-wlan0 disabled_11b_rates=0
 p2p-dev-wlan0: Failed to initialize driver interface
 P2P: Failed to enable P2P Device interface
 # 再将初始化成功，-B参数表示后台运行。如果遇到驱动不支持所插入的无线网卡，可选择wired或者wext等，具体详情可使用 wpa_supplicant -h 进行查看。
+# 此方法连接无线网络后速度并不理想，不知是否与-D nl80211选项有关。
 
 3. 使用交互式命令wpa_cli
 ⚡ root@shouyu  ~  wpa_cli
@@ -328,6 +329,7 @@ OK
 # 保存配置信息到/etc/wpa_supplicant/example.conf
 > status
 # 查看状态
+# 参考：http://rickgray.me/2015/08/03/useful-command-tool-for-wifi-connection/
 ```
 
 
