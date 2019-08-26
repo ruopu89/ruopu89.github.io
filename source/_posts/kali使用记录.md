@@ -266,8 +266,13 @@ wlan0     IEEE 802.11  ESSID:"ruopu24"
 6. 查看已连接的wifi信息
  ⚡ root@shouyu  ~  cd /etc/NetworkManager/system-connections
 # 在此目录中有已经连接的无线信息，以文件形式保存，文件中有密码等信息
+7. 问题解决
+出现：nl80211: Could not set interface 'p2p-dev-wlan0' UP
+ ⚡ ⚙ root@shouyu  ~  killall wpa_supplicant 
+ # 杀死这个进程再重新执行 wpa_supplicant -i wlan0 -c ruopu24.conf命令即可。
 
 另一种方法：
+# 两种方法只能选择一种。
 1. 创建配置文件
  ⚡ root@shouyu  ~  vim /etc/wpa_supplicant/example.conf
 ctrl_interface=/run/wpa_supplicant                                                        
@@ -330,6 +335,18 @@ OK
 > status
 # 查看状态
 # 参考：http://rickgray.me/2015/08/03/useful-command-tool-for-wifi-connection/
+```
+
+
+
+### dd命令制作启动盘
+
+```shell
+sudo umount /dev/sdb*
+sudo mkfs.vfat /dev/sdb -I
+# 直接格式化即可
+sudo dd if=ubuntu-18.04.1-desktop-amd64.iso of=/dev/sdb bs=10M
+# 直接将镜像写入U盘
 ```
 
 
@@ -868,6 +885,17 @@ zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/
  ⚡ root@ruopu64  ~  vim .zshrc 
  setopt no_nomatch
  # 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
+ 
+ ============================
+   除kde桌面外，其他桌面环境使用
+ ============================
+ # 原因是没有安装Powerline字体，按下面方法操作后，重启终端即可解决。
+ wget https://raw.githubusercontent.com/powerline/powerline/develop/font/10-powerline-symbols.conf
+wget https://raw.githubusercontent.com/powerline/powerline/develop/font/PowerlineSymbols.otf
+sudo mkdir /usr/share/fonts/OTF
+sudo cp 10-powerline-symbols.conf /usr/share/fonts/OTF/
+sudo mv 10-powerline-symbols.conf /etc/fonts/conf.d/
+sudo mv PowerlineSymbols.otf /usr/share/fonts/OTF/
 ```
 
 
@@ -952,7 +980,7 @@ Supported terminals:
    elementary terminal (pantheon/elementary)
    mate-terminal
    gnome-terminal
-   tilix
+   tili
 ```
 
 
