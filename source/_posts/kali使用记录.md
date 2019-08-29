@@ -174,6 +174,11 @@ f. http://http.kali.org/kali/pool/main/l/linux/
 # kali内核下载地址。
 
 17. 安装钉钉时提示"/var/lib/dpkg/info/dtalk.postinst:行7: desktop-file-install：未找到命令"，需要安装desktop-file-utils。之后就可以正常安装了。
+
+18. linux 命令行 提示符前面多了 (base)
+(base) shouyu@shouyu-pc:~$ conda deactivate
+# 是aconda自动加入了命令到 .bashrc中。执行上面的命令可以去掉前面的(base)
+shouyu@shouyu-pc:~$ 
 ```
 
 
@@ -403,6 +408,26 @@ wine uninstaller
 
 # 参考：https://blog.csdn.net/buildcourage/article/details/80871141、https://ywnz.com/linuxjc/2553.html
 # 在使用中发现wine并不好用。不建议使用。
+```
+
+
+
+### virtualbox安装MacOS方法
+
+```shell
+1. 创建MacOS虚拟机，自定义虚拟机名称为MacOS
+2. 在命令行执行VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc" 
+# MacOS为虚拟机名。
+# VirtualBox原生支持Mac OS X的安装，但是只有在系统环境为Mac的环境下，才能正常引导，因为在非Mac环境下，安装程序会检测出我们的CPU不是已经识别的型号，从而拒绝进一步的安装。为此，我们需要执行以下命令来Hack
+# 如果VBoxManage没有被加入PATH的话，可能会提示VBoxManage不是可执行的命令。只需要进入VirtualBox的安装目录下Shift+右键在当前目录打开命令行执行即可~
+# 原理非常简单：利用VBox的命令行工具在虚拟机的DeviceKey中加入Apple的声明即可。
+# 也有说要输入下面命令的：
+VBoxManage modifyvm "macosx" --cpuidset 00000001 000106e5 00100800 0098e3fd bfebfbff
+VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiSystemProduct" "iMac11,3"
+VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiSystemVersion" "1.0"
+VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiBoardProduct" "Iloveapple"
+VBoxManage setextradata "macosx" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
+VBoxManage setextradata "macosx" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRealSMC" 1
 ```
 
 
@@ -1065,6 +1090,9 @@ gsettings list-recursively org.mate.media-handling
 # 修改上面一行的设置
 如果上面的设置不起作用，就需要使用sudo启动软件了
 sudo netease-cloud-music
+
+# 启动时提示"Gtk-Message: 10:33:56.116: Failed to load module "canberra-gtk-module""
+⚙ shouyu@shouyu-pc  ~/下载  sudo apt install libcanberra-gtk-module
 ```
 
 
