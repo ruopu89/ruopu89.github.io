@@ -276,6 +276,7 @@ TypeError: can only concatenate list (not "string") to list
 # 空列表是使用不包含任何内容的两个方括号([])表示的。如果要创建一个可包含10个元素的列表，但没有任何有用的内容，可像前面那样使用[42]*10。但更准确的做法是使用[0]*10，这将创建一个包含10个零的列表。然而，在有些情况下，你可能想使用表示“什么都没有”的值，如表示还没有在列表中添加任何内容。在这种情况下，可使用None。在Python中，None表示什么都没有。
 
 sentence = input("Sentence: ")
+# 这里是要求输入要在框中显示的内容的
 screen_width = 80
 # screen_width：屏幕宽度
 text_width = len(sentence)
@@ -636,7 +637,7 @@ ValueError: list.index(x): x not in list
 # 在指定的索引index处插入元素object
 # 返回None就意味着没有新的列表产生，就地修改
 # 时间复杂度是O(n)
-# 索引超载上界，尾部追加
+# 索引超越上界，尾部追加
 # 索引超越下界，头部追加
 
 >>> numbers = [1, 2, 3, 5, 6, 7]
@@ -676,6 +677,7 @@ ValueError: list.index(x): x not in list
 
 >>> x = [1, 2, 3]
 >>> x.append(x.pop())
+# 每次弹出的都是3，再将3追加到列表的尾部，就还是[1,2,3]
 >>> x
 [1, 2, 3]
 # 使用append代替push方法，因为python中没有提供push。此将刚弹出的值压入(或附加)后，得到的栈将与原来相同。要创建先进先出(FIFO)的队列，可使用insert(0, ...)代替append。另外，也可继续使用append，但用 pop(0)替代 pop() 。

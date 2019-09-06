@@ -179,6 +179,11 @@ f. http://http.kali.org/kali/pool/main/l/linux/
 (base) shouyu@shouyu-pc:~$ conda deactivate
 # 是aconda自动加入了命令到 .bashrc中。执行上面的命令可以去掉前面的(base)
 shouyu@shouyu-pc:~$ 
+
+19. 关于electron-ssr打开后看不到图标的解决办法
+首先，尝试安装libappindicator1应用程序指示器。如果不行，使用下面的快捷键。
+Control+Shift+W
+# 使用快捷键切换主窗口显隐，需要在空白桌面上使用上面的快捷键。
 ```
 
 
@@ -352,6 +357,199 @@ sudo mkfs.vfat /dev/sdb -I
 # 直接格式化即可
 sudo dd if=ubuntu-18.04.1-desktop-amd64.iso of=/dev/sdb bs=10M
 # 直接将镜像写入U盘
+```
+
+
+
+### 使用锐捷客户端
+
+```shell
+# 公司搬家之后需要使用锐捷交换机上网，所以需要安装锐捷客户端才能联网。但使用锐捷客户端无法连接。所以需要使用mentohust包进行连接验证。下面的前两步是下载安装锐捷客户端，可以忽略。
+1. 下载地址：http://pan.baidu.com/s/1hrhaYrU，包名：RG_SU_For_Linux_1_30_Setup.zip
+2. 解压
+unzip RG_SU_For_Linux_1_30_Setup.zip
+3. 下载mentohust，此包为了可以通过锐捷用户名密码验证，也解决使用锐捷脚本验证时提示"不允许使用的客户端类型"。感觉使用这个包，就不需要锐捷的软件包了。
+下载地址：https://code.google.com/archive/p/mentohust/。下载包名：mentohust_0.3.4-1_amd64.deb
+4. 用户名密码验证
+sudo mentohust -v4.44 -w
+欢迎使用MentoHUST	版本: 0.3.4
+Copyright (C) 2009-2010 HustMoon Studio
+人到华中大，有甜亦有辣。明德厚学地，求是创新家。
+Bug report to http://code.google.com/p/mentohust/issues/list
+
+** 网卡[1]:	enp1s0
+** 网卡[2]:	wlp0s20f3
+** 网卡[5]:	bluetooth0
+** 网卡[6]:	nflog
+** 网卡[7]:	nfqueue
+** 网卡[8]:	usbmon1
+** 网卡[9]:	usbmon2
+?? 请选择网卡[1-9]: 1
+** 您选择了第[1]块网卡。
+?? 请输入用户名: guanxiaoman
+?? 请输入密码: Qc3!Kp89
+?? 请选择组播地址(0标准 1锐捷私有 2赛尔): 0
+?? 请选择DHCP方式(0不使用 1二次认证 2认证后 3认证前): 1
+** 用户名:	guanxiaoman
+** 网卡: 	enp1s0
+** 认证超时:	8秒
+** 心跳间隔:	30秒
+** 失败等待:	15秒
+** 允许失败:	8次
+** 组播地址:	标准
+** DHCP方式:	二次认证
+** 通知超时:	5秒
+** DHCP脚本:	dhclient
+!! 在网卡enp1s0上获取IP失败!
+!! 在网卡enp1s0上获取子网掩码失败!
+** 本机MAC:	e4:e7:49:3d:34:92
+** 使用IP:	0.0.0.0
+** 子网掩码:	255.255.255.255
+** 认证参数已成功保存到/etc/mentohust.conf.
+>> 寻找服务器...
+** 认证MAC:	00:1a:a9:48:2a:b1
+>> 发送用户名...
+>> 发送密码...
+** 客户端版本:	4.44
+** MD5种子:	23:ed:66:15:a6:f8:dd:93:2e:63:64:a8:97:52:3d:d2
+!! 缺少8021x.exe信息，客户端校验无法继续！
+>> 发送用户名...
+>> 发送密码...
+** 客户端版本:	4.44
+** MD5种子:	23:ed:66:15:a6:f8:dd:93:2e:63:64:a8:97:52:3d:d2
+!! 缺少8021x.exe信息，客户端校验无法继续！
+>> 认证成功!
+>> 正在获取IP...
+RTNETLINK answers: File exists
+>> 操作结束。
+!! 在网卡enp1s0上获取IP失败!
+!! 在网卡enp1s0上获取子网掩码失败!
+** 本机MAC:	e4:e7:49:3d:34:92
+** 使用IP:	0.0.0.0
+** 子网掩码:	255.255.255.255
+>> 寻找服务器...
+>> 发送用户名...
+>> 发送密码...
+** 客户端版本:	4.44
+** MD5种子:	a5:3a:82:3c:58:6a:2a:00:0a:80:a9:0c:de:13:50:86
+!! 缺少8021x.exe信息，客户端校验无法继续！
+>> 认证成功!
+>> 发送心跳包以保持在线...
+# 上面需要输入和选择一些信息。另外，有一个问题，成功认证后没有分配网关地址。需要手动配置。第一次配置成功后，之后再使用sudo mentohust -v4.44 -w命令连接时就不需要再输入任何信息了，第一次输入的信息会被保存。
+# 参考：https://blog.csdn.net/tales_/article/details/50533748
+```
+
+
+
+### 测试网速
+
+```shell
+# Speedtest.net强大而知名的全球宽带网络速度测试网站，采用Flash载入界面，Alexa世界排名非常高，
+# Speedtest.net在全球有数百个测试节点，国内有测速节点几十个。作为一款在线并且可视化的网速测试工具。
+# 使用方法简单，无需下载、安装。Speedtest.net还推出了命令行下测速工具speedtest.py 就能够实时测试网速。
+shouyu@shouyu-pc  ~  wget https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+# 下载工具
+shouyu@shouyu-pc  ~  chmod +x speedtest.py
+# 给执行权限
+shouyu@shouyu-pc  ~  ./speedtest.py 
+# 执行。下面是执行结果：
+Retrieving speedtest.net configuration...
+Testing from Beijing Primezone Technologies (211.99.134.28)...
+Retrieving speedtest.net server list...
+Selecting best server based on ping...
+Hosted by Beijing Unicom (Beijing) [1.67 km]: 7.089 ms
+Testing download speed................................................................................
+Download: 15.14 Mbit/s
+Testing upload speed................................................................................................
+Upload: 34.94 Mbit/s
+ shouyu@shouyu-pc  /media/shouyu/C64CC89B4CC8879F/Tools/ubuntutool/网速测试  sudo cp -a speedtest.py /usr/bin
+ # 将脚本入到/usr/bin目录下
+shouyu@shouyu-pc  ~  source .zshrc
+ # 加载环境变量
+shouyu@shouyu-pc  ~  speedtest.py 
+Retrieving speedtest.net configuration...
+Testing from Beijing Primezone Technologies (211.99.134.28)...
+Retrieving speedtest.net server list...
+Selecting best server based on ping...
+Hosted by Beijing Broadband Network (Beijing) [1.67 km]: 4.367 ms
+Testing download speed................................................................................
+Download: 15.06 Mbit/s
+Testing upload speed................................................................................................
+Upload: 34.47 Mbit/s
+# 这时就可以直接使用此脚本了。
+# 参考：http://www.mamicode.com/info-detail-2329407.html
+```
+
+
+
+### albert安装
+
+```shell
+# albert类似mac的alfred。可以搜索包括主机与网络上的信息。
+
+1. 下载deb包，也可以添加repo地址
+下载地址：http://download.opensuse.org/repositories/home:/manuelschneid3r/xUbuntu_16.04/amd64/albert_0.16.1_amd64.deb.mirrorlist，下载包名：albert_0.16.1_amd64.deb。这是opensuse包的下载地址，里面会包含其他发行版的包。
+# sudo add-apt-repository ppa:nilarimogard/webupd8，此命令显示超时。如果可以使用，之后更新软件库，
+# 就可以使用apt安装albert了。
+2. 安装时可能还需要依赖其他包，可以到https://pkgs.org下载。
+3. 第一次启动时需要设置一下快捷键，另外需要设置一下要搜索的位置
+```
+
+
+
+### 启动盘制作工具etcher
+
+```shell
+# 此软件为启动盘制作工具，地址：https://www.balena.io/etcher/。下载相应版本的AppImage版本，
+# 之后直接执行这个下载的软件即可。
+
+另一种安装方法：
+1. 添加Etcher debian存储库：
+echo  “ deb https://deb.etcher.io stable etcher ”  | sudo tee /etc/apt/sources.list.d/balena-etcher.list
+2. 信任Bintray.com的GPG密钥：
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
+3. 更新并安装：
+sudo apt-get update
+sudo apt-get install balena-etcher-electron
+
+卸载
+sudo apt-get del balena-etcher-electron
+sudo rm /etc/apt/sources.list.d/balena-etcher.list
+sudo apt-get update
+安装说明地址：https://github.com/balena-io/etcher#debian-and-ubuntu-based-package-repository-gnulinux-x86x64
+```
+
+
+
+### 重装grub
+
+```shell
+grub-install –target=i386-pc /dev/sda # 由于我的系统装在/dev/sda上面，所以这里用的是/dev/sda # –target=i386-pc这个option指的是：只安装BIOS系统的grub。# 我在使用时没有使用--target选项，只是简单地安装
+
+grub-mkconfig -o /boot/grub/grub.cfg 
+#安装好之后，将配置文件输出
+# 参考： https://blog.csdn.net/panglinzhuo/article/details/77599641
+```
+
+
+
+### VirtualBox虚拟机安装Ubuntu 16.04.3 LTS后安装增强功能
+
+```shell
+点击安装增强功能-->bash VBoxLinuxAdditions.run
+# 实际使用时先安装了autorun.sh，但没有效果。安装VBoxLinuxAdditions.run后需要重启。
+```
+
+
+
+### 远程使用root用户无法登录
+
+```shell
+vim /etc/ssh/sshd_config
+    PermitRootLogin yes
+    # PermitRootLogin prohibit-password
+# 注释一条，写入上面一条即可。
+systemctl restart ssh
 ```
 
 
