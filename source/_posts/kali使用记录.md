@@ -184,6 +184,9 @@ shouyu@shouyu-pc:~$
 首先，尝试安装libappindicator1应用程序指示器。如果不行，使用下面的快捷键。
 Control+Shift+W
 # 使用快捷键切换主窗口显隐，需要在空白桌面上使用上面的快捷键。
+
+20. 取消PPA库的方法
+sudo add-apt-repository --remove ppa:nilarimogard/webupd8
 ```
 
 
@@ -1000,6 +1003,24 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.211-b12, mixed mode)
 下载 Oracle_VM_VirtualBox_Extension_Pack-5.2.20-125813.vbox-extpack包，此为增强功能的包，virtualbox-5.2_5.2.20-125813~Ubuntu~bionic_amd64.deb为程序安装包
 安装好程序包后，打开页面左上解的管理，之后选择全局设定，在其中的扩展中选择添加刚才下载的增强功能包，之后就可以自动安装了。下面需要在已安装操作系统的页面上点击上方设备中的安装增强功能，之后就可以看到虚拟机操作系统中的光驱中挂载了光盘，打开安装后就可以使用VirtualBox的共享文件夹功能了。
 进入虚拟机后可以在网络中看到共享的文件夹。
+```
+
+
+
+### VirtualBox虚拟机挂载宿主机U盘
+
+```shell
+1. 下载扩展插件，地址：http://download.virtualbox.org/virtualbox/5.2.32/。因为ubuntu18.04默认安装的是5.2.32版本所以下载这个插件
+2. 到VirtualBox的全局设置中的扩展中加载这个插件
+3. 创建usbfs组
+sudo groupadd usbfs
+4. 将当前用户加入vboxusers和usbfs组。
+shouyu@shouyu-pc  ~  sudo vim /etc/group
+vboxusers:x:127:shouyu 
+usbfs:x:1001:shouyu 
+5. 打开虚拟机的设置，在系统中的芯片组选择ICH9，在USB设备中选择USB3.0控制器。启动虚拟机，如果是windows虚拟机，可以使用360驱动大师安装USB的驱动。这一步是必须做的。
+6. 关闭虚拟机与重启宿主机。
+7. 再次打开VirtualBox，启动虚拟机，插入U盘。会发现右下角的USB设置已经可以正常识别，勾选U盘的设备。
 ```
 
 

@@ -2,7 +2,7 @@
 title: Python基础练习-列表元组与冒泡法
 date: 2019-09-04 13:18:11
 tags: 冒泡法与练习
-categories: python列表依次接收用户输入的3个数，排序后打印
+categories: python
 ---
 
 ### 列表-依次接收用户输入的3个数，排序后打印
@@ -132,82 +132,73 @@ print(nums)
 
 ### 元组习题
 
+#### 冒泡法
+
 ```python
-===============================================
-    用户输入一个数字
-    1. 判断是几位数
-    2. 打印每一位数字及其重复的次数
-    3. 依次打印每一位数字，顺序个、十、百、千、万...位
-===============================================
-num = ''
-# 数字输入的简单判断
-while True:
-    num = input('Input a positive number >>>').strip().lstrip('0')
-    if num.isdigit():
-        break
-print("The length of {} is {}.".format(num,len(num)))
-
-# 倒序打印1
-for i in range(len(num),0,-1):
-    print(num[i-1],end=' ')
-print()
-# print()是换行的
-
-# 倒序打印2
-for i in reversed(num):
-    print(i,end=' ')
-print()
-
-# 负索引方式打印
-for i in range(len(num)):
-    print(num[-i-1],end=' ')
-print()
-
-# 判断0-9的数字在字符串中出现的次数，每一次抚今追昔都是用count，都是O(n)问题
-counter = [0]*10
-for i in range(10):   # 10*n
-    counter[i] = num.count(str(i))
-    if counter[i]:
-        print("The count of {} is {}".format(i,counter[i]))
-        
-print('~'*20)
-
-# 迭代字符串本身的字符
-counter = [0]*10
-for x in num:   # unique(n) * n, unique(n)取值[1,10]
-    i = int(x)
-    if counter[i] == 0:
-        counter[i] = num.count(x)
-        print("The count of {} is {}".format(x,counter[i]))
-        
-print('~'*20)
-
-# 迭代字符串本身的字符
-counter = [0]*10
-for x in num:   # n
-    i = int(x)
-    counter[i] += 1
-    
-for i in range(len(counter)):
-    if counter[i]:
-        print("The count of {} is {}".format(i, counter[i]))
-        
+numlist = [[1,9,8,5,6,7,4,3,2],[1,2,3,4,5,6,7,8,9]]
+# 定义一个列表，列表中有两个元素
+nums = numlist[0]
+# 设置nums等于列表中的第一个元素
+print(nums)
+# 打印一次nums
+length = len(nums)
+# 计算nums的长度，这是为了计算出要比较交换的次数，长度就是比较交换的次数
+count_swap = 0
+# 统计交换的次数，也就是两个数相比，如果两个数对调过一次，这里就会加1。
+count = 0
+# 统计一共进入比较多少次，进入比较后不一定会交换，因为前面的数比后面的数小是不用交换的。
+for i in range(length):  
+# 这是整个要比较的次数。如第1个数与第2个数比较，一直比较到最后一个数。这就是一次比较
+    for j in range(length-i-1):
+# 这是每次要比较几个数，总是从0到n。因为第1次比较完，最大的数就排列在最后了，下一次比较就不用再和最后一个数比较了。-1是因为range()是从0开始的。
+        count += 1
+# 统计进入比较的次数，每进入一次就加1。进入比较后不一定会交换，因为前面的数比后面的数小是不用交换的。
+        if nums[j] > nums[j+1]:
+# 第1次比较索引0和索引1两个数字，如果索引0比索引1大，就向下执行
+            tmp = nums[j]
+# 将索引0的数赋值给tmp，临时存放
+            nums[j] = nums[j+1]
+# 把索引1的数赋值给索引0,这时小的数字就向前移了
+            nums[j+1] = tmp
+# 再把临时存放的大的数字给索引1，这样大的数字就向后移了
+            count_swap += 1
+# 记录1次交换
+print(nums,count_swap,count)
+# 最后打印排列好的结果，进入比较的次数，实际交换的次数。
 # 输出结果：
-# Input a positive number >>>123
-# The length of 123 is 3.
-# 3 2 1 
-# 3 2 1 
-# 3 2 1 
-# The count of 1 is 1
-# The count of 2 is 1
-# The count of 3 is 1
-# ~~~~~~~~~~~~~~~~~~~~
-# The count of 1 is 1
-# The count of 2 is 1
-# The count of 3 is 1
-# ~~~~~~~~~~~~~~~~~~~~
-# The count of 1 is 1
-# The count of 2 is 1
-# The count of 3 is 1
+# [1, 9, 8, 5, 6, 7, 4, 3, 2]
+# [1, 2, 3, 4, 5, 6, 7, 8, 9] 25 36
+
+=======
+    优化
+=======
+# 冒泡法代码实现二，优化实现
+num_list = [[1,9,8,5,6,7,4,3,2],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,9,8]]
+nums = num_list[2]
+print(nums)
+length = len(nums)
+count_swap = 0
+count = 0
+for i in range(length):
+    flag = False
+# 每次每个数比较之前都加一个标记
+    for j in range(length-i-1):
+        count += 1
+        if nums[j] > nums[j+1]:
+            tmp = nums[j]
+            nums[j] = nums[j+1]
+            nums[j+1] = tmp
+            flag = True
+            # 如果前面的数字比后面的大，进行了交换，就将flag改为True
+            count_swap += 1
+    if not flag:   
+# 如果not flag为真，就break。这里也可以写成if flag，如果写成这样，那么上面两处对flag的定义就要转过来，把
+# False变成True，True变成False。
+        break
+# 当flag为False时，证明没有交换，也就证明没必要再进行之后的动作，顺序已经排好了。
+print(nums, count_swap, count)
+# 输出结果：
+[1, 2, 3, 4, 5, 6, 7, 9, 8]
+[1, 2, 3, 4, 5, 6, 7, 8, 9] 1 15
 ```
 
