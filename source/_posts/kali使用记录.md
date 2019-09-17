@@ -191,6 +191,30 @@ sudo add-apt-repository --remove ppa:nilarimogard/webupd8
 
 
 
+### 更新软件源时的公钥问题
+
+```shell
+apt update
+错误提示：W: GPG error: http://mirrordirector.raspbian.org/raspbian stretch InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 9165938D90FDDD2E
+W: The repository 'http://mirrordirector.raspbian.org/raspbian stretch InRelease' is not signed.
+N: Data from such a repository can't be authenticated and is therefore potentially dangerous to use.
+N: See apt-secure(8) manpage for repository creation and user configuration details.
+W: There is no public key available for the following key IDs:
+9165938D90FDDD2E
+E: Failed to fetch http://mirrordirector.raspbian.org/raspbian/dists/stretch/main/binary-armhf/Packages.xz Hash Sum mismatch
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+# 错误信息大致意思为没有找到对应的公钥，所以软件源地址不被信任。
+
+解决办法：
+apt install software-properties-common dirmngr
+gpg --keyserver  keyserver.ubuntu.com --recv-keys 9165938D90FDDD2E
+# keyserver.ubuntu.com是key服务器，9165938D90FDDD2E是上面错误提示中提到的，这是公钥签名。
+gpg --export --armor  9165938D90FDDD2E | sudo apt-key add -
+# 参考：https://www.cnblogs.com/lanqie/p/8513102.html
+```
+
+
+
 ### VMWare问题解决
 
 ```shell
@@ -481,6 +505,53 @@ Testing upload speed............................................................
 Upload: 34.47 Mbit/s
 # 这时就可以直接使用此脚本了。
 # 参考：http://www.mamicode.com/info-detail-2329407.html
+```
+
+
+
+### glances安装
+
+```shell
+wget -O- https://bit.ly/glances | /bin/bash
+# 使用此方法安装比较完整。安装过程时间比较长。不可使用apt安装，
+# 因为安装后会有python的报错。
+glances -w
+# 使用此命令后，即可打开网页http://0.0.0.0:61208/查看监控的页面了。
+glances -t 2
+# Glances 的默认刷新频率是 1 （秒），但是你可以通过在终端指定参数来手动定义其刷新频率
+
+=============================================================================
+Glances 的选项
+
+· a – 对进程自动排序
+· c – 按 CPU 百分比对进程排序
+· m – 按内存百分比对进程排序
+· p – 按进程名字母顺序对进程排序
+· i – 按读写频率（I/O）对进程排序
+· d – 显示/隐藏磁盘 I/O 统计信息
+· f – 显示/隐藏文件系统统计信息
+· n – 显示/隐藏网络接口统计信息
+· s – 显示/隐藏传感器统计信息
+· y – 显示/隐藏硬盘温度统计信息
+· l – 显示/隐藏日志（log）
+· b – 切换网络 I/O 单位（Bytes/bits）
+· w – 删除警告日志
+· x – 删除警告和严重日志
+· 1 – 切换全局 CPU 使用情况和每个 CPU 的使用情况
+· h – 显示/隐藏这个帮助画面
+· t – 以组合形式浏览网络 I/O
+· u – 以累计形式浏览网络 I/O
+· q – 退出（‘ESC‘ 和 ‘Ctrl&C‘ 也可以）
+
+Glances 中颜色的含义
+
+· 绿色：OK（一切正常）
+· 蓝色：CAREFUL（需要注意）
+· 紫色：WARNING（警告）
+· 红色：CRITICAL（严重）
+阀值可以在配置文件中设置，一般阀值被默认设置为（careful=50、warning=70、critical=90）。
+我们可以按照自己的需求在配置文件（默认在 /etc/glances/glances.conf）中自定义。
+=============================================================================
 ```
 
 

@@ -202,3 +202,28 @@ print(nums, count_swap, count)
 [1, 2, 3, 4, 5, 6, 7, 8, 9] 1 15
 ```
 
+
+
+#### 命名元组
+
+```python
+# 帮助文档中,查阅namedtuple,有使用例程
+# namedtuple(typename, field_names, verbose=False, rename=False)
+	# 命名元组,返回一个元组的子类,并定义了字段
+	# field_names可以是空白符或逗号分割的字段的字符串,可以是字段的列表
+from collections import namedtuple
+Point = namedtuple('_Point',['x','y']) 
+# Point为返回的类
+p = Point(11, 22)
+print(p)
+输出：_Point(x=11, y=22)
+
+Student = namedtuple('Student', 'name age')
+tom = Student('tom', 20)
+jerry = Student('jerry', 18)
+tom.name
+输出：'tom'
+jerry.age
+输出：18
+```
+

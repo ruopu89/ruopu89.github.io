@@ -34,16 +34,53 @@ print(s1,s2,s3,s4,s5,s6,s7,s8,sql)
 ```python
 # 字符串支持使用索引访问
 sql = "select * from user where name='tom'"
-sql[4]   # 字符串'c'
+sql[4]   
+输出：'c'
+
 sql[4] = 'o'
+输出：---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-6-9056ec11fda5> in <module>
+      1 sql = "select * from user where name='tom'"
+----> 2 sql[4] = 'o'
+
+TypeError: 'str' object does not support item assignment
+# 字符串是不可变对象，所以报错
 
 # 有序的字符集合，字符序列
+sql = "select * from user where name='tom'"
 for c in sql:
     print(c)
-    print[type(typec)]
-    
+    print(type(c))
+输出：
+s
+<class 'str'>
+e
+<class 'str'>
+l
+<class 'str'>
+e
+<class 'str'>
+c
+<class 'str'>
+t
+<class 'str'>
+
 # 可迭代
-	lst = ()
+sql = "select * from user where name='tom'"
+lst = list(sql)
+print(lst)
+输出：
+['s', 'e', 'l', 'e', 'c', 't', ' ', '*', ' ', 'f', 'r', 'o', 'm', ' ', 'u', 's', 'e', 'r', ' ', 'w', 'h', 'e', 'r', 'e', ' ', 'n', 'a', 'm', 'e', '=', "'", 't', 'o', 'm', "'"]
+
+练习：
+>>> website = 'http://www.python.org'
+>>> website[-3:] = 'com'
+Traceback (most recent call last):
+File "<pyshell#19>", line 1, in ?
+website[-3:] = 'com'
+TypeError: object doesn't support slice assignment
+# 所有标准序列操作(索引、切片、乘法、成员资格检查、长度、最小值和最大值)都适用于字符串，但字符串是不可变的，因此所有的元素赋值和切片赋值都是非法的。
 ```
 
 
@@ -58,11 +95,50 @@ for c in sql:
 
 lst = ['1','2','3']
 print("\"".join(lst))
-# 分隔符是双引号
+输出：1"2"3
+# 分隔符是双引号。\是转义符
+
 print(" ".join(lst))
+输出：1 2 3
+
 print("\n".join(lst))
+输出：
+1
+2
+3
+
 lst = ['1',['a','b'],'3']
 print(" ".join(lst))
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-11-d6bdd3c2fbc5> in <module>
+      1 lst = ['1',['a','b'],'3']
+----> 2 print(" ".join(lst))
+
+TypeError: sequence item 1: expected str instance, list found
+# 不能对复杂列表用join()函数
+
+练习
+
+>>> seq = [1, 2, 3, 4, 5]
+>>> sep = '+'
+>>> sep.join(seq) 
+# 尝试合并一个数字列表
+Traceback (most recent call last):
+File "<stdin>", line 1, in ?
+TypeError: sequence item 0: expected string, int found
+>>> seq = ['1', '2', '3', '4', '5']
+>>> sep.join(seq) 
+'1+2+3+4+5'
+# 合并一个字符串列表
+>>> dirs = '', 'usr', 'bin', 'env'
+>>> '/'.join(dirs)
+'/usr/bin/env'
+>>> print('C:' + '\\'.join(dirs))
+C:\usr\bin\env
+# 这里需要对\转义
+# 注：所合并序列的元素必须都是字符串。
 ```
 
 
@@ -82,8 +158,8 @@ print(" ".join(lst))
 ```python
 # 分割字符串的方法分为2类
 	# split系
-    	# 将字符串按照分隔符分割成若干字符串，并返回列表
-    # partition系
+		# 将字符串按照分隔符分割成若干字符串，并返回列表
+	# partition系
     	# 将字符串按照分隔符分割成2段，返回这2段和分隔符的元组
         
 # split(sep=None,maxsplit=-1) -> list of strings
@@ -93,39 +169,89 @@ print(" ".join(lst))
     
 s1 = "I'm \ta super student."
 s1.split()
+输出：["I'm", 'a', 'super', 'student.']
 # 默认以空白为分割符
+
 s1.split('s')
+输出：["I'm \ta ", 'uper ', 'tudent.']
 # 以s为分割符
+
 s1.split('super')
-s1.split('super ')
+输出：["I'm \ta ", ' student.']
+
+s1.split('super ')    # 这比上面的super多了一个空格
+输出：["I'm \ta ", 'student.']
+
 s1.split(' ')
+输出：["I'm", '\ta', 'super', 'student.']
+
 s1.split(' ',maxsplit=2)
+输出：["I'm", '\ta', 'super student.']
+
 s1.split('\t',maxsplit=2)
+输出：["I'm ", 'a super student.']
+
+练习
+
+>>> '1+2+3+4+5'.split('+')
+['1', '2', '3', '4', '5']
+>>> '/usr/bin/env'.split('/')
+['', 'usr', 'bin', 'env']
+>>> 'Using the default'.split()
+['Using', 'the', 'default']
+# split是一个非常重要的字符串方法，其作用与join相反，用于将字符串拆分为序列。如果没有指定分隔符，将默认在单个或多个连续的空白字符(空格、制表符、换行符等)处进行拆分。
 
 # splitlines([keepends]) -> list of strings
 	# 按照行来切分字符串
     # keepends指的是是否保留行分隔符
     # 行分隔符包括\n、\r\n、\r、等
 'ab c\n\nde fg\rkl\r\n'.splitlines()
+输出：['ab c', '', 'de fg', 'kl']
+
 'ab c\n\nde fg\rkl\r\n'.splitlines(True)
+输出：['ab c\n', '\n', 'de fg\r', 'kl\r\n']
+
 s1 = '''I'm a super student.
 You're a super teacher.'''
 print(s1)
+输出：
+I'm a super student.
+You're a super teacher.
+
 print(s1.splitlines())
+输出：["I'm a super student.", "You're a super teacher."]
+
 print(s1.splitlines(True))
+输出：["I'm a super student.\n", "You're a super teacher."]
 
 # * partition(sep) -> (head, sep, tail)
-	# 从左至右，遇到分隔符就把字符串分割成两部分，反回头、分隔符、尾三部分的三元组；如果没有找
+	# 从左至右，遇到分隔符就把字符串分割成两部分，返回头、分隔符、尾三部分的三元组；如果没有找
     # 到分隔符，就返回头、2个空元素的三元组
     # sep分割字符串，心须指定
 s1 = "I'm a super student."
 s1.partition('s')
+输出：("I'm a ", 's', 'uper student.')
+
 s1.partition('stu')
+输出：("I'm a super ", 'stu', 'dent.')
+
 s1.partition('')
+输出：
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-29-4a93ae92b66c> in <module>
+      2 s1.partition('s')
+      3 s1.partition('stu')
+----> 4 s1.partition('')
+
+ValueError: empty separator
+    
 s1.partition('abc')
+输出：
 
 # rpartition(sep) -> (head, sep, tail)
-	# 从右至左，遇到分隔符就把字符串分割成两部分，返回头、分隔符、尾三部分的三元组；如果没有找到分隔符，就返回2个空元素和尾的三元组
+	# 从右至左，遇到分隔符就把字符串分割成两部分，返回头、分隔符、尾三部分的三元组；如果没有找到分隔符，
+    # 就返回2个空元素和尾的三元组
 ```
 
 
@@ -137,6 +263,24 @@ s1.partition('abc')
 # lower()    全小写
 # 大小写，做判断的时候用
 # swapcase()    交互大小写
+
+练习
+
+>>> 'Trondheim Hammer Dance'.lower()
+'trondheim hammer dance'
+# lower返回字符串的小写版本
+>>> if 'Gumby' in ['gumby', 'smith', 'jones']: print('Found it!')
+...
+>>>
+# 这样是找不到的
+
+>>> name = 'Gumby'
+>>> names = ['gumby', 'smith', 'jones']
+>>> if name.lower() in names: print('Found it!')
+...
+Found it!
+>>>
+# 使用lower转换后才可以找到
 ```
 
 
@@ -155,6 +299,24 @@ s1.partition('abc')
     # width  打印宽度，居右，左边用0填充
 # ljust(width[,fillchar]) -> str    左对齐
 # rjust(width[,fillchar]) -> str    右对齐
+
+练习
+>>> "The Middle by Jimmy Eat World".center(39)
+'      The Middle by Jimmy Eat World      '
+>>> "The Middle by Jimmy Eat World".center(39, "*")
+'*****The Middle by Jimmy Eat World*****'
+# center通过在两边添加填充字符(默认为空格)让字符串居中。上面表示总长度是39，不足的地方用星号填充
+
+>>> "that's all folks".title()
+"That'S All, Folks"
+# title将字符串转换为词首大写，即所有单词的首字母都大写，其他字母都小写。然而，它确定单词边界的方式可能导致结果不合理。
+
+>>> import string
+>>> string.capwords("that's all, folks")
+That's All, Folks"
+# 还可以使用模块string中的函数capwords
+
+
 ```
 
 
@@ -181,6 +343,12 @@ s1.partition('abc')
 'www.magedu.com'.replace('www','python',2)
 输出：'python.magedu.com'
 
+练习
+
+>>> 'This is a test'.replace('is', 'eez')
+'Theez eez a test'
+# replace将指定子串都替换为另一个字符串，并返回替换后的结果。上面是将is替换为eez
+
 # strip([chars]) -> str
 	# 从字符串两端去除指定的字符集chars中的所有字符
     # 如果chars没有指定，去除两端的空白字符
@@ -199,6 +367,27 @@ s = " I am very very very sorry "
 s.strip('Iy ')
 输出：'am very very very sorr'
 # 在strip中加了空格，所以可以去除字符串中前后的空格和与空格挨着的I和y。
+
+练习
+
+>>> '      internal whitespace is kept      '.strip()
+'internal whitespace is kept'
+# strip将字符串开头和末尾的空白(但不包括中间的空白)删除，并返回删除后的结果。
+
+>>> names = ['gumby', 'smith', 'jones']
+>>> name = 'gumby '
+# 这里的gumby后有一个空格
+>>> if name in names: print('Found it!')
+...
+>>> if name.strip() in names: print('Found it!')
+...
+Found it!
+>>>
+# 需要将输入与存储的值进行比较时，strip很有用。如上面，在用户名后多了一个空格也可以找到
+
+>>> '*** SPAM * for * everyone!!! ***'.strip(' *!')
+'SPAM * for * everyone'
+# 这个方法可以删除开头或末尾的指定字符，中间的星号不会被删除。
 
 # lstrip([chars]) -> str
 	# 从左开始
@@ -242,6 +431,39 @@ s.rfind('very', 10, 15)
 s = "I am very very very sorry"
 s.rfind('very',-10,-1)
 输出：15
+
+练习
+
+>>> 'With a moo-moo here, and a moo-moo there'.find('moo')
+7
+>>> title = "Monty Python's Flying Circus"
+>>> title.find('Monty')
+0
+>>> title.find('Python')
+6
+>>> title.find('Flying')
+15
+>>> title.find('Zirquss')
+-1
+# find在字符串中查找子串。如果找到,就返回子串的第一个字符的索引,否则返回-1。
+
+>>> subject = '$$$ Get rich now!!! $$$'
+>>> subject.find('$$$')
+0
+# 使用find查找在subject字符串中的$$$，字符串方法find返回的并非布尔值。如果find像这样返回0，就意味着它在索引0处找到了指定的子串。
+
+>>> subject = '$$$ Get rich now!!! $$$'
+>>> subject.find('$$$')
+0
+>>> subject.find('$$$', 1) 
+20
+# 只指定了起点
+>>> subject.find('!!!')
+16
+>>> subject.find('!!!', 0, 16) 
+-1
+# 同时指定了起点和终点
+# 起点和终点值(第二个和第三个参数)指定的搜索范围包含起点，但不包含终点。前包后不包
 
 # index(sub[, start[, end]]) -> int
 	# 在指定的区间[start, end)，从左至右，查找子串sub。找到返回索引，没找到抛出异常ValueError
@@ -360,17 +582,17 @@ s.endswith('sorry', 5, 100)
 #### *** 字符串格式化
 
 ```python
-# 字符串的格式化是一种拼接字符串输出样式的手段,更灵活方便
-	# join拼接只能使用分隔符,且要求被拼接的是可迭代对象
-	# + 拼接字符串还算方便,但是非字符串需要先转换为字符串才能拼接
-# 在2.5版本之前,只能使用printf style风格的print输出
-	# printf-style formatting,来自于C语言的printf函数
+# 字符串的格式化是一种拼接字符串输出样式的手段，更灵活方便
+	# join拼接只能使用分隔符，且要求被拼接的是可迭代对象
+	# + 拼接字符串还算方便，但是非字符串需要先转换为字符串才能拼接
+# 在2.5版本之前，只能使用printf style风格的print输出
+	# printf-style formatting，来自于C语言的printf函数
 	# 格式要求
-		# 占位符:使用%和格式字符组成,例如%s、%d等
-			# s调用str(),r会调用repr()。所有对象都可以被这两个转换。
-		# 占位符中还可以插入修饰字符,例如%03d表示打印3个位置,不够前面补零
-		# format % values,格式字符串和被格式的值之间使用%分隔
-		# values只能是一个对象,或是一个和格式字符串占位符数目相等的元组,或一个字典
+		# 占位符:使用%和格式字符组成，例如%s、%d等
+			# s调用str()，r会调用repr()。所有对象都可以被这两个转换。
+		# 占位符中还可以插入修饰字符，例如%03d表示打印3个位置，不够前面补零
+		# format % values，格式字符串和被格式的值之间使用%分隔
+		# values只能是一个对象，或是一个和格式字符串占位符数目相等的元组，或一个字典
 # printf-style formatting 举例
 "I am %03d" % (20,)
 输出：'I am 020'
@@ -395,54 +617,50 @@ s.endswith('sorry', 5, 100)
     
 # 位置参数
 "{}:{}".format('192.168.1.100',8888)
+输出：192.168.1.100:8888
 # 这就是按照位置顺序用位置参数替换前面的格式字符串的占位符中
 
 # 关键字参数或命名参数
 "{server} {1}:{0}".format(8888, '192.168.1.100', server='Web Server Info : ') 
+输出：Web Server Info :  192.168.1.100:8888
 # 位置参数按照序号匹配，关键字参数按照名词匹配
 
 # 访问元素
 "{0[0]}.{0[1]}".format(('magedu','com'))
+输出：magedu.com
 
 # 对象属性访问
 from collections import namedtuple
-Point = namedtuple('Point','x y')
+Point = namedtuple('_Point','x y')
 p = Point(4,5)
 "{{{0.x},{0.y}}}".format(p)
+输出：'{4,5}'
 
 # 对齐
 '{0}*{1}={2:<2}'.format(3,2,2*3)
+输出：3*2=6 
 '{0}*{1}={2:<02}'.format(3,2,2*3)
+输出：3*2=60
 '{0}*{1}={2:>02}'.format(3,2,2*3)
+输出：3*2=06
 '{:^30}'.format('centered')
+输出：           centered           
 '{:*^30}'.format('centered')
+输出：***********centered***********
 
 # 进制
 "int: {0:d}; hex: {0:x}; oct: {0:o}; bin: {0:b}".format(42)
+输出：int: 42; hex: 2a; oct: 52; bin: 101010
+                
 "int: {0:d}; hex: {0:#x}; oct: {0:#o}; bin: {0:#b}".format(42)
+输出：int: 42; hex: 0x2a; oct: 0o52; bin: 0b101010
+                
 octets = [192, 168, 0, 1]
 '{:02X}{:02X}{:02X}{:02X}'.format(*octets)
-```
+输出：C0A80001
+# *号表示参数解构，依次将每个元素分解开。X表示转为16进制
 
-
-
-### 字符串基本操作
-
-```python
->>> website = 'http://www.python.org'
->>> website[-3:] = 'com'
-Traceback (most recent call last):
-File "<pyshell#19>", line 1, in ?
-website[-3:] = 'com'
-TypeError: object doesn't support slice assignment
-# 所有标准序列操作(索引、切片、乘法、成员资格检查、长度、最小值和最大值)都适用于字符串，但字符串是不可变的，因此所有的元素赋值和切片赋值都是非法的。
-```
-
-
-
-### 设置字符串的格式
-
-```python
+练习
 >>> format = "Hello, %s. %s enough for ya?"
 >>> values = ('world', 'Hot')
 >>> format % values
@@ -493,13 +711,7 @@ TypeError: object doesn't support slice assignment
 * 转换标志：跟在叹号后面的单个字符。当前支持的字符包括r(表示repr) 、s(表示str)和a(表示ascii)。如果你指定了转换标志，将不使用对象本身的格式设置机制，而是使用指定的函数将对象转换为字符串，再做进一步的格式设置。
 * 格式说明符：跟在冒号后面的表达式(这种表达式是使用微型格式指定语言表示的) 。格式说明符让我们能够详细地指定最终的格式，包括格式类型(如字符串、浮点数或十六进制数)，字段宽度和数的精度，如何显示符号和千位分隔符，以及各种对齐和填充方式。
 ============================================================================================
-```
 
-
-
-#### 替换字段名
-
-```python
 >>> "{foo} {} {bar} {}".format(1, 2, bar=4, foo=3)
 '3 1 4 2'
 # 还可通过索引来指定要在哪个字段中使用相应的未命名参数，这样可不按顺序使用未命名参数。
@@ -518,13 +730,7 @@ TypeError: object doesn't support slice assignment
 >>> tmpl = "The {mod.__name__} module defines the value {mod.pi} for π"
 >>> tmpl.format(mod=math)
 'The math module defines the value 3.141592653589793 for π'
-```
 
-
-
-#### 基本转换
-
-```python
 >>> print("{pi!s} {pi!r} {pi!a}".format(pi="π"))
 π 'π' '\u03c0'
 # 上述三个标志(s、r和a)指定分别使用str、repr和ascii进行转换。函数str通常创建外观普通的字符串版本(这里没有对输入字符串做任何处理)。函数 repr 尝试创建给定值的Python表示(这里是一个字符串字面量)。函数 ascii创建只包含ASCII字符的表示
@@ -540,31 +746,24 @@ TypeError: object doesn't support slice assignment
 # 作为二进制数进行处理
 
 ============================================================================================
-类型																															含义
-b						将整数表示为二进制数
-c						将整数解读为Unicode码点
-d						将整数视为十进制数进行处理，这是整数默认使用的说明符
-e						使用科学表示法来表示小数(用e来表示指数)
-E						与e相同，但使用E来表示指数
-f						 将小数表示为定点数
-F						与 f相同，但对于特殊值(nan和 inf)，使用大写表示
-g						自动在定点表示法和科学表示法之间做出选择。这是默认用于小数的说明符，但在默认情况下至少有1
-						  位小数
-G						与 g相同，但使用大写来表示指数和特殊值
-n						与 g相同，但插入随区域而异的数字分隔符
-o						将整数表示为八进制数
-s						保持字符串的格式不变，这是默认用于字符串的说明符
-x						将整数表示为十六进制数并使用小写字母
-X						与 x相同，但使用大写字母
-%					  将数表示为百分比值(乘以100，按说明符 f设置格式，再在后面加上%)
+类型			含义
+b			将整数表示为二进制数
+c			将整数解读为Unicode码点
+d			将整数视为十进制数进行处理，这是整数默认使用的说明符
+e			使用科学表示法来表示小数(用e来表示指数)
+E			与e相同，但使用E来表示指数
+f			将小数表示为定点数
+F			与 f相同，但对于特殊值(nan和 inf)，使用大写表示
+g			自动在定点表示法和科学表示法之间做出选择。这是默认用于小数的说明符，但在默认情况下至少有1位小数
+G			与 g相同，但使用大写来表示指数和特殊值
+n			与 g相同，但插入随区域而异的数字分隔符
+o			将整数表示为八进制数
+s			保持字符串的格式不变，这是默认用于字符串的说明符
+x			将整数表示为十六进制数并使用小写字母
+X			与 x相同，但使用大写字母
+%			将数表示为百分比值(乘以100，按说明符 f设置格式，再在后面加上%)
 ============================================================================================
-```
 
-
-
-#### 宽度、精度和千位分隔符
-
-```python
 >>> "{num:10}".format(num=3)
 '          3'
 >>> "{name:10}".format(name="Bob")
@@ -587,13 +786,7 @@ X						与 x相同，但使用大写字母
 'One googol is 10,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,00
 0,000,000,000,000,000,000,000,000,000,000,000,000,000,000'
 # 使用逗号来指出你要添加千位分隔符
-```
 
-
-
-#### 符号、对齐和用 0 填充
-
-```python
 >>> '{:010.2f}'.format(pi)
 '0000003.14'
 # 在指定宽度和精度的数前面，可添加一个标志。这个标志可以是零、加号、减号或空格，其中零表示使用0来填充数字。
@@ -638,13 +831,7 @@ X						与 x相同，但使用大写字母
 >>> "{:#g}".format(42)
 '42.0000'
 # 对于各种十进制数,它要求必须包含小数点(对于类型g,它保留小数点后面的零)。
-```
 
-
-
-#### 代码
-
-```python
 # 根据指定的宽度打印格式良好的价格列表
 width = int(input('Please enter width: '))
 
@@ -682,8 +869,6 @@ Prunes (4 lbs.)										12.00
 
 
 
-### 字符串方法
-
 #### string模块
 
 ```python
@@ -700,166 +885,6 @@ string.punctuation
 string.ascii_uppercase
 # 包含所有大写ASCII字母的字符串。
 # 虽然说的是ASCII字符，但值实际上是未解码的Unicode字符串。
-```
-
-
-
-#### center（字符居中）
-
-```python
->>> "The Middle by Jimmy Eat World".center(39)
-'      The Middle by Jimmy Eat World      '
->>> "The Middle by Jimmy Eat World".center(39, "*")
-'*****The Middle by Jimmy Eat World*****'
-# center通过在两边添加填充字符(默认为空格)让字符串居中。上面表示总长度是39，不足的地方用星号填充
-```
-
-
-
-#### find（查找子串）
-
-```python
->>> 'With a moo-moo here, and a moo-moo there'.find('moo')
-7
->>> title = "Monty Python's Flying Circus"
->>> title.find('Monty')
-0
->>> title.find('Python')
-6
->>> title.find('Flying')
-15
->>> title.find('Zirquss')
--1
-# find在字符串中查找子串。如果找到,就返回子串的第一个字符的索引,否则返回-1。
-
->>> subject = '$$$ Get rich now!!! $$$'
->>> subject.find('$$$')
-0
-# 使用find查找在subject字符串中的$$$，字符串方法find返回的并非布尔值。如果find像这样返回0，就意味着它在索引0处找到了指定的子串。
-
->>> subject = '$$$ Get rich now!!! $$$'
->>> subject.find('$$$')
-0
->>> subject.find('$$$', 1) 
-20
-# 只指定了起点
->>> subject.find('!!!')
-16
->>> subject.find('!!!', 0, 16) 
--1
-# 同时指定了起点和终点
-# 起点和终点值(第二个和第三个参数)指定的搜索范围包含起点，但不包含终点。前包后不包
-```
-
-
-
-#### join（合并序列元素）
-
-```python
->>> seq = [1, 2, 3, 4, 5]
->>> sep = '+'
->>> sep.join(seq) 
-# 尝试合并一个数字列表
-Traceback (most recent call last):
-File "<stdin>", line 1, in ?
-TypeError: sequence item 0: expected string, int found
->>> seq = ['1', '2', '3', '4', '5']
->>> sep.join(seq) 
-'1+2+3+4+5'
-# 合并一个字符串列表
->>> dirs = '', 'usr', 'bin', 'env'
->>> '/'.join(dirs)
-'/usr/bin/env'
->>> print('C:' + '\\'.join(dirs))
-C:\usr\bin\env
-# 这里需要对\转义
-# 注：所合并序列的元素必须都是字符串。
-```
-
-
-
-#### lower（返回字符串小写）
-
-```python
->>> 'Trondheim Hammer Dance'.lower()
-'trondheim hammer dance'
-# lower返回字符串的小写版本
->>> if 'Gumby' in ['gumby', 'smith', 'jones']: print('Found it!')
-...
->>>
-# 这样是找不到的
-
->>> name = 'Gumby'
->>> names = ['gumby', 'smith', 'jones']
->>> if name.lower() in names: print('Found it!')
-...
-Found it!
->>>
-# 使用lower转换后才可以找到
-```
-
-
-
-#### title（词首大写）
-
-```python
->>> "that's all folks".title()
-"That'S All, Folks"
-# title将字符串转换为词首大写，即所有单词的首字母都大写，其他字母都小写。然而，它确定单词边界的方式可能导致结果不合理。
-
->>> import string
->>> string.capwords("that's all, folks")
-That's All, Folks"
-# 还可以使用模块string中的函数capwords
-```
-
-
-
-#### replace（替换子串）
-
-```python
->>> 'This is a test'.replace('is', 'eez')
-'Theez eez a test'
-# replace将指定子串都替换为另一个字符串，并返回替换后的结果。上面是将is替换为eez
-```
-
-
-
-#### split（拆分字符串）
-
-```python
->>> '1+2+3+4+5'.split('+')
-['1', '2', '3', '4', '5']
->>> '/usr/bin/env'.split('/')
-['', 'usr', 'bin', 'env']
->>> 'Using the default'.split()
-['Using', 'the', 'default']
-# split是一个非常重要的字符串方法，其作用与join相反，用于将字符串拆分为序列。如果没有指定分隔符，将默认在单个或多个连续的空白字符(空格、制表符、换行符等)处进行拆分。
-```
-
-
-
-#### strip（删除空白）
-
-```python
->>> '      internal whitespace is kept      '.strip()
-'internal whitespace is kept'
-# strip将字符串开头和末尾的空白(但不包括中间的空白)删除，并返回删除后的结果。
-
->>> names = ['gumby', 'smith', 'jones']
->>> name = 'gumby '
-# 这里的gumby后有一个空格
->>> if name in names: print('Found it!')
-...
->>> if name.strip() in names: print('Found it!')
-...
-Found it!
->>>
-# 需要将输入与存储的值进行比较时，strip很有用。如上面，在用户名后多了一个空格也可以找到
-
->>> '*** SPAM * for * everyone!!! ***'.strip(' *!')
-'SPAM * for * everyone'
-# 这个方法可以删除开头或末尾的指定字符，中间的星号不会被删除。
 ```
 
 
