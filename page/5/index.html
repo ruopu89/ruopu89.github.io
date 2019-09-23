@@ -350,6 +350,558 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/corosync&pacemaker集群部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/29/corosync&pacemaker集群部署/" itemprop="url">
+                  corosync&pacemaker集群部署
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 14:16:07" itemprop="dateCreated datePublished" datetime="2019-03-29T14:16:07+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-04-04 10:33:08" itemprop="dateModified" datetime="2019-04-04T10:33:08+08:00">2019-04-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="OpenAIS"><a href="#OpenAIS" class="headerlink" title="OpenAIS"></a>OpenAIS</h4><blockquote>
+<p>OpenAIS是基于SA Forum 标准的集群框架的应用程序接口规范。OpenAIS提供一种集群模式，这个模式包括集群框架，集群成员管理，通信方式，集群监测等，能够为集群软件或工具提供满足 AIS标准的集群接口，但是它没有集群资源管理功能，不能独立形成一个集群。OpenAIS组件包括AMF，CLM，CKPT，EVT，LCK，MSG，TMR，CPG，EVS等，因OpenAIS分支不同，组件略有不同。OpenAIS主要包含三个分支：Picacho，Whitetank，Wilson。Wilson是最新的，比较稳定的版本是从openais 1.0.0到openais1.1.4。Whitetank现在是主流分支版本，比较稳定的版本是openais0.80到openais0.86。Picacho第一代的OpenAIS的分支，比较稳定的版本是openais0.70和openais0.71。现在比较常用的是Whitetank和Wilson，两者之间有很多不同。OpenAIS从Whitetank升级到Wilson版本后，组件变化很大，Wilson把Openais核心架构组件独立出来放在Corosync（Corosync是一个集群管理引擎）里面。Whitetank包含的组件有AMF，CLM，CKPT，EVT，LCK ，MSG，CPG，CFG，EVS，aisparser，VSF_ykd，bojdb等。而Wilson只含有AMF，CLM，CKPT，LCK, MSG，EVT，TMR（TMR，Whitetank里面没有），这些都是AIS组件。其他核心组件被放到了Corosync内。Wilson被当做Corosync的一个插件。</p>
+</blockquote>
+<h4 id="corosync"><a href="#corosync" class="headerlink" title="corosync"></a>corosync</h4><blockquote>
+<p>Corosync是OpenAIS发展到Wilson版本后衍生出来的开放性集群引擎工程。可以说Corosync是OpenAIS工程的一部分。OpenAIS从openais0.90开始独立成两部分，一个是Corosync；另一个是AIS标准接口Wilson。Corosync包含OpenAIS的核心框架用来对Wilson的标准接口的使用、管理。它为商用的或开源性的集群提供集群执行框架。Corosync执行高可用应用程序的通信组系统，它有以下特征： </p>
+<ul>
+<li>一个封闭的程序组（A closed process group communication model）通信模式，这个模式提供一种虚拟的同步方式来保证能够复制服务器的状态。 </li>
+<li>一个简单可用性管理组件（A simple availability manager），这个管理组件可以重新启动应用程序的进程当它失败后。 </li>
+<li>一个配置和内存数据的统计（A configuration and statistics <a href="http://en.wikipedia.org/wiki/in-memory_database" target="_blank" rel="noopener">in-memory database</a>），内存数据能够被设置，回复，接受通知的更改信息。 </li>
+<li>一个定额的系统（A quorum  system），定额完成或者丢失时通知应用程序。 </li>
+</ul>
+</blockquote>
+<h4 id="cman"><a href="#cman" class="headerlink" title="cman"></a>cman</h4><blockquote>
+<p>CMAN是红帽RHCS套件的核心部分，CCS是CMAN集群配置系统，配置cluster.conf，而cluster.conf其实就是openais的配置文件，通过CCS映射到openais。 </p>
+</blockquote>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
+<p>AIS就是一个通用的应用程序编程接口，OpenAIS是AIS的子项目，标准的集群框架的应用程序接口规范，而corosync是OpenAIS是具体实现。</p>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="基本实现"><a href="#基本实现" class="headerlink" title="基本实现"></a>基本实现</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">环境：</span><br><span class="line">准备三台主机，地址：192.168.2.132（primary, node1）、192.168.2.133（secondary, node2）。192.168.2.128（node3）提供NFS服务。</span><br><span class="line">===========================================================================================</span><br><span class="line">----------------</span><br><span class="line">   node1&amp;2</span><br><span class="line">----------------</span><br><span class="line">[root@primary ~]# ntpdate ntp.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@primary ~]# ssh-keygen -t rsa -P ''</span><br><span class="line">[root@primary ~]# ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.133</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让两节点使用密钥通信</span></span><br><span class="line">[root@primary ~]# yum install -y corosync pacemaker</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装两个包</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# cd /etc/corosync/</span><br><span class="line">[root@primary corosync]# cp corosync.conf.example</span><br><span class="line">corosync.conf.example       corosync.conf.example.udpu  </span><br><span class="line">[root@primary corosync]# cp corosync.conf.example corosync.conf</span><br><span class="line">[root@primary corosync]# vim corosync.conf</span><br><span class="line">compatibility: whitetank</span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否兼容whitetank </span></span><br><span class="line">totem &#123;</span><br><span class="line">	version: 2</span><br><span class="line">	secauth: on</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否打开安装认证，不让其他主机加入，打开此功能后需要使用corosync-keygen生成密钥 </span></span><br><span class="line">	threads: 0</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 工作时的线程数，0表示基于进程模式工作</span></span><br><span class="line">	interface &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 定义多个节点之间通过哪个接口，基于哪个多播地址，监听什么端口完成多播通信 </span></span><br><span class="line">		ringnumber: 0</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 环数目，一般为0，类似TTL值 </span></span><br><span class="line">		bindnetaddr: 192.168.2.0</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 这通常是要绑定到的接口的*网络*地址，也就是本机所在的网络。这样可以确保您可以跨所有集群节点使用此配置文件的相同实例，而无需修改此选项。 </span></span><br><span class="line">		mcastaddr: 239.165.134.13</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 多播地址</span></span><br><span class="line">		mcastport: 5405</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 多播监听端口 </span></span><br><span class="line">		ttl: 1</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">logging &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定日志系统</span></span><br><span class="line">	fileline: off</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录fileline </span></span><br><span class="line">	to_stderr: no</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否发往标准错误输出，一般不发送</span></span><br><span class="line">	to_logfile: yes</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录到日志文件中</span></span><br><span class="line">	logfile: /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 日志位置 </span></span><br><span class="line">	to_syslog: no</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 也发往syslog一份，一般记录一份<span class="built_in">log</span>即可，所以这里关闭了此功能 </span></span><br><span class="line">	debug: off</span><br><span class="line">	timestamp: on</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否在日志中打开时间戳功能，如果是on，会影响系统性能 </span></span><br><span class="line">	logger_subsys &#123;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否记录子系统，记录AMF，这是OpenAIS的子组件</span></span><br><span class="line">		subsys: AMF</span><br><span class="line">		debug: off</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">service &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此段，以插件形式运行pacemaker</span></span><br><span class="line">	ver: 0</span><br><span class="line">	name: pacemaker</span><br><span class="line">	use_mgmtd: yes</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 此项可有可无 </span></span><br><span class="line">&#125;</span><br><span class="line">aisexec &#123;</span><br><span class="line">	user: root</span><br><span class="line">	group:	root</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 以root用户身份运行，此项可有可无 </span></span><br><span class="line">&#125;</span><br><span class="line">[root@primary corosync]# ip link show</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:83:af:ca brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看网卡是否支持MULTICAST</span></span><br><span class="line">[root@primary corosync]# corosync-keygen </span><br><span class="line">Corosync Cluster Engine Authentication key generator.</span><br><span class="line">Gathering 1024 bits for key from /dev/random.</span><br><span class="line">Press keys on your keyboard to generate entropy.</span><br><span class="line">Writing corosync key to /etc/corosync/authkey.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从随机数中生成密钥，需要1024个字符，可能不够，如果不够，可以下载大文件产生IO数，使熵池中生成随机数</span></span><br><span class="line">[root@primary corosync]# ll </span><br><span class="line">总用量 32</span><br><span class="line">-rw-r--r-- 1 root root 5384 7月  20 2011 amf.conf.example</span><br><span class="line">-r-------- 1 root root  128 4月   2 15:47 authkey</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成了authkey文件，权限400</span></span><br><span class="line">[root@primary corosync]# scp authkey corosync.conf 192.168.2.133:/etc/corosync/</span><br><span class="line">[root@primary corosync]# service corosync start; ssh 192.168.2.133 'service corosync start'</span><br><span class="line">Starting Corosync Cluster Engine (corosync):               [  OK  ]</span><br><span class="line">Starting Corosync Cluster Engine (corosync): [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动两个节点的corosync服务</span></span><br><span class="line">[root@primary corosync]# ss -tlun</span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听了5405多播端口</span></span><br><span class="line">[root@primary corosync]# tail -f /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看日志中是否有报错信息</span></span><br><span class="line">[root@primary corosync]# grep -e "Corosync Cluster Engine" -e "configuration file" /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看两个节点中是否有两条信息，如果有就证明启动成功了</span></span><br><span class="line">[root@primary corosync]# grep TOTEM /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看初始化成员节点通知是否正常发出，应该可以查到内容</span></span><br><span class="line">[root@primary corosync]# grep ERROR: /var/log/cluster/corosync.log | grep –v unpack_resources</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="comment"># 检查启动过程中是否有错误产生，错误信息表示packmaker不久之后将不再作为corosync的插件运行，因此，建议使用cman作为集群基础架构服务，此处可安全忽略。 </span></span></span><br><span class="line">[root@primary corosync]# grep pcmk_startup /var/log/cluster/corosync.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果有信息说明启动完成</span></span><br></pre></td></tr></table></figure>
+<h4 id="使用crmsh配置pacemaker"><a href="#使用crmsh配置pacemaker" class="headerlink" title="使用crmsh配置pacemaker"></a>使用crmsh配置pacemaker</h4><blockquote>
+<p>crmsh工具在集群中的任一节点上安装均可，不需要每个节点都安装</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@primary corosync]# cd /etc/yum.repos.d/</span><br><span class="line">[root@primary yum.repos.d]# wget http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/CentOS_CentOS-6/network:ha-clustering:Stable.repo</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载opensuse的源，因为crmsh工具是opensuse提供的</span></span><br><span class="line">[root@primary yum.repos.d]# yum install -y crmsh pssh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装，连接速度很慢</span></span><br><span class="line">[root@primary yum.repos.d]# crm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入crm模式</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:03:21 2019</span><br><span class="line">Last change: Tue Apr  2 15:51:08 2019 by hacluster via crmd on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">0 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">No resources</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，也可以直接使用crm status命令。可以看到DC是主机名为primary的节点，Online: [ primary secondary ]表示有两台主机都在线。</span></span><br></pre></td></tr></table></figure>
+<h5 id="configure配置集群"><a href="#configure配置集群" class="headerlink" title="configure配置集群"></a>configure配置集群</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@primary ~]# crm </span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在子命令中使用此命令，表示配置集群模式 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">help</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看configure的帮助</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary</span><br><span class="line">node secondary</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是configure中的子命令，显示当前集群配置信息，实际配置文件是XML格式的。显示的property表示集群的全局属性，全局属性是配置集群的基本特性的 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show xml</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样就可以看到xml格式的配置文件</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property </span></span><br><span class="line">batch-limit=                   enable-startup-probes=         node-health-strategy=          stonith-enabled= </span><br><span class="line">cluster-delay=                 have-watchdog=                 node-health-yellow=            stonith-max-attempts= </span><br><span class="line">cluster-ipc-limit=             is-managed-default=            pe-error-series-max=           stonith-timeout= </span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行此命令后，再按两次Tab键，可以看到可以配置的全局属性。stonity-enabled=表示是否必须配置stonith设备，默认为是。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property stonith-enabled=</span></span><br><span class="line">stonith-enabled (boolean, [true]): </span><br><span class="line">    Failed nodes are STONITH'd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 按两次Tab键后可以看到默认的值是True </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property stonith-enabled=<span class="literal">false</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 禁用stonith</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 校验配置是否有错，如果没错，不会显示任何信息</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary</span><br><span class="line">node secondary</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2 \</span><br><span class="line">	stonith-enabled=false</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再查看，多了stonith-enabled=<span class="literal">false</span>一项</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交，这样才能生效。因为上面的配置都是在内存中完成的。</span></span><br></pre></td></tr></table></figure>
+<h5 id="node"><a href="#node" class="headerlink" title="node"></a>node</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> ls</span></span><br><span class="line">..               help             fence            </span><br><span class="line">show             attribute        back             </span><br><span class="line">cd               ready            status-attr      </span><br><span class="line">quit             end              utilization      </span><br><span class="line">exit             ls               maintenance      </span><br><span class="line">online           bye              ?                </span><br><span class="line">status           clearstate       standby          </span><br><span class="line">list             up               server           </span><br><span class="line">delete           </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看可用的命令</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> show</span></span><br><span class="line">primary: normal</span><br><span class="line">secondary: normal</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示当前在线节点，都是normal状态</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把当前节点设置为备用状态 </span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> show</span></span><br><span class="line">primary: normal</span><br><span class="line">	standby=on</span><br><span class="line">secondary: normal</span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> online</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 再让节点上线</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> status</span></span><br><span class="line">&lt;nodes&gt;</span><br><span class="line">  &lt;node id="primary" uname="primary"&gt;</span><br><span class="line">    &lt;instance_attributes id="nodes-primary"&gt;</span><br><span class="line">      &lt;nvpair id="nodes-primary-standby" name="standby" value="off"/&gt;</span><br><span class="line">    &lt;/instance_attributes&gt;</span><br><span class="line">  &lt;/node&gt;</span><br><span class="line">  &lt;node id="secondary" uname="secondary"/&gt;</span><br><span class="line">&lt;/nodes&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前节点信息</span></span><br></pre></td></tr></table></figure>
+<h5 id="resource"><a href="#resource" class="headerlink" title="resource"></a>resource</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">help</span></span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源状态</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> restart resource-name</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启资源</span></span><br></pre></td></tr></table></figure>
+<h5 id="ra资源代理"><a href="#ra资源代理" class="headerlink" title="ra资源代理"></a>ra资源代理</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> ra </span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> ls</span></span><br><span class="line">..               info             quit             </span><br><span class="line">end              help             providers        </span><br><span class="line">up               list             cd               </span><br><span class="line">classes          meta             ls               </span><br><span class="line">back             exit             validate         </span><br><span class="line">bye              ?                </span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> classes</span></span><br><span class="line">lsb</span><br><span class="line">ocf / .isolation heartbeat linbit pacemaker</span><br><span class="line">service</span><br><span class="line">stonith</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示资源代理模式 </span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list lsb</span></span><br><span class="line">abrt-ccpp                abrt-oops                abrtd                    acpid                    atd</span><br><span class="line">auditd                   autofs                   blk-availability         bmc-snmp-proxy           certmonger</span><br><span class="line">cgconfig                 cgred                    cman                     corosync                 corosync-notifyd</span><br><span class="line">cpuspeed                 crond                    cups                     drbd                     exchange-bmc-os-info</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看lsb中有哪些资源代理可用</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list ocf heartbeat</span></span><br><span class="line">CTDB              Delay             Dummy             Filesystem        IPaddr            IPaddr2           IPsrcaddr</span><br><span class="line">LVM               MailTo            Route             SendArp           Squid             VirtualDomain     Xinetd</span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list ocf pacemaker</span></span><br><span class="line">ClusterMon    Dummy         HealthCPU     HealthSMART   Stateful      SysInfo       SystemHealth  attribute     ifspeed</span><br><span class="line">ping          pingd         remote  </span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list service</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> service与lsb是一样的</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> list stonith</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> <span class="built_in">help</span> info</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  info可以查看帮助信息</span></span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> info ocf:heartbeat:IPaddr</span></span><br></pre></td></tr></table></figure>
+<h5 id="配置资源primitive"><a href="#配置资源primitive" class="headerlink" title="配置资源primitive"></a>配置资源primitive</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line"><span class="meta">crm(live)ra#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webip ocf:heartbeat:IPaddr params ip=192.168.2.100 nic=eth1 cidr_netmask=24</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> webip是资源名称，ocf:heartbeat:IPaddr是资源代理，params 用来指明参数，IP地址，网卡，掩码。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:26:40 2019</span><br><span class="line">Last change: Tue Apr  2 16:26:27 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到webip资源添加到了节点1上</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# ip a</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:83:af:ca brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.2.132/24 brd 192.168.2.255 scope global eth1</span><br><span class="line">    inet 192.168.2.100/24 brd 192.168.2.255 scope global secondary eth1</span><br><span class="line">    inet6 fe80::20c:29ff:fe83:afca/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看看到添加了一个IP</span></span><br><span class="line">[root@primary ~]# crm node standby</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要将哪个节点转为备节点，就在哪个节点上执行此命令</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:30:38 2019</span><br><span class="line">Last change: Tue Apr  2 16:30:34 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Node primary: standby</span><br><span class="line">Online: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，online的就只有node2了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ip a</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:af:e1:97 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.2.133/24 brd 192.168.2.255 scope global eth1</span><br><span class="line">    inet 192.168.2.100/24 brd 192.168.2.255 scope global secondary eth1</span><br><span class="line">    inet6 fe80::20c:29ff:feaf:e197/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到ip地址转到node2了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm node online</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点1上线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 16:32:28 2019</span><br><span class="line">Last change: Tue Apr  2 16:32:25 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源没有转回</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# service corosync stop</span><br><span class="line">Signaling Corosync Cluster Engine (corosync) to terminate: [  OK  ]</span><br><span class="line">Waiting for corosync services to unload:.                  [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停掉节点2的服务，看资源是转到节点1上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition WITHOUT quorum</span><br><span class="line">Last updated: Tue Apr  2 16:34:22 2019</span><br><span class="line">Last change: Tue Apr  2 16:32:25 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 看资源是否转移，显示资源没有启动，因为一个服务停止了，所以只有一个节点在线，未超过半数，并且资源默认是关闭的，所以资源未启动 </span></span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> property no-quorum-policy=ignore</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置没有法定票数时怎么办，设置为ignore</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition WITHOUT quorum</span><br><span class="line">Last updated: Tue Apr  2 16:36:29 2019</span><br><span class="line">Last change: Tue Apr  2 16:35:58 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">1 resource configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到资源启动了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# service corosync start</span><br><span class="line">Starting Corosync Cluster Engine (corosync): </span><br><span class="line">                                                           [  OK  ]</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm resource</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: primary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源状态，显示资源在primary上</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> migrate webip secondary</span></span><br><span class="line">INFO: Move constraint created for webip to secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 转移资源 到secondary上，secondary是主机名</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示资源在secondary上</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源 </span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is NOT running</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源 </span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status </span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看所有资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> unmigrate webip</span></span><br><span class="line">INFO: Removed migration constraints for webip</span><br><span class="line"><span class="meta">#</span><span class="bash"> 转回到原来的节点</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> status webip</span></span><br><span class="line">resource webip is running on: secondary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为没有倾向性，所以没有转移</span></span><br></pre></td></tr></table></figure>
+<h5 id="高可用web"><a href="#高可用web" class="headerlink" title="高可用web"></a>高可用web</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br></pre></td><td class="code"><pre><span class="line">----------------</span><br><span class="line">   node1&amp;2</span><br><span class="line">----------------</span><br><span class="line">[root@primary ~]# yum install -y httpd</span><br><span class="line">[root@primary ~]# vim /var/www/html/index.html</span><br><span class="line">node1:primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提供网页文件，另一台内容为node2:secondary</span></span><br><span class="line">[root@primary ~]# service httpd start</span><br><span class="line">[root@primary ~]# curl 192.168.2.132</span><br><span class="line">node1:primary</span><br><span class="line">[root@primary ~]# curl 192.168.2.133</span><br><span class="line">node2:secondary</span><br><span class="line">[root@secondary ~]# service httpd stop</span><br><span class="line">[root@secondary ~]# chkconfig httpd off</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为要高可用此资源，所以不可以让服务自动启动</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm configure      </span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webserver lsb:httpd</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> web服务在节点2上启动了</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm resource</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看资源是启动的</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Stopped (disabled)</span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> start webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 再启动</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> show</span></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started</span><br><span class="line"> webserver	(lsb:httpd):	Started</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时资源还是在节点2上启动</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2成为备用节点</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:10:10 2019</span><br><span class="line">Last change: Tue Apr  2 17:08:47 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时两个资源都在节点1上运行了</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node online secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2上线</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:11:16 2019</span><br><span class="line">Last change: Tue Apr  2 17:11:08 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> web资源又转移到了节点2上</span></span><br><span class="line"> </span><br><span class="line"> ==========================================================================================</span><br><span class="line"> 使用资源组的方式，让资源在同一个节点运行</span><br><span class="line"> ==========================================================================================</span><br><span class="line"><span class="meta"> crm(live)configure#</span><span class="bash"> group webservice webip webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一个组叫webservice，组内有两个资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">exit</span></span></span><br><span class="line">bye</span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:14:15 2019</span><br><span class="line">Last change: Tue Apr  2 17:13:22 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> web资源又转移到节点1上了</span></span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> edit</span></span><br><span class="line">node primary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">primitive webip IPaddr \</span><br><span class="line">        params ip=192.168.2.100 nic=eth1 cidr_netmask=24 \</span><br><span class="line">        meta target-role=Started</span><br><span class="line">primitive webserver lsb:httpd \</span><br><span class="line">        meta target-role=Started</span><br><span class="line">group webservice webip webserver</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">        have-watchdog=false \</span><br><span class="line">        dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">        cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">        expected-quorum-votes=2 \</span><br><span class="line">        stonith-enabled=false \</span><br><span class="line">        no-quorum-policy=ignore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 编辑配置文件</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:18:54 2019</span><br><span class="line">Last change: Tue Apr  2 17:18:36 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到两个资源在一个资源组中</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure delete webservice</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除资源组，并不会报错，资源组马上被删除了</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:19:12 2019</span><br><span class="line">Last change: Tue Apr  2 17:19:10 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源组没有了</span></span><br><span class="line">==========================================================================================</span><br><span class="line">定义排列约束，即将资源绑定在一起</span><br><span class="line">==========================================================================================</span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> colocation webserver_with_webip inf: webserver webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> colocation定义排列约束，webserver_with_webip是自定义名称，inf表示定义分数，冒号后没有东西表示无穷大，这样两个资源就永远在一起了 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:26:39 2019</span><br><span class="line">Last change: Tue Apr  2 17:26:35 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交后，两个资源就都在节点1上运行了</span></span><br><span class="line">==========================================================================================</span><br><span class="line">定义顺序约束，即资源的启动顺序。定义位置约束，即让资源倾向在哪个节点上运行。</span><br><span class="line">==========================================================================================</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> order webip_before_webserver Mandatory: webip webserver</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义顺序约束，先启动webip再启动webserver </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> location webip_on_node2 webip 50: secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义位置约束，让webip资源尽量在节点2上运行 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:51:11 2019</span><br><span class="line">Last change: Tue Apr  2 17:50:50 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 提交后，资源都转到节点2运行了</span></span><br><span class="line"> </span><br><span class="line"><span class="meta"> crm(live)configure#</span><span class="bash"> delete webip_on_node2 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> show</span></span><br><span class="line">node primary \</span><br><span class="line">	attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">	attributes standby=off</span><br><span class="line">primitive webip IPaddr \</span><br><span class="line">	params ip=192.168.2.100 nic=eth1 cidr_netmask=24 \</span><br><span class="line">	meta target-role=Started</span><br><span class="line">primitive webserver lsb:httpd \</span><br><span class="line">	meta target-role=Started</span><br><span class="line">order webip_before_webserver Mandatory: webip webserver</span><br><span class="line">colocation webserver_with_webip inf: webserver webip</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">	have-watchdog=false \</span><br><span class="line">	dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">	cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">	expected-quorum-votes=2 \</span><br><span class="line">	stonith-enabled=false \</span><br><span class="line">	no-quorum-policy=ignore</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> location webip_on_node2 webip rule 50: <span class="comment">#uname eq secondary</span></span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 让节点2成为备用节点</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:55:23 2019</span><br><span class="line">Last change: Tue Apr  2 17:55:07 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时资源会转移到节点1</span></span><br><span class="line"><span class="meta">crm(live)node#</span><span class="bash"> online secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点2上线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 17:55:38 2019</span><br><span class="line">Last change: Tue Apr  2 17:55:34 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line"> webserver	(lsb:httpd):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 资源又转回到节点2</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> rsc_defaults resource-stickiness=50</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置资源指黏性值，默认是0。之前的命令property default-resource-stickiness=50 已经不能使用了</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> node standby secondary</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 节点2下线</span></span><br><span class="line">[root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:10:12 2019</span><br><span class="line">Last change: Tue Apr  2 18:07:48 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Node secondary: standby</span><br><span class="line">Online: [ primary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 资源到节点1</span></span><br><span class="line"><span class="meta"> crm(live)#</span><span class="bash"> node online secondary</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> 节点2上线</span></span><br><span class="line"> [root@primary ~]# crm status</span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:11:19 2019</span><br><span class="line">Last change: Tue Apr  2 18:10:41 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 资源不再转移，与设置资源黏性有关</span></span><br><span class="line"> [root@primary ~]# killall httpd</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 停止web服务</span></span><br><span class="line"><span class="meta"> crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Tue Apr  2 18:12:49 2019</span><br><span class="line">Last change: Tue Apr  2 18:10:41 2019 by root via crm_attribute on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">2 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line"> webserver	(lsb:httpd):	Started primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认只高可用节点，资源停掉也不会关心，还是显示资源在节点1上运行</span></span><br><span class="line"></span><br><span class="line">===========================================================================================</span><br><span class="line">配置高可用web资源，设置监控</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webserver</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> stop webip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止资源</span></span><br><span class="line"><span class="meta">crm(live)resource#</span><span class="bash"> <span class="built_in">cd</span> ..</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> configure edit</span></span><br><span class="line">node primary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">node secondary \</span><br><span class="line">        attributes standby=off</span><br><span class="line">property cib-bootstrap-options: \</span><br><span class="line">        have-watchdog=false \</span><br><span class="line">        dc-version=1.1.18-3.el6-bfe4e80420 \</span><br><span class="line">        cluster-infrastructure="classic openais (with plugin)" \</span><br><span class="line">        expected-quorum-votes=2 \</span><br><span class="line">        stonith-enabled=false \</span><br><span class="line">        no-quorum-policy=ignore</span><br><span class="line">rsc_defaults rsc-options: \</span><br><span class="line">        resource-stickiness=50</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除上面定义的资源，下面重新定义</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webip ocf:heartbeat:IPaddr params ip=192.168.2.100 nic=eth1 cidr_netmask=24 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义资源</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> monitor webip 10s:20s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 单独定义monitor，后面是interval和timeout的时间</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webserver lsb:httpd op monitor interval=10s timeout=20s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 也可以将定义资源与监控在一起定义。一定要用op才能使用monitor命令。monitor表示监控，interval=10s timeout=20s是监控的轮询时间和超时时间，有了监控，就可以在资源停止时进行转移了 </span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> group webservice webip webserver</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line">[root@primary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在服务运行在节点1上</span></span><br><span class="line">[root@primary ~]# killall httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止web服务</span></span><br><span class="line">[root@primary ~]# ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 10秒后，web服务会再次启动</span></span><br><span class="line">[root@primary ~]# yum install -y epel-release</span><br><span class="line">[root@primary ~]# yum install -y nginx</span><br><span class="line">[root@primary ~]# killall httpd</span><br><span class="line">[root@primary ~]# service nginx start</span><br><span class="line">Starting nginx:                                            [  OK  ]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止httpd服务，并启动nginx服务，为了不让httpd服务在节点1启动。看资源是否会转移到节点2上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node2</span><br><span class="line">-------------</span><br><span class="line">[root@secondary ~]# ss -tln</span><br><span class="line">[root@secondary ~]# ip a</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务与地址都转到了节点2上</span></span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node3</span><br><span class="line">-------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此节点提供NFS服务</span></span><br><span class="line">[root@webdav ~]# yum install -y nfs-utils nginx</span><br><span class="line">[root@webdav ~]# systemctl start nfs</span><br><span class="line">[root@webdav ~]# mkdir /shared</span><br><span class="line">[root@webdav ~]# vim /shared/index.html</span><br><span class="line">test page</span><br><span class="line">[root@webdav ~]# vim /etc/exports</span><br><span class="line">/shared       192.168.2.0/24(rw,no_root_squash) 192.168.1.0/24(rw)</span><br><span class="line">[root@webdav ~]# exportfs -ra</span><br><span class="line">[root@webdav ~]# showmount -e 192.168.2.128</span><br><span class="line"></span><br><span class="line">-------------</span><br><span class="line">   node1</span><br><span class="line">-------------</span><br><span class="line">[root@primary ~]# crm configure</span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> primitive webstore ocf:heartbeat:Filesystem params device=<span class="string">"192.168.2.128:/shared"</span> directory=<span class="string">"/var/www/html"</span> fstype=<span class="string">"nfs"</span> op monitor interval=20s timeout=40s op start timeout=60s op stop timeout=60s</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 定义一个存储资源，提供NFS地址与挂载地址、文件系统类型。最后设置监控。</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> edit</span></span><br><span class="line">group webservice webip webserver webstore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将资源加入组</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> verify</span></span><br><span class="line"><span class="meta">crm(live)configure#</span><span class="bash"> commit</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: secondary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Wed Apr  3 04:58:49 2019</span><br><span class="line">Last change: Wed Apr  3 04:57:53 2019 by hacluster via cibadmin on secondary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary ]</span><br><span class="line">OFFLINE: [ secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started primary</span><br><span class="line">     webserver	(lsb:httpd):	Stopped</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为实验不是一起做的，提供NFS服务是第二次接着做，所以忘记上一次为什么资源会停止了，新加入的服务也停止了，使用节点上线与启动资源的命令也没有反应。所以下面准备重新启动服务</span></span><br><span class="line">[root@primary ~]# service corosync status</span><br><span class="line">corosync (pid  46159) is running...</span><br><span class="line">[root@primary ~]# kill -9 46159</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为停止服务非常 慢，所以使用<span class="built_in">kill</span>杀死服务，两个节点都重新启动服务</span></span><br><span class="line">[root@primary ~]# service corosync start</span><br><span class="line">[root@primary ~]# crm </span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: NONE</span><br><span class="line">Last updated: Wed Apr  3 05:02:40 2019</span><br><span class="line">Last change: Wed Apr  3 04:57:53 2019 by hacluster via cibadmin on secondary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">OFFLINE: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Stopped</span><br><span class="line">     webserver	(lsb:httpd):	Stopped</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Stopped</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务后，资源还是停止状态</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> resource start webservice</span></span><br><span class="line"><span class="meta">crm(live)#</span><span class="bash"> status</span></span><br><span class="line">Stack: classic openais (with plugin)</span><br><span class="line">Current DC: primary (version 1.1.18-3.el6-bfe4e80420) - partition with quorum</span><br><span class="line">Last updated: Wed Apr  3 05:03:07 2019</span><br><span class="line">Last change: Wed Apr  3 05:03:03 2019 by root via cibadmin on primary</span><br><span class="line"></span><br><span class="line">2 nodes configured (2 expected votes)</span><br><span class="line">3 resources configured</span><br><span class="line"></span><br><span class="line">Online: [ primary secondary ]</span><br><span class="line"></span><br><span class="line">Full list of resources:</span><br><span class="line"></span><br><span class="line"> Resource Group: webservice</span><br><span class="line">     webip	(ocf::heartbeat:IPaddr):	Started secondary</span><br><span class="line">     webserver	(lsb:httpd):	Started secondary</span><br><span class="line">     webstore	(ocf::heartbeat:Filesystem):	Started secondary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动资源后正常了</span></span><br><span class="line">访问192.168.2.100，可以看到test page的字样证明成功了。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止节点2后，资源无法转移，后发现是在节点1上启动了nginx服务，停止nginx服务后仍然无法启动webserver资源。未找到原因，删除webserver资源重新添加后正常。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/drbd基本配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/29/drbd基本配置使用/" itemprop="url">
+                  drbd基本配置使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 10:57:21 / 修改時間：14:10:56" itemprop="dateCreated datePublished" datetime="2019-03-29T10:57:21+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。 </p>
+<p>一般情况下文件写入磁盘的步骤是：写操作 –&gt; 文件系统 –&gt; 内存缓存中 –&gt; 磁盘调度器 –&gt; 磁盘驱动器 –&gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模块通过tcp/ip协议栈经过网卡和对方建立数据同步。 </p>
+</blockquote>
+<p><img src="/images/drbd/工作流程.png" alt=""></p>
+<h4 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h4><blockquote>
+<ol>
+<li><p>主从模型</p>
+<p>master/slave模型，在某一时刻只允许有一个主节点。主节点的作用是可以挂载使用，写入数据等；从节点只作为主节点的镜像，是主节点的备份。 </p>
+</li>
+<li><p>主主模型</p>
+<p>dula primary模型，2个节点都可以当做主节点来挂载使用。需要配合集群文件系统使用，通过分布式文件锁管理器避免同时写一个文件造成文件系统损坏的问题。</p>
+</li>
+</ol>
+</blockquote>
+<h4 id="复制模型"><a href="#复制模型" class="headerlink" title="复制模型"></a>复制模型</h4><blockquote>
+<ol>
+<li>A协议：异步复制（asynchronous），写操作到本机网卡时即认为成功，性能好，数据可靠性差。 </li>
+<li>B协议：半同步复制（semi sync），写操作到达备节点网卡即认为成功，数据可靠性介于A和C之间。 </li>
+<li>C协议：同步复制（ sync），备用节点写入磁盘即认为成功，性能差，数据可靠性高。也是drbd默认使用的复制协议 </li>
+</ol>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">环境：</span><br><span class="line">主机两台，操作系统CentOS6.6，内核2.6.32-504.el6.x86_64。地址：192.168.2.132、192.168.2.133</span><br><span class="line">安装与配置在两个节点上是一样的</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash"> 两台主机均按如下方法操作</span></span><br><span class="line">[root@primary drbd]# rpm -ivh drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装包取自生产环境。drbd84-utils-8.9.1-1.el6.elrepo包提供配置文件与工具，komd-drbd84-8.4.6-504.el6.x86_64.rpm包提供内核模块。注意两个包要一起安装，不然可能不会添加设备</span></span><br><span class="line">[root@template ~]# ls /dev/d</span><br><span class="line">disk/   dm-1    drbd1   drbd11  drbd13  drbd15  drbd3   drbd5   drbd7   drbd9   dvdrw   </span><br><span class="line">dm-0    drbd0   drbd10  drbd12  drbd14  drbd2   drbd4   drbd6   drbd8   dvd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装软件后可以看到添加了很多以drbd开头的设备</span></span><br><span class="line">[root@primary ~]# fdisk /dev/sdb</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在两个分区上提供大小一致的分区</span></span><br><span class="line">[root@primary ~]# ntpdate ntp1.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@primary ~]# partprobe /dev/sdb</span><br><span class="line">[root@primary drbd]# vim /etc/sysconfig/network</span><br><span class="line">NETWORKING=yes</span><br><span class="line">HOSTNAME=primary</span><br><span class="line">[root@primary drbd]# hostname primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改主机名</span></span><br><span class="line">[root@primary drbd]# ssh-keygen -t rsa -P ''</span><br><span class="line">[root@primary drbd]# ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.133</span><br><span class="line"><span class="meta">#</span><span class="bash"> 密钥通信</span></span><br><span class="line">[root@primary drbd]# vim /etc/hosts</span><br><span class="line">192.168.2.132 primary</span><br><span class="line">192.168.2.133 secondary</span><br><span class="line">[root@primary drbd]# scp drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm secondary:/root</span><br></pre></td></tr></table></figure>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">[root@primary ~]# cd /etc/drbd.d</span><br><span class="line">[root@primary drbd.d]# vim global_common.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此配置文件提供全局配置，及多个drbd设备相同的配置 </span></span><br><span class="line">global &#123;</span><br><span class="line">	usage-count no;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否加入改进计划 </span></span><br><span class="line">&#125;</span><br><span class="line">common &#123;</span><br><span class="line">	handlers &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	startup &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	options &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	disk &#123;</span><br><span class="line">		on-io-error detach;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> IO出问题时，就将节点卸载 </span></span><br><span class="line">	&#125;</span><br><span class="line">	net &#123;</span><br><span class="line">		cram-hmac-alg "sha1";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 使用的算法 </span></span><br><span class="line">		shared-secret "mydrbdshared123";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 共享密钥，建议用随机数生成 </span></span><br><span class="line">	&#125;</span><br><span class="line">	syncer &#123;</span><br><span class="line">		rate 500M;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 同步速率</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> glocal：全局属性，定义drbd自己的工作特性。common：通用属性，定义多组drbd设备通用特性 </span></span><br><span class="line"></span><br><span class="line">[root@primary drbd.d]# vim mystore.res</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此文件为自建文件</span></span><br><span class="line">resource mystore &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 首先定义公共配置，这一段可以被下面的多段使用 </span></span><br><span class="line">    device /dev/drdb0;</span><br><span class="line">    # 定义设备</span><br><span class="line">    disk /dev/sdb1;</span><br><span class="line">    # 定义磁盘，定义这两项就让磁盘与设备关联了？</span><br><span class="line">    meta-disk internal;</span><br><span class="line">     # 在自己的dev内部构建使用</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面定义单个节点的属性 </span></span><br><span class="line">    on primary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">    on secondary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化资源，mystore是资源名，是在mystore.res文件中定义的。在两个节点上分别执行 </span></span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line">[root@primary drbd.d]# service drbd start</span><br><span class="line">Starting DRBD resources: [</span><br><span class="line">     create res: mystore</span><br><span class="line">   prepare disk: mystore</span><br><span class="line">    adjust disk: mystore</span><br><span class="line">     adjust net: mystore</span><br><span class="line">]</span><br><span class="line">....</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动一个节点后，它会等待另一个节点也启动此服务，这时两个节点才会一起启动服务</span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:Inconsistent/Inconsistent C r-----</span><br><span class="line">    ns:0 nr:0 dw:0 dr:0 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:3140544</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看运行状态，现在两个都是Secondary，没有同步 </span></span><br><span class="line">[root@primary drbd.d]# drbd-overview </span><br><span class="line"> 0:mystore/0  Connected Secondary/Secondary Inconsistent/Inconsistent </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 使用此命令也可以</span></span><br><span class="line"> [root@primary drbd.d]# drbdadm primary --force mystore</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 设置节点1为主节点</span></span><br><span class="line"> [root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:SyncSource ro:Primary/Secondary ds:UpToDate/Inconsistent C r-----</span><br><span class="line">    ns:1067676 nr:0 dw:0 dr:1069720 al:0 bm:0 lo:0 pe:2 ua:2 ap:0 ep:1 wo:f oos:2074560</span><br><span class="line">	[=====&gt;..............] sync'ed: 34.1% (2074560/3140544)K</span><br><span class="line">	finish: 0:00:52 speed: 39,708 (39,480) K/sec</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 显示同步过程，有两种状态，primary和secondary，主和从，左边为自己的状态右边是对方的状态 </span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3140544 nr:0 dw:0 dr:3141208 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步完成，这是状态为Primary/Secondary </span></span><br><span class="line">[root@primary drbd.d]# mke2fs -t ext4 /dev/drbd0</span><br><span class="line">mke2fs 1.41.12 (17-May-2010)</span><br><span class="line">文件系统标签=</span><br><span class="line">操作系统:Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">196608 inodes, 785136 blocks</span><br><span class="line">39256 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=805306368</span><br><span class="line">24 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成</span><br><span class="line"></span><br><span class="line">This filesystem will be automatically checked every 26 mounts or</span><br><span class="line">180 days, whichever comes first.  Use tune2fs -c or -i to override.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在主节点格式化磁盘，从节点也会自动格式化，因为是按位同步的</span></span><br></pre></td></tr></table></figure>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary drbd.d]# ls /mnt</span><br><span class="line">lost+found</span><br><span class="line">[root@primary drbd.d]# cd /mnt</span><br><span class="line">[root@primary mnt]# cp /etc/issue ./</span><br><span class="line">[root@primary mnt]# ls</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@primary mnt]# cd</span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把自己切换为从节点</span></span><br><span class="line">[root@primary ~]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3256316 nr:0 dw:115772 dr:3141925 al:31 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态都是从节点</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node2    </span><br><span class="line">=========</span><br><span class="line">[root@secondary drbd.d]# drbdadm primary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在哪个节点执行此命令就是切换哪个节点的状态，这里将备用节点切换为主节点</span></span><br><span class="line">[root@secondary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:0 nr:3256316 dw:3256316 dr:664 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line">[root@secondary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@secondary drbd.d]# ls /mnt</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@secondary drbd.d]# vim /mnt/issue</span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入一些内容</span></span><br><span class="line">[root@secondary drbd.d]# umount /mnt</span><br><span class="line">[root@secondary drbd.d]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要切换状态，备用状态是不能被挂载</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">mount: you must specify the filesystem type</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备用状态是不能被挂载的</span></span><br><span class="line">[root@primary ~]# drbdadm primary mystore</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary ~]# cat /mnt/issue </span><br><span class="line">CentOS release 6.6 (Final)</span><br><span class="line">Kernel \r on an \m</span><br><span class="line"></span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 内容也被改变了</span></span><br><span class="line">[root@primary ~]# service drbd status</span><br><span class="line">drbd driver loaded OK; device status:</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line">m:res      cs         ro                 ds                 p  mounted  fstype</span><br><span class="line">0:mystore  Connected  Primary/Secondary  UpToDate/UpToDate  C  /mnt     ext4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，UpToDate/UpToDate 表示已经同步</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/26/python基础学习-语句/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/26/python基础学习-语句/" itemprop="url">
+                  python基础学习-语句
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-26 16:34:05" itemprop="dateCreated datePublished" datetime="2019-03-26T16:34:05+08:00">2019-03-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-09-23 11:34:30" itemprop="dateModified" datetime="2019-09-23T11:34:30+08:00">2019-09-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="print"><a href="#print" class="headerlink" title="print"></a>print</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">'Age:'</span>, <span class="number">42</span>)</span><br><span class="line">Age: <span class="number">42</span></span><br><span class="line"><span class="comment"># 可同时打印多个表达式，条件是用逗号分隔它们</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>salutation = <span class="string">'Mr.'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>greeting = <span class="string">'Hello,'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(greeting, salutation, name)</span><br><span class="line">Hello, Mr. Gumby</span><br><span class="line"></span><br><span class="line">print(greeting + <span class="string">','</span>, salutation, name)</span><br><span class="line"><span class="comment"># 如果字符串变量greeting不包含逗号，可使用此方法添加，记得一定要有加号，不然会在greeting与逗号间加入一个空格</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"I"</span>, <span class="string">"wish"</span>, <span class="string">"to"</span>, <span class="string">"register"</span>, <span class="string">"a"</span>, <span class="string">"complaint"</span>, sep=<span class="string">"_"</span>)</span><br><span class="line">I_wish_to_register_a_complaint</span><br><span class="line"><span class="comment"># 自定义分隔符</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'Hello,'</span>, end=<span class="string">''</span>)</span><br><span class="line">print(<span class="string">'world!'</span>)</span><br><span class="line">Hello,world!</span><br><span class="line"><span class="comment"># 还可自定义结束字符串，以替换默认的换行符。上面将结束字符串指定为空字符串，所以Hello和world会打印在一行。</span></span><br></pre></td></tr></table></figure>
+<h3 id="import"><a href="#import" class="headerlink" title="import"></a>import</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> somemodule</span><br><span class="line"><span class="keyword">from</span> somemodule <span class="keyword">import</span> somefunction</span><br><span class="line"><span class="keyword">from</span> somemodule <span class="keyword">import</span> somefunction, anotherfunction, yetanotherfunction</span><br><span class="line"><span class="keyword">from</span> somemodule <span class="keyword">import</span> *</span><br><span class="line"><span class="comment"># 从模块导入。仅当你确定要导入模块中的一切时，采用使用最后一种方式</span></span><br><span class="line"></span><br><span class="line">module1.open(...)</span><br><span class="line">module2.open(...)</span><br><span class="line"><span class="comment"># 有两个模块，它们都包含函数open，可使用第一种方式导入这两个模块，使用此种方式调用open函数</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math <span class="keyword">as</span> foobar</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>foobar.sqrt(<span class="number">4</span>)</span><br><span class="line"><span class="number">2.0</span></span><br><span class="line"><span class="comment"># 导入整个模块并在语句末尾添加as子句指定别名。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> math <span class="keyword">import</span> sqrt <span class="keyword">as</span> foobar</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>foobar(<span class="number">4</span>)</span><br><span class="line"><span class="number">2.0</span></span><br><span class="line"><span class="comment"># 导入特定函数并给它指定别名，这是给sqrt起的别名叫foobar</span></span><br></pre></td></tr></table></figure>
+<h3 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h3><h4 id="序列解包"><a href="#序列解包" class="headerlink" title="序列解包"></a>序列解包</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>x, y, z = <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(x, y, z)</span><br><span class="line"><span class="number">1</span> <span class="number">2</span> <span class="number">3</span></span><br><span class="line"><span class="comment"># 同时(并行)给多个变量赋值</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x, y = y, x</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(x, y, z)</span><br><span class="line"><span class="number">2</span> <span class="number">1</span> <span class="number">3</span></span><br><span class="line"><span class="comment"># 这种方式还可交换多个变量的值</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>values = <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>values</span><br><span class="line">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x, y, z = values</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="comment"># 这里执行的操作称为序列解包(或可迭代对象解包)：将一个序列(或任何可迭代对象)解包，并将得到的值存储到一系列变量中。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>scoundrel = &#123;<span class="string">'name'</span>: <span class="string">'Robin'</span>, <span class="string">'girlfriend'</span>: <span class="string">'Marion'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>key, value = scoundrel.popitem()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>key</span><br><span class="line"><span class="string">'girlfriend'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>value</span><br><span class="line"><span class="string">'Marion'</span></span><br><span class="line"><span class="comment"># 从字典中随便获取(或删除)一个键值对，可使用方法popitem，它随便获取一个键值对并以元组的方式返回。接下来，可直接将返回的元组解包到两个变量中。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x, y, z = <span class="number">1</span>, <span class="number">2</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">ValueError: need more than <span class="number">2</span> values to unpack</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x, y, z = <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">ValueError: too many values to unpack</span><br><span class="line"><span class="comment"># 要解包的序列包含的元素个数必须与你在等号左边列出的目标个数相同</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a, b, *rest = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>rest</span><br><span class="line">[<span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="comment"># 可使用星号运算符(*)来收集多余的值，这样无需确保值和变量的个数相同</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"Albus Percival Wulfric Brian Dumbledore"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>first, *middle, last = name.split()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>middle</span><br><span class="line">[<span class="string">'Percival'</span>, <span class="string">'Wulfric'</span>, <span class="string">'Brian'</span>]</span><br><span class="line"><span class="comment"># 还可将带星号的变量放在其他位置。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a, *b, c = <span class="string">"abc"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a, b, c</span><br><span class="line">(<span class="string">'a'</span>, [<span class="string">'b'</span>], <span class="string">'c'</span>)</span><br><span class="line"><span class="comment"># 赋值语句的右边可以是任何类型的序列，但带星号的变量最终包含的总是一个列表。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/26/python基础学习-字典/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1816,310 +2368,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/storm概念/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/11/storm概念/" itemprop="url">
-                  storm概念
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-11 17:00:54" itemprop="dateCreated datePublished" datetime="2019-03-11T17:00:54+08:00">2019-03-11</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-03-13 13:00:26" itemprop="dateModified" datetime="2019-03-13T13:00:26+08:00">2019-03-13</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/大数据/" itemprop="url" rel="index"><span itemprop="name">大数据</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
-<p>Storm 是一个分布式的，可靠的，容错的数据流处理系统。它会把工作任务委托给不同类型的组件，每个组件负责处理一项简单特定的任务。Storm 集群的输入流由一个被称作 spout 的组件管理，spout 把数据传递给 bolt， bolt 要么把数据保存到某种存储器，要么把数据传递给其它的 bolt。你可以想象一下，一个 Storm 集群就是在一连串的 bolt 之间转换 spout 传过来的数据。</p>
-<p>这里用一个简单的例子来说明这个概念。昨晚我在新闻节目里看到主持人在谈论政治人物和他们对于各种政治话题的立场。他们一直重复着不同的名字，而我开始考虑这些名字是否被提到了相同的次数，以及不同次数之间的偏差。</p>
-<p>想像播音员读的字幕作为你的数据输入流。你可以用一个 spout 读取一个文件（或者 socket，通过 HTTP，或者别的方法）。文本行被 spout 传给一个 bolt，再被 bolt 按单词切割。单词流又被传给另一个 bolt，在这里每个单词与一张政治人名列表比较。每遇到一个匹配的名字，第二个 bolt 为这个名字在数据库的计数加1。你可以随时查询数据库查看结果， 而且这些计数是随着数据到达实时更新的。</p>
-<p>现在想象一下，很容易在整个 Storm 集群定义每个 bolt 和 spout 的并行性级别，因此你可以无限的扩展你的拓扑结构。很神奇，是吗？尽管这是个简单例子，你也可以看到 Storm 的强大。</p>
-</blockquote>
-<h3 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h3><blockquote>
-<ul>
-<li><p>数据处理流</p>
-<p>正如上例所展示的，不像其它的流处理系统，Storm 不需要中间队列。</p>
-</li>
-<li><p>连续计算</p>
-<p>连续发送数据到客户端，使它们能够实时更新并显示结果，如网站指标。</p>
-</li>
-<li><p>分布式远程过程调用</p>
-<p>频繁的 CPU 密集型操作并行化。</p>
-</li>
-</ul>
-</blockquote>
-<h3 id="Storm-组件"><a href="#Storm-组件" class="headerlink" title="Storm 组件"></a>Storm 组件</h3><blockquote>
-<p>Storm 集群由一个主节点(也可称为控制节点)和多个工作节点组成。主节点运行一个名为“Nimbus”的守护进程，工作节点都运行一个名为“Supervisor”的守护进程，两者的协调工作由 ZooKeeper 来完成， ZooKeeper 用于管理集群中的不同组件。</p>
-<p>每一个工作节点上运行的 Supervisor 监听分配给它那台机器的工作，根据需要启动 / 关闭工作进程，每一个工作进程执行一个 Topology 的一个子集；一个运行的 Topology 由运行在很多机器上的很多工作进程 Worker 组成。那么Storm 的核心就是主节点（Nimbus）、工作节点（Supervisor）、协调器（ZooKeeper）、工作进程（ Worker）、任务线程（Task）。</p>
-<p>在系统底层，Storm 使用了 zeromq(0mq, zeromq(<a href="http://www.zeromq.org/" target="_blank" rel="noopener">http://www.zeromq.org</a>))。这是一种先进的，可嵌入的网络通讯库，它提供的绝妙功能使 Storm 成为可能。下面列出一些 zeromq 的特性。</p>
-<ul>
-<li>一个并发架构的 Socket 库</li>
-<li>对于集群产品和超级计算，比 TCP 要快</li>
-<li>可通过 inproc（进程内）, IPC（进程间）, TCP 和 multicast(多播协议)通信</li>
-<li>异步 I / O 的可扩展的多核消息传递应用程序</li>
-<li>利用扇出(fanout), 发布订阅（PUB-SUB）,管道（pipeline）, 请求应答（REQ-REP），等方式实现 N-N 连接</li>
-</ul>
-<p>Storm 只用了 push/pull sockets</p>
-</blockquote>
-<h4 id="Nimbus"><a href="#Nimbus" class="headerlink" title="Nimbus"></a>Nimbus</h4><blockquote>
-<p>主节点通常运行一个后台程序——Nimbus，用于响应分布在集群中的节点，分配任务和监测故障，这类似于 Hadoop 中的 JobTracker。<br>Nimbus 进程是快速失败（ fail-fast）和无状态的，所有的状态要么在 ZooKeeper 中，要么在本地磁盘上。可以使用 kill -9 来杀死 Nimbus 进程，然后重启即可继续工作。</p>
-</blockquote>
-<h4 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h4><blockquote>
-<p>工作节点同样会运行一个后台程序——Supervisor，用于收听工作指派并基于要求运行工作进程。每个工作节点都是Topology中一个子集的实现。而Nimbus 和 Supervisor 之间的协调则通过 ZooKeeper 系统。<br>同 样，Supervisor进程也是快速失败（fail-fast）和无状态的， 所有的状态要么在ZooKeeper中，要么在本地磁盘上，用kill -9来杀死Supervisor进程，然后重启就可以继续工作。这个设计使得storm不可思议的稳定。</p>
-</blockquote>
-<h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h4><blockquote>
-<p>ZooKeeper 是完成 Nimbus 和 Supervisor 之间协调的服务。 Storm使用ZooKeeper 协调集群，由于ZooKeeper 并不用于消息传递，所以Storm给ZooKeeper 带来的压力相当低。<strong>在大多数情况下，单个节点的 ZooKeeper 集群足够胜任，不过为了确保故障恢复或者部署大规模Storm集群，可能需要更大规模的 ZooKeeper 集群</strong>。</p>
-</blockquote>
-<h4 id="worker"><a href="#worker" class="headerlink" title="worker"></a>worker</h4><blockquote>
-<p>运行具体处理组件逻辑的进程。</p>
-</blockquote>
-<h4 id="Topology"><a href="#Topology" class="headerlink" title="Topology"></a>Topology</h4><blockquote>
-<p>拓扑。一个Storm拓扑打包了一个实时处理程序的逻辑。一个Storm拓扑类似一个Hadoop的MapReduce任务(Job)。主要区别是MapReduce任务最终会结束，而拓扑会一直运行（当然直到你杀死它)。一个拓扑是一个通过流分组(stream grouping)把Spout和Bolt连接到一起的拓扑结构。一个拓扑就是一个复杂的多阶段的流计算。</p>
-<p>所有Topology任务的提交必须在Storm客户端节点上进行(需要配置~/.storm/storm.yaml文件)，由Nimbus节点分配给其他Supervisor节点进行处理。Nimbus节点首先将提交的Topology进行分片，分成一个个的Task，并将Task和Supervisor相关的信息提交到<strong>zookeeper</strong>集群上，Supervisor会去zookeeper集群上认领自己的Task，通知自己的Worker进程进行Task的处理。总体的Topology处理流程图为：</p>
-</blockquote>
-<p><img src="/images/storm/topology处理流程.png" alt=""></p>
-<blockquote>
-<p>每个Topology都由<strong>Spout和Bolt</strong>组成，在Spout和Bolt传递信息的基本单位叫做<strong>Tuple</strong>，由Spout发出的连续不断的Tuple及其在相应Bolt上处理的子Tuple连起来称为一个<strong>Steam</strong>，每个Stream的命名是在其首个Tuple被Spout发出的时候，此时Storm会利用内部的<strong>Ackor机制</strong>保证每个Tuple可靠的被处理。</p>
-<p>而Tuple可以理解成键值对，其中，键就是定义在declareStream方法中的Fields字段，而值就是在emit方法中发送的Values字段。</p>
-<p>在运行Topology之前，可以通过一些参数的配置来调节运行时的状态，参数的配置是通过Storm框架部署目录下的<strong>conf/storm.yaml</strong>文件来完成的。在此文件中可以配置运行时的Storm本地目录路径、运行时Worker的数目等。</p>
-<p>在代码中，也可以设置Config的一些参数，但是优先级是不同的，不同位置配置Config参数的优先级顺序为：外部组件的special configuration &gt; 内部组件的special configuration &gt; topology内部的configuration &gt; storm.yaml &gt; default.yaml</p>
-</blockquote>
-<h4 id="Spout"><a href="#Spout" class="headerlink" title="Spout"></a>Spout</h4><blockquote>
-<p>一个在Topology中产生源数据流的组件。通常情况下Spout会从外部数据源中读取数据，然后转换为Topology内部的源数据。Spout 是一个主动的角色，其接口中有个nextTuple()函数， Storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</p>
-</blockquote>
-<h4 id="Bolt"><a href="#Bolt" class="headerlink" title="Bolt"></a>Bolt</h4><blockquote>
-<p>一个在Topology中接收由Spout或者其他上游Bolt类发来的Tuple数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数，在接收到消息后会调用此函数，用户可以在其中执行自己想要的操作。</p>
-</blockquote>
-<h4 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h4><blockquote>
-<p>Worker中每一个Spout/Bolt的线程称为一个Task。在 Storm 0.8之后，task不再与物理线程对应，同一个Spout/Bolt的Task可能会共享一个物理线程，该线程称为Executor。</p>
-</blockquote>
-<h4 id="Tuple"><a href="#Tuple" class="headerlink" title="Tuple"></a>Tuple</h4><blockquote>
-<p>元组，一次消息传递的基本单元。</p>
-</blockquote>
-<h4 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h4><blockquote>
-<p>源源不断传递的Tuple就组成了stream。</p>
-</blockquote>
-<h4 id="Stream-Grouping"><a href="#Stream-Grouping" class="headerlink" title="Stream Grouping"></a>Stream Grouping</h4><blockquote>
-<p>即消息的partition方法。流分组策略告诉Topology如何在两个组件之间发送Tuple。 Storm 中提供若干种实用的grouping方式，包括shuffle, fields hash, all, global, none, direct和localOrShuffle等。</p>
-<ul>
-<li>ShuffleGrouping:随机分组，随机分发Stream中的tuple，保证每个Bolt的Task接收Tuple数量大致一致；</li>
-<li>FieldsGrouping：按照字段分组，保证相同字段的Tuple分配到同一个Task中；</li>
-<li>AllGrouping：广播发送，每一个Task都会受到所有的Tuple；</li>
-<li>GlobalGrouping：全局分组，所有的Tuple都发送到同一个Task中，此时一般将当前Component的并发数目设置为1；</li>
-<li>NonGrouping：不分组，和ShuffleGrouping类似，当前Task的执行会和它的被订阅者在同一个线程中执行；</li>
-<li>DirectGrouping：直接分组，直接指定由某个Task来执行Tuple的处理，而且，此时必须有emitDirect方法来发送；</li>
-<li>localOrShuffleGrouping：和ShuffleGrouping类似，若Bolt有多个Task在同一个进程中，Tuple会随机发给这些Task。</li>
-</ul>
-</blockquote>
-<h3 id="Storm-的特性"><a href="#Storm-的特性" class="headerlink" title="Storm 的特性"></a>Storm 的特性</h3><blockquote>
-<p>在所有这些设计思想与决策中，有一些非常棒的特性成就了独一无二的 Storm。</p>
-<ul>
-<li>简化编程：如果你曾试着从零开始实现实时处理，你应该明白这是一件多么痛苦的事情。使用 Storm，复杂性被大大降低了。</li>
-<li>使用一门基于 JVM 的语言开发会更容易，但是你可以借助一个小的中间件，在 Storm 上使用任何语言开发。有现成的中间件可供选择，当然也可以自己开发中间件。</li>
-<li>容错：Storm 集群会关注工作节点状态，如果宕机了必要的时候会重新分配任务。</li>
-<li>可扩展：所有你需要为扩展集群所做的工作就是增加机器。Storm 会在新机器就绪时向它们分配任务。</li>
-<li>可靠的：所有消息都可保证至少处理一次。如果出错了，消息可能处理不只一次，不过你永远不会丢失消息。</li>
-<li>快速：速度是驱动 Storm 设计的一个关键因素</li>
-<li>事务性：You can get exactly once messaging semantics for pretty much any computation. 你可以为几乎任何计算得到恰好一次消息语义。</li>
-</ul>
-</blockquote>
-<h3 id="Topology运行流程"><a href="#Topology运行流程" class="headerlink" title="Topology运行流程"></a>Topology运行流程</h3><blockquote>
-<p>Topology的运行可以分为<strong>本地模式</strong>和<strong>分布式模式</strong>，模式的设置可以在配置文件中设定，也可以在代码中设置。需要注意的是，在Storm代码编写完成之后，需要打包成jar包放到Nimbus中运行，打包的时候，不需要把依赖的jar都打进去，否则如果把依赖的storm.jar包打进去的话，运行时会出现重复的配置文件错误导致Topology无法运行。因为Topology运行之前，会加载本地的storm.yaml配置文件。</p>
-<ul>
-<li>Storm提交后，会把代码首先存放到<strong>Nimbus节点的inbox目录</strong>下，之后，会把当前Storm运行的配置生成一个<strong>stormconf.ser文件</strong>放到<strong>Nimbus节点的stormdist目录</strong>中，在此目录中同时还有<strong>序列化之后的Topology代码文件</strong>；</li>
-<li>在<strong>设定Topology所关联的Spouts和Bolts</strong>时，可以同时<strong>设置当前Spout和Bolt的executor数目和task数目</strong>，默认情况下，一个Topology的task的总和是和executor的总和一致的。之后，系统根据worker的数目，尽量平均的分配这些task的执行。worker在哪个supervisor节点上运行是由storm本身决定的；</li>
-<li>任务分配好之后，Nimbus节点会将任务的信息提交到<strong>zookeeper集群</strong>，同时在zookeeper集群中会有<strong>workerbeats节点</strong>，这里<strong>存储了当前Topology的所有worker进程的心跳信息</strong>；</li>
-<li>Supervisor节点会不断的<strong>轮询</strong>zookeeper集群，在<strong>zookeeper的assignments节点中保存了所有Topology的任务分配信息、代码存储目录、任务之间的关联关系</strong>等，Supervisor通过轮询此节点的内容，来领取自己的任务，启动worker进程运行；</li>
-<li>一个Topology运行之后，就会不断的通过Spouts来发送Stream流，通过Bolts来不断的处理接收到的Stream流，Stream流是无界的。这一步会不间断的执行，除非<strong>手动结束Topology</strong>。</li>
-</ul>
-</blockquote>
-<h3 id="Topology并行度"><a href="#Topology并行度" class="headerlink" title="Topology并行度"></a>Topology并行度</h3><blockquote>
-<ul>
-<li>worker：每个worker都属于一个特定的Topology，每个Supervisor节点的worker可以有多个，每个worker使用一个单独的端口，它对Topology中的每个component运行一个或者多个executor线程来提供task的运行服务。</li>
-<li>executor：executor是产生于worker进程内部的线程，会执行同一个component的一个或者多个task。</li>
-<li>task：实际的数据处理由task完成，在Topology的生命周期中，每个组件的task数目是不会发生变化的，而executor的数目却不一定。executor数目小于等于task的数目，默认情况下，二者是相等的。</li>
-</ul>
-<p>​    在运行一个Topology时，可以根据具体的情况来设置不同数量的worker、task、executor，而<strong>设置的位置</strong>也可以在多个地方。</p>
-<ul>
-<li><p>worker设置：</p>
-<ul>
-<li>可以通过设置yaml中的topology.workers属性</li>
-<li>在代码中通过<strong>Config的setNumWorkers方法设定</strong></li>
-</ul>
-</li>
-<li><p>executor设置：</p>
-<ul>
-<li>通过<strong>在Topology的入口类中setBolt、setSpout方法的最后一个参数指定</strong>，不指定的话，默认为1；</li>
-</ul>
-</li>
-<li><p>task设置：</p>
-<ul>
-<li>默认情况下，<strong>和executor数目一致</strong>；</li>
-<li>在代码中通过<strong>TopologyBuilder的setNumTasks方法设定具体某个组件的task数目</strong>；</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<p>参考：</p>
-<p><a href="http://www.cnblogs.com/zlslch/p/5989256.html" target="_blank" rel="noopener">http://www.cnblogs.com/zlslch/p/5989256.html</a></p>
-<p><a href="https://blog.yaodataking.com/2017/03/07/storm-2/" target="_blank" rel="noopener">https://blog.yaodataking.com/2017/03/07/storm-2/</a></p>
-<p><a href="http://www.cnblogs.com/xymqx/p/4366429.html" target="_blank" rel="noopener">http://www.cnblogs.com/xymqx/p/4366429.html</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/supervisor配置使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2289,329 +2537,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB监控/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/11/MongoDB监控/" itemprop="url">
-                  MongoDB监控
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-11 16:03:28 / 修改時間：16:14:06" itemprop="dateCreated datePublished" datetime="2019-03-11T16:03:28+08:00">2019-03-11</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
-<p>在你已经安装部署并允许MongoDB服务后，你必须要了解MongoDB的运行情况，并查看MongoDB的性能。这样在大流量得情况下可以很好的应对并保证MongoDB正常运作。</p>
-<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
-</blockquote>
-<h3 id="mongostat命令"><a href="#mongostat命令" class="headerlink" title="mongostat命令"></a>mongostat命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongostat -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">insert query update delete getmore command % dirty % used flushes  vsize   res qr|qw ar|aw netIn netOut conn       set repl                      time</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:14+08:00</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:15+08:00</span><br><span class="line">......</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</span></span><br></pre></td></tr></table></figure>
-<h3 id="mongotop命令"><a href="#mongotop命令" class="headerlink" title="mongotop命令"></a>mongotop命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongotop -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">2019-03-11T16:08:02.818+0800	connected to: 192.168.251.134:27017</span><br><span class="line"></span><br><span class="line">                    ns    total    read    write    2019-03-11T16:08:03+08:00</span><br><span class="line">        local.oplog.rs      1ms     1ms      0ms                             </span><br><span class="line">    admin.system.roles      0ms     0ms      0ms                             </span><br><span class="line">    admin.system.users      0ms     0ms      0ms                             </span><br><span class="line">  admin.system.version      0ms     0ms      0ms                             </span><br><span class="line">              local.me      0ms     0ms      0ms                             </span><br><span class="line">local.replset.election      0ms     0ms      0ms                             </span><br><span class="line">local.replset.minvalid      0ms     0ms      0ms                             </span><br><span class="line">     local.startup_log      0ms     0ms      0ms                             </span><br><span class="line">  local.system.replset      0ms     0ms      0ms                             </span><br><span class="line">        runoob.article      0ms     0ms      0ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看那些花费在读取和写入数据的大量时间的操作。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ns：包含数据库命名空间，后者结合了数据库名称和集合。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> total：mongod花费的时间工作在这个命名空间提供总额。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">read</span>：mongod在此命名空间花费在执行读操作的时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> write：提供这个命名空间进行写操作的时间。</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB备份与恢复/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/11/MongoDB备份与恢复/" itemprop="url">
-                  MongoDB备份与恢复
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-11 15:33:28 / 修改時間：16:00:01" itemprop="dateCreated datePublished" datetime="2019-03-11T15:33:28+08:00">2019-03-11</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">mongodump -h dbhost -d dbname -o dbdirectory</span><br><span class="line"><span class="meta">#</span><span class="bash"> -h：MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -d：需要备份的数据库实例，例如：<span class="built_in">test</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -o：备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个<span class="built_in">test</span>目录，这个目录里面存放该数据库实例的备份数据。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -u: 指定用户名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -p: 指定密码</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mkdir /tmp/mongodb</span><br><span class="line">[root@master ~]# mongodump -h 192.168.251.134:27017 -o /tmp/mongodb/ -u system -p centos</span><br><span class="line">2019-03-11T15:40:42.802+0800	writing admin.system.users to </span><br><span class="line">2019-03-11T15:40:42.803+0800	done dumping admin.system.users (2 documents)</span><br><span class="line">2019-03-11T15:40:42.803+0800	writing admin.system.version to </span><br><span class="line">2019-03-11T15:40:42.804+0800	done dumping admin.system.version (1 document)</span><br><span class="line">2019-03-11T15:40:42.804+0800	writing runoob.collection to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.col to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.test to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.runoob to </span><br><span class="line">2019-03-11T15:40:42.806+0800	done dumping runoob.collection (3 documents)</span><br><span class="line">2019-03-11T15:40:42.806+0800	writing runoob.mycol to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.col (3 documents)</span><br><span class="line">2019-03-11T15:40:42.807+0800	writing runoob.values to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.mycol (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	writing test.col to </span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping runoob.values (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping test.col (0 documents)</span><br><span class="line">2019-03-11T15:40:42.841+0800	done dumping runoob.test (1 document)</span><br><span class="line">2019-03-11T15:40:42.842+0800	done dumping runoob.runoob (0 documents)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备份所有库到/tmp/mongodb下</span></span><br><span class="line">[root@master ~]# ls /tmp/mongodb/</span><br><span class="line">admin  runoob  test</span><br></pre></td></tr></table></figure>
-<h3 id="数据恢复"><a href="#数据恢复" class="headerlink" title="数据恢复"></a>数据恢复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d admin /tmp/mongodb/admin/ -u system -p centos</span><br><span class="line">2019-03-11T15:48:44.761+0800	building a list of collections to restore from /tmp/mongodb/admin dir</span><br><span class="line">2019-03-11T15:48:44.764+0800	restoring users from /tmp/mongodb/admin/system.users.bson</span><br><span class="line">2019-03-11T15:48:44.825+0800	done</span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d test /tmp/mongodb/test/ -u system -p centos --authenticationDatabase admin，不然会报验证失败的错误。</span><br><span class="line"></span><br><span class="line">2019-03-11T15:52:39.194+0800	building a list of collections to restore from /tmp/mongodb/test dir</span><br><span class="line">2019-03-11T15:52:39.195+0800	reading metadata for test.col from /tmp/mongodb/test/col.metadata.json</span><br><span class="line">2019-03-11T15:52:39.196+0800	restoring test.col from /tmp/mongodb/test/col.bson</span><br><span class="line">2019-03-11T15:52:39.198+0800	restoring indexes for collection test.col from metadata</span><br><span class="line">2019-03-11T15:52:39.200+0800	finished restoring test.col (0 documents)</span><br><span class="line">2019-03-11T15:52:39.200+0800	done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令中必须加入--authenticationDatabase admin，不然会报验证失败的错误。</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 /tmp/mongodb/ -u system -p centos --authenticationDatabase admin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复所有数据库</span></span><br><span class="line"></span><br><span class="line">============================================================================================</span><br><span class="line">mongodump与mongoexport的区别：</span><br><span class="line">a. mongodump导出的是bson格式，是二进制形式，不过可以使用mongo自带的bsondump命令查看里面的数据，而mongoexport导出的则是文本，可以是csv、json格式。</span><br><span class="line">b. JSON可读性强但体积较大，BSON则是二进制文件，体积小但对人类几乎没有可读性。</span><br><span class="line">c. 在一些mongodb版本之间，BSON格式可能会随版本不同而有所不同，所以不同版本之间用mongodump/mongorestore可能不会成功，具体要看版本之间的兼容性。当无法使用BSON进行跨版本的数据迁移的时候，使用JSON格式即mongoexport/mongoimport是一个可选项。跨版本的mongodump/mongorestore个人并不推荐，实在要做请先检查文档看两个版本是否兼容（大部分时候是的）。</span><br><span class="line">d. JSON虽然具有较好的跨版本通用性，但其只保留了数据部分，不保留索引，账户等其他基础信息。使用时应该注意。</span><br><span class="line">============================================================================================</span><br></pre></td></tr></table></figure>
-<h3 id="恢复节点"><a href="#恢复节点" class="headerlink" title="恢复节点"></a>恢复节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1. 将复制集中要恢复的节点移除</span><br><span class="line">rs.remove("10.10.17.26:27000")</span><br><span class="line">2. 运行mongorestore --oplogReplay命令</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 --oplogReplay  /data/mongodbbackup/20150820/</span><br><span class="line">3. 创建oplog</span><br><span class="line">use local </span><br><span class="line">db.createCollection("oplog.rs", &#123;"capped" : true, "size" : 10000000&#125;)</span><br><span class="line">4. 恢复oplog</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 -d local -c oplog.rs  /data/mongodbbackup/20150820/oplog.bson</span><br><span class="line">5. 将该节点加入到复制集 </span><br><span class="line">rs.add("10.10.17.26:27000")</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2659,7 +2584,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">146</span>
+                    <span class="site-state-item-count">149</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2967,7 +2892,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">112</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">115</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

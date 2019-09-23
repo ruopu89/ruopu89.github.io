@@ -350,6 +350,633 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/storm概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/storm概念/" itemprop="url">
+                  storm概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 17:00:54" itemprop="dateCreated datePublished" datetime="2019-03-11T17:00:54+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-03-13 13:00:26" itemprop="dateModified" datetime="2019-03-13T13:00:26+08:00">2019-03-13</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/大数据/" itemprop="url" rel="index"><span itemprop="name">大数据</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>Storm 是一个分布式的，可靠的，容错的数据流处理系统。它会把工作任务委托给不同类型的组件，每个组件负责处理一项简单特定的任务。Storm 集群的输入流由一个被称作 spout 的组件管理，spout 把数据传递给 bolt， bolt 要么把数据保存到某种存储器，要么把数据传递给其它的 bolt。你可以想象一下，一个 Storm 集群就是在一连串的 bolt 之间转换 spout 传过来的数据。</p>
+<p>这里用一个简单的例子来说明这个概念。昨晚我在新闻节目里看到主持人在谈论政治人物和他们对于各种政治话题的立场。他们一直重复着不同的名字，而我开始考虑这些名字是否被提到了相同的次数，以及不同次数之间的偏差。</p>
+<p>想像播音员读的字幕作为你的数据输入流。你可以用一个 spout 读取一个文件（或者 socket，通过 HTTP，或者别的方法）。文本行被 spout 传给一个 bolt，再被 bolt 按单词切割。单词流又被传给另一个 bolt，在这里每个单词与一张政治人名列表比较。每遇到一个匹配的名字，第二个 bolt 为这个名字在数据库的计数加1。你可以随时查询数据库查看结果， 而且这些计数是随着数据到达实时更新的。</p>
+<p>现在想象一下，很容易在整个 Storm 集群定义每个 bolt 和 spout 的并行性级别，因此你可以无限的扩展你的拓扑结构。很神奇，是吗？尽管这是个简单例子，你也可以看到 Storm 的强大。</p>
+</blockquote>
+<h3 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h3><blockquote>
+<ul>
+<li><p>数据处理流</p>
+<p>正如上例所展示的，不像其它的流处理系统，Storm 不需要中间队列。</p>
+</li>
+<li><p>连续计算</p>
+<p>连续发送数据到客户端，使它们能够实时更新并显示结果，如网站指标。</p>
+</li>
+<li><p>分布式远程过程调用</p>
+<p>频繁的 CPU 密集型操作并行化。</p>
+</li>
+</ul>
+</blockquote>
+<h3 id="Storm-组件"><a href="#Storm-组件" class="headerlink" title="Storm 组件"></a>Storm 组件</h3><blockquote>
+<p>Storm 集群由一个主节点(也可称为控制节点)和多个工作节点组成。主节点运行一个名为“Nimbus”的守护进程，工作节点都运行一个名为“Supervisor”的守护进程，两者的协调工作由 ZooKeeper 来完成， ZooKeeper 用于管理集群中的不同组件。</p>
+<p>每一个工作节点上运行的 Supervisor 监听分配给它那台机器的工作，根据需要启动 / 关闭工作进程，每一个工作进程执行一个 Topology 的一个子集；一个运行的 Topology 由运行在很多机器上的很多工作进程 Worker 组成。那么Storm 的核心就是主节点（Nimbus）、工作节点（Supervisor）、协调器（ZooKeeper）、工作进程（ Worker）、任务线程（Task）。</p>
+<p>在系统底层，Storm 使用了 zeromq(0mq, zeromq(<a href="http://www.zeromq.org/" target="_blank" rel="noopener">http://www.zeromq.org</a>))。这是一种先进的，可嵌入的网络通讯库，它提供的绝妙功能使 Storm 成为可能。下面列出一些 zeromq 的特性。</p>
+<ul>
+<li>一个并发架构的 Socket 库</li>
+<li>对于集群产品和超级计算，比 TCP 要快</li>
+<li>可通过 inproc（进程内）, IPC（进程间）, TCP 和 multicast(多播协议)通信</li>
+<li>异步 I / O 的可扩展的多核消息传递应用程序</li>
+<li>利用扇出(fanout), 发布订阅（PUB-SUB）,管道（pipeline）, 请求应答（REQ-REP），等方式实现 N-N 连接</li>
+</ul>
+<p>Storm 只用了 push/pull sockets</p>
+</blockquote>
+<h4 id="Nimbus"><a href="#Nimbus" class="headerlink" title="Nimbus"></a>Nimbus</h4><blockquote>
+<p>主节点通常运行一个后台程序——Nimbus，用于响应分布在集群中的节点，分配任务和监测故障，这类似于 Hadoop 中的 JobTracker。<br>Nimbus 进程是快速失败（ fail-fast）和无状态的，所有的状态要么在 ZooKeeper 中，要么在本地磁盘上。可以使用 kill -9 来杀死 Nimbus 进程，然后重启即可继续工作。</p>
+</blockquote>
+<h4 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h4><blockquote>
+<p>工作节点同样会运行一个后台程序——Supervisor，用于收听工作指派并基于要求运行工作进程。每个工作节点都是Topology中一个子集的实现。而Nimbus 和 Supervisor 之间的协调则通过 ZooKeeper 系统。<br>同 样，Supervisor进程也是快速失败（fail-fast）和无状态的， 所有的状态要么在ZooKeeper中，要么在本地磁盘上，用kill -9来杀死Supervisor进程，然后重启就可以继续工作。这个设计使得storm不可思议的稳定。</p>
+</blockquote>
+<h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h4><blockquote>
+<p>ZooKeeper 是完成 Nimbus 和 Supervisor 之间协调的服务。 Storm使用ZooKeeper 协调集群，由于ZooKeeper 并不用于消息传递，所以Storm给ZooKeeper 带来的压力相当低。<strong>在大多数情况下，单个节点的 ZooKeeper 集群足够胜任，不过为了确保故障恢复或者部署大规模Storm集群，可能需要更大规模的 ZooKeeper 集群</strong>。</p>
+</blockquote>
+<h4 id="worker"><a href="#worker" class="headerlink" title="worker"></a>worker</h4><blockquote>
+<p>运行具体处理组件逻辑的进程。</p>
+</blockquote>
+<h4 id="Topology"><a href="#Topology" class="headerlink" title="Topology"></a>Topology</h4><blockquote>
+<p>拓扑。一个Storm拓扑打包了一个实时处理程序的逻辑。一个Storm拓扑类似一个Hadoop的MapReduce任务(Job)。主要区别是MapReduce任务最终会结束，而拓扑会一直运行（当然直到你杀死它)。一个拓扑是一个通过流分组(stream grouping)把Spout和Bolt连接到一起的拓扑结构。一个拓扑就是一个复杂的多阶段的流计算。</p>
+<p>所有Topology任务的提交必须在Storm客户端节点上进行(需要配置~/.storm/storm.yaml文件)，由Nimbus节点分配给其他Supervisor节点进行处理。Nimbus节点首先将提交的Topology进行分片，分成一个个的Task，并将Task和Supervisor相关的信息提交到<strong>zookeeper</strong>集群上，Supervisor会去zookeeper集群上认领自己的Task，通知自己的Worker进程进行Task的处理。总体的Topology处理流程图为：</p>
+</blockquote>
+<p><img src="/images/storm/topology处理流程.png" alt=""></p>
+<blockquote>
+<p>每个Topology都由<strong>Spout和Bolt</strong>组成，在Spout和Bolt传递信息的基本单位叫做<strong>Tuple</strong>，由Spout发出的连续不断的Tuple及其在相应Bolt上处理的子Tuple连起来称为一个<strong>Steam</strong>，每个Stream的命名是在其首个Tuple被Spout发出的时候，此时Storm会利用内部的<strong>Ackor机制</strong>保证每个Tuple可靠的被处理。</p>
+<p>而Tuple可以理解成键值对，其中，键就是定义在declareStream方法中的Fields字段，而值就是在emit方法中发送的Values字段。</p>
+<p>在运行Topology之前，可以通过一些参数的配置来调节运行时的状态，参数的配置是通过Storm框架部署目录下的<strong>conf/storm.yaml</strong>文件来完成的。在此文件中可以配置运行时的Storm本地目录路径、运行时Worker的数目等。</p>
+<p>在代码中，也可以设置Config的一些参数，但是优先级是不同的，不同位置配置Config参数的优先级顺序为：外部组件的special configuration &gt; 内部组件的special configuration &gt; topology内部的configuration &gt; storm.yaml &gt; default.yaml</p>
+</blockquote>
+<h4 id="Spout"><a href="#Spout" class="headerlink" title="Spout"></a>Spout</h4><blockquote>
+<p>一个在Topology中产生源数据流的组件。通常情况下Spout会从外部数据源中读取数据，然后转换为Topology内部的源数据。Spout 是一个主动的角色，其接口中有个nextTuple()函数， Storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</p>
+</blockquote>
+<h4 id="Bolt"><a href="#Bolt" class="headerlink" title="Bolt"></a>Bolt</h4><blockquote>
+<p>一个在Topology中接收由Spout或者其他上游Bolt类发来的Tuple数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数，在接收到消息后会调用此函数，用户可以在其中执行自己想要的操作。</p>
+</blockquote>
+<h4 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h4><blockquote>
+<p>Worker中每一个Spout/Bolt的线程称为一个Task。在 Storm 0.8之后，task不再与物理线程对应，同一个Spout/Bolt的Task可能会共享一个物理线程，该线程称为Executor。</p>
+</blockquote>
+<h4 id="Tuple"><a href="#Tuple" class="headerlink" title="Tuple"></a>Tuple</h4><blockquote>
+<p>元组，一次消息传递的基本单元。</p>
+</blockquote>
+<h4 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h4><blockquote>
+<p>源源不断传递的Tuple就组成了stream。</p>
+</blockquote>
+<h4 id="Stream-Grouping"><a href="#Stream-Grouping" class="headerlink" title="Stream Grouping"></a>Stream Grouping</h4><blockquote>
+<p>即消息的partition方法。流分组策略告诉Topology如何在两个组件之间发送Tuple。 Storm 中提供若干种实用的grouping方式，包括shuffle, fields hash, all, global, none, direct和localOrShuffle等。</p>
+<ul>
+<li>ShuffleGrouping:随机分组，随机分发Stream中的tuple，保证每个Bolt的Task接收Tuple数量大致一致；</li>
+<li>FieldsGrouping：按照字段分组，保证相同字段的Tuple分配到同一个Task中；</li>
+<li>AllGrouping：广播发送，每一个Task都会受到所有的Tuple；</li>
+<li>GlobalGrouping：全局分组，所有的Tuple都发送到同一个Task中，此时一般将当前Component的并发数目设置为1；</li>
+<li>NonGrouping：不分组，和ShuffleGrouping类似，当前Task的执行会和它的被订阅者在同一个线程中执行；</li>
+<li>DirectGrouping：直接分组，直接指定由某个Task来执行Tuple的处理，而且，此时必须有emitDirect方法来发送；</li>
+<li>localOrShuffleGrouping：和ShuffleGrouping类似，若Bolt有多个Task在同一个进程中，Tuple会随机发给这些Task。</li>
+</ul>
+</blockquote>
+<h3 id="Storm-的特性"><a href="#Storm-的特性" class="headerlink" title="Storm 的特性"></a>Storm 的特性</h3><blockquote>
+<p>在所有这些设计思想与决策中，有一些非常棒的特性成就了独一无二的 Storm。</p>
+<ul>
+<li>简化编程：如果你曾试着从零开始实现实时处理，你应该明白这是一件多么痛苦的事情。使用 Storm，复杂性被大大降低了。</li>
+<li>使用一门基于 JVM 的语言开发会更容易，但是你可以借助一个小的中间件，在 Storm 上使用任何语言开发。有现成的中间件可供选择，当然也可以自己开发中间件。</li>
+<li>容错：Storm 集群会关注工作节点状态，如果宕机了必要的时候会重新分配任务。</li>
+<li>可扩展：所有你需要为扩展集群所做的工作就是增加机器。Storm 会在新机器就绪时向它们分配任务。</li>
+<li>可靠的：所有消息都可保证至少处理一次。如果出错了，消息可能处理不只一次，不过你永远不会丢失消息。</li>
+<li>快速：速度是驱动 Storm 设计的一个关键因素</li>
+<li>事务性：You can get exactly once messaging semantics for pretty much any computation. 你可以为几乎任何计算得到恰好一次消息语义。</li>
+</ul>
+</blockquote>
+<h3 id="Topology运行流程"><a href="#Topology运行流程" class="headerlink" title="Topology运行流程"></a>Topology运行流程</h3><blockquote>
+<p>Topology的运行可以分为<strong>本地模式</strong>和<strong>分布式模式</strong>，模式的设置可以在配置文件中设定，也可以在代码中设置。需要注意的是，在Storm代码编写完成之后，需要打包成jar包放到Nimbus中运行，打包的时候，不需要把依赖的jar都打进去，否则如果把依赖的storm.jar包打进去的话，运行时会出现重复的配置文件错误导致Topology无法运行。因为Topology运行之前，会加载本地的storm.yaml配置文件。</p>
+<ul>
+<li>Storm提交后，会把代码首先存放到<strong>Nimbus节点的inbox目录</strong>下，之后，会把当前Storm运行的配置生成一个<strong>stormconf.ser文件</strong>放到<strong>Nimbus节点的stormdist目录</strong>中，在此目录中同时还有<strong>序列化之后的Topology代码文件</strong>；</li>
+<li>在<strong>设定Topology所关联的Spouts和Bolts</strong>时，可以同时<strong>设置当前Spout和Bolt的executor数目和task数目</strong>，默认情况下，一个Topology的task的总和是和executor的总和一致的。之后，系统根据worker的数目，尽量平均的分配这些task的执行。worker在哪个supervisor节点上运行是由storm本身决定的；</li>
+<li>任务分配好之后，Nimbus节点会将任务的信息提交到<strong>zookeeper集群</strong>，同时在zookeeper集群中会有<strong>workerbeats节点</strong>，这里<strong>存储了当前Topology的所有worker进程的心跳信息</strong>；</li>
+<li>Supervisor节点会不断的<strong>轮询</strong>zookeeper集群，在<strong>zookeeper的assignments节点中保存了所有Topology的任务分配信息、代码存储目录、任务之间的关联关系</strong>等，Supervisor通过轮询此节点的内容，来领取自己的任务，启动worker进程运行；</li>
+<li>一个Topology运行之后，就会不断的通过Spouts来发送Stream流，通过Bolts来不断的处理接收到的Stream流，Stream流是无界的。这一步会不间断的执行，除非<strong>手动结束Topology</strong>。</li>
+</ul>
+</blockquote>
+<h3 id="Topology并行度"><a href="#Topology并行度" class="headerlink" title="Topology并行度"></a>Topology并行度</h3><blockquote>
+<ul>
+<li>worker：每个worker都属于一个特定的Topology，每个Supervisor节点的worker可以有多个，每个worker使用一个单独的端口，它对Topology中的每个component运行一个或者多个executor线程来提供task的运行服务。</li>
+<li>executor：executor是产生于worker进程内部的线程，会执行同一个component的一个或者多个task。</li>
+<li>task：实际的数据处理由task完成，在Topology的生命周期中，每个组件的task数目是不会发生变化的，而executor的数目却不一定。executor数目小于等于task的数目，默认情况下，二者是相等的。</li>
+</ul>
+<p>​    在运行一个Topology时，可以根据具体的情况来设置不同数量的worker、task、executor，而<strong>设置的位置</strong>也可以在多个地方。</p>
+<ul>
+<li><p>worker设置：</p>
+<ul>
+<li>可以通过设置yaml中的topology.workers属性</li>
+<li>在代码中通过<strong>Config的setNumWorkers方法设定</strong></li>
+</ul>
+</li>
+<li><p>executor设置：</p>
+<ul>
+<li>通过<strong>在Topology的入口类中setBolt、setSpout方法的最后一个参数指定</strong>，不指定的话，默认为1；</li>
+</ul>
+</li>
+<li><p>task设置：</p>
+<ul>
+<li>默认情况下，<strong>和executor数目一致</strong>；</li>
+<li>在代码中通过<strong>TopologyBuilder的setNumTasks方法设定具体某个组件的task数目</strong>；</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>参考：</p>
+<p><a href="http://www.cnblogs.com/zlslch/p/5989256.html" target="_blank" rel="noopener">http://www.cnblogs.com/zlslch/p/5989256.html</a></p>
+<p><a href="https://blog.yaodataking.com/2017/03/07/storm-2/" target="_blank" rel="noopener">https://blog.yaodataking.com/2017/03/07/storm-2/</a></p>
+<p><a href="http://www.cnblogs.com/xymqx/p/4366429.html" target="_blank" rel="noopener">http://www.cnblogs.com/xymqx/p/4366429.html</a></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB监控/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB监控/" itemprop="url">
+                  MongoDB监控
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 16:03:28 / 修改時間：16:14:06" itemprop="dateCreated datePublished" datetime="2019-03-11T16:03:28+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>在你已经安装部署并允许MongoDB服务后，你必须要了解MongoDB的运行情况，并查看MongoDB的性能。这样在大流量得情况下可以很好的应对并保证MongoDB正常运作。</p>
+<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
+</blockquote>
+<h3 id="mongostat命令"><a href="#mongostat命令" class="headerlink" title="mongostat命令"></a>mongostat命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongostat -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">insert query update delete getmore command % dirty % used flushes  vsize   res qr|qw ar|aw netIn netOut conn       set repl                      time</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:14+08:00</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:15+08:00</span><br><span class="line">......</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</span></span><br></pre></td></tr></table></figure>
+<h3 id="mongotop命令"><a href="#mongotop命令" class="headerlink" title="mongotop命令"></a>mongotop命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongotop -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">2019-03-11T16:08:02.818+0800	connected to: 192.168.251.134:27017</span><br><span class="line"></span><br><span class="line">                    ns    total    read    write    2019-03-11T16:08:03+08:00</span><br><span class="line">        local.oplog.rs      1ms     1ms      0ms                             </span><br><span class="line">    admin.system.roles      0ms     0ms      0ms                             </span><br><span class="line">    admin.system.users      0ms     0ms      0ms                             </span><br><span class="line">  admin.system.version      0ms     0ms      0ms                             </span><br><span class="line">              local.me      0ms     0ms      0ms                             </span><br><span class="line">local.replset.election      0ms     0ms      0ms                             </span><br><span class="line">local.replset.minvalid      0ms     0ms      0ms                             </span><br><span class="line">     local.startup_log      0ms     0ms      0ms                             </span><br><span class="line">  local.system.replset      0ms     0ms      0ms                             </span><br><span class="line">        runoob.article      0ms     0ms      0ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看那些花费在读取和写入数据的大量时间的操作。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ns：包含数据库命名空间，后者结合了数据库名称和集合。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> total：mongod花费的时间工作在这个命名空间提供总额。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">read</span>：mongod在此命名空间花费在执行读操作的时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> write：提供这个命名空间进行写操作的时间。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB备份与恢复/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB备份与恢复/" itemprop="url">
+                  MongoDB备份与恢复
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 15:33:28 / 修改時間：16:00:01" itemprop="dateCreated datePublished" datetime="2019-03-11T15:33:28+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">mongodump -h dbhost -d dbname -o dbdirectory</span><br><span class="line"><span class="meta">#</span><span class="bash"> -h：MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -d：需要备份的数据库实例，例如：<span class="built_in">test</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -o：备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个<span class="built_in">test</span>目录，这个目录里面存放该数据库实例的备份数据。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -u: 指定用户名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -p: 指定密码</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mkdir /tmp/mongodb</span><br><span class="line">[root@master ~]# mongodump -h 192.168.251.134:27017 -o /tmp/mongodb/ -u system -p centos</span><br><span class="line">2019-03-11T15:40:42.802+0800	writing admin.system.users to </span><br><span class="line">2019-03-11T15:40:42.803+0800	done dumping admin.system.users (2 documents)</span><br><span class="line">2019-03-11T15:40:42.803+0800	writing admin.system.version to </span><br><span class="line">2019-03-11T15:40:42.804+0800	done dumping admin.system.version (1 document)</span><br><span class="line">2019-03-11T15:40:42.804+0800	writing runoob.collection to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.col to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.test to </span><br><span class="line">2019-03-11T15:40:42.805+0800	writing runoob.runoob to </span><br><span class="line">2019-03-11T15:40:42.806+0800	done dumping runoob.collection (3 documents)</span><br><span class="line">2019-03-11T15:40:42.806+0800	writing runoob.mycol to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.col (3 documents)</span><br><span class="line">2019-03-11T15:40:42.807+0800	writing runoob.values to </span><br><span class="line">2019-03-11T15:40:42.807+0800	done dumping runoob.mycol (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	writing test.col to </span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping runoob.values (0 documents)</span><br><span class="line">2019-03-11T15:40:42.808+0800	done dumping test.col (0 documents)</span><br><span class="line">2019-03-11T15:40:42.841+0800	done dumping runoob.test (1 document)</span><br><span class="line">2019-03-11T15:40:42.842+0800	done dumping runoob.runoob (0 documents)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备份所有库到/tmp/mongodb下</span></span><br><span class="line">[root@master ~]# ls /tmp/mongodb/</span><br><span class="line">admin  runoob  test</span><br></pre></td></tr></table></figure>
+<h3 id="数据恢复"><a href="#数据恢复" class="headerlink" title="数据恢复"></a>数据恢复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d admin /tmp/mongodb/admin/ -u system -p centos</span><br><span class="line">2019-03-11T15:48:44.761+0800	building a list of collections to restore from /tmp/mongodb/admin dir</span><br><span class="line">2019-03-11T15:48:44.764+0800	restoring users from /tmp/mongodb/admin/system.users.bson</span><br><span class="line">2019-03-11T15:48:44.825+0800	done</span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 -d test /tmp/mongodb/test/ -u system -p centos --authenticationDatabase admin，不然会报验证失败的错误。</span><br><span class="line"></span><br><span class="line">2019-03-11T15:52:39.194+0800	building a list of collections to restore from /tmp/mongodb/test dir</span><br><span class="line">2019-03-11T15:52:39.195+0800	reading metadata for test.col from /tmp/mongodb/test/col.metadata.json</span><br><span class="line">2019-03-11T15:52:39.196+0800	restoring test.col from /tmp/mongodb/test/col.bson</span><br><span class="line">2019-03-11T15:52:39.198+0800	restoring indexes for collection test.col from metadata</span><br><span class="line">2019-03-11T15:52:39.200+0800	finished restoring test.col (0 documents)</span><br><span class="line">2019-03-11T15:52:39.200+0800	done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令中必须加入--authenticationDatabase admin，不然会报验证失败的错误。</span></span><br><span class="line"></span><br><span class="line">[root@master ~]# mongorestore -h 192.168.251.134:27017 /tmp/mongodb/ -u system -p centos --authenticationDatabase admin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复所有数据库</span></span><br><span class="line"></span><br><span class="line">============================================================================================</span><br><span class="line">mongodump与mongoexport的区别：</span><br><span class="line">a. mongodump导出的是bson格式，是二进制形式，不过可以使用mongo自带的bsondump命令查看里面的数据，而mongoexport导出的则是文本，可以是csv、json格式。</span><br><span class="line">b. JSON可读性强但体积较大，BSON则是二进制文件，体积小但对人类几乎没有可读性。</span><br><span class="line">c. 在一些mongodb版本之间，BSON格式可能会随版本不同而有所不同，所以不同版本之间用mongodump/mongorestore可能不会成功，具体要看版本之间的兼容性。当无法使用BSON进行跨版本的数据迁移的时候，使用JSON格式即mongoexport/mongoimport是一个可选项。跨版本的mongodump/mongorestore个人并不推荐，实在要做请先检查文档看两个版本是否兼容（大部分时候是的）。</span><br><span class="line">d. JSON虽然具有较好的跨版本通用性，但其只保留了数据部分，不保留索引，账户等其他基础信息。使用时应该注意。</span><br><span class="line">============================================================================================</span><br></pre></td></tr></table></figure>
+<h3 id="恢复节点"><a href="#恢复节点" class="headerlink" title="恢复节点"></a>恢复节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1. 将复制集中要恢复的节点移除</span><br><span class="line">rs.remove("10.10.17.26:27000")</span><br><span class="line">2. 运行mongorestore --oplogReplay命令</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 --oplogReplay  /data/mongodbbackup/20150820/</span><br><span class="line">3. 创建oplog</span><br><span class="line">use local </span><br><span class="line">db.createCollection("oplog.rs", &#123;"capped" : true, "size" : 10000000&#125;)</span><br><span class="line">4. 恢复oplog</span><br><span class="line">mongorestore --host 10.10.17.26 --port  27000 -d local -c oplog.rs  /data/mongodbbackup/20150820/oplog.bson</span><br><span class="line">5. 将该节点加入到复制集 </span><br><span class="line">rs.add("10.10.17.26:27000")</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1803,938 +2430,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/06/MongoDB安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/06/MongoDB安装/" itemprop="url">
-                  MongoDB安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-06 15:54:47" itemprop="dateCreated datePublished" datetime="2019-03-06T15:54:47+08:00">2019-03-06</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-03-07 18:21:29" itemprop="dateModified" datetime="2019-03-07T18:21:29+08:00">2019-03-07</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="安装与启动"><a href="#安装与启动" class="headerlink" title="安装与启动"></a>安装与启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">环境：</span><br><span class="line">一台主机，地址：192.168.251.129</span><br><span class="line">============================================================================================</span><br><span class="line">[root@test ~]# cat &gt;&gt; /etc/rc.local &lt;&lt;'EOF'</span><br><span class="line">if test -f /sys/kernel/mm/transparent_hugepage/enabled; then</span><br><span class="line">  echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled</span><br><span class="line">fi</span><br><span class="line">if test -f /sys/kernel/mm/transparent_hugepage/defrag; then</span><br><span class="line">   echo never &gt; /sys/kernel/mm/transparent_hugepage/defrag</span><br><span class="line">fi</span><br><span class="line">EOF</span><br><span class="line"><span class="meta">#</span><span class="bash"> 该方法仅限与CentOS系统使用。Transparent Huge Pages (THP)，通过使用更大的内存页面，可以减少具有大量内存的机器上的缓冲区（TLB）查找的开销。但是，数据库工作负载通常对THP表现不佳，因为它们往往具有稀疏而不是连续的内存访问模式。您应该在Linux机器上禁用THP，以确保MongoDB的最佳性能。</span></span><br><span class="line">[root@test ~]# chmod +x /etc/rc.d/rc.local</span><br><span class="line">[root@test ~]# wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.2.8.tgz</span><br><span class="line">[root@test ~]# tar xf mongodb-linux-x86_64-rhel62-3.2.8.tgz</span><br><span class="line">[root@test ~]# mv mongodb-linux-x86_64-rhel62-3.2.8 /usr/local/mongodb</span><br><span class="line">[root@test ~]# mkdir /usr/local/mongodb/&#123;log,data,conf&#125;</span><br><span class="line">[root@test ~]# vim .bash_profile</span><br><span class="line">export PATH=/usr/local/mongodb/bin:$PATH</span><br><span class="line">[root@test ~]# source .bash_profile</span><br><span class="line">[root@test ~]# mongod --dbpath=/usr/local/mongodb/data/ --logpath=/usr/local/mongodb/log/mongodb.log --port=27017 --logappend --fork</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务。默认的数据库路径是/data/db，如果单独指定数据库路径的话，一定要创建这个数据目录，不然启动会失败，使用mongod就可以直接启动服务。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --dbpath：数据存放路径；--logpath：日志文件路径；--logappend：日志输出方式；--port：启用端口号；--fork：在后台运行；--auth：是否需要验证权限登录(用户名和密码)；--bind_ip：限制访问的ip；--shutdown：关闭数据库；--rest：通过HTTP访问用户界面。默认mongodb监听在27017端口，web页面监听28017端口。</span></span><br><span class="line">about to fork child process, waiting until server is ready for connections.</span><br><span class="line">forked process: 5118</span><br><span class="line">child process started successfully, parent exiting</span><br><span class="line">[root@test ~]# ss -tln</span><br><span class="line">State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              </span><br><span class="line">LISTEN     0      128               *:22                            *:*                  </span><br><span class="line">LISTEN     0      100       127.0.0.1:25                            *:*                  </span><br><span class="line">LISTEN     0      128               *:27017                         *:* </span><br><span class="line">[root@test ~]# mongod --shutdown --dbpath=/usr/local/mongodb/data/ --logpath=/usr/local/mongodb/log/mongodb.log --port=27017 --logappend --fork</span><br><span class="line">killing process with pid: 5118</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭服务</span></span><br></pre></td></tr></table></figure>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">==========</span><br><span class="line">   普通格式</span><br><span class="line">==========</span><br><span class="line">[root@test ~]# vim /usr/local/mongodb/conf/mongod1.conf</span><br><span class="line">port=27017</span><br><span class="line">bind_ip = 192.168.251.129                 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个最好配置成本机的ip地址。否则后面进行副本集初始化的时候可能会失败！           </span></span><br><span class="line">dbpath=/usr/local/mongodb/data</span><br><span class="line">logpath=/usr/local/mongodb/log/mongo.log</span><br><span class="line">pidfilepath=/usr/local/mongodb/mongo.pid</span><br><span class="line">fork=true</span><br><span class="line">logappend=true</span><br><span class="line">shardsvr=true</span><br><span class="line">directoryperdb=true</span><br><span class="line"><span class="meta">#</span><span class="bash"> auth=<span class="literal">true</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> keyFile =/usr/<span class="built_in">local</span>/mongodb/keyfile</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> replSet =hqmongodb</span></span><br><span class="line">[root@test ~]# mongod -f /usr/local/mongodb/conf/mongod1.conf </span><br><span class="line">about to fork child process, waiting until server is ready for connections.</span><br><span class="line">forked process: 5201</span><br><span class="line">child process started successfully, parent exiting</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动</span></span><br><span class="line">[root@test ~]# mongod -f /usr/local/mongodb/conf/mongod1.conf --shutdown</span><br><span class="line">killing process with pid: 5201</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭</span></span><br><span class="line"></span><br><span class="line">==========</span><br><span class="line">   YAML格式</span><br><span class="line">==========</span><br><span class="line"><span class="meta">#</span><span class="bash"> 3.X 版本官方推荐使用</span></span><br><span class="line">[root@test ~]# vim /usr/local/mongodb/conf/mongod.conf</span><br><span class="line">systemLog:</span><br><span class="line">    destination: file</span><br><span class="line">    path: "/usr/local/mongodb/log/mongod.log"</span><br><span class="line">    logAppend: true</span><br><span class="line">storage:</span><br><span class="line">    journal:</span><br><span class="line">        enabled: true</span><br><span class="line">    dbPath: "/usr/local/mongodb/data"</span><br><span class="line">processManagement:</span><br><span class="line">    fork: true</span><br><span class="line">net:</span><br><span class="line">    port: 27017</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意有空格的行，都是四个空格或八个空格，不要使用Tab键，启动时可能会报错：<span class="string">"Error parsing YAML config file: yaml-cpp: error at line 7, column 2: end of map not found"</span></span></span><br><span class="line">[root@test ~]# mongod -f /usr/local/mongodb/conf/mongod.conf </span><br><span class="line">about to fork child process, waiting until server is ready for connections.</span><br><span class="line">forked process: 5250</span><br><span class="line">child process started successfully, parent exiting</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/05/CentOS优化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/05/CentOS优化/" itemprop="url">
-                  CentOS优化
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-05 11:29:58 / 修改時間：13:02:35" itemprop="dateCreated datePublished" datetime="2019-03-05T11:29:58+08:00">2019-03-05</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="文件句柄数"><a href="#文件句柄数" class="headerlink" title="文件句柄数"></a>文件句柄数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">* 临时调整</span><br><span class="line">[root@template ~]# ulimit -n</span><br><span class="line">1024</span><br><span class="line">[root@template ~]# ulimit -n 65535</span><br><span class="line">[root@template ~]# ulimit -n</span><br><span class="line">65535</span><br><span class="line"></span><br><span class="line">* 永久生效</span><br><span class="line">[root@template ~]# vim /etc/security/limits.conf</span><br><span class="line">*       soft    nofile          65535</span><br><span class="line">*       hard    nofile          65535</span><br></pre></td></tr></table></figure>
-<h3 id="调整历史记录及连接超时"><a href="#调整历史记录及连接超时" class="headerlink" title="调整历史记录及连接超时"></a>调整历史记录及连接超时</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# vim /etc/bashrc</span><br><span class="line">HISTFILESIZE=4000</span><br><span class="line">HISTSIZE=4000</span><br><span class="line">HISTTIMEFORMAT='%F %T '</span><br><span class="line">export HISTTIMEFORMAT</span><br><span class="line"><span class="meta">#</span> 添加上面四行。HISTFILESIZE定义了.bash_history中保存命令的总数，默认是1000，这里改成了4000，HISTSIZE设置了history命令输出最多的记录总数，HISTTIMEFORMAT定了时间显示格式。</span><br><span class="line"><span class="meta">#</span>以前的操作记录都会显示更改/etc/bashrc文件的时间，而不是真正的操作时间，只有更改完/etc/bashrc以后的操作记录会显示正确的时间</span><br><span class="line">export TMOUT=10</span><br><span class="line"><span class="meta">#</span> 置连接会话的超时时间</span><br></pre></td></tr></table></figure>
-<h3 id="同步时间"><a href="#同步时间" class="headerlink" title="同步时间"></a>同步时间</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">* 查看时区</span><br><span class="line">[root@template ~]# cat /etc/sysconfig/clock </span><br><span class="line">ZONE="Asia/Shanghai"</span><br><span class="line"></span><br><span class="line">* 同步时间</span><br><span class="line">[root@template ~]# ntpdate cn.pool.ntp.org</span><br><span class="line">[root@template ~]#crontab -e</span><br><span class="line">0 10 * * * /usr/sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure>
-<h3 id="调整yum源"><a href="#调整yum源" class="headerlink" title="调整yum源"></a>调整yum源</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp CentOS-Base.repo&#123;,.$(date +%F)&#125;</span><br><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br></pre></td></tr></table></figure>
-<h3 id="更改SSH服务端远程登录的配置"><a href="#更改SSH服务端远程登录的配置" class="headerlink" title="更改SSH服务端远程登录的配置"></a>更改SSH服务端远程登录的配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# cp /etc/ssh/sshd_config&#123;,.bak&#125;</span><br><span class="line">[root@template ~]# vim /etc/ssh/sshd_config</span><br><span class="line">Port 52113           </span><br><span class="line"><span class="meta">#</span> ssh连接默认的端口</span><br><span class="line">PermitRootLogin no   </span><br><span class="line"><span class="meta">#</span> 禁止root登录</span><br><span class="line">PermitEmptyPasswords no </span><br><span class="line"><span class="meta">#</span> 禁止空密码登录，此项默认就是no</span><br><span class="line">UseDNS no            </span><br><span class="line"><span class="meta">#</span> 不使用DNS解析地址</span><br><span class="line">[root@template ~]# /etc/init.d/sshd restart</span><br></pre></td></tr></table></figure>
-<h3 id="锁定关键系统文件"><a href="#锁定关键系统文件" class="headerlink" title="锁定关键系统文件"></a>锁定关键系统文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# chattr +i /etc/passwd /etc/inittab /etc/group /etc/shadow /etc/gshadow</span><br><span class="line"><span class="meta">#</span> attr命令用于改变文件属性，i选项表示不得任意更动文件或目录。这时创建用户或组的命令执行也会失败。</span><br><span class="line">[root@template ~]# ll /etc/gshadow</span><br><span class="line">---------- 1 root root 631 1月  18 18:38 /etc/gshadow</span><br><span class="line">[root@template ~]# ll /etc/shadow</span><br><span class="line">---------- 1 root root 1259 1月  18 18:40 /etc/shadow</span><br><span class="line">[root@template ~]# chattr -i /etc/shadow</span><br><span class="line"><span class="meta">#</span> 使用-i可以解锁</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/15/python概念及语法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/15/python概念及语法/" itemprop="url">
-                  python概念及语法
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-02-15 18:05:02" itemprop="dateCreated datePublished" datetime="2019-02-15T18:05:02+08:00">2019-02-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-06-24 11:22:42" itemprop="dateModified" datetime="2019-06-24T11:22:42+08:00">2019-06-24</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="编译器与解释器"><a href="#编译器与解释器" class="headerlink" title="编译器与解释器"></a>编译器与解释器</h4><blockquote>
-<p><strong>编译器</strong>是把源程序的每一条语句都编译成机器语言,并保存成二进制文件,这样运行时计算机可以直接以机器语言来运行此程序,速度很快；它把源代码转换成目标机器的CPU指令</p>
-<p>而<strong>解释器</strong>则是只在执行程序时,才一条一条的解释成机器语言给计算机来执行,所以运行速度是不如编译后的程序运行的快的。解释后转换成字节码，运行在虚拟机上，解释器执行中间代码。</p>
-<p>这是因为计算机不能直接认识并执行我们写的语句,它只能认识机器语言(是二进制的形式)。</p>
-</blockquote>
-<h4 id="编译型语言与解释型语言"><a href="#编译型语言与解释型语言" class="headerlink" title="编译型语言与解释型语言"></a>编译型语言与解释型语言</h4><blockquote>
-<ul>
-<li><p>编译型<br>优点：编译器一般会有预编译的过程对代码进行优化。因为编译只做一次，运行时不需要编译，所以编译型语言的程序执行效率高。可以脱离语言环境独立运行。<br>缺点：编译之后如果需要修改就需要整个模块重新编译。编译的时候根据对应的运行环境生成机器码，不同的操作系统之间移植就会有问题，需要根据运行的操作系统环境编译不同的可执行文件。</p>
-</li>
-<li><p>解释型<br>优点：有良好的平台兼容性，在任何环境中都可以运行，前提是安装了解释器（虚拟机）。灵活，修改代码的时候直接修改就可以，可以快速部署，不用停机维护。</p>
-<p>缺点：每次运行的时候都要解释一遍，性能上不如编译型语言。</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="低级语言与高级语言"><a href="#低级语言与高级语言" class="headerlink" title="低级语言与高级语言"></a>低级语言与高级语言</h4><blockquote>
-<ul>
-<li><p>低级语言</p>
-<p>面向机器的语言，包括机器语言、汇编语言</p>
-<p>不同的机器不能通用，不同的机器需要不同的机器指令或者汇编程序</p>
-</li>
-<li><p>高级语言</p>
-<p>接近自然语言和数学语言的计算机语言</p>
-<p>高级语言首先要书写源程序，通过编译程序把源程序转换成机器指令的程序</p>
-<p>人们只需要关心怎么书写源程序，针对不同机器的编译的事交给编译器处理</p>
-</li>
-</ul>
-<p>语言越高级，越接近人类的自然语言和数学语言。语言越低级，越能让机器理解。高级语言和低级语言之间需要一个转换的工具，就是编译器或解释器。</p>
-</blockquote>
-<h4 id="动态语言和静态语言"><a href="#动态语言和静态语言" class="headerlink" title="动态语言和静态语言"></a>动态语言和静态语言</h4><blockquote>
-<ul>
-<li><p>动态类型语言：动态类型语言是指在运行期间才去做数据类型检查的语言，也就是说，在用动态类型的语言编程时，永远也不用给任何变量指定数据类型，该语言会在你第一次赋值给变量时，在内部将数据类型记录下来。Python和Ruby就是一种典型的动态类型语言，其他的各种脚本语言如VBScript也多少属于动态类型语言。</p>
-</li>
-<li><p>静态类型语言：静态类型语言与动态类型语言刚好相反，它的数据类型是在编译其间检查的，也就是说在写程序时要声明所有变量的数据类型，C/C++是静态类型语言的典型代表，其他的静态类型语言还有C#、JAVA等。</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="强类型定义语言和弱类型定义语言"><a href="#强类型定义语言和弱类型定义语言" class="headerlink" title="强类型定义语言和弱类型定义语言"></a>强类型定义语言和弱类型定义语言</h4><blockquote>
-<ul>
-<li>强类型语言：不同类型之间操作，必须先强制类型转换为同一类型。print(‘a’+1)</li>
-<li>弱类型语言：不同类型间可以操作，自动隐式转换，JavaScript中console.log(1+’a’)</li>
-</ul>
-</blockquote>
-<h3 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h3><blockquote>
-<ul>
-<li><p>注释：# 标注的文本</p>
-</li>
-<li><p>数字：</p>
-<ul>
-<li>整数，不区分long和int。可使用二进制、十进制、十六进制。bool(布尔)有两个值True和False</li>
-<li>浮点数：1.2、3.1415、-0.12、1.46e9等价于1.46*10的9次方</li>
-<li>复数：1+2j</li>
-</ul>
-</li>
-<li><p>字符串：</p>
-<ul>
-<li>使用’ “ 单双引号引用的字符的序列</li>
-<li>‘’’和””” 单双三引号，可以跨行、可以在其中自由的使用单双引号</li>
-<li>在字符串前面加上r或R前缀，表示该字符串不做特殊的处理</li>
-</ul>
-</li>
-<li><p>转义序列</p>
-<ul>
-<li>\\    \t    \r    \n    \‘    \“</li>
-<li>前缀r，把里面的所有字符当普通字符对待</li>
-</ul>
-</li>
-<li><p>缩进</p>
-<ul>
-<li>未使用C等语言的花括号，而是采用缩进的方式表示层次关系</li>
-<li>约定使用4个空格缩进</li>
-</ul>
-</li>
-<li><p>续行</p>
-<ul>
-<li>在行尾使用\</li>
-<li>如果使用各种括号，认为括号内是一个整体，内部跨行不用\</li>
-</ul>
-</li>
-<li><p>标识符</p>
-<ol>
-<li>一个名字，用来指代一个值</li>
-<li>只能字母、下划线和数字</li>
-<li>只能以字母或下划线开头</li>
-<li>不能是python的关键字，如def、class就不能作为标识符</li>
-<li>python是大小写敏感的</li>
-</ol>
-<ul>
-<li>约定：<ul>
-<li>不允许使用中文</li>
-<li>不允许使用歧义单词，如class_</li>
-<li>在python中不要随便使用下划线开头的表示符</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>常量</p>
-<ul>
-<li>一旦赋值就不能改变值的标识符</li>
-<li>python中无法定义常量</li>
-</ul>
-</li>
-<li><p>字面常量</p>
-<ul>
-<li>一个单独的量，如12、”abc”、’234531.03e-9’</li>
-</ul>
-</li>
-<li><p>变量</p>
-<ul>
-<li>赋值后，可以改变值的标识符</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<h3 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h3><h4 id="算数运算符"><a href="#算数运算符" class="headerlink" title="算数运算符"></a>算数运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+</td>
-<td>两个对象相加</td>
-<td>a + b输出结果30</td>
-</tr>
-<tr>
-<td>-</td>
-<td>得到负数或是一个数减去另一个数</td>
-<td>a - b输出结果-10</td>
-</tr>
-<tr>
-<td>*</td>
-<td>两个数相乘或是返回一个被重复若干次的字符串</td>
-<td>a * b输出结果200</td>
-</tr>
-<tr>
-<td>/</td>
-<td>x除以y</td>
-<td>b / a输出结果2</td>
-</tr>
-<tr>
-<td>%</td>
-<td>返回除法的余数</td>
-<td>b % a输出结果0</td>
-</tr>
-<tr>
-<td>**</td>
-<td>返回x的y次幂</td>
-<td>a ** b为10的20次方，输出结果1000000000000000000</td>
-</tr>
-<tr>
-<td>//</td>
-<td>返回商的整数部分</td>
-<td>9 // 2输出结果4，9.0//2.0输出结果4.0</td>
-</tr>
-</tbody>
-</table>
-<h4 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>==</td>
-<td>比较两个对象是否相等</td>
-<td>(a == b)返回False</td>
-</tr>
-<tr>
-<td>!=</td>
-<td>比较两个对象是否不等</td>
-<td>(a != b)返回true</td>
-</tr>
-<tr>
-<td>&lt;&gt;</td>
-<td>比较两个对象是否不等</td>
-<td>(a &lt;&gt; b)返回true。这个运算符类似!=</td>
-</tr>
-<tr>
-<td>&gt;</td>
-<td>返回x是否大于y，返回一个bool值</td>
-<td>(a &gt; b)返回False；4&gt;3&gt;2或4&gt;mynumber&gt;=1是链式比较操作符</td>
-</tr>
-<tr>
-<td>&lt;</td>
-<td>返回x是否小于y。所有比较运算符返回1表示真，返回0表示假。这分别与特殊的变量True和False等价。注意，这些变量名的大写。</td>
-<td>(a &lt; b)返回true</td>
-</tr>
-<tr>
-<td>&gt;=</td>
-<td>返回x是否大于等于y</td>
-<td>(a &gt;= b)返回False</td>
-</tr>
-<tr>
-<td>&lt;=</td>
-<td>返回x是否小于等于y</td>
-<td>(a &lt;= b)返回true</td>
-</tr>
-</tbody>
-</table>
-<h4 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>=</td>
-<td>简单的赋值运算符</td>
-<td>c = a+b将a + b的运算结果赋值为c</td>
-</tr>
-<tr>
-<td>+=</td>
-<td>加法赋值运算符</td>
-<td>c += a等效于c = c + a</td>
-</tr>
-<tr>
-<td>-=</td>
-<td>减法赋值运算符</td>
-<td>c -= a等效于c = c - a</td>
-</tr>
-<tr>
-<td>*=</td>
-<td>乘法赋值运算符</td>
-<td>c *= a等效于c = c * a</td>
-</tr>
-<tr>
-<td>/=</td>
-<td>除法赋值运算符</td>
-<td>c /= a等效于c = c / a</td>
-</tr>
-<tr>
-<td>%=</td>
-<td>取模赋值运算符</td>
-<td>c %= a等效于c = c % a</td>
-</tr>
-<tr>
-<td>**=</td>
-<td>幂赋值运算符</td>
-<td>c **= a等效于c = c ** a</td>
-</tr>
-<tr>
-<td>//=</td>
-<td>取整除赋值运算符</td>
-<td>c //= a等效于c = c // a</td>
-</tr>
-</tbody>
-</table>
-<h4 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h4><blockquote>
-<p>短路运算符，可以把and当作乘法，把or当作加法，非是取反。and 如果第一个表达式为False，后面就没有必要计算了，这个逻辑表达式一定是False；or 如果第一个表达式为True，后面没有必要计算了，这个逻辑表达式一定是True</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>and</td>
-<td>布尔“与”，如果x为False，x and y返回False，否则它返回y的计算值</td>
-<td>(a and b)返回true</td>
-</tr>
-<tr>
-<td>or</td>
-<td>布尔“或”，如果x是True，它返回True，否则它返回y的计算值</td>
-<td>(a or b)返回true</td>
-</tr>
-<tr>
-<td>not</td>
-<td>布尔“非”，如果x为True，返回False。如果x为False，它返回True</td>
-<td>not(a and b)返回false</td>
-</tr>
-</tbody>
-</table>
-<h4 id="成员运算符"><a href="#成员运算符" class="headerlink" title="成员运算符"></a>成员运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>in</td>
-<td>如果在指定的序列中找到值返回True，否则返回False</td>
-<td>x在y序列中，如果x在y序列中返回True</td>
-</tr>
-<tr>
-<td>not in</td>
-<td>如果在指定的序列中没有找到值返回True，否则返回False</td>
-<td>x不在y序列中，如果x不在y序列中返回True</td>
-</tr>
-</tbody>
-</table>
-<h4 id="身份运算符"><a href="#身份运算符" class="headerlink" title="身份运算符"></a>身份运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>is</td>
-<td>is是判断两个标识符是不是引用自一个对象</td>
-<td>x is y，如果id(x)等于id(y)，is返回结果1</td>
-</tr>
-<tr>
-<td>is not</td>
-<td>is not是判断两个标识符是不是引用自不同对象</td>
-<td>x is not y，如果id(x)不等于id(y)，is not返回结果1</td>
-</tr>
-</tbody>
-</table>
-<h4 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h4><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&amp;</td>
-<td>按位与运算符</td>
-<td>(a &amp; b)输出结果12，二进制解释：0000 1100。只有1和1相与得1，其他相与都是0</td>
-</tr>
-<tr>
-<td>I</td>
-<td>按位或运算符</td>
-<td>(a I b)输出结果61，二进制解释：0011 1101</td>
-</tr>
-<tr>
-<td>^</td>
-<td>按位异或运算符</td>
-<td>(a ^ b)输出结果49，二进制解释：0011 0001</td>
-</tr>
-<tr>
-<td>~</td>
-<td>按位取反运算符</td>
-<td>(~a)输出结果-61，二进制解释：1100 0011，在一个有符号二进制数的补码形式</td>
-</tr>
-<tr>
-<td>&lt;&lt;</td>
-<td>左移动运算符</td>
-<td>a &lt;&lt; 2输出结果240，二进制解释：1111 0000</td>
-</tr>
-<tr>
-<td>&gt;&gt;</td>
-<td>右移动运算符</td>
-<td>a &gt;&gt; 2输出结果15，二进制解释：0000 1111</td>
-</tr>
-</tbody>
-</table>
-<h4 id="运算符优先级"><a href="#运算符优先级" class="headerlink" title="运算符优先级"></a>运算符优先级</h4><blockquote>
-<p>算数运算符 &gt; 位运算符 &gt; 身份运算符 &gt; 成员运算符 &gt; 逻辑运算符</p>
-<p>记不住，就用小括号</p>
-<p>长表达式，多用括号，易懂、易读</p>
-</blockquote>
-<h4 id="原码、反码、补码、负数表示法"><a href="#原码、反码、补码、负数表示法" class="headerlink" title="原码、反码、补码、负数表示法"></a>原码、反码、补码、负数表示法</h4><blockquote>
-<ul>
-<li><p>原码</p>
-<p>5 =&gt; 0b101，1 =&gt; 0b1，-1 =&gt; -0b1，bin(-1)</p>
-</li>
-<li><p>反码</p>
-<p>正数的反码与原码相同；负数的反码符号位不变其余按位取反</p>
-</li>
-<li><p>补码</p>
-<p>正数的补码与原码相同；负数的补码符号位不变其余按位取反后+1；补码的补码就是原码</p>
-</li>
-<li><p>负数表示法</p>
-<p>数字电路的CPU中的运算器实现了加法器，但是没有减法器，减法是转换成加法</p>
-<p>负数在计算机中使用补码存储，-1的补码为1111 1111</p>
-<p>5 - 1 =&gt; 5+(-1)直觉上是0b101-0b1，其实计算机中是0b101+0b11111111，溢出位舍弃</p>
-</li>
-</ul>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">例：<span class="number">5</span><span class="number">-1</span>保存为二进制</span><br><span class="line"><span class="number">0000</span> <span class="number">0101</span>		</span><br><span class="line"><span class="comment"># 5的二进制。原码是人比较习惯的方式，-0b1中的负号表示转换为二进制数字时在最高位是0还是1，1表示负号，0表示正号。-0b1是python中的写法。-0b1也就是原码</span></span><br><span class="line"><span class="number">1111</span> <span class="number">1111</span>		</span><br><span class="line"><span class="comment"># -1的二进制，因为计算机中保存的都是补码，而正数的原码与补码一样，所以上面的5不会变。-1的二进制是1000 0001，转换为补码后，除最高位的符号位不变外，还要加1，就是1111 1110 + 1，所以最后就是1111 1111</span></span><br><span class="line"><span class="number">1</span> <span class="number">0000</span> <span class="number">0100</span></span><br><span class="line"><span class="comment"># 这是5和-1的二进制相加后的结果，因为最高位的1溢出了，所以舍弃，最后就变成了0000 0100，也就是4了</span></span><br><span class="line"></span><br><span class="line">例：~<span class="number">12</span>为什么是<span class="number">-13</span></span><br><span class="line"><span class="number">0000</span> <span class="number">1100</span></span><br><span class="line"><span class="comment"># 这是12的二进制</span></span><br><span class="line"><span class="number">1111</span> <span class="number">0011</span></span><br><span class="line"><span class="comment"># 这是对12的二进制取反后的数，但最高位是1表示负数，并且保存在计算机中的应该是数字的补码，所以要取这个负数的补码</span></span><br><span class="line"><span class="number">1000</span> <span class="number">1101</span></span><br><span class="line"><span class="comment"># 这是对上面二进制数取的补码，因为上面表示负数，所以按照最高位不变最后加1的原则，取出的二进制数就是这个数，转换为十进制数就是-13了。</span></span><br></pre></td></tr></table></figure>
-<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><blockquote>
-<p>变量无须事先声明，也不需要指定类型</p>
-<p>编程中一般无须关心变量的存亡，也不用关心内存的管理</p>
-<p>python使用引用 计数记录所有对象的引用数。当对象引用数变为0,它就可以被垃圾回收（GC）了。</p>
-<p>计数增加：赋值给其它变量就增加引用计数，例如：x=3;y=x</p>
-<p>计数减少：函数运行结束时，局部变量就会被自动销毁，对象引用计数减少。变量被赋值给其它对象。例如：x=3;y=x;x=4</p>
-</blockquote>
-<h3 id="程序控制"><a href="#程序控制" class="headerlink" title="程序控制"></a>程序控制</h3><blockquote>
-<ul>
-<li><p>顺序</p>
-<p>按照先后顺序一条条执行</p>
-</li>
-<li><p>分支</p>
-<p>根据不同的情况判断，条件满足执行某条件下的语句</p>
-</li>
-<li><p>循环</p>
-<p>条件满足就反复执行，不满足就不执行或不再执行</p>
-</li>
-</ul>
-</blockquote>
-<h4 id="单分支结构"><a href="#单分支结构" class="headerlink" title="单分支结构"></a>单分支结构</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>语句</span><br><span class="line"><span class="keyword">if</span> condition:</span><br><span class="line">		代码块</span><br><span class="line"><span class="comment"># condition必须是一个bool类型，这个地方有一个隐式转换bool(condition)</span></span><br><span class="line"><span class="keyword">if</span> <span class="number">1</span> &lt; <span class="number">2</span>:</span><br><span class="line">		print(<span class="string">'1 less than 2'</span>)</span><br><span class="line"><span class="comment"># 代码块：类似于if语句的冒号后面的就是一个语句块	</span></span><br><span class="line"></span><br><span class="line">=======================================================================================</span><br><span class="line">真值表</span><br><span class="line"><span class="string">""</span>						   假</span><br><span class="line"><span class="string">"string"</span>			 真</span><br><span class="line"><span class="number">0</span>							假</span><br><span class="line">&gt;=<span class="number">1</span>						 真</span><br><span class="line">&lt;=<span class="number">-1</span>					 真</span><br><span class="line">()空元组			  假</span><br><span class="line">[]空列表			  假</span><br><span class="line">&#123;&#125;空字典			  假</span><br><span class="line"><span class="keyword">None</span>				  假</span><br><span class="line">=======================================================================================</span><br></pre></td></tr></table></figure>
-<h4 id="三目运算"><a href="#三目运算" class="headerlink" title="三目运算"></a>三目运算</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">语法：真值if条件else假值</span><br><span class="line">x if(x&gt;y) else y</span><br><span class="line">print((x if (x&gt;y) else y) if ((x if (x&gt;y) else y)&gt;z) else z)</span><br></pre></td></tr></table></figure>
-<h4 id="多分支结构"><a href="#多分支结构" class="headerlink" title="多分支结构"></a>多分支结构</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>...<span class="keyword">elif</span>...<span class="keyword">else</span>语句</span><br><span class="line"><span class="keyword">if</span> condition1:</span><br><span class="line">		代码块<span class="number">1</span></span><br><span class="line"><span class="keyword">elif</span> condition2:</span><br><span class="line">		代码块<span class="number">2</span></span><br><span class="line"><span class="keyword">elif</span> condition3:</span><br><span class="line">		代码块<span class="number">3</span></span><br><span class="line"><span class="meta">... </span>...</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		代码块</span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line">a = <span class="number">5</span></span><br><span class="line"><span class="keyword">if</span> a &lt; <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'negative'</span>)</span><br><span class="line"><span class="keyword">elif</span> a == <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'zero'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		print(<span class="string">'positive'</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="分支嵌套"><a href="#分支嵌套" class="headerlink" title="分支嵌套"></a>分支嵌套</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">例：</span><br><span class="line">score = <span class="number">80</span></span><br><span class="line"><span class="keyword">if</span> score &lt; <span class="number">0</span>:</span><br><span class="line">		print(<span class="string">'wrong'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		<span class="keyword">if</span> sore == <span class="number">0</span>:</span><br><span class="line">				print(<span class="string">'egg'</span>)</span><br><span class="line">		<span class="keyword">elif</span> score &lt;= <span class="number">100</span>:</span><br><span class="line">				print(<span class="string">'right'</span>)</span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">				print(<span class="string">'too big'</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> condition:</span><br><span class="line">		block</span><br><span class="line"><span class="comment"># 当条件满足即condition为True，进入循环体，执行block</span></span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line">flag = <span class="number">10</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">		print(flag)</span><br><span class="line">		flag -= <span class="number">1</span></span><br><span class="line"><span class="comment"># lag是标记，while flag也就是while为真，flag会递减，等flag等于0时，while就会退出循环了</span></span><br><span class="line"><span class="comment"># while true是死循环，因为条件永远为真，不会变成假。如果 改为-10也会是死循环，可以使用return退出死循环</span></span><br></pre></td></tr></table></figure>
-<h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> iteratable:</span><br><span class="line">		block</span><br><span class="line"><span class="comment"># 当可迭代对象中有元素可以迭代，进入循环体，执行block</span></span><br><span class="line"></span><br><span class="line">例：</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">		print(i+<span class="number">1</span>)</span><br><span class="line"><span class="comment"># range()函数类似seq命令，range(10)可以输出从0到9，共10个数字</span></span><br><span class="line"><span class="comment"># iteratable表示迭代的，element表示元素。</span></span><br><span class="line"></span><br><span class="line">In [1]: range?                                                                  </span><br><span class="line">Init signature: range(self, /, *args, **kwargs)</span><br><span class="line">Docstring:     </span><br><span class="line">range(stop) -&gt; range object</span><br><span class="line">range(start, stop[, step]) -&gt; range object</span><br><span class="line"></span><br><span class="line">Return an object that produces a sequence of integers <span class="keyword">from</span> start (inclusive)</span><br><span class="line">to stop (exclusive) by step.  range(i, j) produces i, i+<span class="number">1</span>, i+<span class="number">2</span>, ..., j<span class="number">-1.</span></span><br><span class="line">start defaults to <span class="number">0</span>, <span class="keyword">and</span> stop <span class="keyword">is</span> omitted!  range(<span class="number">4</span>) produces <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3.</span></span><br><span class="line">These are exactly the valid indices <span class="keyword">for</span> a list of <span class="number">4</span> elements.</span><br><span class="line">When step <span class="keyword">is</span> given, it specifies the increment (<span class="keyword">or</span> decrement).</span><br><span class="line">Type:           type</span><br><span class="line">Subclasses:     </span><br><span class="line"><span class="comment"># range?可以查看帮助</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>,<span class="number">5</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="comment"># 只会输出3和4</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>,<span class="number">6</span>,<span class="number">2</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="comment"># 还可以加上步长</span></span><br></pre></td></tr></table></figure>
-<h4 id="循环continue语句"><a href="#循环continue语句" class="headerlink" title="循环continue语句"></a>循环continue语句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">中断当前循环的当次执行，继续下一次循环</span><br><span class="line">例：</span><br><span class="line">In [<span class="number">7</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>): </span><br><span class="line">   ...:     <span class="keyword">if</span> <span class="keyword">not</span> i%<span class="number">2</span>: </span><br><span class="line">   ...:         print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># 这里会打印偶数是因为range中的数字与2取余后，如果是0就表示假，1表示真，但取余前加了not，所以假就变成了真，所以打印的是偶数，如果不加not，那么就会打印所有奇数。</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">10</span>,<span class="number">2</span>): </span><br><span class="line">   ...:     print(i) </span><br><span class="line">   ...:                                                                         </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># 直接使用range()函数就可以打印奇偶数</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">10</span>): </span><br><span class="line">    ...:     <span class="keyword">if</span> i &amp; <span class="number">1</span>: </span><br><span class="line">    ...:         <span class="keyword">continue</span> </span><br><span class="line">    ...:     print(i) </span><br><span class="line">    ...:                                                                        </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="comment"># range()函数内的数字和1按位与，如果为真，也就是1，就会中断当前循环，如果为假就会打印i</span></span><br></pre></td></tr></table></figure>
-<h4 id="循环break语句"><a href="#循环break语句" class="headerlink" title="循环break语句"></a>循环break语句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">终止当前循环，跳出循环</span><br><span class="line">例：计算<span class="number">1000</span>以内的被<span class="number">7</span>整除的前<span class="number">20</span>个数（<span class="keyword">for</span>循环）</span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">1000</span>,<span class="number">7</span>):</span><br><span class="line">    print(i)</span><br><span class="line">    count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> count == <span class="number">20</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="comment"># range必须从0开始，如果从1开始，那么永远到不了7的整数倍。但这样也会打印0</span></span><br></pre></td></tr></table></figure>
-<h4 id="continue和break语句总结"><a href="#continue和break语句总结" class="headerlink" title="continue和break语句总结"></a>continue和break语句总结</h4><blockquote>
-<ul>
-<li>continue和break是循环的控制语句，只影响当前循环，包括while、for循环</li>
-<li>如果循环嵌套，continue和break也只影响语句所在的那一层循环</li>
-<li>continue和break不是跳出语句块，所以if cond: break不是跳出if，而是终止if外的break所在的循环</li>
-</ul>
-</blockquote>
-<h4 id="循环else子句"><a href="#循环else子句" class="headerlink" title="循环else子句"></a>循环else子句</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果循环正常的执行结束，就执行else子句；如果使用break终止，else子句不会执行</span></span><br><span class="line"><span class="keyword">while</span> condition:</span><br><span class="line">		block</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">		block</span><br><span class="line">        </span><br><span class="line"><span class="keyword">for</span> element <span class="keyword">in</span> iteratable:</span><br><span class="line">    	block</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    	block</span><br></pre></td></tr></table></figure>
-<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 输入<span class="number">2</span>个数字，输出最大数</span><br><span class="line">a = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">b = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line"><span class="keyword">while</span> a == b:</span><br><span class="line">    print(<span class="string">'请重新输入'</span>)</span><br><span class="line">    a = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">    b = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">    <span class="keyword">if</span> a &gt; b:</span><br><span class="line">        print(a)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(b)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> 给定一个不超过<span class="number">5</span>位的正整数，判断其有几位</span><br><span class="line"><span class="comment"># 使用input函数，例：input函数获取键盘输入，input([prompt])。input()是内建函数，返回的是字符串。下划线在ipython中是一个特殊的字符，表示上一次output的结果。</span></span><br><span class="line">a = int(input(<span class="string">'&gt;&gt;&gt;'</span>))</span><br><span class="line"><span class="keyword">if</span> a // <span class="number">100000</span>:</span><br><span class="line">    print(<span class="string">'6位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">10000</span>:</span><br><span class="line">    print(<span class="string">'5位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">1000</span>:</span><br><span class="line">    print(<span class="string">'4位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">100</span>:</span><br><span class="line">    print(<span class="string">'3位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">10</span>:</span><br><span class="line">    print(<span class="string">'2位数'</span>)</span><br><span class="line"><span class="keyword">elif</span> a // <span class="number">1</span>:</span><br><span class="line">    print(<span class="string">'1位数'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="number">3.</span> 给定一个不超过<span class="number">5</span>位的正整数，判断该数的位数，依次打印出个位、十位、百位、千位、万位的数字</span><br><span class="line"></span><br><span class="line"><span class="number">4.</span> 打印一个连长为n的正方形</span><br><span class="line"></span><br><span class="line"><span class="number">5.</span> 求<span class="number">100</span>内所有奇数的和(<span class="number">2500</span>)</span><br><span class="line"></span><br><span class="line"><span class="number">6.</span> 判断学生成绩，成绩等级A~E。其中，<span class="number">90</span>分以上为A，<span class="number">80</span>～<span class="number">89</span>分为B，<span class="number">70</span>～<span class="number">79</span>分为C，<span class="number">60</span>～<span class="number">69</span>分为D，<span class="number">60</span>分以下为E</span><br><span class="line"></span><br><span class="line"><span class="number">7.</span> 求<span class="number">1</span>到<span class="number">5</span>阶乘之和</span><br><span class="line"></span><br><span class="line"><span class="number">8.</span> 给一个数，判断它是否是素数（质数）。质数：一个大于<span class="number">1</span>的自然数只能被<span class="number">1</span>和它本身整除</span><br><span class="line"></span><br><span class="line"><span class="number">9.</span> 打印九九乘法表</span><br><span class="line"></span><br><span class="line"><span class="number">10.</span> 打印菱形</span><br><span class="line"></span><br><span class="line"><span class="number">11.</span> 打印<span class="number">100</span>以内的斐波那契数列</span><br><span class="line"></span><br><span class="line"><span class="number">12.</span> 求斐波那契数列第<span class="number">101</span>项</span><br><span class="line"></span><br><span class="line"><span class="number">13.</span> 求<span class="number">10</span>万内的所有素数</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2782,7 +2477,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">146</span>
+                    <span class="site-state-item-count">149</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3090,7 +2785,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">112</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">115</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
