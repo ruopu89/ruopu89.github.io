@@ -635,7 +635,8 @@ systemctl restart ssh
 ### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp 
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch
+# gimp是作图工具，axel是命令行下载工具，screenfetch是显示系统信息的
 ```
 
 
@@ -1287,11 +1288,28 @@ apt install -y tilix
 # 一款不错的linux终端仿真器
 下载配色方案，https://www.ctolib.com/Gogh.html，这里提供了一个配色方法，大根提供进200种方案，如果选择ALL，表示全部安装，或只输入要安装的方案的编号即可。如果安装全部，可能会比较慢。在https://mayccoll.github.io/Gogh/中有配色方案的样例。
 bash -c  "$(wget -qO- https://git.io/vQgMr)"
-# 运行此命令即可安装配色方案。个人比较喜欢Mona Lisa这个方案，还有google的，github的，方案号有50，52，53，89，
+# 运行此命令即可安装配色方案。个人比较喜欢Mona Lisa这个方案，还有google的，github的，方
+# 案号有04，05，07，12，51，53，54，56，90，172
 apt install dconf-cli
 # 安装配色方案前要安装此包。
 
-配色方案支持的终端
+--------------
+  修改默认终端
+--------------  
+shouyu@shouyu-pc  ~  sudo update-alternatives --config x-terminal-emulator
+# 执行命令后会让用户选择默认终端，选择后即可修改。如下：
+ Selection    Path                             Priority   Status
+------------------------------------------------------------
+* 0            /usr/bin/gnome-terminal.wrapper   40        auto mode
+  1            /usr/bin/gnome-terminal.wrapper   40        manual mode
+  2            /usr/bin/tilix.wrapper            30        manual mode
+
+Press <enter> to keep the current choice[*], or type selection number: 2
+update-alternatives: using /usr/bin/tilix.wrapper to provide /usr/bin/x-terminal-emulator (x-terminal-emulator) in manual mode
+
+---------------------
+   配色方案支持的终端
+---------------------
 Supported terminals:
    mintty and deriviates
    guake

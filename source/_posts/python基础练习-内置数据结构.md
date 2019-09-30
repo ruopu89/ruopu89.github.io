@@ -53,11 +53,15 @@ k = 5
 n = m - 1
 r = k - 1
 d = n - r
+# 上面三行可以写成一行，使用封装解构的方法
 targets = []   # r, n-r, n
 factorial = 1
+# factorial是初始值，求阶乘起始为1，求和起始为0
 # 可以加入k为1或者m的判断，返回1
 for i in range(1,n+1):
+# range中的范围就是要求的阶乘的范围
     factorial *= i
+# 这里是求阶乘
     if i == r:
         targets.append(factorial)
     if i == d:
@@ -92,15 +96,31 @@ print(targets[2]//(targets[0]*targets[1]))
 matrix=[[1,2,3],[4,5,6],[7,8,9]]
 print(matrix)
 count = 0
-for i,row in enumerate(matrix):
+for i,row in enumerate(matrix):   
+# 这里的结果是
+# 0 [1,2,3]  i是索引0，row是值[1,2,3]
+# 1 [4,5,6]   
+# 2 [7,8,9]
     for j,col in enumerate(row):
+# 当这里是0 [1,2,3]时，这里的结果是
+# 0 1
+# 1 2
+# 2 3
         if i < j:
+# 在这里进行索引的比较，交i小于j时才交换，第一次时，i一直是0，j是0,1,2，当i和j都是0时，不会有变动。当i是0,j是1时，
+# 就将matrix[0][1]和matrix[1][0]对调，也就成了[[1,4,3],[2,5,6],[7,8,9]]，当i是0，j是2时，
+# 就将matrix[0][2]和matrix[2][0]对调，也就成了[[1,4,7],[2,5,6],[3,8,9]]。之后以此类推。
             temp = matrix[i][j]
             matrix[i][j] = matrix[j][i]
             matrix[j][i] = temp
             count += 1
 print(matrix)
 print(count)
+# 统计一共交换的次数
+输出：
+[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+[[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+3
 ```
 
 
@@ -112,7 +132,9 @@ matrix = [[1,2,3,10],[4,5,6,11],[7,8,9,12],[1,2,3,4]]
 length = len(matrix)
 count = 0
 for i in range(length):
-    for j in range(i):   #j<i
+    for j in range(i):   
+# 这个设计更加巧妙，按此方法，如果matrix中有五个元素，每个元素中有五个小的元素，使用此方法
+# 也可以转置。只要matrix中的元素与元素中的子元素个数是相等的就可以转置。
         matrix[i][j],matrix[j][i] = matrix[j][i],matrix[i][j]
         count += 1
 print(matrix)
@@ -150,7 +172,17 @@ tm = []
 count = 0
 for row in matrix:
     for i,col in enumerate(row):
-        if len(tm) < i + 1:   # matrix有i列就要为tm创建i行
+# 这里是为了计算matrix中有几列，有几列就要为tm创建几行，结果是：
+# 0 1
+# 1 2
+# 2 3
+# 0 4
+# 1 5
+# 2 6
+        if len(tm) < i + 1:   
+# matrix的列数与tm的行数应该相等，len(tm)就是计算tm有几行的，i+1是列数，加1是因为i是
+# 从0开始的。这里的条件会一直满足，len(tm)会一直小于i+1。因为第一次len(tm)的结果是0。只
+# 有这个条件满足时，才会向tm的元素中追加值。把tm转化为matrix也一样可以使用这个方法
             tm.append([])
             
         tm[i].append(col)
@@ -280,7 +312,7 @@ states = [0] * length   # 记录不同的索引异同状态
 
 for i in range(length):
     flag = False   # 假定没有重复
-    if states[i] == i:
+    if states[i] == 1:
         continue
     for j in range(i+1,length):
         if states[j] == 1:

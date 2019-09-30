@@ -20,7 +20,7 @@ conky-manager
 在窗口中选择.conky/Gotham/Gotham，这是会在桌面上显示时间与一些电脑基本信息，再选择配置这个效果，在弹出的窗口中选择Transparency，再选择Transparent，这会有一个透明的效果。
 
 vim ~/.conky/Gotham/Gotham
-use_xft yes                                                                                                                                                                 
+use_xft yes                                                                     
 xftfont caviar dreams:size=8
 # 这里改为caviar dreams
 xftalpha 0.1 
