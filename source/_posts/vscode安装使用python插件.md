@@ -2,7 +2,7 @@
 title: vscode安装使用python插件
 date: 2019-09-30 13:28:52
 tags: python插件
-categories: python
+categories: vscode
 ---
 
 1. 安装插件，搜索安装Python和python for VSCode插件

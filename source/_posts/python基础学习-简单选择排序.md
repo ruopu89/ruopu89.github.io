@@ -33,13 +33,21 @@ count_swap = 0
 count_iter = 0
 
 for i in range(length):
+# 按列表元素长度来迭代，第二次进入此循环，第一个索引，也就是索引0就不再进行比较了
     maxindex = i
+# 假定最大值索引为i
     for j in range(i + 1, length): 
+# j从列表元素的第二个数开始，所以加1。到长度减1结束，因为是索引，所以会少1。
         count_iter += 1
         if nums[maxindex] < nums[j]:
             maxindex = j
+# 用maxindex索引与j索引比软，谁大，maxindex就替换为谁，实际是如果maxindex索引大，就不变，如果j索引
+# 大，就将maxindex替换为j。之后再用j索引与maxindex索引比较，当第一次比较过后，会得到此轮比较的最大值
+# 的索引。
             
     if i != maxindex:
+# 每轮比较过后，用maxindex与i索引比较，如果不一样，说明i索引不是最大值，就要进行下面的替换。如果i索引
+# 与maxindex索引相等，就不用动了。
         tmp = nums[i]
         nums[i] = nums[maxindex]
         nums[maxindex] = tmp
@@ -72,13 +80,17 @@ nums = m_list[1]
 length = len(nums)
 print(nums)
 
-count_swap = 0
-count_iter = 0
+count_swap = 0   # 交换次数
+count_iter = 0   # 迭代次数
 
-for i in range(length // 2):   # [1,9,8,5,6,7,4,3,2]
+for i in range(length // 2):   # [1,9,8,5,6,7,4,3,2]，因为每轮找到两个极值，所以要整除2
     maxindex = i
+# 假定最大值的索引是最左边的i
     minindex = -i - 1
+# 假定最小值的索引是最右边的数，因为是前包后不包，所以还要减1
     minorigin = minindex
+# minorigin是记录每轮最小值开头的索引，每轮最大值开头的索引就是i，但没有记录最小值开头的索引，所以这里
+# 要定义一个minorigin。
     
     for j in range(i + 1, length - i):  # 每次左右都要少比较一个，所以range()内的数字都要减少
         count_iter += 1
@@ -86,8 +98,8 @@ for i in range(length // 2):   # [1,9,8,5,6,7,4,3,2]
             maxindex = j
         if nums[minindex] > nums[-j - 1]:
             minindex = -j - 1
-            
-#     print(maxindex,minindex)
+# 每轮进行两次比较，得到最大值与最小值索引          
+#     print(maxindex,minindex)  打印每轮比较后得到的两个极值 
     
     if i != maxindex:
         tmp = nums[i]
@@ -97,17 +109,22 @@ for i in range(length // 2):   # [1,9,8,5,6,7,4,3,2]
         # 如果最小值被交换过，要更新索引
         if i == minindex or i == length + minindex:
             minindex = maxindex
-            
+# 如果这里i不是最大值索引，就要把最大值索引给i。但这样变更后，minindex的索引也会受到影响，比如m_list
+# 列表第一个元素中的情况，那么这里还要做一个判断，如果最小值索引等于i或等于length加最小值索引，那么就把
+# 交换前的最大值索引赋值给最小值索引，这也就是为了保证最小值索引不会变。上面的判断中使用了or来判断两种情
+# 况是因为minindex可能是负数，i是不会等于负数的，如果是负数，就要用长度加上这个负索引值，也可以得到一个 
+# 正数的索引。保存了最小值索引，才能保证下面的判断是有意义的。
     if minorigin != minindex:
         tmp = nums[minorigin]
         nums[minorigin] = nums[minindex]
         nums[minindex] = tmp
         count_swap += 1
-        
+# 上面判断最大值与最小值索引是否
 print(nums, count_swap, count_iter)
 输出：
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 [9, 8, 7, 6, 5, 4, 3, 2, 1] 8 20
+# 通过取两个极值，可以看到迭代的次数从36变成了20
 ```
 
 
@@ -194,8 +211,8 @@ for i in range(length // 2):
         
         if i == minindex or i == length + minindex:
             minindex = maxindex
-        # 最小值索引不同，但值相同就没有必要交换了
     if minorigin != minindex and nums[minorigin] != nums[minindex]:
+# 这里的判断指最小值索引不同，但值相同就没有必要交换了
         tmp = nums[minorigin]
         nums[minorigin] = nums[minindex]
         nums[minindex] = tmp
@@ -215,5 +232,5 @@ print(nums, count_swap, count_iter)
 - 简单选择排序需要数据一轮轮比较，并在每一轮中发现极值
 - 没有办法知道当前轮是否已经达到排序要求，但是可以知道极值是否在目标索引位置上
 - 遍历次数1,...,n-1之和n(n-1)/2
-- 时间复杂度O(n**2)
+- 时间复杂度O(n**2)，因为用了两个循环，所以是n的平方
 - 减少了交换次数，提高了效率，性能略好于冒泡法

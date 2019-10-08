@@ -376,6 +376,31 @@ OK
 
 
 
+### 安装Wunderlist奇妙清单
+
+```shell
+下载地址：https://github.com/edipox/wunderlistux/releases/tag/v0.0.9-linux-x64
+# 可能下载deb，AppImage，和原码包。使用deb包安装即可，桌面图标显示有问题，可以在命令行使
+# 用wunderlist &运行
+参考：https://sourcedigit.com/21169-install-wunderlist-app-wunderlistux-ubuntu-16-10-ubuntu-16-04/
+```
+
+
+
+### ubuntu18.04 鼠标插入时，自动关闭触摸板
+
+```shell
+sudo add-apt-repository ppa:atareao/atareao
+sudo apt update
+sudo apt install touchpad-indicator
+# 安装后，可以使用命令行启动touchpad-indicator，启动后可能看不到设置页面，但在屏幕上方可
+# 以看到一个触摸板的图标，可以左键点击它进行设置，设置页面第一个标签页可以设置快捷键，快捷键
+# 可以打开或关闭触摸板。第二个标签页第一项是设置插入鼠标就禁用触摸板的，第三个标签页可以设置
+# 在开机的时候就启动这个小程序
+```
+
+
+
 ### dd命令制作启动盘
 
 ```shell
@@ -635,8 +660,8 @@ systemctl restart ssh
 ### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch
-# gimp是作图工具，axel是命令行下载工具，screenfetch是显示系统信息的
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload
+# gimp是作图工具；axel是命令行下载工具；screenfetch是显示系统信息的；preload安装即可，开机时会将数据预加载到内存中。
 ```
 
 
@@ -1326,7 +1351,7 @@ Supported terminals:
 ```shell
 apt install mate-terminal
 # 这个终端使用起来更好用一些
-bash -c  "$(wget -qO- https://git.io
+bash -c  "$(wget -qO- https://git.io/vQgMr)"
 # 在选择安装后，可以试着选n来安装使用，这需要尝试，当使用y会有dconf的错误提示的时候可以这样试一下。
 安装主题后，这个终端是通过新建配置文件来修改终端主题的，安装一个主题后就可以创建一个新的配置文件了。但在设置时还是会有一些混乱的问题，需要反复测试。
 root@ruopu:~# mv /usr/bin/konsole{,.bak}
@@ -1684,5 +1709,25 @@ root@ruopu64:networks#virsh net-list
 
 ```shell
 官网http://jmeter.apache.org/download_jmeter.cgi，下载Apache的JMeter的-5.1.1.tgz。解压文件，执行解压后的目录中的bin目录下的jmeter即可打开。
+```
+
+
+
+### 开启TCP BBR单边加速
+
+```shell
+# 4.9 的内核支持TCP BBR 单边加速。但需要开启
+# 新的 TCP 拥塞控制算法 BBR (Bottleneck Bandwidth and RTT) 可以让服务器的带宽尽量跑
+# 慢，并且尽量不要有排队的情况，让网络服务更佳稳定和高效。
+
+ubuntu@ip-172-31-33-103:~$ sudo vim /etc/sysctl.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+ubuntu@ip-172-31-33-103:~$ sudo sysctl -p
+ubuntu@ip-172-31-33-103:~$ lsmod |grep bbr
+tcp_bbr                20480  1
+ubuntu@ip-172-31-33-103:~$ sysctl net.ipv4.tcp_available_congestion_control
+net.ipv4.tcp_available_congestion_control = reno cubic bbr
+# 查看开启结果，如果上面这样，就表示开启了BBR
 ```
 
