@@ -350,6 +350,188 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/drbd基本配置使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/29/drbd基本配置使用/" itemprop="url">
+                  drbd基本配置使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 10:57:21 / 修改時間：14:10:56" itemprop="dateCreated datePublished" datetime="2019-03-29T10:57:21+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>DRBD即Distributed Relicated Block Device：分布式磁盘块设备， 可以解决磁盘单点故障。一般情况下只支持两个节点。 </p>
+<p>一般情况下文件写入磁盘的步骤是：写操作 –&gt; 文件系统 –&gt; 内存缓存中 –&gt; 磁盘调度器 –&gt; 磁盘驱动器 –&gt; 写入磁盘。而DRBD的工作机制如上图所示，数据经过buffer cache后有内核中的DRBD模块通过tcp/ip协议栈经过网卡和对方建立数据同步。 </p>
+</blockquote>
+<p><img src="/images/drbd/工作流程.png" alt=""></p>
+<h4 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h4><blockquote>
+<ol>
+<li><p>主从模型</p>
+<p>master/slave模型，在某一时刻只允许有一个主节点。主节点的作用是可以挂载使用，写入数据等；从节点只作为主节点的镜像，是主节点的备份。 </p>
+</li>
+<li><p>主主模型</p>
+<p>dula primary模型，2个节点都可以当做主节点来挂载使用。需要配合集群文件系统使用，通过分布式文件锁管理器避免同时写一个文件造成文件系统损坏的问题。</p>
+</li>
+</ol>
+</blockquote>
+<h4 id="复制模型"><a href="#复制模型" class="headerlink" title="复制模型"></a>复制模型</h4><blockquote>
+<ol>
+<li>A协议：异步复制（asynchronous），写操作到本机网卡时即认为成功，性能好，数据可靠性差。 </li>
+<li>B协议：半同步复制（semi sync），写操作到达备节点网卡即认为成功，数据可靠性介于A和C之间。 </li>
+<li>C协议：同步复制（ sync），备用节点写入磁盘即认为成功，性能差，数据可靠性高。也是drbd默认使用的复制协议 </li>
+</ol>
+</blockquote>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">===========================================================================================</span><br><span class="line">环境：</span><br><span class="line">主机两台，操作系统CentOS6.6，内核2.6.32-504.el6.x86_64。地址：192.168.2.132、192.168.2.133</span><br><span class="line">安装与配置在两个节点上是一样的</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash"> 两台主机均按如下方法操作</span></span><br><span class="line">[root@primary drbd]# rpm -ivh drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装包取自生产环境。drbd84-utils-8.9.1-1.el6.elrepo包提供配置文件与工具，komd-drbd84-8.4.6-504.el6.x86_64.rpm包提供内核模块。注意两个包要一起安装，不然可能不会添加设备</span></span><br><span class="line">[root@template ~]# ls /dev/d</span><br><span class="line">disk/   dm-1    drbd1   drbd11  drbd13  drbd15  drbd3   drbd5   drbd7   drbd9   dvdrw   </span><br><span class="line">dm-0    drbd0   drbd10  drbd12  drbd14  drbd2   drbd4   drbd6   drbd8   dvd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装软件后可以看到添加了很多以drbd开头的设备</span></span><br><span class="line">[root@primary ~]# fdisk /dev/sdb</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在两个分区上提供大小一致的分区</span></span><br><span class="line">[root@primary ~]# ntpdate ntp1.aliyun.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步时间</span></span><br><span class="line">[root@primary ~]# partprobe /dev/sdb</span><br><span class="line">[root@primary drbd]# vim /etc/sysconfig/network</span><br><span class="line">NETWORKING=yes</span><br><span class="line">HOSTNAME=primary</span><br><span class="line">[root@primary drbd]# hostname primary</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改主机名</span></span><br><span class="line">[root@primary drbd]# ssh-keygen -t rsa -P ''</span><br><span class="line">[root@primary drbd]# ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.133</span><br><span class="line"><span class="meta">#</span><span class="bash"> 密钥通信</span></span><br><span class="line">[root@primary drbd]# vim /etc/hosts</span><br><span class="line">192.168.2.132 primary</span><br><span class="line">192.168.2.133 secondary</span><br><span class="line">[root@primary drbd]# scp drbd84-utils-8.9.2-1.el6.elrepo.x86_64.rpm kmod-drbd84-8.4.6-1.el6.elrepo.x86_64.rpm secondary:/root</span><br></pre></td></tr></table></figure>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">[root@primary ~]# cd /etc/drbd.d</span><br><span class="line">[root@primary drbd.d]# vim global_common.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此配置文件提供全局配置，及多个drbd设备相同的配置 </span></span><br><span class="line">global &#123;</span><br><span class="line">	usage-count no;</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 是否加入改进计划 </span></span><br><span class="line">&#125;</span><br><span class="line">common &#123;</span><br><span class="line">	handlers &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	startup &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	options &#123;</span><br><span class="line">	&#125;</span><br><span class="line">	disk &#123;</span><br><span class="line">		on-io-error detach;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> IO出问题时，就将节点卸载 </span></span><br><span class="line">	&#125;</span><br><span class="line">	net &#123;</span><br><span class="line">		cram-hmac-alg "sha1";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 使用的算法 </span></span><br><span class="line">		shared-secret "mydrbdshared123";</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 共享密钥，建议用随机数生成 </span></span><br><span class="line">	&#125;</span><br><span class="line">	syncer &#123;</span><br><span class="line">		rate 500M;</span><br><span class="line"><span class="meta">		#</span><span class="bash"> 同步速率</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> glocal：全局属性，定义drbd自己的工作特性。common：通用属性，定义多组drbd设备通用特性 </span></span><br><span class="line"></span><br><span class="line">[root@primary drbd.d]# vim mystore.res</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此文件为自建文件</span></span><br><span class="line">resource mystore &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 首先定义公共配置，这一段可以被下面的多段使用 </span></span><br><span class="line">    device /dev/drdb0;</span><br><span class="line">    # 定义设备</span><br><span class="line">    disk /dev/sdb1;</span><br><span class="line">    # 定义磁盘，定义这两项就让磁盘与设备关联了？</span><br><span class="line">    meta-disk internal;</span><br><span class="line">     # 在自己的dev内部构建使用</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面定义单个节点的属性 </span></span><br><span class="line">    on primary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">    on secondary &#123;</span><br><span class="line">        address 192.168.2.132:7789;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化资源，mystore是资源名，是在mystore.res文件中定义的。在两个节点上分别执行 </span></span><br><span class="line">[root@primary drbd.d]# drbdadm create-md mystore</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">Writing meta data...</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line">[root@primary drbd.d]# service drbd start</span><br><span class="line">Starting DRBD resources: [</span><br><span class="line">     create res: mystore</span><br><span class="line">   prepare disk: mystore</span><br><span class="line">    adjust disk: mystore</span><br><span class="line">     adjust net: mystore</span><br><span class="line">]</span><br><span class="line">....</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动一个节点后，它会等待另一个节点也启动此服务，这时两个节点才会一起启动服务</span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:Inconsistent/Inconsistent C r-----</span><br><span class="line">    ns:0 nr:0 dw:0 dr:0 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:3140544</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看运行状态，现在两个都是Secondary，没有同步 </span></span><br><span class="line">[root@primary drbd.d]# drbd-overview </span><br><span class="line"> 0:mystore/0  Connected Secondary/Secondary Inconsistent/Inconsistent </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 使用此命令也可以</span></span><br><span class="line"> [root@primary drbd.d]# drbdadm primary --force mystore</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 设置节点1为主节点</span></span><br><span class="line"> [root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:SyncSource ro:Primary/Secondary ds:UpToDate/Inconsistent C r-----</span><br><span class="line">    ns:1067676 nr:0 dw:0 dr:1069720 al:0 bm:0 lo:0 pe:2 ua:2 ap:0 ep:1 wo:f oos:2074560</span><br><span class="line">	[=====&gt;..............] sync'ed: 34.1% (2074560/3140544)K</span><br><span class="line">	finish: 0:00:52 speed: 39,708 (39,480) K/sec</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 显示同步过程，有两种状态，primary和secondary，主和从，左边为自己的状态右边是对方的状态 </span></span><br><span class="line">[root@primary drbd.d]# cat /proc/drbd </span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3140544 nr:0 dw:0 dr:3141208 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步完成，这是状态为Primary/Secondary </span></span><br><span class="line">[root@primary drbd.d]# mke2fs -t ext4 /dev/drbd0</span><br><span class="line">mke2fs 1.41.12 (17-May-2010)</span><br><span class="line">文件系统标签=</span><br><span class="line">操作系统:Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">196608 inodes, 785136 blocks</span><br><span class="line">39256 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=805306368</span><br><span class="line">24 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成</span><br><span class="line"></span><br><span class="line">This filesystem will be automatically checked every 26 mounts or</span><br><span class="line">180 days, whichever comes first.  Use tune2fs -c or -i to override.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在主节点格式化磁盘，从节点也会自动格式化，因为是按位同步的</span></span><br></pre></td></tr></table></figure>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary drbd.d]# ls /mnt</span><br><span class="line">lost+found</span><br><span class="line">[root@primary drbd.d]# cd /mnt</span><br><span class="line">[root@primary mnt]# cp /etc/issue ./</span><br><span class="line">[root@primary mnt]# ls</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@primary mnt]# cd</span><br><span class="line">[root@primary ~]# umount /mnt</span><br><span class="line">[root@primary ~]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 把自己切换为从节点</span></span><br><span class="line">[root@primary ~]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Secondary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:3256316 nr:0 dw:115772 dr:3141925 al:31 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 状态都是从节点</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node2    </span><br><span class="line">=========</span><br><span class="line">[root@secondary drbd.d]# drbdadm primary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在哪个节点执行此命令就是切换哪个节点的状态，这里将备用节点切换为主节点</span></span><br><span class="line">[root@secondary drbd.d]# cat /proc/drbd</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line"> 0: cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate C r-----</span><br><span class="line">    ns:0 nr:3256316 dw:3256316 dr:664 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span><br><span class="line">[root@secondary drbd.d]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@secondary drbd.d]# ls /mnt</span><br><span class="line">issue  lost+found</span><br><span class="line">[root@secondary drbd.d]# vim /mnt/issue</span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入一些内容</span></span><br><span class="line">[root@secondary drbd.d]# umount /mnt</span><br><span class="line">[root@secondary drbd.d]# drbdadm secondary mystore</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要切换状态，备用状态是不能被挂载</span></span><br><span class="line"></span><br><span class="line">=========</span><br><span class="line">    node1   </span><br><span class="line">=========</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">mount: you must specify the filesystem type</span><br><span class="line"><span class="meta">#</span><span class="bash"> 备用状态是不能被挂载的</span></span><br><span class="line">[root@primary ~]# drbdadm primary mystore</span><br><span class="line">[root@primary ~]# mount /dev/drbd0 /mnt</span><br><span class="line">[root@primary ~]# cat /mnt/issue </span><br><span class="line">CentOS release 6.6 (Final)</span><br><span class="line">Kernel \r on an \m</span><br><span class="line"></span><br><span class="line">abcabc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 内容也被改变了</span></span><br><span class="line">[root@primary ~]# service drbd status</span><br><span class="line">drbd driver loaded OK; device status:</span><br><span class="line">version: 8.4.6 (api:1/proto:86-101)</span><br><span class="line">GIT-hash: 833d830e0152d1e457fa7856e71e11248ccf3f70 build by phil@Build64R6, 2015-04-09 14:35:00</span><br><span class="line">m:res      cs         ro                 ds                 p  mounted  fstype</span><br><span class="line">0:mystore  Connected  Primary/Secondary  UpToDate/UpToDate  C  /mnt     ext4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看状态，UpToDate/UpToDate 表示已经同步</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/26/python基础学习-语句/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -585,7 +767,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-10-08 17:02:49" itemprop="dateModified" datetime="2019-10-08T17:02:49+08:00">2019-10-08</time>
+                <time title="修改時間：2019-10-11 15:52:03" itemprop="dateModified" datetime="2019-10-11T15:52:03+08:00">2019-10-11</time>
               
             
           </span>
@@ -910,12 +1092,18 @@
 <li>打印每一位数字及其重复的次数</li>
 </ul>
 </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">num = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> d.get(c):</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    d[c] += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">print(d)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> c <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[c] += <span class="number">1</span></span><br><span class="line">print(d)</span><br></pre></td></tr></table></figure>
+<ul>
 <li>数字重复统计<ul>
 <li>随机产生100个整数</li>
 <li>数字的范围[-1000,1000]</li>
 <li>升序输出所有不同的数字及其重复的次数</li>
 </ul>
 </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">n = <span class="number">100</span></span><br><span class="line">nums = [<span class="number">0</span>] * n</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">    nums[i] = random.randint(<span class="number">-1000</span>,<span class="number">1000</span>)</span><br><span class="line">print(nums)</span><br><span class="line">t = nums.copy()</span><br><span class="line">t.sort()</span><br><span class="line">print(t)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> nums:</span><br><span class="line">    <span class="keyword">if</span> x <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[x] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[x] += <span class="number">1</span></span><br><span class="line">print(d)</span><br><span class="line">d1 = sorted(d.items())</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
+<ul>
 <li>字符串重复统计<ul>
 <li>字符表’abcdefghijklmnopqrstuvwxyz’</li>
 <li>随机挑选2个字母组成字符串，共挑选100个</li>
@@ -923,6 +1111,7 @@
 </ul>
 </li>
 </ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">alphabet = <span class="string">'abcdefghijklmnopqrstuvwxyz'</span></span><br><span class="line"></span><br><span class="line">words = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    <span class="comment"># words.append(random.choice(alphabet)+random.choice(alphabet))</span></span><br><span class="line">    <span class="comment"># words.append(''.join(random.sample(alphabet,2)))   随机采样</span></span><br><span class="line">    words.append(<span class="string">''</span>.join(random.choice(alphabet) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2</span>))) <span class="comment"># 生成器</span></span><br><span class="line">    </span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> words:</span><br><span class="line">    d[x] = d.get(x,<span class="number">0</span>) + <span class="number">1</span></span><br><span class="line">print(d)</span><br><span class="line"></span><br><span class="line">d1 = sorted(d.items(),reverse=<span class="keyword">True</span>)</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
 <h4 id="将字符串格式设置功能用于字典"><a href="#将字符串格式设置功能用于字典" class="headerlink" title="将字符串格式设置功能用于字典"></a>将字符串格式设置功能用于字典</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; phonebook</span><br><span class="line">&#123;<span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Cecil's phone number is &#123;Cecil&#125;."</span>.format_map(phonebook)</span><br><span class="line"><span class="string">"Cecil's phone number is 3258."</span></span><br><span class="line"><span class="comment"># 可在字典中包含各种信息，这样只需在格式字符串中提取所需的信息即可。使用format_map来指出你</span></span><br><span class="line"><span class="comment"># 将通过一个映射来提供所需的信息。可使用字符串格式设置功能来设置值的格式，这些值是作为命名或</span></span><br><span class="line"><span class="comment"># 非命名参数提供给方法format的。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>template = <span class="string">'''&lt;html&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;head&gt;&lt;title&gt;&#123;title&#125;&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;body&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;h1&gt;&#123;title&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;p&gt;&#123;text&#125;&lt;/p&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;/body&gt;'''</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>data = &#123;<span class="string">'title'</span>: <span class="string">'My Home Page'</span>, <span class="string">'text'</span>: <span class="string">'Welcome to my home page!'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(template.format_map(data))</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;My Home Page&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;h1&gt;My Home Page&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;Welcome to my home page!&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line"><span class="comment"># 将data字典的值代入template中。像这样使用字典时，可指定任意数量的转换说明符，条件是所有</span></span><br><span class="line"><span class="comment"># 的字段名都是包含在字典中的键。</span></span><br></pre></td></tr></table></figure>
 <p>##### </p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -2067,7 +2256,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-10-10 13:25:46" itemprop="dateModified" datetime="2019-10-10T13:25:46+08:00">2019-10-10</time>
+                <time title="修改時間：2019-10-11 13:28:03" itemprop="dateModified" datetime="2019-10-11T13:28:03+08:00">2019-10-11</time>
               
             
           </span>
@@ -2132,6 +2321,8 @@
 <h3 id="使用锐捷客户端"><a href="#使用锐捷客户端" class="headerlink" title="使用锐捷客户端"></a>使用锐捷客户端</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 公司搬家之后需要使用锐捷交换机上网，所以需要安装锐捷客户端才能联网。但使用锐捷客户端无法连接。所以需要使用mentohust包进行连接验证。下面的前两步是下载安装锐捷客户端，可以忽略。</span></span><br><span class="line">1. 下载地址：http://pan.baidu.com/s/1hrhaYrU，包名：RG_SU_For_Linux_1_30_Setup.zip</span><br><span class="line">2. 解压</span><br><span class="line">unzip RG_SU_For_Linux_1_30_Setup.zip</span><br><span class="line">3. 下载mentohust，此包为了可以通过锐捷用户名密码验证，也解决使用锐捷脚本验证时提示"不允许使用的客户端类型"。感觉使用这个包，就不需要锐捷的软件包了。</span><br><span class="line">下载地址：https://code.google.com/archive/p/mentohust/。下载包名：mentohust_0.3.4-1_amd64.deb</span><br><span class="line">4. 用户名密码验证</span><br><span class="line">sudo mentohust -v4.44 -w</span><br><span class="line">欢迎使用MentoHUST	版本: 0.3.4</span><br><span class="line">Copyright (C) 2009-2010 HustMoon Studio</span><br><span class="line">人到华中大，有甜亦有辣。明德厚学地，求是创新家。</span><br><span class="line">Bug report to http://code.google.com/p/mentohust/issues/list</span><br><span class="line"></span><br><span class="line">** 网卡[1]:	enp1s0</span><br><span class="line">** 网卡[2]:	wlp0s20f3</span><br><span class="line">** 网卡[5]:	bluetooth0</span><br><span class="line">** 网卡[6]:	nflog</span><br><span class="line">** 网卡[7]:	nfqueue</span><br><span class="line">** 网卡[8]:	usbmon1</span><br><span class="line">** 网卡[9]:	usbmon2</span><br><span class="line">?? 请选择网卡[1-9]: 1</span><br><span class="line">** 您选择了第[1]块网卡。</span><br><span class="line">?? 请输入用户名: guanxiaoman</span><br><span class="line">?? 请输入密码: Qc3!Kp89</span><br><span class="line">?? 请选择组播地址(0标准 1锐捷私有 2赛尔): 0</span><br><span class="line">?? 请选择DHCP方式(0不使用 1二次认证 2认证后 3认证前): 1</span><br><span class="line">** 用户名:	guanxiaoman</span><br><span class="line">** 网卡: 	enp1s0</span><br><span class="line">** 认证超时:	8秒</span><br><span class="line">** 心跳间隔:	30秒</span><br><span class="line">** 失败等待:	15秒</span><br><span class="line">** 允许失败:	8次</span><br><span class="line">** 组播地址:	标准</span><br><span class="line">** DHCP方式:	二次认证</span><br><span class="line">** 通知超时:	5秒</span><br><span class="line">** DHCP脚本:	dhclient</span><br><span class="line">!! 在网卡enp1s0上获取IP失败!</span><br><span class="line">!! 在网卡enp1s0上获取子网掩码失败!</span><br><span class="line">** 本机MAC:	e4:e7:49:3d:34:92</span><br><span class="line">** 使用IP:	0.0.0.0</span><br><span class="line">** 子网掩码:	255.255.255.255</span><br><span class="line">** 认证参数已成功保存到/etc/mentohust.conf.</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 寻找服务器...</span></span><br><span class="line">** 认证MAC:	00:1a:a9:48:2a:b1</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送用户名...</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送密码...</span></span><br><span class="line">** 客户端版本:	4.44</span><br><span class="line">** MD5种子:	23:ed:66:15:a6:f8:dd:93:2e:63:64:a8:97:52:3d:d2</span><br><span class="line">!! 缺少8021x.exe信息，客户端校验无法继续！</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送用户名...</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送密码...</span></span><br><span class="line">** 客户端版本:	4.44</span><br><span class="line">** MD5种子:	23:ed:66:15:a6:f8:dd:93:2e:63:64:a8:97:52:3d:d2</span><br><span class="line">!! 缺少8021x.exe信息，客户端校验无法继续！</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 认证成功!</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 正在获取IP...</span></span><br><span class="line">RTNETLINK answers: File exists</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 操作结束。</span></span><br><span class="line">!! 在网卡enp1s0上获取IP失败!</span><br><span class="line">!! 在网卡enp1s0上获取子网掩码失败!</span><br><span class="line">** 本机MAC:	e4:e7:49:3d:34:92</span><br><span class="line">** 使用IP:	0.0.0.0</span><br><span class="line">** 子网掩码:	255.255.255.255</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 寻找服务器...</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送用户名...</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送密码...</span></span><br><span class="line">** 客户端版本:	4.44</span><br><span class="line">** MD5种子:	a5:3a:82:3c:58:6a:2a:00:0a:80:a9:0c:de:13:50:86</span><br><span class="line">!! 缺少8021x.exe信息，客户端校验无法继续！</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 认证成功!</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt; 发送心跳包以保持在线...</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面需要输入和选择一些信息。另外，有一个问题，成功认证后没有分配网关地址。需要手动配置。第一次配置成功后，之后再使用sudo mentohust -v4.44 -w命令连接时就不需要再输入任何信息了，第一次输入的信息会被保存。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：https://blog.csdn.net/tales_/article/details/50533748</span></span><br></pre></td></tr></table></figure>
 <h3 id="测试网速"><a href="#测试网速" class="headerlink" title="测试网速"></a>测试网速</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Speedtest.net强大而知名的全球宽带网络速度测试网站，采用Flash载入界面，Alexa世界排名非常高，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Speedtest.net在全球有数百个测试节点，国内有测速节点几十个。作为一款在线并且可视化的网速测试工具。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用方法简单，无需下载、安装。Speedtest.net还推出了命令行下测速工具speedtest.py 就能够实时测试网速。</span></span><br><span class="line">shouyu@shouyu-pc  ~  wget https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载工具</span></span><br><span class="line">shouyu@shouyu-pc  ~  chmod +x speedtest.py</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给执行权限</span></span><br><span class="line">shouyu@shouyu-pc  ~  ./speedtest.py </span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行。下面是执行结果：</span></span><br><span class="line">Retrieving speedtest.net configuration...</span><br><span class="line">Testing from Beijing Primezone Technologies (211.99.134.28)...</span><br><span class="line">Retrieving speedtest.net server list...</span><br><span class="line">Selecting best server based on ping...</span><br><span class="line">Hosted by Beijing Unicom (Beijing) [1.67 km]: 7.089 ms</span><br><span class="line">Testing download speed................................................................................</span><br><span class="line">Download: 15.14 Mbit/s</span><br><span class="line">Testing upload speed................................................................................................</span><br><span class="line">Upload: 34.94 Mbit/s</span><br><span class="line"> shouyu@shouyu-pc  /media/shouyu/C64CC89B4CC8879F/Tools/ubuntutool/网速测试  sudo cp -a speedtest.py /usr/bin</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 将脚本入到/usr/bin目录下</span></span><br><span class="line">shouyu@shouyu-pc  ~  source .zshrc</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 加载环境变量</span></span><br><span class="line">shouyu@shouyu-pc  ~  speedtest.py </span><br><span class="line">Retrieving speedtest.net configuration...</span><br><span class="line">Testing from Beijing Primezone Technologies (211.99.134.28)...</span><br><span class="line">Retrieving speedtest.net server list...</span><br><span class="line">Selecting best server based on ping...</span><br><span class="line">Hosted by Beijing Broadband Network (Beijing) [1.67 km]: 4.367 ms</span><br><span class="line">Testing download speed................................................................................</span><br><span class="line">Download: 15.06 Mbit/s</span><br><span class="line">Testing upload speed................................................................................................</span><br><span class="line">Upload: 34.47 Mbit/s</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时就可以直接使用此脚本了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考：http://www.mamicode.com/info-detail-2329407.html</span></span><br></pre></td></tr></table></figure>
 <h3 id="glances安装"><a href="#glances安装" class="headerlink" title="glances安装"></a>glances安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">wget -O- https://bit.ly/glances | /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此方法安装比较完整。安装过程时间比较长。不可使用apt安装，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为安装后会有python的报错。</span></span><br><span class="line">glances -w</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令后，即可打开网页http://0.0.0.0:61208/查看监控的页面了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试发现，这样在前台运行，在使用浏览器打开时显示没有问题。如果使用nohup在后台运行，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用浏览器打开时，显示不了CPU、MEM、SWAP的百分比与代表百分比的线条。在前台运行后，使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Ctrl+z放到后台，再用<span class="built_in">bg</span> %1在后台运行显示也没有问题。再次测试，发现如果不使用nohup，只</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用&amp;在后台运行，显示是没有问题的。</span></span><br><span class="line">glances -t 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> Glances 的默认刷新频率是 1 （秒），但是你可以通过在终端指定参数来手动定义其刷新频率</span></span><br><span class="line"></span><br><span class="line">=============================================================================</span><br><span class="line">Glances 的选项</span><br><span class="line"></span><br><span class="line">· a – 对进程自动排序</span><br><span class="line">· c – 按 CPU 百分比对进程排序</span><br><span class="line">· m – 按内存百分比对进程排序</span><br><span class="line">· p – 按进程名字母顺序对进程排序</span><br><span class="line">· i – 按读写频率（I/O）对进程排序</span><br><span class="line">· d – 显示/隐藏磁盘 I/O 统计信息</span><br><span class="line">· f – 显示/隐藏文件系统统计信息</span><br><span class="line">· n – 显示/隐藏网络接口统计信息</span><br><span class="line">· s – 显示/隐藏传感器统计信息</span><br><span class="line">· y – 显示/隐藏硬盘温度统计信息</span><br><span class="line">· l – 显示/隐藏日志（log）</span><br><span class="line">· b – 切换网络 I/O 单位（Bytes/bits）</span><br><span class="line">· w – 删除警告日志</span><br><span class="line">· x – 删除警告和严重日志</span><br><span class="line">· 1 – 切换全局 CPU 使用情况和每个 CPU 的使用情况</span><br><span class="line">· h – 显示/隐藏这个帮助画面</span><br><span class="line">· t – 以组合形式浏览网络 I/O</span><br><span class="line">· u – 以累计形式浏览网络 I/O</span><br><span class="line">· q – 退出（‘ESC‘ 和 ‘Ctrl&amp;C‘ 也可以）</span><br><span class="line"></span><br><span class="line">Glances 中颜色的含义</span><br><span class="line"></span><br><span class="line">· 绿色：OK（一切正常）</span><br><span class="line">· 蓝色：CAREFUL（需要注意）</span><br><span class="line">· 紫色：WARNING（警告）</span><br><span class="line">· 红色：CRITICAL（严重）</span><br><span class="line">阀值可以在配置文件中设置，一般阀值被默认设置为（careful=50、warning=70、critical=90）。</span><br><span class="line">我们可以按照自己的需求在配置文件（默认在 /etc/glances/glances.conf）中自定义。</span><br><span class="line">=============================================================================</span><br></pre></td></tr></table></figure>
+<h3 id="安装apt-fast"><a href="#安装apt-fast" class="headerlink" title="安装apt-fast"></a>安装apt-fast</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:apt-fast/stable</span><br><span class="line">sudo apt-get install apt-fast</span><br><span class="line"><span class="meta">#</span><span class="bash"> 会弹出一些信息要求选择，按默认选择即可</span></span><br><span class="line">sudo apt-fast upgrade</span><br><span class="line"><span class="meta">#</span><span class="bash"> 没有命令补全，有点不好。</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装使用7zip"><a href="#安装使用7zip" class="headerlink" title="安装使用7zip"></a>安装使用7zip</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install p7zip</span><br><span class="line">7z x Windows.iso</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解压iso文件</span></span><br><span class="line">7z l Windows.iso</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看压缩文件的内容</span></span><br><span class="line">7zr a win10.7z cn_windows_10_multi-***.iso</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建压缩文件</span></span><br></pre></td></tr></table></figure>
 <h3 id="albert安装"><a href="#albert安装" class="headerlink" title="albert安装"></a>albert安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> albert类似mac的alfred。可以搜索包括主机与网络上的信息。</span></span><br><span class="line"></span><br><span class="line">1. 下载deb包，也可以添加repo地址</span><br><span class="line">下载地址：http://download.opensuse.org/repositories/home:/manuelschneid3r/xUbuntu_16.04/amd64/albert_0.16.1_amd64.deb.mirrorlist，下载包名：albert_0.16.1_amd64.deb。这是opensuse包的下载地址，里面会包含其他发行版的包。</span><br><span class="line"><span class="meta">#</span><span class="bash"> sudo add-apt-repository ppa:nilarimogard/webupd8，此命令显示超时。如果可以使用，之后更新软件库，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 就可以使用apt安装albert了。</span></span><br><span class="line">2. 安装时可能还需要依赖其他包，可以到https://pkgs.org下载。</span><br><span class="line">3. 第一次启动时需要设置一下快捷键，另外需要设置一下要搜索的位置</span><br></pre></td></tr></table></figure>
 <h3 id="启动盘制作工具etcher"><a href="#启动盘制作工具etcher" class="headerlink" title="启动盘制作工具etcher"></a>启动盘制作工具etcher</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 此软件为启动盘制作工具，地址：https://www.balena.io/etcher/。下载相应版本的AppImage版本，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 之后直接执行这个下载的软件即可。</span></span><br><span class="line"></span><br><span class="line">另一种安装方法：</span><br><span class="line">1. 添加Etcher debian存储库：</span><br><span class="line">echo  “ deb https://deb.etcher.io stable etcher ”  | sudo tee /etc/apt/sources.list.d/balena-etcher.list</span><br><span class="line">2. 信任Bintray.com的GPG密钥：</span><br><span class="line">sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61</span><br><span class="line">3. 更新并安装：</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install balena-etcher-electron</span><br><span class="line"></span><br><span class="line">卸载</span><br><span class="line">sudo apt-get del balena-etcher-electron</span><br><span class="line">sudo rm /etc/apt/sources.list.d/balena-etcher.list</span><br><span class="line">sudo apt-get update</span><br><span class="line">安装说明地址：https://github.com/balena-io/etcher#debian-and-ubuntu-based-package-repository-gnulinux-x86x64</span><br></pre></td></tr></table></figure>
 <h3 id="重装grub"><a href="#重装grub" class="headerlink" title="重装grub"></a>重装grub</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">grub-install –target=i386-pc /dev/sda # 由于我的系统装在/dev/sda上面，所以这里用的是/dev/sda # –target=i386-pc这个option指的是：只安装BIOS系统的grub。# 我在使用时没有使用--target选项，只是简单地安装</span><br><span class="line"></span><br><span class="line">grub-mkconfig -o /boot/grub/grub.cfg </span><br><span class="line"><span class="meta">#</span><span class="bash">安装好之后，将配置文件输出</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 参考： https://blog.csdn.net/panglinzhuo/article/details/77599641</span></span><br></pre></td></tr></table></figure>
@@ -2725,169 +2916,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB监控/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/11/MongoDB监控/" itemprop="url">
-                  MongoDB监控
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-11 16:03:28 / 修改時間：16:14:06" itemprop="dateCreated datePublished" datetime="2019-03-11T16:03:28+08:00">2019-03-11</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
-<p>在你已经安装部署并允许MongoDB服务后，你必须要了解MongoDB的运行情况，并查看MongoDB的性能。这样在大流量得情况下可以很好的应对并保证MongoDB正常运作。</p>
-<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
-</blockquote>
-<h3 id="mongostat命令"><a href="#mongostat命令" class="headerlink" title="mongostat命令"></a>mongostat命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongostat -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">insert query update delete getmore command % dirty % used flushes  vsize   res qr|qw ar|aw netIn netOut conn       set repl                      time</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:14+08:00</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:15+08:00</span><br><span class="line">......</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</span></span><br></pre></td></tr></table></figure>
-<h3 id="mongotop命令"><a href="#mongotop命令" class="headerlink" title="mongotop命令"></a>mongotop命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongotop -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">2019-03-11T16:08:02.818+0800	connected to: 192.168.251.134:27017</span><br><span class="line"></span><br><span class="line">                    ns    total    read    write    2019-03-11T16:08:03+08:00</span><br><span class="line">        local.oplog.rs      1ms     1ms      0ms                             </span><br><span class="line">    admin.system.roles      0ms     0ms      0ms                             </span><br><span class="line">    admin.system.users      0ms     0ms      0ms                             </span><br><span class="line">  admin.system.version      0ms     0ms      0ms                             </span><br><span class="line">              local.me      0ms     0ms      0ms                             </span><br><span class="line">local.replset.election      0ms     0ms      0ms                             </span><br><span class="line">local.replset.minvalid      0ms     0ms      0ms                             </span><br><span class="line">     local.startup_log      0ms     0ms      0ms                             </span><br><span class="line">  local.system.replset      0ms     0ms      0ms                             </span><br><span class="line">        runoob.article      0ms     0ms      0ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看那些花费在读取和写入数据的大量时间的操作。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ns：包含数据库命名空间，后者结合了数据库名称和集合。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> total：mongod花费的时间工作在这个命名空间提供总额。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">read</span>：mongod在此命名空间花费在执行读操作的时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> write：提供这个命名空间进行写操作的时间。</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2935,7 +2963,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">157</span>
+                    <span class="site-state-item-count">158</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3265,7 +3293,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">122</span>
+                      
+                    
+                    <span class="site-state-item-count">123</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

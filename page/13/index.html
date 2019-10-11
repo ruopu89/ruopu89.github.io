@@ -350,6 +350,292 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/19/RabbitMQ概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/19/RabbitMQ概念/" itemprop="url">
+                  RabbitMQ概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-19 09:19:07" itemprop="dateCreated datePublished" datetime="2018-10-19T09:19:07+08:00">2018-10-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-30 11:11:37" itemprop="dateModified" datetime="2019-01-30T11:11:37+08:00">2019-01-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/消息队列/" itemprop="url" rel="index"><span itemprop="name">消息队列</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="转：干货：这也许是最全面透彻的一篇RabbitMQ指南！"><a href="#转：干货：这也许是最全面透彻的一篇RabbitMQ指南！" class="headerlink" title="转：干货：这也许是最全面透彻的一篇RabbitMQ指南！"></a>转：干货：这也许是最全面透彻的一篇RabbitMQ指南！</h2><p>原文地址：<a href="https://www.cnblogs.com/zhangxiaoliu/p/7524846.html" target="_blank" rel="noopener">https://www.cnblogs.com/zhangxiaoliu/p/7524846.html</a></p>
+<p><strong>本文大纲：</strong></p>
+<ol>
+<li>RabbitMQ 历史</li>
+<li>RabbitMQ 应用场景</li>
+<li>RabbitMQ 系统架构</li>
+<li>RabbitMQ 基本概念</li>
+<li>RabbitMQ 细节阐明</li>
+</ol>
+<p><strong>历史-从开始到现在</strong></p>
+<p>RabbitMQ是一个Erlang开发的AMQP（Advanced Message Queuing Protocol ）的开源实现。AMQP 的出现其实也是应了广大人民群众的需求，虽然在同步消息通讯的世界里有很多公开标准（如 Cobar）的 IIOP ，或者是 SOAP 等），但是在异步消息处理中却不是这样，只有大企业有一些商业实现（如微软的 MSMQ ，IBM 的 WebSphere MQ 等），因此，在 2006 年的 6 月，Cisco 、Red Hat、iMatix 等联合制定了 AMQP 的公开标准。</p>
+<p>RabbitMQ由RabbitMQ Technologies Ltd开发并且提供商业支持的。该公司在2010年4月被SpringSource（VMware的一个部门）收购。在2013年5月被并入Pivotal。其实VMware，Pivotal和EMC本质上是一家的。不同的是，VMware是独立上市子公司，而Pivotal是整合了EMC的某些资源，现在并没有上市。</p>
+<p>RabbitMQ官网：<a href="http://www.rabbitmq.com" target="_blank" rel="noopener">http://www.rabbitmq.com</a></p>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>言归正传。RabbitMQ，或者说AMQP解决了什么问题，或者说它的应用场景是什么？</p>
+<p>对于一个大型的软件系统来说，它会有很多的组件或者说模块，又或者说子系统。那这些模块又如何通信？这和传统的IPC有很大的区别。传统的IPC很多都是在单一系统上的，模块耦合性很大，不适合扩展（Scalability）。如果使用Socket，那么不同的模块的确可以部署到不同的机器上，但是还是有很多问题需要解决。比如：</p>
+<ul>
+<li>信息的发送者和接收者如何维持这个连接，如果一方的连接中断，这期间的数据是以什么方式丢失？</li>
+<li>如何降低发送者和接收者的耦合度？</li>
+<li>如何让Priority高的接收者先接到数据？</li>
+<li>如何做到Load Balance？有效均衡接收者的负载？</li>
+<li>如何有效的将数据发送到相关的接收者？也就是说将接收者subscribe 不同的数据，如何做有效的filter。</li>
+<li>如何做到可扩展，甚至将这个通信模块发到cluster上？</li>
+<li>如何保证接收者接收到了完整，正确的数据？</li>
+</ul>
+<p>AMQP协议解决了以上的问题，而RabbitMQ实现了AMQP。</p>
+<h3 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h3><p><img src="/images/rabbitmq/消息模型.jpg" alt=""></p>
+<h4 id="RabbitMQ-Server"><a href="#RabbitMQ-Server" class="headerlink" title="RabbitMQ Server"></a><strong>RabbitMQ Server</strong></h4><p>&emsp;&emsp;也叫Broker Server，它不是运送食物的卡车，而是一种传输服务。原话是RabbitMQ isn’t a food truck, it’s a delivery service. 它的角色就是维护一条从Producer到Consumer的路线，保证数据能够按照指定的方式进行传输。虽然这个保证也不是100%的保证，但是对于普通的应用来说这已经足够了。当然对于商业系统来说，可以再做一层数据一致性的guard，就可以彻底保证系统的一致性了。</p>
+<h4 id="producer"><a href="#producer" class="headerlink" title="producer"></a>producer</h4><p>&emsp;&emsp;数据的发送方。Create messages and publish (send) them to a Broker Server (RabbitMQ)。一个Message有两个部分：payload（有效载荷）和label（标签）。payload顾名思义就是传输的数据。label是exchange的名字或者说是一个tag，它描述了payload，而且RabbitMQ也是通过这个label来决定把这个Message发给哪个Consumer。AMQP仅仅描述了label，而RabbitMQ决定了如何使用这个label的规则。</p>
+<h4 id="consumer"><a href="#consumer" class="headerlink" title="consumer"></a>consumer</h4><p>&emsp;&emsp;数据的接收方。Consumers attach to a Broker Server (RabbitMQ) and subscribe to a queue。把queue比作是一个有名字的邮箱。当有Message到达某个邮箱后，RabbitMQ把它发送给它的某个订阅者即Consumer。当然可能会把同一个Message发送给很多的Consumer。在这个Message中，只有payload，label已经被删掉了。对于Consumer来说，它是不知道谁发送的这个信息的,就是协议本身不支持。如果Producer发送的payload包含了Producer的信息就另当别论了。</p>
+<p>对于一个数据从Producer到Consumer的正确传递，还有三个概念需要明确：exchanges, queues and bindings。</p>
+<ul>
+<li>Exchanges are where producers publish their messages.</li>
+<li>Queues are where the messages end up and are received by consumers.</li>
+<li>Bindings are how the messages get routed from the exchange to particular queues.</li>
+</ul>
+<p>还有几个概念是上述图中没有标明的，那就是Connection（连接）和Channel（通道，频道）。</p>
+<h4 id="Connection"><a href="#Connection" class="headerlink" title="Connection"></a>Connection</h4><p>&emsp;&emsp;就是一个TCP的连接。Producer和Consumer都是通过TCP连接到RabbitMQ Server的。</p>
+<h4 id="Connection-Factory"><a href="#Connection-Factory" class="headerlink" title="Connection Factory"></a>Connection Factory</h4><p>&emsp;&emsp;连接管理器。应用程序与Rabbit之间建立连接的管理器，程序代码中使用；</p>
+<h4 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h4><p>&emsp;&emsp;信道。消息推送使用的通道。虚拟连接。它建立在上述的TCP连接中。数据流动都是在Channel中进行的。也就是说，一般情况是程序起始建立TCP连接，第二步就是建立这个Channel。因为对于系统来说，建立和关闭TCP连接是有代价的，频繁的建立关闭TCP连接对于系统的性能有很大的影响，而且TCP的连接数也有限制，这也限制了系统处理高并发的能力。但是，在TCP连接中建立Channel是没有上述代价的。对于Producer或者Consumer来说，可以并发的使用多个Channel进行Publish或者Receive。有实验表明，1s的数据可以Publish10K的数据包。当然对于不同的硬件环境，不同的数据包大小这个数据肯定不一样，但是我只想说明，对于普通的Consumer或者Producer来说，这已经足够了。如果不够用，你考虑的应该是如何细化SPLIT你的设计。</p>
+<h4 id="相关定义"><a href="#相关定义" class="headerlink" title="相关定义"></a>相关定义</h4><ul>
+<li>Broker： 简单来说就是消息队列服务器实体</li>
+<li>Exchange： 消息交换机，它指定消息按什么规则，路由到哪个队列</li>
+<li>Queue： 消息队列载体，每个消息都会被投入到一个或多个队列</li>
+<li>Binding： 绑定，它的作用就是把exchange和queue按照路由规则绑定起来</li>
+<li>Routing Key： 路由关键字，exchange根据这个关键字进行消息投递</li>
+<li>VHost： 虚拟主机，一个broker里可以开设多个vhost，用作不同用户的权限分离。</li>
+<li>Producer： 消息生产者，就是投递消息的程序</li>
+<li>Consumer： 消息消费者，就是接受消息的程序</li>
+<li>Channel： 消息通道，在客户端的每个连接里，可建立多个channel，每个channel代表一个会话任务</li>
+</ul>
+<p>由Exchange、Queue、RoutingKey三个才能决定一个从Exchange到Queue的唯一的线路。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>&emsp;&emsp;Connection Factory（连接管理器）、Connection、Channel（信道）都是RabbitMQ对外提供的API中最基本的对象。Connection是RabbitMQ的socket链接，它封装了socket协议相关部分逻辑。Connection Factory则是Connection的制造工厂。Channel是我们与RabbitMQ打交道的最重要的一个接口，我们大部分的业务操作是在Channel这个接口中完成的，包括定义Queue、定义Exchange、绑定Queue与Exchange、发布消息等。</p>
+<h4 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h4><p>&emsp;&emsp;Queue（队列）是RabbitMQ的内部对象，用于存储消息，用下图表示。</p>
+<p><img src="/images/rabbitmq/queue.jpg" alt=""></p>
+<p>&emsp;&emsp;RabbitMQ中的消息都只能存储在Queue中，生产者（下图中的P）生产消息并最终投递到Queue中，消费者（下图中的C）可以从Queue中获取消息并消费。</p>
+<p><img src="/images/rabbitmq/queue1.jpg" alt=""></p>
+<p>&emsp;&emsp;多个消费者可以订阅同一个Queue，这时Queue中的消息会被平均分摊给多个消费者进行处理，而不是每个消费者都收到所有的消息并处理。</p>
+<p><img src="/images/rabbitmq/queue2.jpg" alt=""></p>
+<h4 id="Message-acknowledgment"><a href="#Message-acknowledgment" class="headerlink" title="Message acknowledgment"></a>Message acknowledgment</h4><p>&emsp;&emsp;在实际应用中，可能会发生消费者收到Queue中的消息，但没有处理完成就宕机（或出现其他意外）的情况，这种情况下就可能会导致消息丢失。为了避免这种情况发生，我们可以要求消费者在消费完消息后发送一个回执给RabbitMQ，RabbitMQ收到消息回执（Message acknowledgment）后才将该消息从Queue中移除。</p>
+<p>&emsp;&emsp;如果RabbitMQ没有收到回执并检测到消费者的RabbitMQ连接断开，则RabbitMQ会将该消息发送给其他消费者（如果存在多个消费者）进行处理。这里不存在timeout，一个消费者处理消息时间再长也不会导致该消息被发送给其他消费者，除非它的RabbitMQ连接断开。</p>
+<p>&emsp;&emsp;这里会产生另外一个问题，如果我们的开发人员在处理完业务逻辑后，忘记发送回执给RabbitMQ，这将会导致严重的bug——Queue中堆积的消息会越来越多。消费者重启后会重复消费这些消息并重复执行业务逻辑。</p>
+<p>&emsp;&emsp;另外publish message 是没有ACK的。</p>
+<h4 id="Message-durability"><a href="#Message-durability" class="headerlink" title="Message durability"></a>Message durability</h4><p>&emsp;&emsp;如果我们希望即使在RabbitMQ服务重启的情况下，也不会丢失消息，我们可以将Queue与Message都设置为可持久化的（durable），这样可以保证绝大部分情况下我们的RabbitMQ消息不会丢失。但依然解决不了小概率丢失事件的发生（比如RabbitMQ服务器已经接收到生产者的消息，但还没来得及持久化该消息时RabbitMQ服务器就断电了），如果我们需要对这种小概率事件也要管理起来，那么我们要用到事务。</p>
+<h4 id="Prefetch-count"><a href="#Prefetch-count" class="headerlink" title="Prefetch count"></a><strong>Prefetch count</strong></h4><p>&emsp;&emsp;前面我们讲到如果有多个消费者同时订阅同一个Queue中的消息，Queue中的消息会被平摊给多个消费者。这时如果每个消息的处理时间不同，就有可能会导致某些消费者一直在忙，而另外一些消费者很快就处理完手头工作并一直空闲的情况。我们可以通过设置Prefetch count来限制Queue每次发送给每个消费者的消息数，比如我们设置prefetchCount=1，则Queue每次给每个消费者发送一条消息；消费者处理完这条消息后Queue会再给该消费者发送一条消息。</p>
+<p><img src="/images/rabbitmq/prefetchcount.jpg" alt=""></p>
+<h4 id="Exchange"><a href="#Exchange" class="headerlink" title="Exchange"></a><strong>Exchange</strong></h4><p>&emsp;&emsp;生产者将消息投递到Queue中，实际上这在RabbitMQ中这种事情永远都不会发生。实际的情况是，生产者将消息发送到Exchange（交换器，下图中的X），由Exchange将消息路由到一个或多个Queue中（或者丢弃）。</p>
+<p><img src="/images/rabbitmq/exchange.jpg" alt=""></p>
+<h4 id="Routing-Key"><a href="#Routing-Key" class="headerlink" title="Routing Key"></a><strong>Routing Key</strong></h4><p>&emsp;&emsp;生产者在将消息发送给Exchange的时候，一般会指定一个Routing Key，来指定这个消息的路由规则，而这个Routing Key需要与Exchange Type及Binding key联合使用才能最终生效。</p>
+<p>&emsp;&emsp;在Exchange Type与Binding key固定的情况下（在正常使用时一般这些内容都是固定配置好的），我们的生产者就可以在发送消息给Exchange时，通过指定Routing Key来决定消息流向哪里。</p>
+<p>&emsp;&emsp;RabbitMQ为Routing Key设定的长度限制为255 bytes。</p>
+<h4 id="Binding"><a href="#Binding" class="headerlink" title="Binding"></a><strong>Binding</strong></h4><p>&emsp;&emsp;RabbitMQ中通过Binding将Exchange与Queue关联起来，这样RabbitMQ就知道如何正确地将消息路由到指定的Queue了。</p>
+<p><img src="/images/rabbitmq/binding.jpg" alt=""></p>
+<h4 id="Binding-key"><a href="#Binding-key" class="headerlink" title="Binding key"></a><strong>Binding key</strong></h4><p>&emsp;&emsp;在绑定（Binding）Exchange与Queue的同时，一般会指定一个Binding key。消费者将消息发送给Exchange时，一般会指定一个Routing Key。当Binding key与Routing Key相匹配时，消息将会被路由到对应的Queue中。</p>
+<p>&emsp;&emsp;在绑定多个Queue到同一个Exchange的时候，这些Binding允许使用相同的Binding key。</p>
+<p>&emsp;&emsp;Binding key并不是在所有情况下都生效，它依赖于Exchange Type，比如fanout类型的Exchange就会无视Binding key，而是将消息路由到所有绑定到该Exchange的Queue。</p>
+<h4 id="Exchange-Types"><a href="#Exchange-Types" class="headerlink" title="Exchange Types"></a><strong>Exchange Types</strong></h4><p>&emsp;&emsp;RabbitMQ常用的Exchange Type有fanout、direct、topic、headers这四种（AMQP规范里还提到两种Exchange Type，分别为system与自定义，这里不予以描述），下面分别进行介绍。</p>
+<h5 id="fanout"><a href="#fanout" class="headerlink" title="fanout"></a><strong>fanout</strong></h5><p>&emsp;&emsp;fanout类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到所有与它绑定的Queue中。</p>
+<p><img src="/images/rabbitmq/fanout.jpg" alt=""></p>
+<p>&emsp;&emsp;上图中，生产者（P）发送到Exchange（X）的所有消息都会路由到图中的两个Queue，并最终被两个消费者（C1与C2）消费。</p>
+<h5 id="direct"><a href="#direct" class="headerlink" title="direct"></a><strong>direct</strong></h5><p>&emsp;&emsp;direct类型的Exchange路由规则也很简单，它会把消息路由到那些Binding key与Routing key完全匹配的Queue中。</p>
+<p><img src="/images/rabbitmq/direct.jpg" alt=""></p>
+<p>&emsp;&emsp;以上图的配置为例，我们以routingKey=”error”发送消息到Exchange，则消息会路由到Queue1（amqp.gen-S9b…，这是由RabbitMQ自动生成的Queue名称）和Queue2（amqp.gen-Agl…）；如果我们以Routing Key=”info”或routingKey=”warning”来发送消息，则消息只会路由到Queue2。如果我们以其他Routing Key发送消息，则消息不会路由到这两个Queue中。</p>
+<h5 id="topic"><a href="#topic" class="headerlink" title="topic"></a><strong>topic</strong></h5><p>&emsp;&emsp;前面讲到direct类型的Exchange路由规则是完全匹配Binding Key与Routing Key，但这种严格的匹配方式在很多情况下不能满足实际业务需求。topic类型的Exchange在匹配规则上进行了扩展，它与direct类型的Exchage相似，也是将消息路由到Binding Key与Routing Key相匹配的Queue中，但这里的匹配规则有些不同，它约定：Routing Key为一个句点号“.”分隔的字符串（我们将被句点号”. “分隔开的每一段独立的字符串称为一个单词），如”stock.usd.nyse”、”nyse.vmw”、”quick.orange.rabbit”。Binding Key与Routing Key一样也是句点号“. ”分隔的字符串。</p>
+<p>&emsp;&emsp;Binding Key中可以存在两种特殊字符”*“与”#”，用于做模糊匹配，其中”*“用于匹配一个单词，”#”用于匹配多个单词（可以是零个）。</p>
+<p><img src="/images/rabbitmq/topic.jpg" alt=""></p>
+<p>&emsp;&emsp;以上图中的配置为例，routingKey=”quick.orange.rabbit”的消息会同时路由到Q1与Q2，routingKey=”lazy.orange.fox”的消息会路由到Q1，routingKey=”lazy.brown.fox”的消息会路由到Q2，routingKey=”lazy.pink.rabbit”的消息会路由到Q2（只会投递给Q2一次，虽然这个routingKey与Q2的两个bindingKey都匹配）；routingKey=”quick.brown.fox”、routingKey=”orange”、routingKey=”quick.orange.male.rabbit”的消息将会被丢弃，因为它们没有匹配任何bindingKey。</p>
+<h5 id="headers"><a href="#headers" class="headerlink" title="headers"></a><strong>headers</strong></h5><p>&emsp;&emsp;headers类型的Exchange不依赖于Routing Key与Binding Key的匹配规则来路由消息，而是根据发送的消息内容中的headers属性进行匹配。</p>
+<p>&emsp;&emsp;在绑定Queue与Exchange时指定一组键值对；当消息发送到Exchange时，RabbitMQ会取到该消息的headers（也是一个键值对的形式），对比其中的键值对是否完全匹配Queue与Exchange绑定时指定的键值对。如果完全匹配则消息会路由到该Queue，否则不会路由到该Queue。</p>
+<h4 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a><strong>RPC</strong></h4><p>&emsp;&emsp;MQ本身是基于异步的消息处理，前面的示例中所有的生产者（P）将消息发送到RabbitMQ后不会知道消费者（C）处理成功或者失败（甚至连有没有消费者来处理这条消息都不知道）。但实际的应用场景中，我们很可能需要一些同步处理，需要同步等待服务端将我的消息处理完成后再进行下一步处理。这相当于RPC（Remote Procedure Call，远程过程调用）。在RabbitMQ中也支持RPC。</p>
+<p><img src="/images/rabbitmq/rpc.jpg" alt=""></p>
+<p>&emsp;&emsp;<strong>RabbitMQ中实现RPC的机制是：</strong>客户端发送请求（消息）时，在消息的属性（Message Properties，在AMQP协议中定义了14种properties，这些属性会随着消息一起发送）中设置两个值replyTo（一个Queue名称，用于告诉服务器处理完成后将通知我的消息发送到这个Queue中）和correlationId（此次请求的标识号，服务器处理完成后需要将此属性返还，客户端将根据这个id了解哪条请求被成功执行了或执行失败）。服务器端收到消息处理完后，将生成一条应答消息到replyTo指定的Queue，同时带上correlationId属性。客户端之前已订阅replyTo指定的Queue，从中收到服务器的应答消息后，根据其中的correlationId属性分析哪条请求被执行了，根据执行结果进行后续业务处理。</p>
+<h4 id="使用ACK确认Message的正确传递"><a href="#使用ACK确认Message的正确传递" class="headerlink" title="使用ACK确认Message的正确传递"></a><strong>使用ACK确认Message的正确传递</strong></h4><p>&emsp;&emsp;默认情况下，如果Message 已经被某个Consumer正确的接收到了，那么该Message就会被从Queue中移除。当然也可以让同一个Message发送到很多的Consumer。</p>
+<p>&emsp;&emsp;如果一个Queue没被任何的Consumer Subscribe（订阅），当有数据到达时，这个数据会被cache，不会被丢弃。当有Consumer时，这个数据会被立即发送到这个Consumer。这个数据被Consumer正确收到时，这个数据就被从Queue中删除。</p>
+<p>&emsp;&emsp;那么什么是正确收到呢？通过ACK。每个Message都要被acknowledged（确认，ACK）。我们可以显式的在程序中去ACK，也可以自动的ACK。如果有数据没有被ACK，那么RabbitMQ Server会把这个信息发送到下一个Consumer。</p>
+<p>&emsp;&emsp;如果这个APP有bug，忘记了ACK，那么RabbitMQ Server不会再发送数据给它，因为Server认为这个Consumer处理能力有限。而且ACK的机制可以起到限流的作用（Benefitto throttling）：在Consumer处理完成数据后发送ACK，甚至在额外的延时后发送ACK，将有效的balance Consumer的load。</p>
+<p>&emsp;&emsp;当然对于实际的例子，比如我们可能会对某些数据进行merge，比如merge 4s内的数据，然后sleep 4s后再获取数据。特别是在监听系统的state，我们不希望所有的state实时的传递上去，而是希望有一定的延时。这样可以减少某些IO，而且终端用户也不会感觉到。</p>
+<h4 id="Reject-a-message"><a href="#Reject-a-message" class="headerlink" title="Reject a message"></a><strong>Reject a message</strong></h4><p>&emsp;&emsp;有两种方式，第一种的Reject可以让RabbitMQ Server将该Message 发送到下一个Consumer。第二种是从Queue中立即删除该Message。</p>
+<h4 id="Creating-a-queue"><a href="#Creating-a-queue" class="headerlink" title="Creating a queue"></a><strong>Creating a queue</strong></h4><p>&emsp;&emsp;Consumer和Procuder都可以通过 queue.declare 创建queue。对于某个Channel来说，Consumer不能declare一个queue，却订阅其他的queue。当然也可以创建私有的queue。这样只有APP本身才可以使用这个queue。queue也可以自动删除，被标为auto-delete的queue在最后一个Consumer unsubscribe后就会被自动删除。那么如果是创建一个已经存在的queue呢？那么不会有任何的影响。需要注意的是没有任何的影响，也就是说第二次创建如果参数和第一次不一样，那么该操作虽然成功，但是queue的属性并不会被修改。</p>
+<p>&emsp;&emsp;那么谁应该负责创建这个queue呢？是Consumer，还是Producer？</p>
+<p>&emsp;&emsp;如果queue不存在，当然Consumer不会得到任何的Message。那么Producer Publish的Message会被丢弃。所以，还是为了数据不丢失，Consumer和Producer都try to create the queue！反正不管怎么样，这个接口都不会出问题。</p>
+<p>&emsp;&emsp;queue对load balance的处理是完美的。对于多个Consumer来说，RabbitMQ 使用循环的方式（round-robin）均衡地发送给不同的Consumer。</p>
+<h4 id="Exchanges"><a href="#Exchanges" class="headerlink" title="Exchanges"></a><strong>Exchanges</strong></h4><p>&emsp;&emsp;从架构图可以看出，Procuder Publish的Message进入了Exchange。接着通过”routing keys”， RabbitMQ会找到应该把这个Message放到哪个queue里。queue也是通过这个routing keys来做的绑定。</p>
+<p>&emsp;&emsp;有三种类型的Exchanges：direct, fanout,topic。 每个实现了不同的路由算法（routing algorithm）。</p>
+<h4 id="Direct-exchange"><a href="#Direct-exchange" class="headerlink" title="Direct exchange"></a><strong>Direct exchange</strong></h4><p>&emsp;&emsp;如果 routing key 匹配，那么Message就会被传递到相应的queue中。其实在queue创建时，它会自动的以queue的名字作为routing key来绑定那个exchange。</p>
+<h4 id="Fanout-exchange"><a href="#Fanout-exchange" class="headerlink" title="Fanout exchange"></a><strong>Fanout exchange</strong></h4><p>&emsp;&emsp;会向响应的queue广播。</p>
+<h4 id="Topic-exchange"><a href="#Topic-exchange" class="headerlink" title="Topic exchange"></a><strong>Topic exchange</strong></h4><p>&emsp;&emsp;对key进行模式匹配，比如ab可以传递到所有ab的queue。</p>
+<h4 id="Virtual-hosts"><a href="#Virtual-hosts" class="headerlink" title="Virtual hosts"></a><strong>Virtual hosts</strong></h4><p>&emsp;&emsp;每个virtual host本质上都是一个RabbitMQ Server，拥有它自己的queue，exchagne，和bings rule等等。这保证了你可以在多个不同的Application中使用RabbitMQ。</p>
+<h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>acknowledgment[əkˈnɔlidʒmənt]：确认</p>
+<p>cache[kæʃ]： 缓存</p>
+<p>balance[ˈbæləns]：平衡</p>
+<p>merge[mə:dʒ]：合并</p>
+<p>unsubscribe[ˌʌnsəbˈskraɪb]：退订</p>
+<p>declare[diˈklɛə]：声明</p>
+<p>Publish[ˈpʌbliʃ]：发布</p>
+<p>exchange[iksˈtʃeindʒ]：交换</p>
+<p>fanout[fænaʊt]：分列（帐户）</p>
+<p>derect[diˈrekt]：直接</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/18/RabbitMQ部署/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2110,191 +2396,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/12/iptables匹配条件/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/12/iptables匹配条件/" itemprop="url">
-                  iptables匹配条件
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-10-12 16:35:15" itemprop="dateCreated datePublished" datetime="2018-10-12T16:35:15+08:00">2018-10-12</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-02-13 14:46:45" itemprop="dateModified" datetime="2019-02-13T14:46:45+08:00">2019-02-13</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="基本匹配条件"><a href="#基本匹配条件" class="headerlink" title="基本匹配条件"></a>基本匹配条件</h3><h4 id="指定地址"><a href="#指定地址" class="headerlink" title="指定地址"></a>指定地址</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">* 一次指定多个源地址</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249,10.5.5.224 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用逗号分隔多个地址</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 55 packets, 4698 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       all  --  *      *       10.5.5.224           0.0.0.0/0           </span><br><span class="line">2          12     1008 DROP       all  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定后会一次添加两条规则</span></span><br><span class="line"></span><br><span class="line">* 指定网段</span><br><span class="line">[root@bogon ~]# iptables -I FORWARD -s 10.5.5.0/16 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.0网段的所有地址访问</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL FORWARD</span><br><span class="line">Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       all  --  *      *       10.5.0.0/16          0.0.0.0/0</span><br><span class="line"></span><br><span class="line">* 对条件取反</span><br><span class="line">[root@bogon ~]# iptables -A INPUT ! -s 10.5.5.25 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"! -s 10.5.5.25"</span>表示对 -s 10.5.5.25这个匹配条件取反， -s 10.5.5.25表示报文源IP地址为10.5.5.25即可满足匹配条件，使用 <span class="string">"!"</span> 取反后则表示，报文源地址IP只要不为10.5.5.25即满足条件，那么，上例中规则表达的意思就是，只要发往本机的报文的源地址不是10.5.5.25，就接受报文。但10.5.5.25还是可以ping通这台主机，因为filter表的INPUT链中只有一条规则，这条规则要表达的意思就是：只要报文的源IP不是10.5.5.25，那么就接受此报文，但并不能代表，报文的源IP是10.5.5.25时，会被拒绝。因为并没有任何一条规则指明源IP是10.5.5.25时，该执行怎样的动作，所以，当来自10.5.5.25的报文经过INPUT链时，并不能按上例中的规则处理报文，这时报文被两条规则匹配，一是拒绝10.5.5.25的报文，一是默认允许所有报文通过的规则。于是，此报文就继续匹配后面的规则，因为只有一条规则，于是，此报文就会去匹配当前链的默认动作(默认策略)，因为默认策略是ACCEPT，所以10.5.5.25还可以ping通这台主机。</span></span><br><span class="line">[root@bogon ~]# iptables --line -vnxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 287 packets, 24108 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         159    12226 ACCEPT     all  --  *      *      !10.5.5.25            0.0.0.0/0 </span><br><span class="line"></span><br><span class="line">* 指定目标地址</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -d 10.5.5.22 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这条规则就可以实现上面的禁止10.5.5.249访问本机10.5.5.22</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-d选项指定目标地址。如果我们不指定任何目标地址，则目标地址默认为0.0.0.0/0，同理，如果我们不指定源地址，源地址默认为0.0.0.0/0。-d选项也可以使用<span class="string">"叹号"</span>进行取反，也能够同时指定多个IP地址，使用<span class="string">"逗号"</span>隔开即可。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 但是请注意，不管是-s选项还是-d选项，取反操作与同时指定多个IP的操作不能同时使用。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当一条规则中有多个匹配条件时，那么多个匹配条件之间，默认存在<span class="string">"与"</span>的关系。如上面规则表示源地址与目标地址必须同时能被这两个条件匹配，才算作被当前规则匹配</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          12     1008 DROP       all  --  *      *       10.5.5.249           10.5.5.22           </span><br><span class="line">2        1978   144348 ACCEPT     all  --  *      *      !10.5.5.25            0.0.0.0/0</span><br></pre></td></tr></table></figure>
-<h4 id="协议类型"><a href="#协议类型" class="headerlink" title="协议类型"></a>协议类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -s 10.5.5.249 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝10.5.5.249的tcp请求，所以ssh无法连接，但可以ping通。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当不使用-p指定协议类型时，默认表示所有类型的协议都会被匹配到，与使用-p all的效果相同。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT ! -p udp -s 10.5.5.249 -j DROP</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 192 packets, 11044 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          18     1512 DROP      !udp  --  *      *       10.5.5.249           0.0.0.0/0           </span><br><span class="line">2           0        0 DROP       tcp  --  *      *       10.5.5.249           0.0.0.0/0 </span><br><span class="line"><span class="meta">#</span><span class="bash"> -p用于匹配报文的协议类型,可以匹配的协议类型tcp、udp、udplite、icmp、esp、ah、sctp等（centos7中还支持icmpv6、mh）</span></span><br></pre></td></tr></table></figure>
-<h4 id="网卡接口"><a href="#网卡接口" class="headerlink" title="网卡接口"></a>网卡接口</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">* 流入</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -i eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp ! -i eth0 -j DROP</span><br><span class="line"><span class="meta">#</span><span class="bash"> -i用于匹配报文是从哪个网卡接口流入本机的，由于匹配条件只是用于匹配报文流入的网卡，所以在OUTPUT链与POSTROUTING链中不能使用此选项。</span></span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 52 packets, 4422 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       icmp --  !eth0  *       0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">2          25     2100 DROP       icmp --  eth0   *       0.0.0.0/0            0.0.0.0/0</span><br><span class="line"></span><br><span class="line">* 流出</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p icmp -o eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p icmp ! -o eth0 -j DROP</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL OUTPUT</span><br><span class="line">Chain OUTPUT (policy ACCEPT 65 packets, 6908 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 DROP       icmp --  *      !eth0   0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">2          23     1932 DROP       icmp --  *      eth0    0.0.0.0/0            0.0.0.0/0</span><br></pre></td></tr></table></figure>
-<h3 id="扩展匹配条件"><a href="#扩展匹配条件" class="headerlink" title="扩展匹配条件"></a>扩展匹配条件</h3><h4 id="tcp扩展模块"><a href="#tcp扩展模块" class="headerlink" title="tcp扩展模块"></a>tcp扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">* 目标端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m tcp --dport 22 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-m选项来指定扩展模块，如果想要使用--dport这个扩展匹配条件，则必须依靠某个扩折模块完成，上例中，这个扩展模块就是tcp扩展模块。 -m tcp表示使用tcp扩展模块，--dport表示tcp扩展模块中的一个扩展匹配条件，可用于匹配报文的目标端口。-p tcp与 -m tcp并不冲突，-p用于匹配报文的协议，-m 用于指定扩展模块的名称，正好这个扩展模块也叫tcp。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 基本匹配条件我们可以直接使用，而如果想要使用扩展匹配条件，则需要依赖一些扩展模块</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 扩展匹配条件是可以取反的，同样是使用<span class="string">"!"</span>进行取反，比如 <span class="string">"! --dport 22"</span>，表示目标端口不是22的报文将会被匹配到。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport 22 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 也可以省略-m选项。当使用-p选项指定了报文的协议时，如果在没有使用-m指定对应的扩展模块名称的情况下，使用了扩展匹配条件，  iptables默认会调用与-p选项对应的协议名称相同的模块。</span></span><br><span class="line"></span><br><span class="line">* 源端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --sport 22 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 59 packets, 4224 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 ACCEPT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp spt:22</span><br><span class="line">2           1       60 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpt:22 reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 指定端口范围</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport 22:25 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 9 packets, 662 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpts:22:25 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> --dport 22:25表示目标端口为22到25之间的所有端口</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --dport :22 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp --sport 80: -j REJECT </span><br><span class="line">[root@bogon ~]# iptables --line -xvnL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 46 packets, 3358 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp spts:80:65535 reject-with icmp-port-unreachable</span><br><span class="line">2           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            tcp dpts:0:22 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> --sport和--dport都可以指定多个端口，第一条表示从0到22端口，第二条表示80端口到65535端口</span></span><br><span class="line"></span><br><span class="line">* --tcp-flags</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--tcp-flags"</span>指的就是tcp头中的标志位，我们可以通过此扩展匹配条件，去匹配tcp报文的头部的标识位，然后根据标识位的实际情况实现访问控制的功能。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-m tcp --dport 22"</span>的表示使用tcp扩展模块，指定目标端口为22号端口(ssh默认端口)，<span class="string">"--tcp-flags"</span>用于匹配报文tcp头部的标志位，<span class="string">"SYN,ACK,FIN,RST,URG,PSH SYN"</span>就是用于配置我们要匹配的标志位的，我们可以把这串字符拆成两部分去理解，第一部分为<span class="string">"SYN,ACK,FIN,RST,URG,PSH"</span>，第二部分为<span class="string">"SYN"</span>。第一部分表示：我们需要匹配报文tcp头中的哪些标志位，这里指定了六个标志位。第二部分表示：第一部分的标志位列表中，哪些标志位必须为1，这里指定的是SYN标志位必须为1，其他标志位必须为0。也就是tcp三次握手时第一次握手时的情况。</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 44 packets, 3226 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22 flags:0x3F/0x02 reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp -m tcp --sport 22 --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN,ACK -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一条命令匹配到的报文是第一次握手的报文，第二条命令匹配到的报文是第二次握手的报文。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --tcp-flags ALL SYN -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp -m tcp --sport 22 --tcp-flags ALL SYN,ACK -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面两条命令可以简写成这样，也就是将六个标志位用ALL代替</span></span><br><span class="line"></span><br><span class="line">* --syn</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp -m tcp --dport 22 --syn -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"--syn"</span>选项匹配第一次握手，这相当于使用<span class="string">"--tcp-flags SYN,RST,ACK,FIN  SYN"</span>，也就是说，可以使用<span class="string">"--syn"</span>选项去匹配tcp新建连接的请求报文。</span></span><br></pre></td></tr></table></figure>
-<h4 id="udp扩展"><a href="#udp扩展" class="headerlink" title="udp扩展"></a>udp扩展</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -I INPUT -p udp -m udp --dport 137 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp -m udp --dport 138 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行samba服务的137与138这两个UDP端口</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 137 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 138 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以省略-m选项</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p udp --dport 137:157 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开放137到157之间的所有udp端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> udp中的--sport与--dport也只能指定连续的端口范围，并不能一次性指定多个离散的端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用multiport扩展模块，即可指定多个离散的UDP端口</span></span><br></pre></td></tr></table></figure>
-<h4 id="icmp扩展"><a href="#icmp扩展" class="headerlink" title="icmp扩展"></a>icmp扩展</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ICMP协议的全称为Internet Control Message Protocol，翻译为互联网控制报文协议，它主要用于探测网络上的主机是否可用，目标是否可达，网络是否通畅，路由是否可用等。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 我们平常使用ping命令ping某主机时，如果主机可达，对应主机会对我们的ping请求做出回应（此处不考虑禁ping等情况），也就是说，我们发出ping请求，对方回应ping请求，虽然ping请求报文与ping回应报文都属于ICMP类型的报文，但是如果在概念上细分的话，它们所属的类型还是不同的，我们发出的ping请求属于类型8的icmp报文，而对方主机的ping回应报文则属于类型0的icmp报文，根据应用场景的不同，icmp报文被细分为如下各种类型。</span></span><br></pre></td></tr></table></figure>
-<p><img src="/images/iptables/icmp.png"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 从上图可以看出，所有表示<span class="string">"目标不可达"</span>的icmp报文的<span class="built_in">type</span>码为3，而<span class="string">"目标不可达"</span>又可以细分为多种情况，是网络不可达呢？还是主机不可达呢？再或者是端口不可达呢？所以，为了更加细化的区分它们，icmp对每种<span class="built_in">type</span>又细分了对应的code，用不同的code对应具体的场景，所以，我们可以使用<span class="built_in">type</span>/code去匹配具体类型的ICMP报文，比如可以使用<span class="string">"3/1"</span>表示主机不可达的icmp报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上图中的第一行就表示ping回应报文，它的<span class="built_in">type</span>为0，code也为0，从上图可以看出，ping回应报文属于查询类（query）的ICMP报文，从大类上分，ICMP报文还能分为查询类与错误类两大类，目标不可达类的icmp报文则属于错误类报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 而我们发出的ping请求报文对应的<span class="built_in">type</span>为8，code为0。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上例中，我们并没有使用任何扩展匹配条件，我们只是使用<span class="string">"-p icmp"</span>匹配了所有icmp协议类型的报文。如果进行了上述设置，别的主机向我们发送的ping请求报文无法进入防火墙，我们向别人发送的ping请求对应的回应报文也无法进入防火墙。所以，我们既无法ping通别人，别人也无法ping通我们。</span></span><br><span class="line">[root@bogon ~]# iptables -F</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type 8/0 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 本机可以ping通外部主机，但外部主机不能ping通本机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-m icmp"</span>表示使用icmp扩展，因为上例中使用了<span class="string">"-p icmp"</span>，所以<span class="string">"-m icmp"</span>可以省略，使用<span class="string">"--icmp-type"</span>选项表示根据具体的<span class="built_in">type</span>与code去匹配对应的icmp报文，而上图中的<span class="string">"--icmp-type 8/0"</span>表示icmp报文的<span class="built_in">type</span>为8，code为0才会被匹配到，也就是只有ping请求类型的报文才能被匹配到，所以，别人对我们发起的ping请求将会被拒绝通过防火墙，而我们之所以能够ping通别人，是因为别人回应我们的报文的icmp <span class="built_in">type</span>为0，code也为0，所以无法被上述规则匹配到，所以我们可以看到别人回应我们的信息。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type 8 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为<span class="built_in">type</span>为8的类型下只有一个code为0的类型，所以我们可以省略对应的code</span></span><br><span class="line">[root@test ~]# iptables -I OUTPUT -p icmp --icmp-type 8 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果这样设置，那么我们的主机就无法ping通外部主机了，因为我们ping外部主机发出的是类型8的报文，设置在OUTPUT链上，就无法出去了。我们ping外部主机出去的是类型8进来的是类型0的报文，外部主机ping我们的主机，进来的是类型8出去的是类型0的报文。</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m icmp --icmp-type "echo-request" -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 我们可以用icmp报文的描述名称去匹配对应类型的报文。使用 --icmp-type <span class="string">"echo-request"</span>与 --icmp-type 8/0的效果完全相同</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 名称中的<span class="string">"空格"</span>需要替换为<span class="string">"-"</span>，如<span class="built_in">echo</span> request要命令中要写为<span class="built_in">echo</span>-request</span></span><br></pre></td></tr></table></figure>
-<h4 id="multiport扩展模块"><a href="#multiport扩展模块" class="headerlink" title="multiport扩展模块"></a>multiport扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">* 指定不连续端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m multiport --dports 22,36,80 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 121 packets, 7270 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            multiport dports 22,36,80 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 禁止来自249的主机上的tcp报文访问本机的22号端口、36号端口以及80号端口</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用multiport模块的--sports扩展条件同时指定多个离散的源端口。使用multiport模块的--dports扩展条件同时指定多个离散的目标端口</span></span><br><span class="line"></span><br><span class="line">* 指定连续端口</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -s 10.5.5.249 -p tcp -m multiport --dports 22,80:88 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 47 packets, 3474 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       10.5.5.249           0.0.0.0/0            multiport dports 22,80:88 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用multiport模块的--sports与--dpors时，也可以指定连续的端口范围，并且能够在指定连续的端口范围的同时，指定离散的端口号</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝来自10.5.5.249的tcp报文访问当前主机的22号端口以及80到88之间的所有端口号</span></span><br></pre></td></tr></table></figure>
-<h4 id="iprange扩展模块"><a href="#iprange扩展模块" class="headerlink" title="iprange扩展模块"></a>iprange扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用iprange扩展模块可以指定<span class="string">"一段连续的IP地址范围"</span>，用于匹配报文的源地址或者目标地址。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> iprange扩展模块中有两个扩展匹配条件可以使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --src-range</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --dst-range</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m iprange --src-range 10.5.5.240-10.5.5.249 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nxvL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 208 packets, 11763 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            source IP range 10.5.5.240-10.5.5.249 reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果报文的源IP地址在10.5.5.240到10.5.5.249之间，则丢弃报文，IP段的始末IP使用<span class="string">"横杠"</span>连接，--src-range与--dst-range和其他匹配条件一样，能够使用<span class="string">"!"</span>取反</span></span><br></pre></td></tr></table></figure>
-<h4 id="string扩展模块"><a href="#string扩展模块" class="headerlink" title="string扩展模块"></a>string扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用string扩展模块，可以指定要匹配的字符串，如果报文中包含对应的字符串，则符合匹配条件。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> string模块的常用选项</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --algo：用于指定匹配算法，可选的算法有bm与kmp，此选项为必须选项，我们不用纠结于选择哪个算法，但是我们必须指定一个。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --string：用于指定需要匹配的字符串。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面在10.5.5.249上部署</span></span><br><span class="line">[root@test html]# yum install -y httpd</span><br><span class="line">[root@test html]# vim /var/www/html/index.html</span><br><span class="line">	OOXX</span><br><span class="line">[root@test html]# vim /var/www/html/index1.html</span><br><span class="line">	Hello World</span><br><span class="line">[root@test ~]# systemctl start httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面到10.5.5.22主机访问</span></span><br><span class="line">[root@bogon ~]# curl 10.5.5.249</span><br><span class="line">OOXX</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249/index1.html</span><br><span class="line">Hello World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在249主机上安装httpd，提供两个网页，内容分别为OOXX和Hello World。此时在另一台主机可以正常访问</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m string --algo bm --string "OOXX" -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果报文中包含<span class="string">"OOXX"</span>字符，我们就拒绝报文进入本机。<span class="string">'-m string'</span>表示使用string模块，<span class="string">'--algo bm'</span>表示使用bm算法去匹配指定的字符串，<span class="string">' --string "OOXX" '</span>则表示我们想要匹配的字符串为<span class="string">"OOXX"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是设置返回的信息中如果有OOXX就拒绝进入本机</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 51 packets, 3603 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            STRING match  "OOXX" ALGO name bm TO 65535 reject-with icmp-port-unreachable</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249</span><br><span class="line">^C</span><br><span class="line">[root@bogon ~]# curl 10.5.5.249/index1.html</span><br><span class="line">Hello World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在22主机上设置规则后，因为249主机的默认页中包含“OOXX”，所以访问时会停留在空白处，没有信息返回。如果访问index1.html页面是没有问题的。</span></span><br></pre></td></tr></table></figure>
-<h4 id="time扩展模块"><a href="#time扩展模块" class="headerlink" title="time扩展模块"></a>time扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 可以通过time扩展模块，根据时间段匹配报文，如果报文到达的时间在指定的时间范围以内，则符合匹配条件。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --monthdays与--weekdays可以使用<span class="string">"!"</span>取反，其他选项不能取反。</span></span><br><span class="line"></span><br><span class="line">* 指定时间</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --timestart 09:00:00 --timestop 18:00:00 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 443 -m time --timestart 09:00:00 --timestop 18:00:00 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每天早上9点到下午6点不能看网页。<span class="string">"-m time"</span>表示使用time扩展模块，--timestart选项用于指定起始时间，--timestop选项用于指定结束时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试时，此条设置完未生效，依然可以访问网页</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL OUTPUT</span><br><span class="line">Chain OUTPUT (policy ACCEPT 37 packets, 3516 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 TIME from 09:00:00 to 18:00:00 UTC reject-with icmp-port-unreachable</span><br><span class="line">2           0        0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 TIME from 09:00:00 to 18:00:00 UTC reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">* 按周指定日期</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --weekdays 6,7 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 只有周六日不能看网页。使用--weekdays选项可以指定每个星期的具体哪一天，可以同时指定多个，用逗号隔开，除了能够数字表示<span class="string">"星期几"</span>,还能用缩写表示，例如：Mon, Tue, Wed, Thu, Fri, Sat, Sun</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --timestart 09:00:00 --timestop 18:00:00 --weekdays 6,7 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将上面两种方法结合使用。指定只有周六日的早上9点到下午6点不能浏览网页。</span></span><br><span class="line"></span><br><span class="line">* 指月指定日期</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --monthdays 22,23 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用--monthdays选项可以具体指定的每个月的22号，23号不能访问网页。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --weekdays 5 --monthdays 22,23,24,25,26,27,28 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当一条规则中同时存在多个条件时，多个条件之间默认存在<span class="string">"与"</span>的关系。所以，上面的规则表示匹配的时间必须为星期五，并且这个<span class="string">"星期五"</span>同时还需要是每个月的22号到28号之间的一天，也就表示每个月的第4个星期五</span></span><br><span class="line"></span><br><span class="line">* 指定具体时间</span><br><span class="line">[root@bogon ~]# iptables -I OUTPUT -p tcp --dport 80 -m time --datestart 2018-10-15 --datestop 2018-10-19 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用--datestart 选项与-datestop选项，指定具体的日期范围。测试中，此条可以生效。</span></span><br></pre></td></tr></table></figure>
-<h4 id="connlimit扩展模块"><a href="#connlimit扩展模块" class="headerlink" title="connlimit扩展模块"></a>connlimit扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用connlimit扩展模块，可以限制每个IP地址同时链接到server端的链接数量，注意：我们不用指定IP，其默认就是针对<span class="string">"每个客户端IP"</span>，即对单IP的并发连接数限制。</span></span><br><span class="line"></span><br><span class="line">* --connlimit-above</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 2 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 超过两个连接就拒绝。使用<span class="string">"-m connlimit"</span>指定使用connlimit扩展，使用<span class="string">"--connlimit-above 2"</span>表示限制每个IP的链接数量上限为2，再配合-p tcp --dport 22，即表示限制每个客户端IP的ssh并发链接数量不能超过(above)2。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> centos6中，我们可以对--connlimit-above选项进行取反</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit ! --connlimit-above 2 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每个客户端IP的ssh链接数量只要不超过两个，则允许链接。但上例的规则并不能表示：每个客户端IP的ssh链接数量超过两个则拒绝链接。因为匹配不到时要匹配默认规则，如果默认规则是ACCEPT，那么依然可以连接</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 即使我们配置了上例中的规则，也不能达到<span class="string">"限制"</span>的目的，所以我们通常并不会对此选项取反，因为既然使用了此选项，我们的目的通常就是<span class="string">"限制"</span>连接数量。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> centos7中iptables为我们提供了一个新的选项，--connlimit-upto，这个选项的含义与<span class="string">"! --commlimit-above"</span>的含义相同，即链接数量未达到指定的连接数量之意，所以综上所述，--connlimit-upto选项也不常用。</span></span><br><span class="line"></span><br><span class="line">* --connlimit-mask</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 24 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--connlimit-mask 24"</span>表示某个C类网段。上面规则表示，一个最多包含254个IP的C类网络中，同时最多只能有2个ssh客户端连接到当前服务器</span></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 10 --connlimit-mask 27 -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--connlimit-mask 27"</span>表示某个C类网段，通过计算后可以得知，这个网段中最多只能有30台机器（30个IP），这30个IP地址最多只能有10个ssh连接同时连接到服务器端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在不使用--connlimit-mask的情况下，连接数量的限制是针对<span class="string">"每个IP"</span>而言的，当使用了--connlimit-mask选项以后，则可以针对<span class="string">"某类IP段内的一定数量的IP"</span>进行连接数量的限制</span></span><br></pre></td></tr></table></figure>
-<h4 id="limit扩展模块"><a href="#limit扩展模块" class="headerlink" title="limit扩展模块"></a>limit扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">limit</span>模块是对<span class="string">"报文到达速率"</span>进行限制的.如果想要限制单位时间内流入的包的数量，就能用<span class="built_in">limit</span>模块</span></span><br><span class="line"></span><br><span class="line">* --limit</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m limit --limit 10/minute -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-p icmp"</span>表示我们针对ping请求添加了一条规则（ping使用icmp协议），<span class="string">"-m limit"</span>表示使用<span class="built_in">limit</span>模块， <span class="string">"--limit 10/minute -j ACCEPT"</span>表示每分钟最多放行10个包，就相当于每6秒钟最多放行一个包</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 5950 packets, 5128996 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         111     9416 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面的规则并不会起作用。因为每6秒放行一个包，那么iptables就会计时，每6秒一个轮次，到第6秒时，达到的报文就会匹配到对应的规则，执行对应的动作ACCEPT。那么在第6秒之前到达的包，则无法被上述规则匹配到。那么这些包就要向下匹配策略中的其他规则，如果都不能匹配，就会匹配默认策略，因为默认策略是ACCEPT，所以ping此主机的时候还是会正常运行。</span></span><br><span class="line">[root@bogon ~]# iptables -A INPUT -p icmp -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝所有的ping包</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 6 packets, 428 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1         150    12692 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 5</span><br><span class="line">2          56     4704 REJECT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一条规则表示每分钟最多放行10个icmp包，也就是6秒放行一个，第6秒的icmp包会被上例中的第一条规则匹配到，第6秒之前的包则不会被第一条规则匹配到，于是被后面的拒绝规则匹配到了</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时再ping此主机时就可以发现每6秒才能ping通一次了。但还有一个问题，就是最开始的5个ping包是不受限制的，可以正常ping通。现象如下，下面解释原因</span></span><br><span class="line">[root@test ~]# ping 10.5.5.22</span><br><span class="line">PING 10.5.5.22 (10.5.5.22) 56(84) bytes of data.</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=1 ttl=64 time=0.248 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=2 ttl=64 time=0.355 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=3 ttl=64 time=0.332 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=4 ttl=64 time=0.261 ms</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=5 ttl=64 time=0.528 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=6 Destination Port Unreachable</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=7 ttl=64 time=0.418 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=8 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=9 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=10 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=11 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=12 Destination Port Unreachable</span><br><span class="line">64 bytes from 10.5.5.22: icmp_seq=13 ttl=64 time=0.435 ms</span><br><span class="line">From 10.5.5.22 icmp_seq=14 Destination Port Unreachable</span><br><span class="line">From 10.5.5.22 icmp_seq=15 Destination Port Unreachable</span><br><span class="line"></span><br><span class="line">* --limit-burst</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--limit-burst"</span>可以指定<span class="string">"空闲时可放行的包的数量。在不使用"</span>--<span class="built_in">limit</span>-burst<span class="string">"选项明确指定放行包的数量时，默认值为5，所以才会有上面的现象。</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想要彻底了解<span class="built_in">limit</span>模块的工作原理，我们需要先了解一下<span class="string">"令牌桶"</span>算法，因为<span class="built_in">limit</span>模块使用了令牌桶算法。我们可以这样想象，有一个木桶，木桶里面放了5块令牌，而且这个木桶最多也只能放下5块令牌，所有报文如果想要出关入关，都必须要持有木桶中的令牌才行，这个木桶有一个神奇的功能，就是每隔6秒钟会生成一块新的令牌，如果此时，木桶中的令牌不足5块，那么新生成的令牌就存放在木桶中，如果木桶中已经存在5块令牌，新生成的令牌就无处安放了，只能溢出木桶（令牌被丢弃），如果此时有5个报文想要入关，那么这5个报文就去木桶里找令牌，正好一人一个，于是他们5个手持令牌，快乐的入关了，此时木桶空了，再有报文想要入关，已经没有对应的令牌可以使用了，但是，过了6秒钟，新的令牌生成了，此刻，正好来了一个报文想要入关，于是，这个报文拿起这个令牌，就入关了，在这个报文之后，如果很长一段时间内没有新的报文想要入关，木桶中的令牌又会慢慢的积攒了起来，直到达到5个令牌，并且一直保持着5个令牌，直到有人需要使用这些令牌，这就是令牌桶算法的大致逻辑。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"--limit"</span>选项就是用于指定<span class="string">"多长时间生成一个新令牌的"</span>，<span class="string">"--limit-burst"</span>选项就是用于指定<span class="string">"木桶中最多存放几个令牌的"</span></span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p icmp -m limit --limit-burst 1 --limit 10/minute -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"--limit"</span>选项时，可以选择的时间单位有多种，如：/second、/minute、/hour、/day。比如，3/second表示每秒生成3个<span class="string">"令牌"</span>，30/minute表示每分钟生成30个<span class="string">"令牌"</span>。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL INPUT</span><br><span class="line">Chain INPUT (policy ACCEPT 174 packets, 11316 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1          13     1092 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            limit: avg 10/min burst 1</span><br><span class="line">2         194    16296 REJECT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br></pre></td></tr></table></figure>
-<h4 id="state扩展模块"><a href="#state扩展模块" class="headerlink" title="state扩展模块"></a>state扩展模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 对于state模块而言的<span class="string">"连接"</span>并不能与tcp的<span class="string">"连接"</span>画等号，在TCP/IP协议簇中，UDP和ICMP是没有所谓的连接的，但是对于state模块来说，tcp报文、udp报文、icmp报文都是有连接状态的。对于state模块而言，只要两台机器在<span class="string">"你来我往"</span>的通信，就算建立起了连接</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> state模块中的报文状态</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> NEW：连接中的第一个包，状态就是NEW，我们可以理解为新连接的第一个包的状态为NEW。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ESTABLISHED：我们可以把NEW状态包后面的包的状态理解为ESTABLISHED，表示连接已建立。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> RELATED：从字面上理解RELATED译为关系、相关的，但是这样仍然不容易理解，我们举个例子。比如FTP服务，FTP服务端会建立两个进程，一个命令进程，一个数据进程。命令进程负责服务端与客户端之间的命令传输（我们可以把这个传输过程理解成state中所谓的一个<span class="string">"连接"</span>，暂称为<span class="string">"命令连接"</span>）。数据进程负责服务端与客户端之间的数据传输 ( 我们把这个过程暂称为<span class="string">"数据连接"</span> )。但是具体传输哪些数据，是由命令去控制的，所以，<span class="string">"数据连接"</span>中的报文与<span class="string">"命令连接"</span>是有<span class="string">"关系"</span>的。那么，<span class="string">"数据连接"</span>中的报文可能就是RELATED状态，因为这些报文与<span class="string">"命令连接"</span>中的报文有关系。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># (注：如果想要对ftp进行连接追踪，需要单独加载对应的内核模块nf_conntrack_ftp，如果想要自动加载，可以配置/etc/sysconfig/iptables-config文件)</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> INVALID：如果一个包没有办法被识别，或者这个包没有任何状态，那么这个包的状态就是INVALID，我们可以主动屏蔽状态为INVALID的报文。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> UNTRACKED：报文的状态为UNTRACKED时，表示报文未被追踪，当报文的状态为UNTRACKED时通常表示无法找到相关的连接。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -A INPUT -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将状态为RELATED和ESTABLISHED的报文都放行，这样，就表示只有回应我们的报文能够通过防火墙，如果是别人主动发送过来的新的报文，则无法通过防火墙。如想通过ssh连接本机，是不行的，但本机可以ssh连接其他主机。</span></span><br></pre></td></tr></table></figure>
-<h3 id="黑白名单机制"><a href="#黑白名单机制" class="headerlink" title="黑白名单机制"></a>黑白名单机制</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 当链的默认策略为ACCEPT时，链中的规则对应的动作应该为DROP或者REJECT，表示只有匹配到规则的报文才会被拒绝，没有被规则匹配到的报文都会被默认接受，这就是<span class="string">"黑名单"</span>机制。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当链的默认策略为DROP时，链中的规则对应的动作应该为ACCEPT，表示只有匹配到规则的报文才会被放行，没有被规则匹配到的报文都会被默认拒绝，这就是<span class="string">"白名单"</span>机制。</span></span><br><span class="line"></span><br><span class="line">* 白名单</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 22 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 80 -j ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -P INPUT DROP</span><br><span class="line">[root@bogon ~]# iptables --line -nxvL INPUT</span><br><span class="line">Chain INPUT (policy DROP 336 packets, 17902 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80</span><br><span class="line">2         130     9172 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行22与80端口，并将默认策略改为DROP，这样其他端口都是无法访问的。因为只改了INPUT链为DROP，OUTPUT链的默认策略还是ACCEPT，所以可以访问80与22端口。如果OUTPUT的默认策略也是DROP，那就要再写两条出的规则。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果此时有误操作，删除了防火墙规则，那么所有连接就都无法进来了。也就是无法通过远程连接主机了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想要使用<span class="string">"白名单"</span>的机制，最好将链的默认策略保持为<span class="string">"ACCEPT"</span>，然后将<span class="string">"拒绝所有请求"</span>这条规则放在链的尾部，将<span class="string">"放行规则"</span>放在前面，这样做，既能实现<span class="string">"白名单"</span>机制，又能保证在规则被清空时，管理员还有机会连接到主机</span></span><br><span class="line">[root@bogon ~]# iptables -P INPUT ACCEPT</span><br><span class="line">[root@bogon ~]# iptables -A INPUT -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当所有放行规则设置完成后，在INPUT链的尾部，设置一条拒绝所有请求的规则。这样就能必免上面的问题了</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2342,7 +2443,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">157</span>
+                    <span class="site-state-item-count">158</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2672,7 +2773,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">122</span>
+                      
+                    
+                    <span class="site-state-item-count">123</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

@@ -350,6 +350,195 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/04/mysql日志/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/04/mysql日志/" itemprop="url">
+                  mysql日志
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-01-04 15:36:41" itemprop="dateCreated datePublished" datetime="2019-01-04T15:36:41+08:00">2019-01-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-07 12:42:24" itemprop="dateModified" datetime="2019-01-07T12:42:24+08:00">2019-01-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="錯誤日志"><a href="#錯誤日志" class="headerlink" title="錯誤日志"></a>錯誤日志</h4><blockquote>
+<ul>
+<li>錯誤日志記錄內容<ol>
+<li>服務器啟動和關閉過程中的信息</li>
+<li>服務器運行過程中的錯誤信息</li>
+<li>事件調度器運行一個事件時產生的信息</li>
+<li>在從服務器上啟動從服務器進程時產生的信息</li>
+</ol>
+</li>
+</ul>
+<p>默認mysql不啟用任何日志功能，一般啟動錯誤日志，默認放在數據目錄中，以當前主機名加.err為後綴名的文件；log_error</p>
+<p>log_warnings警告信息日志，是否把警告信息記入錯誤日志，服務器上默認是記入的（0是不記，1是記）；mysql中的文件操作要在重啟服務器後生效，我們要把改變內容寫入配置文件。这里的log_warnings改变没有关系</p>
+</blockquote>
+<h3 id="一般查詢日志"><a href="#一般查詢日志" class="headerlink" title="一般查詢日志"></a>一般查詢日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 一般關閉，記錄每條查詢會產生大量IO</span></span><br><span class="line"></span><br><span class="line">general_log               </span><br><span class="line"><span class="meta">#</span><span class="bash"> 表示是否啟用查詢日志</span></span><br><span class="line"></span><br><span class="line">general_log_file        </span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志記錄位置，默認是數據目錄下本機名稱加.<span class="built_in">log</span>。</span></span><br><span class="line"></span><br><span class="line">log                              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 與查詢日志相關，但在5.6中已廢棄。是否啟用記錄所有語句的日志信息於一般查詢日志中，默認是OFF</span></span><br><span class="line"></span><br><span class="line">mysql可以將一般查詢日志保存在表中，只是這個表需要手工創建。啟用此功能還需要啟用log_output，默認輸出是FILE，也可以是TABLE，或是NONE不記錄，這項會控制上面的兩項及其他日志選項。這裡的FILE和TABLE可以同時指定，用逗號隔開即可</span><br></pre></td></tr></table></figure>
+<h3 id="慢查詢日志"><a href="#慢查詢日志" class="headerlink" title="慢查詢日志"></a>慢查詢日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 慢查詢日志，一般啟用，超過正常查詢的都算慢查詢</span></span><br><span class="line"></span><br><span class="line">long_query_time      </span><br><span class="line"><span class="meta">#</span><span class="bash"> 超過此項定義時間的查詢就是慢查詢。這裡的語句執行時長為實際的執行時間，而非在CPU上的執行時長。因此，負載較重的服務器上更容易產生慢查詢。其最小值為0，默認值是10，單位是秒。也支持毫秒級的解析度，作用範圍為全局或會話級別，可用於配置文件，屬動態變量</span></span><br><span class="line"></span><br><span class="line">log_slow_queries=&#123;YES|NO&#125;      </span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否記錄慢查詢。默认是OFF</span></span><br><span class="line"></span><br><span class="line">slow_query_log=&#123;ON|OFF&#125;         </span><br><span class="line"><span class="meta">#</span><span class="bash"> 設定是否啟用慢查詢日志，0或OFF表示禁用，1或ON表示啟用。日志信息的輸出位置取決於log_output變量的定義，如果其值為NONE，則即便slow_query_log為ON，也不會記錄任何慢查詢信息。作用範圍為全局級別，可用於選項文件，屬動態變量</span></span><br><span class="line"></span><br><span class="line">slow_query_log_file </span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志保存位置</span></span><br><span class="line"></span><br><span class="line">set global slow_query_log=1              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 開啓慢查日志</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 操作函數開關的可以當時生效，如果是文件就要重啓服務了。</span></span><br></pre></td></tr></table></figure>
+<h3 id="二進制日志"><a href="#二進制日志" class="headerlink" title="二進制日志"></a>二進制日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 二進制日志，二進制格式，任何引起或可能引起數據庫變化的操作信息都記錄，用於實現mysql復制以及即時點恢復的重要依據。mysql的復制功能就是從服務器不停地從主服務器上把它的二進制日志裡產生的任何操作，它把每個操作通過mysql客戶端、服務器端的每一個操作都讀取過來一份並保存在本地的某個日志中，而後由本地的某一個服務器的mysql線程和IO線程每一次從這個本地文件日志中讀取一行並在本地的服務器上操作一次，其中的某一個線程把日志中的內容讀取出來並在本地執行一次，使兩個數據庫一致，這就是復制。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 本地保存此內容的日志叫中繼日志，中繼日志的格式與二進制的格式一樣，只不過作用並不完全一致，因為中斷日志只是要讓本地服務器執行一次的日志文件。</span></span><br><span class="line"></span><br><span class="line">* mysqlbinlog              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 用此命令查詢此日志文件。mysqlbinlog的工作很獨特，這一般位於我們的數據目錄中，而且以mysql-bin開頭或以當前主機名開頭。mysql服務器每重啟一次，它都會滾動一次，因為要記錄任何數據庫改變的操作。重放可以生成一模一樣的數據庫在多個位置，它是復制與即時點恢復的重要憑據。在日志文件增長到一定程度就會生成一個新的日志文件，不會讓此文件無限增長的，這就是輪動。不要將此日志與數據庫放在一個磁盤上，這可以在數據丟失時進行重放，指定從某個時間進行還原，這就是即時點恢復</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 二進制日志的記錄格式可以是基於語句statement也可基於行row，還有混合方式mixed，由服務器選擇基於語句還是行。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 二進制日志事件，可以是基於行的，也可能是基於語句的，而每一個事件在記錄時的格式是1、事件產生時間；2、每個事件在日志中有一個相對位置。日志文件中有一個文件頭，一般要佔107個字節，記錄日志產生的信息，之後就是事件的內容了，每個事件有一個相對的位置叫position，起始時間starttime，恢復時可指定事件開始時間或位置與結束時間或位置定位。名字一般是mysql-bin.00001之後以此類推，老的文件名是不會改變的</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 二進制日志文件組成有索引文件與二進制日志文件，啟動此功能就會有二進制日志文件，mysql-bin.index是索引文件，記錄了已產生的二進制日志文件名，在其中有指針記錄開始與結束文件，結束文件一般是當前使用的。用命令SHOW MASTER STATUS;可查看當前使用的文件，在結果顯示中的Position表示上次事件結束的位置。使用命令SHOW BINLOG EVENTS IN <span class="string">'mysql-bin.000005'</span>;可查看二進制文件中記錄的信息，或SHOW BINLOG EVENTS IN <span class="string">'mysql-bin.000005'</span> FROM 107;指定從哪個位置開始顯示</span></span><br><span class="line"></span><br><span class="line">* 二進制日志相關的幾個選項</span><br><span class="line">innodb_support_xa=&#123;TRUE|FLASE&#125;              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 定義innodb是否支持分布式事務。存儲引擎事務在存儲引擎內部被賦予了ACID屬性，分布式（XA）事務是一種高層次的事務，它能將InnoDB分爲兩段式提交，它利用“准備”然後“提交”（prepare-then-commit）；現在的存儲引擎都應支持此項功能，建議啓用起來</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 兩段式的方式將ACID屬性擴展到存儲引擎外部，甚至是數據庫外部，然而，“准備”階段會導致額外的磁盤刷寫操作，XA需要事務協調員，它會通知所有的參與者准備提交事務（階段1），當協調員從所有參與者那裡收到“就緒”信息時，它會指示所有參與者進行真正的“提交”操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 此變量正是用於定義InnoDB是否支持兩段式提交的分布式事務，默認為啟用。事實上，所有啟用了二進制日志的並支持多個線程同時向二進制日志寫入數據的Mysql服務器都需要啟用分佈式事務，否則，多個線程對二進制日誌的寫入操作可能會以與次序不同的方式完成，這將會在基於二進制日誌的恢復操作中或者是從服務器上創建出不同原始數據的結果，因此，除了僅有一個線程可以改變數據以外的其它應用場景都不應該禁用此功能。而在僅有一個線程可以修改數據的應用中，禁用此功能是安全的並可以提升InnoDB表的性能。作用範圍為全局和會話級別，可用於選項文件，屬動態變量。</span></span><br><span class="line"></span><br><span class="line">sync_binlog=#</span><br><span class="line"><span class="meta">#</span><span class="bash"> 設定多久同步一次二進制日志至磁盤文件中，0表示不同步，任何正數值都表示對二進制每多少次寫操作之後同步一次。當autocommit的值為1時，每條語句的執行都會引起二進制日志同步，否則，每個事務的提交會引起二進制日志同步。一般建議把此項設為1。這樣可使我們在備份時不會有那些正在寫入的事務。打開此項會使二進制日志在寫入的時候以安全的方式進行。FLUSH LOGS執行後會打開一個新的二進制日志執行寫操作，但上面的方法更好一些</span></span><br></pre></td></tr></table></figure>
+<h3 id="事务日志"><a href="#事务日志" class="headerlink" title="事务日志"></a>事务日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">事務日志是保證給事務提供原子性、一致性的一個重要依據，它能實現將隨機IO轉換為順序IO從而提高性能，並能夠保證事務提交以後不會丟失。只有事務性引擎才會用到事務日志，如InnoDB</span><br><span class="line">mysql靠各種服務器變量或服務器啟動的參數來定義各類日志是否啟用， 以及如何啟用，日志文件是什麼。另外事務日志有一個日志組，裡面至少有兩個日志輪替使用</span><br></pre></td></tr></table></figure>
+<h3 id="与日志相关的变量"><a href="#与日志相关的变量" class="headerlink" title="与日志相关的变量"></a>与日志相关的变量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">SHOW GLOBAL VARIABLES LIKE '%LOG%';</span><br><span class="line"></span><br><span class="line">binlog_cache_size          </span><br><span class="line"><span class="meta">#</span><span class="bash"> 二進制日志緩存大小，大小取決於下面這條</span></span><br><span class="line"></span><br><span class="line">binlog_stmt_cache_size        </span><br><span class="line"><span class="meta">#</span><span class="bash"> 與事務相關的二進制日志緩存大小，這兩條取決於binlog_stmt_cache_size的大小而改變，我們只關心這條即可，建議不要調太大，這會加大丟失量</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> async異步：先在內存中寫，過一會兒再一並寫入磁盤</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> sync同步：每次操作在內存中完成後直接寫入磁盤，這會使性能降低</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 最好是引入異步方式，並提供緩存，寫操作在內存中完成並當作緩存，到一定量再同步到磁盤；可以是按時間，如每一秒與磁盤同步一次；也可以是按語句，如10條語句同步一次；還可以是按事務存儲引擎，只要提交就同步一次。</span></span><br><span class="line"></span><br><span class="line">log_bin         </span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否啟用二進制日志，與指定文件位置有關</span></span><br><span class="line"></span><br><span class="line">sql_ log_bin=&#123;ON|OFF&#125;  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否真正使用二進制日志取決於此條。用於控制二進制日志信息是否記錄進日志文件，默認為ON，表示啟用記錄功能。用戶可以在會話級別修改此變量的值，但用户必須具有SUPER權限，作用範圍為全局和會話級別，屬動態變量。</span></span><br><span class="line"></span><br><span class="line">sql_log_off=&#123;ON|OFF&#125; </span><br><span class="line"><span class="meta">#</span><span class="bash"> 用於控制是否禁止將一般查詢日志類信息記錄進查詢日志文件，默認為OFF，表示不禁止記錄功能。用戶可以在會話級別修改此變量的值，但用户必須具有SUPER權限。作用範圍為全局和會話級別，屬動態變量。與二進制日志無關</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">max_binlog_cache_size                            </span><br><span class="line">max_binlog_stmt_cache_size            </span><br><span class="line"><span class="meta">#</span><span class="bash"> 這兩個值一般不用修改，這是控制上限的。最終緩存大小還是取決於binlog_stmt_cache_size</span></span><br><span class="line"></span><br><span class="line">expire_logs_days            </span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志的過期天數</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> innodb_file_per_table的值為ON就會給每個表創建一個表空間了，這就可以使用innodb的一些高級功能了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 中繼日志:從主服務器的二進制日志文件中復制而來的事件，並保存的日志文件。這是從服務器上的信息。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 因爲二進制日志文件只有一個，所以二進制日志文件所在磁盤性能越好，IO能力越強，服務器的整體性能越強。如用一堆SSD盤作RAID。mysql為提高性能會盡可能提高並發能力，如有多個CPU就可以同時多線程操作，但寫入二進制日志文件時，因為日志文件只有一個，故需要此日志文件所在磁盤IO能力更強</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> IOPS：IO設備每秒執行的IO操作數</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 事務日志是確保事務安全性的重要工具。事務性存儲引擎用於保證原子性、一致性、隔離性和持久性</span></span><br><span class="line"></span><br><span class="line">innodb_flush_log_at_trx_commit        </span><br><span class="line"><span class="meta">#</span><span class="bash"> flush_log的行為，flush_log就是將內存中的日志事件同步到日志文件中的行為。日志文件到磁盤的同步是mysql後台線程自動進行的。這裡的1表示每當有事務提交或每隔1秒都會向磁盤寫一次。2表示每事務提交才同步；0表示每秒同步一次並執行磁盤flush操作（flush操作指告訴內核不在內核中緩存直接寫到磁盤上去）；1表示每事務同步，並執行磁盤flush操作；2表示每事務同步，但不執行磁盤flush操作。</span></span><br><span class="line"></span><br><span class="line">innodb_log_buffer_size         </span><br><span class="line"><span class="meta">#</span><span class="bash"> 內存緩存大小</span></span><br><span class="line"></span><br><span class="line">innodb_log_file_size              </span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志文件大小，估計一下五分鍾會產生多少事務操作，有多大數據量，然後給它一個值即可</span></span><br><span class="line"></span><br><span class="line">innodb_log_files_in_group           </span><br><span class="line"><span class="meta">#</span><span class="bash"> 事務日志組有幾個文件，默認是兩個，一個寫滿就寫另一個，寫滿的將數據同步到磁盤</span></span><br><span class="line"></span><br><span class="line">innodb_log_group_home_dir             </span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志組所在目錄，叫ib_logfile*，建議給事務日志做一個鏡像。在不同的磁盤上</span></span><br><span class="line"></span><br><span class="line">innodb_mirrored_log_groups             </span><br><span class="line"><span class="meta">#</span><span class="bash"> 是否給日志組做鏡像</span></span><br></pre></td></tr></table></figure>
+<h3 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 存放在同一塊磁盤上会使性能降低，更因為數據安全的原因，建議分開存放</span></span><br><span class="line"></span><br><span class="line">语法</span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看當前服務器能識別的二進制日志有哪些</span></span><br><span class="line"></span><br><span class="line">SHOW MASTER STATUS;    </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看當前使用的二進制日志</span></span><br><span class="line"></span><br><span class="line">SHOW BINLOG EVENTS IN '二進制日志文件' [FROM 'position'];</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看某個文件中的事件</span></span><br><span class="line"></span><br><span class="line">PURGE BINARY LOGS TO '日志文件';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除某個日志之前的日志</span></span><br><span class="line"></span><br><span class="line">FLUSH LOGS;   </span><br><span class="line"><span class="meta">#</span><span class="bash"> 手動滾動二進制日志文件</span></span><br></pre></td></tr></table></figure>
+<h3 id="启动二进制日志功能"><a href="#启动二进制日志功能" class="headerlink" title="启动二进制日志功能"></a>启动二进制日志功能</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# systemctl stop mysql</span><br><span class="line">[root@test ~]# vim /etc/my.cnf</span><br><span class="line">[mysqld]</span><br><span class="line">log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此项</span></span><br><span class="line">[root@test ~]# systemctl start mysql</span><br><span class="line">[root@test ~]# mysql</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> SHOW GLOBAL VARIABLES LIKE <span class="string">'sql_log_bin'</span>;</span></span><br><span class="line">+---------------+-------+</span><br><span class="line">| Variable_name | Value |</span><br><span class="line">+---------------+-------+</span><br><span class="line">| sql_log_bin   | ON    |</span><br><span class="line">+---------------+-------+</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果此项为ON，表示开启了二进制日志</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> SHOW BINARY LOGS;</span></span><br><span class="line">+------------------+-----------+</span><br><span class="line">| Log_name         | File_size |</span><br><span class="line">+------------------+-----------+</span><br><span class="line">| mysql_bin.000001 |       120 |</span><br><span class="line">+------------------+-----------+</span><br><span class="line"></span><br><span class="line">[[root@test ~]# mysqlbinlog /var/lib/mysql/mysql_bin.000001</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;</span><br><span class="line">/*!40019 SET @@session.max_insert_delayed_threads=0*/;</span><br><span class="line">/*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;</span><br><span class="line">DELIMITER /*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:41:52 server id 1  end_log_pos 120 CRC32 0x2b1c1f39  Start: binlog v 4, server v 5.6.42-log created 190104 15:41:52 at startup</span></span><br><span class="line">ROLLBACK/*!*/;</span><br><span class="line">BINLOG '</span><br><span class="line">QA4vXA8BAAAAdAAAAHgAAAAAAAQANS42LjQyLWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span><br><span class="line">AAAAAAAAAAAAAAAAAABADi9cEzgNAAgAEgAEBAQEEgAAXAAEGggAAAAICAgCAAAACgoKGRkAATkf</span><br><span class="line">HCs=</span><br><span class="line">'/*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 120</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:52:41 server id 1  end_log_pos 167 CRC32 0x7f00ec56  Rotate to mysql_bin.000002  pos: 4</span></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="meta">#</span><span class="bash"> End of <span class="built_in">log</span> file</span></span><br><span class="line">ROLLBACK /* added by mysqlbinlog */;</span><br><span class="line">/*!50003 SET COMPLETION_TYPE=@OLD_COMPLETION_TYPE*/;</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> /var/lib/mysql是数据库的路径</span></span><br><span class="line"></span><br><span class="line">[root@test ~]# mysqlbinlog --start-position=120 --stop-position=167 /var/lib/mysql/mysql_bin.000001</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;</span><br><span class="line">/*!40019 SET @@session.max_insert_delayed_threads=0*/;</span><br><span class="line">/*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;</span><br><span class="line">DELIMITER /*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:41:52 server id 1  end_log_pos 120 CRC32 0x2b1c1f39  Start: binlog v 4, server v 5.6.42-log created 190104 15:41:52 at startup</span></span><br><span class="line">ROLLBACK/*!*/;</span><br><span class="line">BINLOG '</span><br><span class="line">QA4vXA8BAAAAdAAAAHgAAAAAAAQANS42LjQyLWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span><br><span class="line">AAAAAAAAAAAAAAAAAABADi9cEzgNAAgAEgAEBAQEEgAAXAAEGggAAAAICAgCAAAACgoKGRkAATkf</span><br><span class="line">HCs=</span><br><span class="line">'/*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 120</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:52:41 server id 1  end_log_pos 167 CRC32 0x7f00ec56  Rotate to mysql_bin.000002  pos: 4</span></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="meta">#</span><span class="bash"> End of <span class="built_in">log</span> file</span></span><br><span class="line">ROLLBACK /* added by mysqlbinlog */;</span><br><span class="line">/*!50003 SET COMPLETION_TYPE=@OLD_COMPLETION_TYPE*/;</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看位置從120到167</span></span><br><span class="line">[root@test ~]# mysqlbinlog --start-datetime='2019-01-04 15:41:52' /var/lib/mysql/mysql_bin.000001</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;</span><br><span class="line">/*!40019 SET @@session.max_insert_delayed_threads=0*/;</span><br><span class="line">/*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;</span><br><span class="line">DELIMITER /*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:41:52 server id 1  end_log_pos 120 CRC32 0x2b1c1f39  Start: binlog v 4, server v 5.6.42-log created 190104 15:41:52 at startup</span></span><br><span class="line">ROLLBACK/*!*/;</span><br><span class="line">BINLOG '</span><br><span class="line">QA4vXA8BAAAAdAAAAHgAAAAAAAQANS42LjQyLWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span><br><span class="line">AAAAAAAAAAAAAAAAAABADi9cEzgNAAgAEgAEBAQEEgAAXAAEGggAAAAICAgCAAAACgoKGRkAATkf</span><br><span class="line">HCs=</span><br><span class="line">'/*!*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> at 120</span></span><br><span class="line"><span class="meta">#</span><span class="bash">190104 15:52:41 server id 1  end_log_pos 167 CRC32 0x7f00ec56  Rotate to mysql_bin.000002  pos: 4</span></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="meta">#</span><span class="bash"> End of <span class="built_in">log</span> file</span></span><br><span class="line">ROLLBACK /* added by mysqlbinlog */;</span><br><span class="line">/*!50003 SET COMPLETION_TYPE=@OLD_COMPLETION_TYPE*/;</span><br><span class="line">/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令中的日期一定要使用****-**-**这样的格式，不然会报错：<span class="string">"Incorrect date and time argument"</span>，日期和时间参数不正确。</span></span><br><span class="line"></span><br><span class="line">[root@test ~]# mysqlbinlog --start-datetime='2019-01-04 15:41:52' /var/lib/mysql/mysql_bin.000001 &gt; abc.sql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 將結果重定向到一個.sql文件中，之後可導入mysql執行一次，這就是即時點恢復</span></span><br><span class="line"></span><br><span class="line">* 二進制日志的輪動除重啟服務器外還可以用FLUSH LOGS;来實現，這是在主服務器上，如果是從服務器就是中繼服務器才滾動</span><br><span class="line">* 二進制日志文件不能手動刪除，會影響mysql服務器啟動。要用mysql命令</span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> PURGE BINARY LOGS TO <span class="string">'mysql_bin.000002'</span>;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 刪除000002以前的二進制文件。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/04/mysql命令/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2113,244 +2302,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/02/ShellScript-正则表达式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/02/ShellScript-正则表达式/" itemprop="url">
-                  ShellScript_正则表达式
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-12-02 16:23:41" itemprop="dateCreated datePublished" datetime="2018-12-02T16:23:41+08:00">2018-12-02</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-07-17 15:34:54" itemprop="dateModified" datetime="2019-07-17T15:34:54+08:00">2019-07-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="基本正则表达式元字符"><a href="#基本正则表达式元字符" class="headerlink" title="基本正则表达式元字符"></a>基本正则表达式元字符</h3><h4 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a>转义字符</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">\r: 回车</span><br><span class="line">\n: 换行符</span><br><span class="line">\t: 制表符</span><br><span class="line">\\: “\” 本身</span><br><span class="line">\^: 匹配^符号本身</span><br><span class="line">\$: 匹配$符号本身</span><br><span class="line">\.: 匹配小数点. 本身</span><br></pre></td></tr></table></figure>
-<h4 id="多种字符匹配"><a href="#多种字符匹配" class="headerlink" title="多种字符匹配"></a>多种字符匹配</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">\d：任意一个数字，0~9 中的任意一个</span><br><span class="line">\w：任意一个字母或数字或下划线，也就是 A~Z,a~z,0~9,_ 中任意一个</span><br><span class="line">\s：包括空格、制表符、换页符等空白字符的其中任意一个</span><br><span class="line">.：小数点可以匹配除了换行符以外的任意一个字符</span><br></pre></td></tr></table></figure>
-<h4 id="字符匹配"><a href="#字符匹配" class="headerlink" title="字符匹配"></a>字符匹配</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">.: 匹配任意单个字符</span><br><span class="line">[]:匹配指定范围内的任意单个字符</span><br><span class="line">[^]:匹配指定范围外的任意单个字符</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以上[]当中的范围有以下几种表示方法：</span></span><br><span class="line">[:alnum:]:表示所有的字母和数字</span><br><span class="line">[:alpha:]:表示所有字母（不区分大小写）</span><br><span class="line">[:digit:]:表示所有的数字</span><br><span class="line">[:lower:]:表示所有的小写字母</span><br><span class="line">[:punct:]:表示所有的标点符号</span><br><span class="line">[:space:]:表示所有的空白字符</span><br><span class="line">[:upper:]:表示所有的大写字母</span><br></pre></td></tr></table></figure>
-<h4 id="次数匹配"><a href="#次数匹配" class="headerlink" title="次数匹配"></a>次数匹配</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">用于在要指定次数的字符后面或用于指定前面的字符要出现的次数：</span><br><span class="line">*:匹配前面的字符任意次</span><br><span class="line">.*:任意长度的任意字符</span><br><span class="line">?:匹配其前面的字符0次或1次，即前面的可有可无</span><br><span class="line">+:匹配其前面的字符至少1次</span><br><span class="line">\&#123;m\&#125;:匹配前面的字符m次</span><br><span class="line">\&#123;m,n\&#125;:匹配前面的字符至少m次，至多n次</span><br><span class="line">\&#123;,n\&#125;:匹配前面的字符至多n次</span><br><span class="line">\&#123;m,\&#125;:区配前面的字符至少m次</span><br></pre></td></tr></table></figure>
-<h4 id="位置锚定"><a href="#位置锚定" class="headerlink" title="位置锚定"></a>位置锚定</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">对特定位置进行定位</span><br><span class="line">^:行首锚定：用于模式的最左侧</span><br><span class="line"><span class="meta">$</span><span class="bash">:行尾锚定：用于模式的最右侧</span></span><br><span class="line">^PATTERN$: 用于模式匹配整行</span><br><span class="line">	^$:空行，不包含有空格的行</span><br><span class="line">	^[[:space:]]*$:空行，但包含有空格的行</span><br><span class="line">\&lt;或\b:词首锚定，用于单词模式的左侧</span><br><span class="line">\&gt;或\b:词尾锚定，用于单词模式的右侧</span><br><span class="line">\&lt;PATTERN\&gt;:匹配整个单词</span><br></pre></td></tr></table></figure>
-<h4 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">分组是指将一个或多个字符捆绑在一起，当作一个整体进行处理，其符号为：</span><br><span class="line">\(\):</span><br><span class="line">例：\(xy\)*ab表示xy这个整体可以出现任意次</span><br><span class="line">注意：</span><br><span class="line">1. 分组括号中的模式匹配到的内容会被正则表达式引擎记录于内部的变量中，这些变量的命名方式为：\1, \2, \3, ...。</span><br><span class="line">	\1:从左侧起，第一个左括号以及与之匹配的右括号之间的模式所匹配到的字符；如：\(ab\+\(xy\)*\)中\1表示：ab\+\(xy\)*，\2表示：xy</span><br><span class="line">2. 后向引用：引用前面的分组括号中的模式所匹配的字符，而非模式本身</span><br></pre></td></tr></table></figure>
-<h3 id="扩展正则表达式元字符"><a href="#扩展正则表达式元字符" class="headerlink" title="扩展正则表达式元字符"></a>扩展正则表达式元字符</h3><h4 id="字符匹配-1"><a href="#字符匹配-1" class="headerlink" title="字符匹配"></a>字符匹配</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[]:匹配指定范围内的任意单个字符</span><br><span class="line">[^]:匹配指定范围外的任意单个字符</span><br></pre></td></tr></table></figure>
-<h4 id="次数匹配-1"><a href="#次数匹配-1" class="headerlink" title="次数匹配"></a>次数匹配</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">*:任意次</span><br><span class="line">?:0次或1次</span><br><span class="line">+:至少1次</span><br><span class="line">&#123;m&#125;:精确匹配m次</span><br><span class="line">&#123;m,n&#125;:至少m次，至多n次</span><br><span class="line">&#123;m,&#125;:到少m次</span><br><span class="line">&#123;0,n&#125;:至多n次</span><br></pre></td></tr></table></figure>
-<h4 id="锚定"><a href="#锚定" class="headerlink" title="锚定"></a>锚定</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">扩展正则表达式的位置锚定和其本正则表达式相同</span><br></pre></td></tr></table></figure>
-<h4 id="分组-1"><a href="#分组-1" class="headerlink" title="分组"></a>分组</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">():用括号括起来表示要引用的内容，不需要转义</span><br><span class="line">后向引用：\1, \2, \3</span><br><span class="line">或</span><br><span class="line">a|b:a或者b</span><br></pre></td></tr></table></figure>
-<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="贪婪与非贪婪匹配"><a href="#贪婪与非贪婪匹配" class="headerlink" title="贪婪与非贪婪匹配"></a>贪婪与非贪婪匹配</h4><p>​    在使用修饰匹配次数的特殊符号时，有几种表示方法可以使同一个表达式能够匹配不同的次数，比如：“{m,n}”, “{m,}”, “?”, “<em>”</em>,<em> “+”</em>，*具体匹配的次数随被匹配的字符串而定。这种重复匹配不定次数的表达式在匹配过程中，总是尽可能多的匹配。</p>
-<p>​    比如，文本 “axxxaxxxa”，”(a)(\w+)“，其中”\w+“会匹配”xxxaxxxa”，”(a)(\w+)(a)“则会匹配”xxxaxxx”。由此可见，”\w+“ 在匹配的时候，总是尽可能多的匹配符合它规则的字符。</p>
-<p>​    虽然第二个举例中，它没有匹配最后一个 “a”，但那也是为了让整个表达式能够匹配成功。同样的，带 ”“ 和 ”{m,n}“ 的表达式都是尽可能地多匹配，带 ”?“ 的表达式在可匹配可不匹配的时候，也是尽可能的<strong>匹配</strong>。这种匹配原则就叫作”贪婪”模式。</p>
-<p>​    非贪婪模式则是指的<strong>在修饰匹配次数的特殊符号后再加上一个 “?” 号</strong>，可以使匹配次数不定的表达式尽可能少的匹配，使可匹配可不匹配的表达式，尽可能的<strong>不匹配</strong>。</p>
-<p>​    这种匹配原则也叫作 “勉强” 模式。如果少匹配就会导致整个表达式匹配失败的时候，与贪婪模式类似，非贪婪模式会最小限度的再匹配一些，以使整个表达式匹配成功。如，文本 “axxxaxxxa” ，“(a)(\w+?)”，其中”\w+“只会匹配一个“x”。</p>
-<h4 id="反向引用"><a href="#反向引用" class="headerlink" title="反向引用"></a>反向引用</h4><p>​    表达式在匹配时，表达式引擎会将小括号 “()” 包含的表达式所匹配到的字符串记录下来。在获取匹配结果的时候，小括号包含的表达式所匹配到的字符串可以单独获取。当用某种边界来查找，而所要获取的内容又不包含边界时，必须使用小括号来指定所要的范围。如：“<div>(.*?)</div>“即获取div标签内部的内容。</p>
-<p>​    这里小括号包含的正则表达式所匹配到的字符串不仅仅是在匹配结束后才可以使用，在匹配过程中也可以使用。表达式后边的部分，可以引用前面括号内的子匹配已经匹配到的字符串。引用方法是 “\” 加上一个数字。”\1” 引用第1对括号内匹配到的字符串，”\2” 引用第2对括号内匹配到的字符串，以此类推，而如果一对括号内包含另一对括号，则外层的括号先排序号。换句话说，哪一对的左括号 “(” 在前，那这一对就先排序号。</p>
-<p>​    例如：表达式 “(‘|’)(.*?)(\1)“ 在匹配 ” ‘Hello’, “World” “ 时，匹配结果是：成功；匹配到的内容是：” ‘Hello’ “。再次匹配下一个时，可以匹配到 ” “World” “。</p>
-<h4 id="预搜索"><a href="#预搜索" class="headerlink" title="预搜索"></a>预搜索</h4><p>​    如前面所讲”^“、”$“、”\b”字符有一个共同点，就是：它们本身不匹配任何字符，只是对 “字符串的两头” 或者 “字符之间的缝隙” 附加了一个条件。同样的，正则中提供了其他基于此原理的机制，来实现预搜索。</p>
-<ul>
-<li><p>正向预搜索：”(?=xxxxx)“，”(?!xxxxx)”</p>
-<p>格式：”(?=xxxxx)“，在被匹配的字符串中，它对所处的 “缝隙” 或者 “两头” 附加的条件是：所在缝隙的右侧，必须能够匹配上xxxxx这部分的表达式，不影响后边的表达式去真正匹配这个缝隙之后的字符。如：“Mac (?=book|air)” 在匹配 “Mac pro, Mac air” 时，将只匹配 “Mac air” 中的 “Mac”。</p>
-<p>格式：“(?!xxxxx)”，所在缝隙的右侧，必须不能匹配 xxxxx 这部分表达式。如：“hello(?!\w)” 在匹配字符串 “hello,helloworld”时，匹配 hello”。这里使用 “(?!\w)” 和使用 “\b” 效果一样。</p>
-</li>
-<li><p>反向预搜索：“(?&lt;=xxxxx)”，“(?&lt;!xxxxx)”</p>
-<p>和正向预搜索类似，反向预搜索要求的条件是：所在缝隙的 “左侧”，两种格式分别要求必须能够匹配和必须不能够匹配指定表达式，而不是去判断右侧。与 “正向预搜索” 一样的是：它们都是对所在缝隙的一种附加条件，本身都不匹配任何字符。</p>
-</li>
-</ul>
-<p>其他通用规则</p>
-<ul>
-<li><p>可以使用 “\xXX” 和 “\uXXXX” 表示一个字符（”X” 表示一个十六进制数）</p>
-</li>
-<li><ul>
-<li>\xXX: 编号在 0-255 范围的字符，如：空格可以使用 “\x20” 表示</li>
-<li>\uXXXX: 任何字符可以使用 “\u” 再加上其编号的4位十六进制数表示，比如：“\u4E2D”</li>
-</ul>
-</li>
-<li><p>在表达式 “\s”，”\d”，”\w”，”\b” 表示特殊意义的同时，对应的大写字母表示相反的意义</p>
-</li>
-<li><ul>
-<li>\S: 匹配所有非空白字符</li>
-<li>\D: 匹配所有的非数字字符</li>
-<li>\W: 匹配所有的字母、数字、下划线以外的字符</li>
-<li>\B: 匹配非单词边界，即左右两边都是 “\w” 范围或者左右两边都不是 “\w” 范围时的字符缝隙</li>
-</ul>
-</li>
-<li><p>括号“()”内的子表达式，如果希望匹配结果不进行记录供以后使用，可以使用 “(?:xxxxx)”格式。如：表达式 “(?:(\w)\1)+” 匹配 “a bbccdd efg” 时，结果是 “bbccdd”。括号 “(?:)” 范围的匹配结果不进行记录，因此 “(\w)” 使用 “\1” 来引用。</p>
-</li>
-<li><p>常用的表达式属性设置包括：Ignorecase、Singleline、Multiline、Global</p>
-</li>
-<li><ul>
-<li>Ignorecase: 默认情况下，表达式中的字母是要区分大小写的。配置为 Ignorecase 可使匹配时不区分大小写。有的表达式引擎，把 “大小写” 概念延伸至 UNICODE 范围的大小写。</li>
-<li>Singleline: 默认情况下，小数点 “.” 匹配除了换行符（\n）以外的字符。配置为Singleline可使小数点可匹配包括换行符在内的所有字符。</li>
-<li>Multiline: 默认情况下，表达式 “^” 和 “$” 只匹配字符串的开始1和结尾4位置。如：1xxxxxxxxx2\n 3xxxxxxxxx4</li>
-</ul>
-</li>
-</ul>
-<p>配置为 Multiline 可以使 “^” 匹配1外，还可以匹配换行符之后，下一行开始前3的位置，”$“ 匹配4外，还可以匹配换行符之前，一行结束2的位置。使用(?m)可以设置为Multiline模式。如”(?m)^\n +“。</p>
-<ul>
-<li>Global: 主要在将表达式用来替换时起作用，配置为Global表示替换所有的匹配。</li>
-</ul>
-<h4 id="提示"><a href="#提示" class="headerlink" title="提示"></a>提示</h4><ul>
-<li>如果要求表达式所匹配的内容是整个字符串，而不是其中的一部分，可以在表达式的首尾使用 “^” 和 ““ 要求整个字符串只有数字。</li>
-<li>如果要求匹配的内容是一个完整的单词，而不会是单词的一部分，那么在表达式首尾使用 “\b”，如：使用 “\b(if|while|…)\b” 来匹配程序中的关键字。</li>
-<li>表达式不要匹配空字符串。否则会一直得到匹配成功，而结果什么都没有匹配到。</li>
-<li>能匹配空字符串的子匹配不要循环无限次。如果括号内的子表达式中的每一部分都可以匹配0次，而这个括号整体又可以匹配无限次，那么匹配过程中可能死循环。</li>
-<li>“|” 的左右两边，对某个字符应该只有一边可以匹配，以防止”|“两边的表达式因为交换位置而有所不同。</li>
-<li>要合理选择贪婪模式与非贪婪模式，如. 与 <em>.</em>?的区别使用。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2398,7 +2349,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">157</span>
+                    <span class="site-state-item-count">158</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2728,7 +2679,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">122</span>
+                      
+                    
+                    <span class="site-state-item-count">123</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

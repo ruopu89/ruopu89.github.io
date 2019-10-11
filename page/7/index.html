@@ -350,6 +350,169 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB监控/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/11/MongoDB监控/" itemprop="url">
+                  MongoDB监控
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-11 16:03:28 / 修改時間：16:14:06" itemprop="dateCreated datePublished" datetime="2019-03-11T16:03:28+08:00">2019-03-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MongoDB/" itemprop="url" rel="index"><span itemprop="name">MongoDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>在你已经安装部署并允许MongoDB服务后，你必须要了解MongoDB的运行情况，并查看MongoDB的性能。这样在大流量得情况下可以很好的应对并保证MongoDB正常运作。</p>
+<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
+</blockquote>
+<h3 id="mongostat命令"><a href="#mongostat命令" class="headerlink" title="mongostat命令"></a>mongostat命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongostat -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">insert query update delete getmore command % dirty % used flushes  vsize   res qr|qw ar|aw netIn netOut conn       set repl                      time</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:14+08:00</span><br><span class="line">    *0    *0     *0     *0       0     1|0     0.0    0.0       0 801.0M 52.0M   0|0   0|0   79b    19k    3 hqmongodb  PRI 2019-03-11T16:06:15+08:00</span><br><span class="line">......</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</span></span><br></pre></td></tr></table></figure>
+<h3 id="mongotop命令"><a href="#mongotop命令" class="headerlink" title="mongotop命令"></a>mongotop命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# mongotop -u system -p centos --authenticationDatabase admin -h 192.168.251.134:27017</span><br><span class="line">2019-03-11T16:08:02.818+0800	connected to: 192.168.251.134:27017</span><br><span class="line"></span><br><span class="line">                    ns    total    read    write    2019-03-11T16:08:03+08:00</span><br><span class="line">        local.oplog.rs      1ms     1ms      0ms                             </span><br><span class="line">    admin.system.roles      0ms     0ms      0ms                             </span><br><span class="line">    admin.system.users      0ms     0ms      0ms                             </span><br><span class="line">  admin.system.version      0ms     0ms      0ms                             </span><br><span class="line">              local.me      0ms     0ms      0ms                             </span><br><span class="line">local.replset.election      0ms     0ms      0ms                             </span><br><span class="line">local.replset.minvalid      0ms     0ms      0ms                             </span><br><span class="line">     local.startup_log      0ms     0ms      0ms                             </span><br><span class="line">  local.system.replset      0ms     0ms      0ms                             </span><br><span class="line">        runoob.article      0ms     0ms      0ms</span><br><span class="line"><span class="meta">#</span><span class="bash"> mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看那些花费在读取和写入数据的大量时间的操作。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ns：包含数据库命名空间，后者结合了数据库名称和集合。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> total：mongod花费的时间工作在这个命名空间提供总额。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">read</span>：mongod在此命名空间花费在执行读操作的时间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> write：提供这个命名空间进行写操作的时间。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/MongoDB备份与恢复/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2134,169 +2297,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/05/CentOS优化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/05/CentOS优化/" itemprop="url">
-                  CentOS优化
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-05 11:29:58 / 修改時間：13:02:35" itemprop="dateCreated datePublished" datetime="2019-03-05T11:29:58+08:00">2019-03-05</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="文件句柄数"><a href="#文件句柄数" class="headerlink" title="文件句柄数"></a>文件句柄数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">* 临时调整</span><br><span class="line">[root@template ~]# ulimit -n</span><br><span class="line">1024</span><br><span class="line">[root@template ~]# ulimit -n 65535</span><br><span class="line">[root@template ~]# ulimit -n</span><br><span class="line">65535</span><br><span class="line"></span><br><span class="line">* 永久生效</span><br><span class="line">[root@template ~]# vim /etc/security/limits.conf</span><br><span class="line">*       soft    nofile          65535</span><br><span class="line">*       hard    nofile          65535</span><br></pre></td></tr></table></figure>
-<h3 id="调整历史记录及连接超时"><a href="#调整历史记录及连接超时" class="headerlink" title="调整历史记录及连接超时"></a>调整历史记录及连接超时</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# vim /etc/bashrc</span><br><span class="line">HISTFILESIZE=4000</span><br><span class="line">HISTSIZE=4000</span><br><span class="line">HISTTIMEFORMAT='%F %T '</span><br><span class="line">export HISTTIMEFORMAT</span><br><span class="line"><span class="meta">#</span> 添加上面四行。HISTFILESIZE定义了.bash_history中保存命令的总数，默认是1000，这里改成了4000，HISTSIZE设置了history命令输出最多的记录总数，HISTTIMEFORMAT定了时间显示格式。</span><br><span class="line"><span class="meta">#</span>以前的操作记录都会显示更改/etc/bashrc文件的时间，而不是真正的操作时间，只有更改完/etc/bashrc以后的操作记录会显示正确的时间</span><br><span class="line">export TMOUT=10</span><br><span class="line"><span class="meta">#</span> 置连接会话的超时时间</span><br></pre></td></tr></table></figure>
-<h3 id="同步时间"><a href="#同步时间" class="headerlink" title="同步时间"></a>同步时间</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">* 查看时区</span><br><span class="line">[root@template ~]# cat /etc/sysconfig/clock </span><br><span class="line">ZONE="Asia/Shanghai"</span><br><span class="line"></span><br><span class="line">* 同步时间</span><br><span class="line">[root@template ~]# ntpdate cn.pool.ntp.org</span><br><span class="line">[root@template ~]#crontab -e</span><br><span class="line">0 10 * * * /usr/sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure>
-<h3 id="调整yum源"><a href="#调整yum源" class="headerlink" title="调整yum源"></a>调整yum源</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp CentOS-Base.repo&#123;,.$(date +%F)&#125;</span><br><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br></pre></td></tr></table></figure>
-<h3 id="更改SSH服务端远程登录的配置"><a href="#更改SSH服务端远程登录的配置" class="headerlink" title="更改SSH服务端远程登录的配置"></a>更改SSH服务端远程登录的配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# cp /etc/ssh/sshd_config&#123;,.bak&#125;</span><br><span class="line">[root@template ~]# vim /etc/ssh/sshd_config</span><br><span class="line">Port 52113           </span><br><span class="line"><span class="meta">#</span> ssh连接默认的端口</span><br><span class="line">PermitRootLogin no   </span><br><span class="line"><span class="meta">#</span> 禁止root登录</span><br><span class="line">PermitEmptyPasswords no </span><br><span class="line"><span class="meta">#</span> 禁止空密码登录，此项默认就是no</span><br><span class="line">UseDNS no            </span><br><span class="line"><span class="meta">#</span> 不使用DNS解析地址</span><br><span class="line">[root@template ~]# /etc/init.d/sshd restart</span><br></pre></td></tr></table></figure>
-<h3 id="锁定关键系统文件"><a href="#锁定关键系统文件" class="headerlink" title="锁定关键系统文件"></a>锁定关键系统文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@template ~]# chattr +i /etc/passwd /etc/inittab /etc/group /etc/shadow /etc/gshadow</span><br><span class="line"><span class="meta">#</span> attr命令用于改变文件属性，i选项表示不得任意更动文件或目录。这时创建用户或组的命令执行也会失败。</span><br><span class="line">[root@template ~]# ll /etc/gshadow</span><br><span class="line">---------- 1 root root 631 1月  18 18:38 /etc/gshadow</span><br><span class="line">[root@template ~]# ll /etc/shadow</span><br><span class="line">---------- 1 root root 1259 1月  18 18:40 /etc/shadow</span><br><span class="line">[root@template ~]# chattr -i /etc/shadow</span><br><span class="line"><span class="meta">#</span> 使用-i可以解锁</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2344,7 +2344,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">157</span>
+                    <span class="site-state-item-count">158</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2674,7 +2674,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">122</span>
+                      
+                    
+                    <span class="site-state-item-count">123</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
