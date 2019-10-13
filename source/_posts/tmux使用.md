@@ -28,12 +28,12 @@ categories: 基础
 #### 新建会话
 
 ```shell
- ⚡ root@ruopu64  ~  tmux
+⚡ root@ruopu64  ~  tmux
  # 新建会话后，在屏幕的下方会有提示，如："[0] 0:zsh*        "test" 13:51 02-4月-19"
-  ⚡ root@ruopu64  ~  exit
-  # 退出会话
-   ⚡ root@ruopu64  ~  tmux new -s abc
-   # 创建一个叫做abc的会话，提示信息："[abc] 0:zsh*      "test" 13:53 02-4月-19"
+⚡ root@ruopu64  ~  exit
+# 退出会话
+⚡ root@ruopu64  ~  tmux new -s abc
+# 创建一个叫做abc的会话，提示信息："[abc] 0:zsh*      "test" 13:53 02-4月-19"
 ```
 
 
@@ -51,10 +51,21 @@ categories: 基础
 #### 进入断开的会话
 
 ```shell
- ✘ ⚡ root@ruopu64  ~  tmux a -t abc
- # 进入名称为abc的会话
-  ⚡ root@ruopu64  ~  tmux attach-session
-  # 进入第一个会话，可以将attach-session简写为a或at
+⚡ root@ruopu64  ~  tmux a -t abc
+# 进入名称为abc的会话
+⚡ root@ruopu64  ~  tmux attach-session
+# 进入第一个会话，可以将attach-session简写为a或at
+```
+
+
+
+### 启用鼠标滚动
+
+```shell
+1. 先按ctrl+B
+2. set -g mouse on
+# 这时就启用对所有窗口的鼠标滚动了，但不能选中文本进行复制粘贴
+3. 按住shift再点击鼠标右键，这时就可以看到复制粘贴了，也可以选中文本了
 ```
 
 
