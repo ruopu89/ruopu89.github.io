@@ -11,6 +11,14 @@ categories: python
 
 建议使用3.5以上版本。开发环境使用pyenv，可以管理python解释器、管理python版本、管理python的虚拟环境。可以使多版本共存。pyenv是一个虚拟环境。也有其他的环境可以实现。
 
+pyenv 是 Python 版本管理工具。 pyenv 可以改变全局的 Python 版本，安装多个版本的 Python， 设置目录级别的 Python 版本，还能创建和管理 virtual python environments 。所有的设置都是用户级别的操作，不需要 sudo 命令。
+
+pyenv 主要用来管理 Python 的版本，比如一个项目需要 Python 2.x ，一个项目需要 Python 3.x 。 而 virtualenv 主要用来管理 Python 包的依赖，不同项目需要依赖的包版本不同，则需要使用虚拟环境。
+
+pyenv 通过系统修改环境变量来实现 Python 不同版本的切换。而 virtualenv 通过将 Python 包安装到一个目录来作为 Python 包虚拟环境，通过切换目录来实现不同包环境间的切换。
+
+pyenv 的美好之处在于，它并没有使用将不同的PATH植入不同的shell这种高耦合的工作方式，而是简单地在PATH 的最前面插入了一个垫片路径（shims）：~/.pyenv/shims:/usr/local/bin:/usr/bin:/bin。所有对 Python 可执行文件的查找都会首先被这个 shims 路径截获，从而使后方的系统路径失效。
+
 ## 测试安装
 
 使用CentOS6.5-64
@@ -28,6 +36,7 @@ yum update nss
 # 更新此包，如果不更新此包，在安装pyenv时可能会报错，提示“curl:(35) SSL connect error”
 yum install gcc make patch gdbm-devel openssl-devel sqlite-devel readline-devel zlib-devel bzip2-devel
 # 这是pyenv在安装python时要用到的包，pyenv是就地编译的，在编译时要用到这些包。
+# ubuntu19.04需要安装的包:build-essential python-dev python-setuptools python-pip python-smbus libncurses5-dev libgdbm-dev libc6-dev zlib1g-dev libsqlite3-dev tk-dev libssl-dev openssl libffi-dev
 useradd python
 passwd python
 su - python
@@ -38,7 +47,7 @@ curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer 
 vim ~/.bash_profile
     export PATH="/home/python/.pyenv/bin:$PATH"
     eval "$(pyenv init -)"	
-# 初始化pyenv这个工具
+# 初始化pyenv这个工具，初始化后就可以自动补全了
     eval "$(pyenv virtualenv-init -)"	
 # 初始化virtualenv这个插件，因为开发都用虚拟环境
 # eval会对后面的cmdLine进行两遍扫描，如果在第一遍扫面后cmdLine是一个普通命令，则执行此命令；如果cmdLine中含有变量的间接引用，则保证简介引用的语义。
@@ -51,14 +60,14 @@ pyenv
 pyenv install -l
 # 列出可用的python版本
 pyenv install 3.5.3 -v
-# 安装python3.5.3版本，并输出详细信息。但连接非常慢
+# 安装python3.5.3版本，并输出详细信息。但连接非常慢。如果提示"No module named '_ctypes'"，那么需要安装libffi-devel
 cd ~/.pyenv
 ll
 # 这里是python家目录下的.pyenv目录，里面有上面刚安装过的插件
 mkdir cache
 # 在.pyenv目录中创建一个目录，下面准备使用离线安装的方式。
 cd cache
-将python-3.5.3.tar.xz、python-3.5.3.tgz三个文件放入cache目录中。这三个文件是在安装过程中可能依赖的包，下载地址：https://www.python.org/ftp/python/3.5.3/
+将python-3.5.3.tar.xz、python-3.5.3.tgz两个文件放入cache目录中。这两个文件是在安装过程中可能依赖的包，下载地址：https://www.python.org/ftp/python/3.5.3/
 cd ..
 pyenv install 3.5.3 -v
 # 在cache上一层目录执行安装
@@ -128,6 +137,8 @@ python -V
 # 这里有一个问题，这个版本是大家共用的
 ```
 
+
+
 ## 虚拟环境
 
 ```shell
@@ -145,7 +156,7 @@ cd test
 cd ..
 # 到上一级目录就不会有(my353)
 cd test
-# 这时就有了(my353)
+# 这时就有了(my353)，使用python -V命令可以看到这里的Python版本是3.5.3了
 cd
 # 到家目录
 cd .pyenv
@@ -175,6 +186,8 @@ vim pip.conf
     index-url=https://mirrors.aliyun.com/pypi/simple/
     trusted-host=mirrors.aliyun.com
 # 这一步主要是为了使用pip的国内镜像
+# 在使用 pyenv 之后使用 pip 安装的第三方模块会自动安装到当前使用 python 版本下，不会和系
+# 统模块产生冲突。使用 pip 安装模块之后，如果没有生效，记得使用 pyenv rehash 来更新垫片路径。
 pip
 # 提示找不到此命令，因为使用了pyenv管理这个版本，而目前的版本是system，system默认是没有安装pip命令的
 cd
@@ -182,11 +195,14 @@ cd magedu/projects/test
 pip
 # 现在是3.5.3版本，这里是有pip命令的
 pip install ipython
-# pip就是python install packge，也就是安装包的缩写，pip是安装的管理器，与yum相似。ipython是一个与python交互的工具
+# 在虚拟环境中用pip安装ipython，只有到虚拟环境中才能使用ipython。pip就是python install packge，也就是安装包的缩写，pip是安装的管理器，与yum相似。ipython是一个与python交互的工具
 pip install --upgrade pip
-# 上一步执行完会提示要升级pip
+# 上一步执行完会提示要先升级pip，之后才能安装ipython
 ipython
 # 提示没有ipython命令，再登录一下就可以使用了
+# ubuntu19.04安装时还是会有提示"No module named '_ctypes'"，那么需要安装下列包
+# sudo apt install build-essential python-dev python-setuptools python-pip python-smbus libncurses5-dev libgdbm-dev libc6-dev zlib1g-dev libsqlite3-dev tk-dev libssl-dev openssl libffi-dev
+# 这里有一个问题，就是上面这些包要在安装python版本包之前安装，不然就要用pyenv uninstall 3.8.0先卸载安装的版本，再重新安装了。实际是重新编译安装python版本包，不然还会报错
 pip install jupyter
 # 这是一个可视化界面
 cd

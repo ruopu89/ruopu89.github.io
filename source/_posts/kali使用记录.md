@@ -10,9 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch
-preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution
-tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -34,6 +32,9 @@ tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon
 # Netspeed是拥有GUI界面实时显示网速的工具，未测试
 # sudo add-apt-repository ppa:ferramroberto/linuxfreedomlucid && sudo apt-get update 
 # 添加源：sudo apt-get install netspeed
+# gufw为ufw防火墙的图形界面。Uncomplicated FireWall，是 debian 系发行版中为了轻量化配置
+# iptables 而开发的一款工具。使用本机及本机中的虚拟机测试不出防火墙的效果，使用其他主机可以。原因是虚拟
+# 机使用了NAT联网的方式
 ```
 
 
@@ -67,8 +68,17 @@ chsh -s /bin/zsh
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
 # 安装oh-my-zsh，前提是要先安装过git
 vim ~/.zshrc
+export ZSH="/home/shouyu/.oh-my-zsh"
 ZSH_THEME="agnoster"
 # 修改为这个主题，个人喜欢
+export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/opt/electron-ssr:/usr/local/bin:/usr/local/sbin:/usr/local/jdk1.8/jdk1.8.0_211/bin/:/home/shouyu/anaconda3/bin
+setopt no_nomatch
+if [[ -r /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh ]];then
+    source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
+fi
+plugins=(git)
+source $ZSH/oh-my-zsh.sh
+
 source .zshrc
 # 加载文件生效
 ls ~/.oh-my-zsh
@@ -822,6 +832,39 @@ apt install xfce4 xfce4-goodies kali-desktop-xfce
 
 
 
+#### KVM安装
+
+```shell
+apt install  libvirt-daemon-system  libvirt-daemon qemu-kvm qemu virt-manager virt-viewer bridge-utils virtinst
+# qemu-kvm：QEMU在KVM中主要用于虚拟化IO设备，CPU和内存虚拟化调用KVM内核模块加速实现。
+# libvirt-daemon-system, libvirt-daemon：libvirt库提供虚拟机操作接口，用于控制和管理各类虚拟机。
+# 安装virtinst包，提供一整套虚拟机命令行管理工具，包括安装、克隆等命令。如virt-install, virt-clone, virsh
+# virt-manager,virt-viewer：图形化管理工具
+systemctl enable libvirtd
+systemctl start libvirtd
+systemctl status libvirtd
+sudo virt-manager
+# 直接运行virt-manager有问题，无法创建虚拟机。如果使用root用户运行virt-manager提示"Unable to init server"，可能是root用户或sudo时执行图形化应用程序时出现，无法连接到X server显示界面，解决方法如下：
+# export DISPLAY=":0"
+# xhost +
+# virt-manager
+```
+
+
+
+#### samba图形配置工具
+
+```shell
+下载地址：https://packages.ubuntu.com/xenial/system-config-samba
+system-config-samba
+# 启动时可能会提示: could not open configuration file `/etc/libuser.conf'
+sudo touch /etc/libuser.conf
+# 手动添加这个配置文件
+# 参考：https://www.linuxidc.com/Linux/2018-01/150493.htm
+```
+
+
+
 ### 设置方法
 
 #### apt源
@@ -883,6 +926,17 @@ apt update
 
 
 
+#### 开启bbr（tcp拥塞控制）
+
+```shell
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+sysctl -p 
+lsmod | grep bbr  #检查是否有tcp_bbr
+```
+
+
+
 #### vim设置
 
 ```shell
@@ -914,16 +968,20 @@ set incsearch
 # 输入搜索模式时，每输入一个字符，就自动跳到第一个匹配的结果。
 set ignorecase
 # 搜索时忽略大小写。
-colorscheme slate 即使加载时报错，也要加入此行
+colorscheme slate # 即使加载时报错，也要加入此行
 # 调整配色方案，还有default、blue、darkblue、delek、desert、elflord、evening、industry、koehler、morning、murphy、pablo、peachpuff、ron、shine、slate、torte、zellner
 highlight StatusLine guifg=SlateBlue guibg=Yellow 
 highlight StatusLineNC guifg=Gray guibg=White
 # 状态行颜色，不使用
 set tabstop=4 
-＃ 制表符为4
+# 制表符为4
 set softtabstop=4 
 set shiftwidth=4
-＃ 统一缩进为4 
+# 统一缩进为4
+set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
+set laststatus=2
+set t_Co=256
+
 # 创建.vimrc文件后就可以在命令行中使用鼠标右键了，这是抵消了/etc/vimrc文件中的设置。
 
 vim命令粘贴带数字或符号的信息时格式混乱解决
@@ -991,6 +1049,14 @@ chmod +x fstrim.sh
 crontab -e
     0 9 * * * /bin/bash /root/sh/fstrim.sh
 # 每天9点定时执行
+```
+
+
+
+#### 修改默认编辑器
+
+```shell
+sudo update-alternatives --config editor
 ```
 
 
@@ -1576,9 +1642,10 @@ gpg --export --armor  9165938D90FDDD2E | sudo apt-key add -
 直接无法启动，没有反应
  vim /usr/share/applications/netease-cloud-music.desktop
     ...
-    Exec=netease-cloud-music --no-sandbox %U
+    # Exec=netease-cloud-music --no-sandbox %U
+    Exec=sh -c "unset SESSION_MANAGER && netease-cloud-music %U"
     ...
-# 修改上面一行的设置
+# 修改上面一行的设置为sh -c ...一行的样子
 如果上面的设置不起作用，就需要使用sudo启动软件了
 sudo netease-cloud-music
 
@@ -1698,7 +1765,8 @@ VBoxManage setextradata "macosx" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRe
 #### VirtualBox虚拟机挂载宿主机U盘
 
 ```shell
-1. 下载扩展插件，地址：http://download.virtualbox.org/virtualbox/5.2.32/。因为ubuntu18.04默认安装的是5.2.32版本所以下载这个插件
+1. 下载扩展插件，地址：http://download.virtualbox.org/virtualbox/5.2.32/。因为ubuntu18.04默认安装的是5.2.32版本所以下载这个插件Oracle_VM_VirtualBox_Extension_Pack-5.2.20-125813.vbox-extpack。
+# 6.0使用的插件：Oracle_VM_VirtualBox_Extension_Pack-6.0.0_RC1.vbox-extpack
 2. 到VirtualBox的全局设置中的扩展中加载这个插件
 3. 创建usbfs组
 sudo groupadd usbfs

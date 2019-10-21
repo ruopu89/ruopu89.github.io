@@ -239,6 +239,8 @@ virsh snapshot-list C7
 # 查看C7域的快照
 virsh snapshot-current C7
 # 查看当前虚拟机镜像快照的版本
+virsh snapshot-create-as C7 centos_install_ftp
+# 为虚拟机C7创建快照，快照名称为centos_install_ftp
 
 * 恢复虚拟机快照
 # 恢复虚拟机快照必须关闭虚拟机。
