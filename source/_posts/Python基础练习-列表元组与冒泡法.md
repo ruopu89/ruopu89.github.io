@@ -12,7 +12,7 @@ categories: python
    示例，最笨拙的方法。从小到大排列，i1最小，i3最大
 ===============================================
 nums = []
-
+# 需要先定义出nums这个变量，不然会提示"nums not deni"
 for i in range(3):
     nums.append(int(input('{}:'.format(i))))
 # '{}:'是取其后面format()中变量的值，这时format中是i，'{}:'是显示的提示信息，
@@ -116,7 +116,7 @@ while True:
 # 打印出最后一个元素后就退出循环
 
 ==============
-     列表sort实现
+  列表sort实现
 ==============
 nums = []
 

@@ -13,7 +13,7 @@ print('*'*n)    # 打印第一行
 for i in ('*'*(n-2)):     # 设置循环为减去上下两条边的数量
     print('*'+' '*(n-2)+'*')    
     # 先打印前面一个星号，再打印减去了前后两个星号的空格，最后打印最后一个星号
-print('*'*n)    # 打印最下面一行
+print('*'*n)    # 打印最下面一行的*
 
 n = 6
 e = -n//2
@@ -158,7 +158,8 @@ for i in range(1,10):
     for j in range(1,10):
         if j <= i:
             print(j,"*",i,"=",i*j,end=" ")
-    print(" ")
+    print(" ")   
+    # 循环完一小轮之后要打印一个空行
 1 * 1 = 1  
 1 * 2 = 2 2 * 2 = 4  
 1 * 3 = 3 2 * 3 = 6 3 * 3 = 9  
@@ -191,7 +192,8 @@ for i in range(1,10):
 方法三：
 for i in range(1,10):
     for k in range(1,i):
-        print(end="\t ")    # 这行就是为了打印前面的空行的
+        print(end="\t ")    
+        # 这行就是为了打印前面的空行的，这里需要一个Tab键加一个空格键才能让输出对齐
     for j in range(i,10):
         print('{}x{}={}\t'.format(i, j, i*j), end=' ')
     print("")
@@ -212,8 +214,9 @@ for i in range(1,10):
     for k in range(1,10-i):
         print(end="\t ")            # 打印每一行前面的Tab键，第一行就要打印9个
     for j in range(1,i+1):
-        print("{}*{}={}\t".format(i,j,i*j), end=" ")
-    print ("")
+        print("{}*{}={}".format(i,j,i*j), end="\t ")
+        # \t放在end=""中好像更容易理解
+    print("")
 
 	 	 	 	 	 	 	 	 1*1=1	 
 	 	 	 	 	 	 	 2*1=2	 2*2=4	 
@@ -228,8 +231,9 @@ for i in range(1,10):
 方法五：
 for i in range(1,10):
     for j in range(1,i+1):
-        print('{}*{}={}\t'.format(i,j,i*j), end="")
-    print (" ")
+        print('{}*{}={}'.format(i,j,i*j), end="")
+    # 这种把算式打印在前面，之后再加分隔符的方法中，分隔符使用什么都可以，可以是空格或Tab键或什么也不加
+    print()
 1*1=1	 
 2*1=2	2*2=4	 
 3*1=3	3*2=6	3*3=9	 
@@ -280,7 +284,7 @@ while True:
     # 这里的index就是显示中前面的序号
     if index == 101:
         break
-
+        
 # 只打印第101项
 a=0
 b=1
@@ -294,6 +298,19 @@ for i in range(1,101):
         continue
     print(c)
     # 打印一定要放在最后，因为如果放在c = a + b下方，那么就无法将if判断加入进去了
+    
+a = 0
+b = 1
+# print('{},{}'.format(0,a))
+# print('{},{}'.format(1,b))
+index = 1
+while True:
+    c = a + b
+    a,b = b,c
+    index += 1
+    if index == 101:
+        print('{},{}'.format(index,c))
+        break
 ```
 
 
@@ -356,6 +373,7 @@ for x in range(3,100001,2):
     else:
         count += 1
         t.append(x)
+# 这个else是for语句的，当x可以整除i时，就跳出循环，否则就在count中加一个计数，并将x回到t列表中
 print(t)
 print('花费时间: {}'.format(time.time() - t0))
 print('质数个数: {}'.format(count))
@@ -404,7 +422,7 @@ for i in range(-3,4):
     
 # 三目运算符方法
 for i in range(-3,4):
-    prespace=-i if (i < 0) else i
+    prespace=-i if i < 0 else i
     # 这里不能写成prespace=-i if (i < 0) else prespace=i，这样会报语法错误。
     print(' '*prespace+'*'*(7-prespace*2))
 ```
@@ -553,25 +571,24 @@ n = 6
 oldline = []        
 # oldline就是为了凑每行的[1]和1之后的部分
 newline = [1]
-length = 0
+# length = 0
 print(newline)      
 # 先打印出第一行的[1]
 for i in range(1,n):        
 # 这里会循环1-5
     oldline = newline.copy()
-# 这是浅拷贝。先把每行的第一个1凑出来。第二次循环时，这里的oldline就变成了[1,1]
+# 这是浅拷贝。先把每行的第一个1凑出来。第二次循环时，这里的oldline就会复制成了[1,1]，因为newline变了
     oldline.append(0)
-# 尾部加0,相当于两端加0，这时的oldline是[1,0]
+# 尾部加0，这时的oldline是[1,0]，向oldline中追加0是为了下面计算各元素的值
     newline.clear()     
 # 清空newline，这时的newline是[]
     offset = 0
-    while offset <= i:
+    while offset <= i:  # 满足条件进入循环，这里计算的是从第二行开始的数据
         newline.append(oldline[offset - 1] + oldline[offset])
-# 这里开始凑每行中的所有内容，第一次i是1,offset是0,oldline[0-1] + oldline[0]，这时oldline[-1]
-# 是0,oldline[0]是1，这两个数相加也就是[1],下面offset自增加1,因为offset和i都是1,所以还会进一次循
-# 环，newline现在是[1]，oldline[1-1] + oldline[1]，这时oldline[0]是1,oldline[1]是0，这两个数
-# 相加也是[1]，追加到newline这个空列表中，这时newline是[1,1]。之后offset再增加1,这时offset大于
-# i，退出循环。最后就打印出了第二行的[1,1]
+# 这里开始凑每行中的所有内容，第一次i是1，offset是0，oldline[0-1] + oldline[0]，这时oldline[-1]
+# 是0，oldline[0]是1，这两个数相加也就是[1]，把[1]追加到newline中，下面offset自增加1，因为offset
+# 和i都是1，所以还会进一次循环，newline现在是[1]，oldline[1-1] + oldline[1]，这时oldline[0]是1，oldline[1]是0，这两个数相加也是[1]，追加到newline这个列表中，这时newline是[1,1]。之后offset
+# 再增加1，这时offset大于i，退出循环。最后就打印出了第二行的[1,1]
         offset += 1
     print(newline)
     
@@ -581,7 +598,7 @@ for i in range(1,n):
 n = 6
 oldline = []
 newline = [1]
-length = 0
+# length = 0
 print(newline)
 for i in range(1,n):
     oldline = newline.copy()
@@ -597,7 +614,7 @@ for i in range(1,n):
 
 ======================================================================================
 # 如何比较两段代码的效率？效率一是看时间，一是看进入循环的次数
-# 算质数-1
+# 算10以内的质数-1
 import datetime         
 # 要装载这个模块
 n = 100000
@@ -663,6 +680,9 @@ print(delta)
 # 列表解析式
 # 循环迭代
 # 能不能少算一半的数字
+# 思路：先开辟新列表，把列表中元素的个数先定下来，之后再改。下面计算包括中间点向左部分的数字，
+# 也就是range(1,i//2+1)，之后每计算出中间点向左部分的数字时，都会用if判断语句在反方向相对应的位置加入
+# 相同的一个数字。最后修改的是中间部分的数字。
 triangle = []
 n = 6
 for i in range(n):      
@@ -670,22 +690,27 @@ for i in range(n):
     row = [1]       
 # 开始的1
     for k in range(i):      
-# 当i是0的时候，不会执行其下面的语句，因为k是空。中间填0,尾部填1
+# 当i是0的时候，不会执行for k in循环下面的语句，因为k是空。
         row.append(1) if k == i-1 else row.append(0)
-# 如果k等于i-1，那么就向row后追加1,否则就追加0
+# 如果k等于i-1，那么就向row后追加1，否则就追加0。上面这条语句是在中间填0，尾部填1
     triangle.append(row)        
-# 第一次因为i是0,所以直接到这里，将row插入到triangle列表中，之后到下面的命令，返回到循环的首部。第
-# 二次因为i是1,所以执行上面循环的语句，向row中插入1,row变成了[1,1]
+# 第一次因为i是0，所以直接到这里，将row插入到triangle列表中，之后到下面的语句，当i为0时跳出此轮循环，
+# 返回到循环的首部。第二次因为i是1，所以执行上面循环的语句，向row中插入1，row变成了[1,1]
     if i == 0:
         continue
     for j in range(1,i//2+1):       
-# 当i是1时，这里是for j in range(1,1)，因为是range(1,1)所以不会向下执行。i=2第三行才能进来
+# 当i是1时，这里是for j in range(1,1)，因为是range(1,1)所以不会向下执行。i=2时，也就是计算到第三行
+# 才能进来。这是少算一半数字吗？只算中点以前的数字，然后根据结果追加数字，在中间点的数字前或后，所以这里
+# 要除2再加1，因为是前包后不包，所以要加1
+# 当i是4时，这里循环两次，j是1时，triangle[3][0] + triangle[3][1]，就是[1,3,3,1]，可以算出左半边
+# 的4，下面把row[1]=4，这时row是[1,4,1,1,1]，再向下执行到if语句时，会在反方向对应的位置加入相同的数
+# 字，也就成了[1,4,1,4,1]，j是2时，triangle[3][1]+triangle[3][2]，就是[1,3,3,1]中的3加3，也就
+# 是中间的数字6被计算出来了。
         val = triangle[i-1][j-1] + triangle[i-1][j]
         row[j] = val
-# i为2,j为0 1 2,循环1次
-# i为3，j为0 1 2 3,循环1次
-# i为4,j为0 1 2 3 4,循环2次
-        if i != 2*j:
+        if i != 2*j:   
+# 条件满足，修改中点以后数据的值，从后向前数，偶数行都会满足这里的条件，或者说，每行中前后两个数字能有对
+# 称的，都会满足这里的条件，只有计算到奇数的中间点数字时，不能满足这里的条件
             row[-j-1] = val
 print(triangle)
 # 这个方法就是先将一列计算出来，中间部分先用数字填充，最后再一个一个修改中间的数字。
@@ -702,7 +727,7 @@ for i in range(n):
         val = triangle[i-1][j-1] + triangle[i-1][j]
         row[j] = val
         if i != 2*j:        
-# 奇数个数的中点跳过
+# 奇数个数的中间点数字跳过，也就是只有计算偶数行时才会进入这里，因为计算奇数行时，i一定是一个偶数
             row[-j-1] = val
 print(triangle)
 ```

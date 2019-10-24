@@ -10,7 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -35,6 +35,7 @@ sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfet
 # gufw为ufw防火墙的图形界面。Uncomplicated FireWall，是 debian 系发行版中为了轻量化配置
 # iptables 而开发的一款工具。使用本机及本机中的虚拟机测试不出防火墙的效果，使用其他主机可以。原因是虚拟
 # 机使用了NAT联网的方式
+# fish是一个命令行提示工具，安装后，要运行fish到一个新的shell中才能使用其功能。源：apt-add-repository ppa:fish-shell/release-2
 ```
 
 
@@ -67,6 +68,13 @@ chsh -s /bin/zsh
 重启系统用户shell生效
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
 # 安装oh-my-zsh，前提是要先安装过git
+
+***下面是安装历史命令提示功能***
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+***语法高亮功能***
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
 vim ~/.zshrc
 export ZSH="/home/shouyu/.oh-my-zsh"
 ZSH_THEME="agnoster"
@@ -76,7 +84,7 @@ setopt no_nomatch
 if [[ -r /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh ]];then
     source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
 fi
-plugins=(git)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 source .zshrc
@@ -1022,6 +1030,69 @@ StartupNotify=false
 
 
 
+### 设置桥接
+
+```shell
+# 目前有五种方法。因为需要锐捷客户端拨号上网，所以这里只测试通过nm-connection-editor连接成功。或者说，在测试nm-connection-editor才反应过来这里的问题。
+
+1. nmcli
+# 参考：https://www.zcfy.cc/article/how-to-add-network-bridge-with-nmcli-networkmanager-on-linux
+nmcli con show
+nmcli connection show --active
+# 取当前连接状态
+nmcli con add ifname br0 type bridge con-name br0 
+nmcli con add type bridge-slave ifname eno1 master br0 
+nmcli connection show
+# 添加新的br0网桥
+nmcli con down "Wired connection 1"
+# 先关闭网卡
+nmcli con up br0
+# 打开 br0
+sudo nmcli con modify br0 bridge.stp no   
+# 是不是这里改成yes就开启stp了，stp是生成树协议 
+nmcli con show 
+nmcli -f bridge con show br0
+# 禁用 STP
+
+2. brctl
+参考：https://www.cnblogs.com/yinzhengjie/p/7446226.html
+# 这种方法显得更简单，但连接后br0可以分配到地址，也可以ping通网关。但不能ping能DNS，如114
+brctl addbr br0       #创建一个名称为"br0"的网卡
+ifconfig eth0 0 up     #将需要桥接的网卡IP清空
+brctl addif br0 eth0                       #在"br0"上添加"eth0"；
+ifconfig  br0 192.168.16.107/24 up        #给"br0"配置IP；
+route add default gw 192.168.16.1        #设置默认的网关地址；
+brctl stp br0 on        # 开启stp服务
+
+3. 修改/etc/netplan/50-cloud-init.yaml
+network:
+  version: 2
+  ethernets:
+    enp1s0:
+      dhcp4: no
+      dhcp6: no
+    wlp0s20f3:
+      dhcp4: yes
+      dhcp6: yes
+
+  bridges:
+    br0:
+      interfaces: [enp1s0]
+      dhcp4: yes
+# yaml文件对缩进很严格，一定要注意缩进
+netplan --debug apply
+# 让设置生效，生效后NetworkManager就失效了
+
+4. nm-connection-editor 。测试发现，通过路由器直接连接到电脑后，网桥可用。但如果还要经过锐捷播号，就有问题了。
+- nm-connection-editor    # 启动图形界面
+- 点左下角的加号创建一个网桥 -> 在标签页桥接中点击添加 -> 选择以太网 -> 选择设备为本机的有线网卡，其他默认，保存。-> 这时在桥接标签页中就多了一个添加的以太网，其他默认，IPV4选择与本机网卡相同的配置，如DHCP或静态IP，保存。
+- 删除原有的以太网卡，重启NetworkManager即可。
+
+5. nmtui
+```
+
+
+
 #### 设置远程使用root用户登录
 
 ```shell
@@ -1778,3 +1849,15 @@ usbfs:x:1001:shouyu
 6. 关闭虚拟机与重启宿主机。
 7. 再次打开VirtualBox，启动虚拟机，插入U盘。会发现右下角的USB设置已经可以正常识别，勾选U盘的设备。
 ```
+
+
+
+### NAT模式下宿主机与虚拟机通讯
+
+```shell
+# 默认情况下，桥接方式支持虚拟机到主机、主机到虚拟机、虚拟机到其他主机、其他主机到虚拟机以及虚拟机之间的通讯。NAT方式只支持虚拟机到主机、虚拟机到其他主机的通讯。如果需要用宿主机与虚拟
+# 机通讯，就要配置Prot Forwarding。方法是在全局模式下找到Network，在其中创建一个虚拟网卡，之后在网卡中配置地址，如192.168.1.0/24，再点击Prot Forwarding，其中Host IP指宿主
+# 机的IP，Guest IP指虚拟机的IP，另外，端口要配置成宿主机与虚拟机都没有使用的端口
+# 这相当于VirtualBox只做了SNAT，但没有做DNAT
+```
+

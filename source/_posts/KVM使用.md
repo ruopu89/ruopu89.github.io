@@ -39,6 +39,7 @@ qemu-img create -f qcow2 -o size=100G /images/vm1/ubuntu.qcow2
 11. 创建虚拟机
 qemu-kvm -name "ubuntu10" -m 1024 -smp 2 -hda /images/vm1/ubuntu.qcow2 -cdrom ubuntu-10.01.***.iso -vnc :0 -boot order=dc
 # -name是取一个虚拟机的名字；-m指定内存大小；-smp指定CPU的颗数，但不要超过物理核心数；-hda是指定磁盘镜像，因为是本地第一个分区所以用-hda；-cdrom是指定光盘镜像；-boot是指定启动次序，这里的d指使用一次；-net nic是指定网卡的，指定nic会向某个接口进行桥连接，如果不能连接会报错，所以这里不用此选项；-vnc :0是为了避免vnc连接失败。启动后提示在5900上启动了vnc
+# 发现在ubuntu18.04中找不到qemu-kvm命令，即使安装了qemu-kvm包。
 12. 在CentOS上安装vnc客户端测试
 yum -y install tigervnc
 13. 连接VNC服务器进行安装
@@ -104,6 +105,7 @@ virt-install -n xp -r 1024 --vcpus 2 --disk /images/xp.img,format=qcow2,size=50 
 
 virt-install -n centos6 -r 1024 --vcpus 2 --disk /images/centos.img,format=qcow2,size=30 --network bridge=br0 --network bridge=br1 --os-type=linux --cdrom /images/vm1/centos6.iso --vnc --vncport=5900 --vnclisten=0.0.0.0 --accelerate 
 # --accelerate表示KVM或KQEMU内核加速,这个选项是推荐最好加上。如果KVM和KQEMU都支持，KVM加速器优先使用。--vncport指定端口，--vnclisten很重要，0.0.0.0表示监听在所有端口，不指定的话会监听在本地回环地址，用vncviewer是不能连接的。另外，不能两个VNC软件同时连接虚拟机；--disk /images/centos.img,format=qcow2,size=30是一定要定义的，这与上面创建的磁盘大小没有关系，如果这里不指定磁盘大小，在安装时会显示磁盘大小是0
+# 在启动KVM时，提示"ioctl(KVM_CREATE_VM) failed: 16 Device or resource busy"。这是因为有另一个虚拟程序在运行，它锁定了虚拟化功能。如VirtualBox在运行时，就不能启动KVM虚拟机了。
 ```
 
 
