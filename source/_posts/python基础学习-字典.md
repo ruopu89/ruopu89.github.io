@@ -68,10 +68,9 @@ k in d
 ```python
 # 创建与使用
 phonebook = {'Alice': '2341', 'Beth': '9102', 'Cecil': '3258'}
-# 字典由键及其相应的值组成，这种键值对称为项(item)。这里键为名字，而值为电话号码。每个键与
-# 其值之间都用冒号(:)分隔，项之间用逗号分隔，而整个字典放在花括号内。空字典(没有任何项)用两
-# 个花括号表示。
-# 在字典(以及其他映射类型)中，键必须是独一无二的，而字典中的值无需如此。
+# 字典由键及其相应的值组成，这种键值对称为项(item)。这里键为名字，而值为电话号码。每个键与其值之间都用
+# 冒号(:)分隔，项之间用逗号分隔，而整个字典放在花括号内。空字典(没有任何项)用两个花括号表示。在字典(以
+# 及其他映射类型)中，键必须是独一无二的，而字典中的值无需如此。
 
 # 创建字典
 l1 = list(range(5))
@@ -83,8 +82,8 @@ d = dict(enumerate(l1))
 
 e = enumerate(l1)
 print(type(e))
-# e的类型枚举，是一个可迭代对象，可以使用list、set、tuple来包括这个类型，用什么方法包括这
-# 个类型，这个类型就生成什么数据类型。也就是封装成什么就返回什么类型
+# e的类型枚举，是一个可迭代对象，可以使用list、set、tuple来包括这个类型，用什么方法包括这个类型，这个
+# 类型就生成什么数据类型。也就是封装成什么就返回什么类型
 for x in e:
     print(x)
 # 返回的是二元组，在python命令行中执行要使用Ctrl + 回车
@@ -119,19 +118,18 @@ print(c)
 >>> d
 {'age': 42, 'name': 'Gumby'}
 # 使用关键字实参来调用这个函数
-# 也可使用一个映射实参来调用它，这将创建一个字典，其中包含指定映射中的所有项。像函数list、
-# tuple和str一样，如果调用这个函数时没有提供任何实参，将返回一个空字典。从映射创建字典时，
-# 如果该映射也是字典(毕竟字典是Python中唯一的内置映射类型)，可不使用函数dict，而是使用字
-# 典方法copy
-# 与list、tuple和str一样，dict其实根本就不是函数，而是一个类。
+# 也可使用一个映射实参来调用它，这将创建一个字典，其中包含指定映射中的所有项。像函数list、tuple和str一
+# 样，如果调用这个函数时没有提供任何实参，将返回一个空字典。从映射创建字典时，如果该映射也是字典(毕竟字
+# 典是Python中唯一的内置映射类型)，可不使用函数dict，而是使用字典方法copy。与list、tuple和str一样，
+# dict其实根本就不是函数，而是一个类。
 
 >>> x = []
 >>> x[42] = 'Foobar'
 Traceback (most recent call last):
 File "<stdin>", line 1, in ?
 IndexError: list assignment index out of range
-# 将字符串'Foobar'赋给一个空列表中索引为42的元素。这是不可以的，因为没有这样的元素。要让这
-# 种操作可行，初始化x时，必须使用[None] * 43之类的代码，而不能使用[]。
+# 将字符串'Foobar'赋给一个空列表中索引为42的元素。这是不可以的，因为没有这样的元素。要让这种操作可行，
+# 初始化x时，必须使用[None] * 43之类的代码，而不能使用[]。
 >>> x = {}
 >>> x[42] = 'Foobar'
 >>> x
@@ -201,22 +199,20 @@ l3 = a()
 print(l3)
 # l3被定义成了一个空列表，因为a等于list，所以这里l3 = a()就等于l3 = list()
 # a = list就是a把list的名称拿走了，等于把名称对应的地址拿走了
-# 函数也是一个对象，对象在内存中有一个地方放。这个地方就是函数的地址。列表放在内存中是一个对
-# 象，比如创建一个空列表，这是一个对象，我们把空列表赋值给了l3，l3拿的就是这个空列表对象的
-# 地址。现在我们给出一个函数list，函数本身也是对象，一切皆对象。我们把这个对象给了a，就是把
-# a覆盖掉了，这是把对象地址或叫对象引用给了a，这时a与list也就是等价的了。如果写成list()就
-# 是调用了，只要加了括号就是调用了。
-# 也就是说，a = list是将对象地址给了a，a与list等价。a = list()是调用，将调用list函数的结果给了a，a被定义成了一个空列表
+# 函数也是一个对象，对象在内存中有一个地方放。这个地方就是函数的地址。列表放在内存中是一个对象，比如创建
+# 一个空列表，这是一个对象，我们把空列表赋值给了l3，l3拿的就是这个空列表对象的地址。现在我们给出一个函数
+# list，函数本身也是对象，一切皆对象。我们把这个对象给了a，就是把a覆盖掉了，这是把对象地址或叫对象引用
+# 给了a，这时a与list也就是等价的了。如果写成list()就是调用了，只要加了括号就是调用了。也就是说，
+# a = list是将对象地址给了a，a与list等价。a = list()是调用，将调用list函数的结果给了a，a被定义成了一个空列表
 
 l4 = 5()
-# 这样定义会提示"TypeError: 'int' object is not callable"，这说明int类型是不可以调
-# 用的。这就说明了加括号是可以调用前面的对象或名称的，但前面的对象或名称需要是可调用的对象。
-# list是一个写好的函数，这个函数已经被当前环境加载过了，所以这个名称可以直接拿来用，这个名
-# 称指代的是list名称加载到内存中的位置，这就是引用类型。真正的引用并不是我们写一个列表，把
-# 列表赋值给变量，这才是对它的引用，实际这个函数也是对象，它也在内存中，你要引用它，也要通过
-# 它的名称才能引用，一加括号意义就变了，这个对象如果是可调用对象的话，我们就调用它了。如果函
-# 数是一个可调用对象，调用时就会执行函数里的函数体了。之后的类也可以变成一个可调用对象，比如
-# 把一个类实例化了，它就变成一个对象，这个对象后面也可以加括号，这就是python的技巧
+# 这样定义会提示"TypeError: 'int' object is not callable"，这说明int类型是不可以调用的。这就说明
+# 了加括号是可以调用前面的对象或名称的，但前面的对象或名称需要是可调用的对象。list是一个写好的函数，这个
+# 函数已经被当前环境加载过了，所以这个名称可以直接拿来用，这个名称指代的是list名称加载到内存中的位置，这
+# 就是引用类型。真正的引用并不是我们写一个列表，把列表赋值给变量，这才是对它的引用，实际这个函数也是对
+# 象，它也在内存中，你要引用它，也要通过它的名称才能引用，一加括号意义就变了，这个对象如果是可调用对象的
+# 话，我们就调用它了。如果函数是一个可调用对象，调用时就会执行函数里的函数体了。之后的类也可以变成一个可
+# 调用对象，比如把一个类实例化了，它就变成一个对象，这个对象后面也可以加括号，这就是python的技巧
 ```
 
 
@@ -308,8 +304,8 @@ Gumby's batting average is not available.
 'Gumby'
 >>> d
 {'name': 'Gumby'}
-# 指定的键不存在时， setdefault返回指定的值并相应地更新字典。如果指定的键存在，就返回其
-# 值，并保持字典不变。与get一样，值是可选的；如果没有指定，默认为None。
+# 指定的键不存在时， setdefault返回指定的值并相应地更新字典。如果指定的键存在，就返回其值，并保持字典
+# 不变。与get一样，值是可选的；如果没有指定，默认为None。
 
 >>> d = {}
 >>> print(d.setdefault('name'))
@@ -352,8 +348,7 @@ None
 - copy（返回一个新字典）
 
 ```python
-# 方法copy返回一个新字典，其包含的键值对与原来的字典相同(这个方法执行的是浅复制，因为值本身
-# 是原件，而非副本)。
+# 方法copy返回一个新字典，其包含的键值对与原来的字典相同(这个方法执行的是浅复制，因为值本身是原件，而非副本)。
 >>> x = {'username': 'admin', 'machines': ['foo', 'bar', 'baz']}
 >>> y = x.copy()
 >>> y['username'] = 'mlh'
@@ -362,8 +357,8 @@ None
 {'username': 'mlh', 'machines': ['foo', 'baz']}
 >>> x
 {'username': 'admin', 'machines': ['foo', 'baz']}
-# 当替换副本中的值时，原件不受影响。然而，如果修改副本中的值(就地修改而不是替换)，原件也将
-# 发生变化，因为原件指向的也是被修改的值
+# 当替换副本中的值时，原件不受影响。然而，如果修改副本中的值(就地修改而不是替换)，原件也将发生变化，因为
+# 原件指向的也是被修改的值
 
 >>> from copy import deepcopy
 >>> d = {}
@@ -375,8 +370,8 @@ None
 {'names': ['Alfred', 'Bertrand', 'Clive']}
 >>> dc
 {'names': ['Alfred', 'Bertrand']}
-# 深复制，即同时复制值及其包含的所有值，等等。为此，可使用模块copy中的函数deepcopy。c和dc
-# 的值都是从d复制过来的，只是c是浅复制，dc是深复制，在d中追加值后，c的值也有变化，dc没有。
+# 深复制，即同时复制值及其包含的所有值，等等。为此，可使用模块copy中的函数deepcopy。c和dc的值都是从d
+# 复制过来的，只是c是浅复制，dc是深复制，在d中追加值后，c的值也有变化，dc没有。
 ```
 
 - fromkeys（创建新字典）
@@ -423,15 +418,15 @@ None
   - 字典为empty，抛出KeyError异常
 
 ```python
-# 方法popitem类似于list.pop ，但 list.pop弹出列表中的最后一个元素，而popitem随机地弹
-# 出一个字典项，因为字典项的顺序是不确定的，没有“最后一个元素”的概念。
+# 方法popitem类似于list.pop ，但 list.pop弹出列表中的最后一个元素，而popitem随机地弹出一个字典项，
+# 因为字典项的顺序是不确定的，没有“最后一个元素”的概念。
 >>> d = {'url': 'http://www.python.org', 'spam': 0, 'title': 'Python Web Site'}
 >>> d.popitem()
 ('url', 'http://www.python.org')
 >>> d
 {'spam': 0, 'title': 'Python Web Site'}
-# 虽然popitem 类似于列表方法pop，但字典没有与append(它在列表末尾添加一个元素)对应的方
-# 法。这是因为字典是无序的，类似的方法毫无意义。
+# 虽然popitem 类似于列表方法pop，但字典没有与append(它在列表末尾添加一个元素)对应的方法。这是因为字典
+# 是无序的，类似的方法毫无意义。
 ```
 
 
@@ -439,6 +434,7 @@ None
 - clear()
 
   - 清空字典
+  - 就地修改
 
 ```python
 # clear（删除所有字典项）
@@ -462,8 +458,7 @@ None
 >>> x = {}
 >>> y
 {'key': 'value'}
-# x和y最初都指向同一个字典。通过将一个空字典赋给x来“清空”它。这对y没有任何影响，它依然指向
-# 原来的字典。
+# x和y最初都指向同一个字典。通过将一个空字典赋给x来“清空”它。这对y没有任何影响，它依然指向原来的字典。
 
 >>> x = {}
 >>> y = x
@@ -480,100 +475,87 @@ None
 
 - del语句
 
-  a = True
+```python
+a = True
+b = [6]
+d = {'a':1,'b':b,'c':[1,3,5]}
+del a
+del d['c']   # 删除了'c'键及其值
+del b[0]   # 变成了空列表
+c = b
+del c
+del b
+b = d['b']
+# del d['c']看着像删除了一个对象，本质上减少了一个对象的引用，del实际上删除的是名称，而不是对象
+```
 
-  b = [6]
 
-  d = {'a':1,'b':b,'c':[1,3,5]}
-
-  del a
-
-  del d['c']   # 删除了一个对象[1,3,5]？
-
-  del b[0]
-
-  c = b
-
-  del c
-
-  del b
-
-  b = d['b']
-
-  - del a['c']看着像删除了一个对象，本质上减少了一个对象的引用，del实际上删除的是名称，而不是对象
 
 
 
 ### 字典遍历
 
-- for ... in dict
-
-  - 遍历key，方法keys返回一个字典视图，其中包含指定字典中的键。
-
-  for k in d:
-
-  ​	print(k)
-
-  for k in d.keys():
-
-  ​	print(k)
-
-  //下面这种方法较常用
-
-- for ... in dict
-
-  - 遍历value
-
-  for k in d:
-
-  ​	print(d[k])
-
-  for k in d.keys():
-
-  ​	print(d.get(k))
-
-  for v in d.values():
-
-  ​	print(v)
+- 遍历key，方法keys返回一个字典视图，其中包含指定字典中的键。
 
 ```python
+Method：
+for k in d:
+	print(k)
+
+for k in d.keys():
+	print(k)
+# 下面这种方法较常用
+```
+
+
+
+- 遍历value
+
+
+```python
+Method：
+for k in d:
+	print(d[k])
+
+for k in d.keys():
+	print(d.get(k))
+
+for v in d.values():
+	print(v)
+    
 # 方法values返回一个由字典中的值组成的字典视图。不同于方法keys，方法values返回的视图可能包含重复的值。
 >>> d = {}
 >>> d[1] = 1
 >>> d[2] = 2
 >>> d[3] = 3
 >>> d[4] = 1
+>>> d           
+{1: 1, 2: 2, 3: 3, 4: 4}
 >>> d.values()
 dict_values([1, 2, 3, 1])
 ```
 
 
 
-- for ... in dict
-
-  - 遍历item，即kv对
-
-    for item in d.items():
-
-    ​	print(item)
-
-    for item in d.items():
-
-    ​	print(item[0],item[1])
-
-    for k,v in d.items():
-
-    ​	print(k,v)
-
-    for k,_ in d.items():
-
-    ​	print(k)
-
-    for _,v in d.items():
-
-    ​	print(v)
+- 遍历item，即kv对
 
 ```python
+Method:
+for item in d.items():
+	print(item)
+
+for item in d.items():
+	print(item[0],item[1])
+
+for k,v in d.items():
+	print(k,v)
+
+for k,_ in d.items():
+	print(k)
+
+for _,v in d.items():
+	print(v)
+
 # 方法items返回一个包含所有字典项的列表，其中每个元素都为(key, value)的形式。
 >>> d = {'title': 'Python Web Site', 'url': 'http://www.python.org', 'spam': 0}
 >>> d.items()
@@ -614,40 +596,26 @@ True
 
 - 如何在遍历的时候移除元素
 
-- 错误的做法
+```python
+错误的做法
+d = dict(a=1,b=2,c='abc')
+for k,v in d.items():
+	d.pop(k)   # 异常
+    
+while len(d):   # 相当于清空，不如直接clear()
+	print(d.popitem())
 
-  d = dict(a=1,b=2,c='abc')
-
-  for k,v in d.items():
-
-  ​	d.pop(k)   # 异常
-
-
-
-​	 while len(d):   # 相当于清空，不如直接clear()
-
-​		print(d.popitem())
-
-- 正确的做法
-
-  d = dict(a=1,b=2,c='abc')
-
-  keys = []
-
-  for k,v in d.items():
-
-  ​	if isinstance(v,str)
-
-  ​		keys.append(k)
-
-
-
-​	for k in keys:
-
-​		d.pop(k)
-
-​	print(d)
-
+正确的做法
+d = dict(a=1,b=2,c='abc')
+keys = []
+for k,v in d.items():
+	if isinstance(v,str):
+		keys.append(k)
+        
+for k in keys:
+	d.pop(k)
+print(d)
+```
 
 
 ### 字典的key
@@ -655,7 +623,12 @@ True
 - key的要求和set的元素要求一致
   - set的元素可以看做key，set可以看做dict的简化版
   - hashable可哈希才可以作为key，可以使用hash()测试。可hash的类型是不可变的，可变类型是不可hash的
-  - d = {1:0,2.0:3,"abc":None,('hello','world','python'):"string",b'abc':'135'}
+
+```python
+d = {1:0,2.0:3,"abc":None,('hello','world','python'):"string",b'abc':'135'}
+# 同理，这里要用{}大括号，不能用dict()，不然会报错。个人还是认为dict()是转换类型的，{}是定义的
+```
+
 
 
 
@@ -665,70 +638,59 @@ True
 
   - 第一个参数是default_factory，缺省是None，它提供一个初始化函数。当key不存在的时候，会调用这个工厂函数来生成key对应的value
 
-  import random
-
-  d1 = {}
-
-  for k in 'abcdef':
-
-  ​	for i in range(random.randint(1,5)):
-
-  ​		if k not in d1.keys():
-
-  ​			d1[k] = []
-
-  ​		d1[k].append(i)
-
-  print(d1)
-
-
-
-​	from collections import defaultdict
-
-​	import random
-
-​	d1 = defaultdict(list)
-
-​	for k in 'abcdef':
-
-​		for i in range(random.randint(1,5)):
-
-​			d1[k].append(i)
-
-​	print(d1)
 
 ```python
+例：
+import random
+d1 = {}
+for k in 'abcdef':
+	for i in range(random.randint(1,5)):
+		if k not in d1.keys():
+			d1[k] = []
+		d1[k].append(i)
+print(d1)
+
+from collections import defaultdict
+import random
+d1 = defaultdict(list)
+for k in 'abcdef':
+	for i in range(random.randint(1,5)):
+		d1[k].append(i)
+print(d1)
+
+
 # defaultdict
 
 from collections import defaultdict
 d1 = {}
 d2 = defaultdict(list)
-# list放在这里相当于传了一个工厂方法，要求是一个初始化函数，这就是以后的初始化函数
-# default_factory，初始化函数什么时候用，只有在key不存在的时候，会调用这个工厂函数来生成
-# key对应的value，也就是生成一个缺省值，用来给这个没有value的key赋值，这样就可以凑上一个
-# kv对，也就可以加入字典当中了。
+# list放在这里相当于传了一个工厂方法，要求是一个初始化函数，这就是以后的初始化函数default_factory，初
+# 始化函数什么时候用，只有在key不存在的时候，会调用这个工厂函数来生成key对应的value，也就是生成一个缺
+# 省值，用来给这个没有value的key赋值，这样就可以凑上一个kv对，也就可以加入字典当中了。
 for k in "abcde":    # 迭代a到e，这里要创建的是key
     for v in range(5):     # 迭代0到4，这里要生成value
         if k not in d1.keys():    
-        # d1.keys()开始是空的，第一次的时候找不到上面循环的k是a
+# d1.keys()开始是空的，第一次的时候找不到上面循环的k是a，只有在每次循环的第一次key不存在时会进入这里
             d1[k] = []   # 这里表示，如果上面判断k不存在，就给d1[k]初始化一个空列表
         d1[k].append(v)   
         # 这里把0-4依次追加到d1[k]中，第一次d1[a].append[0]，第二次d1[a].append[1]
 print(d1)   # 最后打印出来，这是第一种方式
-        
+输出：
+{'a': [0, 1, 2, 3, 4], 'b': [0, 1, 2, 3, 4], 'c': [0, 1, 2, 3, 4], 'd': [0, 1, 2, 3, 4], 'e': [0, 1, 2, 3, 4]}
+    
+    
 for k in 'mnopq':
     for v in range(3):   # 这里是3是为了说明v与上面的k的数量可以不一样 
         d2[k].append(v)   
-# 这里不做判断，直接赋值。是为了说明上面的key如果不存在，就调用上面定义的
-# d2 = defaultdict(list)中的list，这时就是在做创建空列表的动作，也就是list()，因为上
-# 面已经说明了当key不存在时调用工厂函数生成key对应的value，并且也定义了d2等于这个工厂函数
-# d2[k]就相当于测试一下这个k是否存在，不存在就调用工厂函数。之后也可以自定义函数，并调用。
+# 这里不做判断，直接赋值。是为了说明上面的k(key)如果不存在，就调用上面定义的d2 = defaultdict(list)
+# 中的list，这时就是在做创建空列表的动作，也就是list()，因为上面已经说明了当key不存在时调用工厂函数生
+# 成key对应的value，并且也定义了d2等于这个工厂函数d2[k]就相当于测试一下这个k是否存在，不存在就调用工
+# 厂函数。之后也可以自定义函数，并调用。
 # 这就相当于替换了d1[k] = []中后面的中括号
-# 个人想，如果将list改成tuple是否可以，好像不行，因为tuple是不可变的，没有append这样的方
-# 法，那么改成set是不是就可以了？
+# 个人想，如果将list改成tuple是否可以，也许不行，因为tuple是不可变的，没有append这样的方法，那么改成
+# set是不是就可以了？测试发现，当使用tuple或set时会提示没有append属性
 print(d2)
 输出：
-{'a': [0, 1, 2, 3, 4], 'b': [0, 1, 2, 3, 4], 'c': [0, 1, 2, 3, 4], 'd': [0, 1, 2, 3, 4], 'e': [0, 1, 2, 3, 4]}
 defaultdict(<class 'list'>, {'m': [0, 1, 2], 'n': [0, 1, 2], 'o': [0, 1, 2], 'p': [0, 1, 2], 'q': [0, 1, 2]})
 ```
 
@@ -740,40 +702,28 @@ defaultdict(<class 'list'>, {'m': [0, 1, 2], 'n': [0, 1, 2], 'o': [0, 1, 2], 'p'
 
   - key并不是按照加入的顺序排列，可以使用OrderedDict记录顺序
 
-  from collections import OrderedDict
-
-  import random
-
-  d = {'banana':3,'apple':4,'pear':1,'orange':2}
-
-  print(d)
-
-  keys = list(d.keys())
-
-  random.shuffle(keys)
-
-  print(keys)
-
-  od = OrderedDict()
-
-  for key in keys:
-
-  ​	od[key] = d[key]
-
-  print(od)
-
-  print(od.keys())
-
 - 有序字典可以记录元素插入的顺序，打印的时候也是按照这个顺序输出打印
 - 3.6版本的Python的字典就是记录key插入的顺序（IPython不一定有效果）
 - 应用场景
   - 假如使用字典记录了N个产品，这些产品使用ID由小到大加入到字典中
-  - 除了使用字典检索的遍历，有进修需要取出ID，但是希望是按照输入的顺序，因为输入顺序是有序的
+  - 除了使用字典检索的遍历，有时候需要取出ID，但是希望是按照输入的顺序，因为输入顺序是有序的
   - 否则还需要重新把遍历到的值排序
 
 ```python
-# OrderedDict顺序的字典，这里指key要按顺序而不是值输出。key的顺序应该和我们放入的顺序是
-# 一样的
+from collections import OrderedDict
+import random
+d = {'banana':3,'apple':4,'pear':1,'orange':2}
+print(d)
+keys = list(d.keys())
+random.shuffle(keys)
+print(keys)
+od = OrderedDict()
+for key in keys:
+	od[key] = d[key]
+print(od)
+print(od.keys())
+
+# OrderedDict顺序的字典，这里指key要按顺序而不是值输出。key的顺序应该和我们放入的顺序是一样的
 d = {}
 d['a'] = 1
 d['b'] = 2
@@ -796,145 +746,21 @@ keys = list(d.keys())
 random.shuffle(keys)   # 用shuffle把keys列表打乱
 od = OrderedDict()
 for key in keys:
-    od[key] = d[key]   # 创建od的kv对
+    od[key] = d[key]   # 创建od的kv对，这里就是od['pear'] = 1这样的形式
     
 print(od)
 print(od.keys())
 
-# 这种方法可能在ipython中不再起作用，因为显示的值与输入的顺序是一样的。3.5版本之前是解决不
-# 了这个问题的。或者是在jupeter中就是可以按顺序显示的？需要在python命令行中再测试一下。视
-# 频中测试的3.6.1版本时，发现和这里的显示是一样的，按顺序显示。所以最好在python环境中测
-# 试，也就是在命令行输入python，之后执行上面的命令测试。之前视频中用ipython测试会打乱顺序
+# 这种方法可能在ipython中不再起作用，因为显示的值与输入的顺序是一样的。3.5版本之前是解决不了这个问题
+# 的。或者是在jupeter中就是可以按顺序显示的？需要在python命令行中再测试一下。视频中测试的3.6.1版本
+# 时，发现和这里的显示是一样的，按顺序显示。所以最好在python环境中测试，也就是在命令行输入python，之后
+# 执行上面的命令测试。之前视频中用ipython测试会打乱顺序
 输出：
 {'banana': 3, 'apple': 4, 'pear': 1, 'orange': 2}
 OrderedDict([('banana', 3), ('pear', 1), ('orange', 2), ('apple', 4)])
 odict_keys(['banana', 'pear', 'orange', 'apple'])
 ```
 
-
-
-### 字典练习
-
-- 用户输入一个数字
-  - 打印每一位数字及其重复的次数
-
-```python
-num = input('>>>')
-d = {}
-for c in num:
-    if not d.get(c):
-        d[c] = 1
-        continue
-    d[c] += 1
-    
-print(d)
-
-d = {}
-for c in num:
-    if c not in d.keys():
-        d[c] = 1
-    else:
-        d[c] += 1
-print(d)
-```
-
-
-
-- 数字重复统计
-  - 随机产生100个整数
-  - 数字的范围[-1000,1000]
-  - 升序输出所有不同的数字及其重复的次数
-
-```python
-import random
-
-n = 100
-nums = [0] * n
-for i in range(n):
-    nums[i] = random.randint(-1000,1000)
-print(nums)
-t = nums.copy()
-t.sort()
-print(t)
-
-d = {}
-for x in nums:
-    if x not in d.keys():
-        d[x] = 1
-    else:
-        d[x] += 1
-print(d)
-d1 = sorted(d.items())
-print(d1)
-```
-
-
-
-- 字符串重复统计
-  - 字符表'abcdefghijklmnopqrstuvwxyz'
-  - 随机挑选2个字母组成字符串，共挑选100个
-  - 降序输出所有不同的字符串及重复的次数
-
-```python
-import random
-
-alphabet = 'abcdefghijklmnopqrstuvwxyz'
-
-words = []
-for _ in range(100):
-    # words.append(random.choice(alphabet)+random.choice(alphabet))
-    # words.append(''.join(random.sample(alphabet,2)))   随机采样
-    words.append(''.join(random.choice(alphabet) for _ in range(2))) # 生成器
-    
-d = {}
-for x in words:
-    d[x] = d.get(x,0) + 1
-print(d)
-
-d1 = sorted(d.items(),reverse=True)
-print(d1)
-```
-
-
-
-
-
-#### 将字符串格式设置功能用于字典
-
-```python
->> phonebook
-{'Beth': '9102', 'Alice': '2341', 'Cecil': '3258'}
->>> "Cecil's phone number is {Cecil}.".format_map(phonebook)
-"Cecil's phone number is 3258."
-# 可在字典中包含各种信息，这样只需在格式字符串中提取所需的信息即可。使用format_map来指出你
-# 将通过一个映射来提供所需的信息。可使用字符串格式设置功能来设置值的格式，这些值是作为命名或
-# 非命名参数提供给方法format的。
-
->>> template = '''<html>
-... <head><title>{title}</title></head>
-... <body>
-... <h1>{title}</h1>
-... <p>{text}</p>
-... </body>'''
->>> data = {'title': 'My Home Page', 'text': 'Welcome to my home page!'}
->>> print(template.format_map(data))
-<html>
-<head><title>My Home Page</title></head>
-<body>
-<h1>My Home Page</h1>
-<p>Welcome to my home page!</p>
-</body>
-# 将data字典的值代入template中。像这样使用字典时，可指定任意数量的转换说明符，条件是所有
-# 的字段名都是包含在字典中的键。
-```
-
-
-
-##### 
-
-```python
-
-```
 
 
 

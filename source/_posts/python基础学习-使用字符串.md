@@ -124,7 +124,7 @@ TypeError: sequence item 1: expected str instance, list found
 >>> seq = [1, 2, 3, 4, 5]
 >>> sep = '+'
 >>> sep.join(seq) 
-# 尝试合并一个数字列表
+# 尝试合并一个数字列表，结果不可以对列表使用join方法
 Traceback (most recent call last):
 File "<stdin>", line 1, in ?
 TypeError: sequence item 0: expected string, int found
@@ -272,7 +272,7 @@ s1.partition('abc')
 >>> if 'Gumby' in ['gumby', 'smith', 'jones']: print('Found it!')
 ...
 >>>
-# 这样是找不到的
+# 这样是找不到的。这里的匹配是区分大小写的
 
 >>> name = 'Gumby'
 >>> names = ['gumby', 'smith', 'jones']
@@ -445,7 +445,7 @@ s.rfind('very',-10,-1)
 15
 >>> title.find('Zirquss')
 -1
-# find在字符串中查找子串。如果找到,就返回子串的第一个字符的索引,否则返回-1。
+# find在字符串中查找子串。如果找到，就返回子串的第一个字符的索引，否则返回-1。
 
 >>> subject = '$$$ Get rich now!!! $$$'
 >>> subject.find('$$$')
@@ -697,7 +697,7 @@ octets = [192, 168, 0, 1]
 >>> from math import e
 >>> f"Euler's constant is roughly {e}."
 "Euler's constant is roughly 2.718281828459045."
-# 如果变量与替换字段同名，可使用f字符串——在字符串前面加上f。创建最终的字符串时,将把替换字段e替换为变量e的值。
+# 如果变量与替换字段同名，可使用f字符串——在字符串前面加上f。创建最终的字符串时，将把替换字段e替换为变量e的值。
 >>> "Euler's constant is roughly {e}.".format(e=e)
 "Euler's constant is roughly 2.718281828459045."
 # 此命令与上面的命令效果是一样的。
@@ -715,9 +715,6 @@ octets = [192, 168, 0, 1]
 >>> "{foo} {} {bar} {}".format(1, 2, bar=4, foo=3)
 '3 1 4 2'
 # 还可通过索引来指定要在哪个字段中使用相应的未命名参数，这样可不按顺序使用未命名参数。
-
->>> "{foo} {} {bar} {}".format(1, 2, bar=4, foo=3)
-'3 1 4 2'
 
 >>> "{foo} {1} {bar} {0}".format(1, 2, bar=4, foo=3)
 '3 2 4 1'
@@ -857,13 +854,13 @@ print('=' * width)
 这个程序的运行情况类似于下面这样:
 Please enter width: 35
 ===================================
-Item													 Price
+Item						Price
 -----------------------------------
-Apples													     0.40
-Pears														   0.50
-Cantaloupes											  1.92
-Dried Apricots (16 oz.)						   8.00
-Prunes (4 lbs.)										12.00
+Apples						0.40
+Pears						0.50
+Cantaloupes					1.92
+Dried Apricots (16 oz.)		8.00
+Prunes (4 lbs.)			   12.00
 ===================================
 ```
 

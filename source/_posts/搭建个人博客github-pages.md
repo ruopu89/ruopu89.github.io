@@ -333,6 +333,131 @@ hexo d
 
 
 
+## 添加访客人数统计
+
+```shell
+vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/layout/_partials/footer.swig
+# 打开使用的主题下的这个文件
+<div class="copyright">
+    ...
+    ...
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+    </script>
+
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_pv">
+        本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+    </span>
+</div>
+# 在上方的两个div之间配置上面的代码，script是安装不蒜子的统计脚本，下面的本部总访问量是统计的PV量
+# pv：单个用户连续点击n篇文章，记录n次访问量
+# uv：单个用户连续点击n篇文章，只记录1次访客数
+# 使用uv的方法
+# <span id="busuanzi_container_site_uv">
+#     本站访客数<span id="busuanzi_value_site_uv"></span>人次
+# </span>
+# 参考：https://hexo-guide.readthedocs.io/zh_CN/latest/third-service/[%E4%B8%8D%E8%92%9C%E5%AD%90]%E8%AE%BF%E5%AE%A2%E4%BA%BA%E6%95%B0.html
+```
+
+
+
+## 添加文章阅读量统计
+
+```shell
+方法一
+vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/_config.yml            
+busuanzi_count:
+	enable: true    # 这里默认是false，改为true即可。next主题自带了不蒜子的统计功能
+	total_visitors: true
+	total_visitors_icon: user
+	total_views: true
+	total_views_icon: eye
+	post_views: true
+	post_views_icon: eye
+# 这个方法在进入文章后，可以看到阅读次数
+
+方法二
+vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/layout/_macro/post.swig
+# 在{# LeanCould PageView #}下添加下面内容
+{# LeanCould PageView #}
+<span id="busuanzi_container_page_pv">                                                     <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+    <i class="fa fa-eye"></i>
+	</span> 
+	阅读量: <span id="busuanzi_value_page_pv"></span>次
+</span>
+# 这个方法在首页就能看到每篇文章的阅读次数
+# 参考：https://hexo-guide.readthedocs.io/zh_CN/latest/third-service/[%E4%B8%8D%E8%92%9C%E5%AD%90]%E6%96%87%E7%AB%A0%E9%98%85%E8%AF%BB%E6%AC%A1%E6%95%B0.html
+```
+
+
+
+## 添加文章评论功能
+
+```shell
+1. 注册github应用，首先登录github，之后在settings->Developer settings->OAuth Apps中注册。注意需要输入四项内容，应用名称是自定义的，主页地址是自己的github页面的地址，但要注意，地址前要加https://，
+不然会报错，应用说明是自定义的，授权回调地址与主页地址一样。注册成功后会得到Client ID和Client Secret
+
+2. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89
+.github.io/themes/hexo-theme-next/layout/_third-party/comments/gitalk.swig
+{% if page.comments && theme.gitalk.enable %}
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '{{ theme.gitalk.ClientID }}',
+          clientSecret: '{{ theme.gitalk.ClientSecret }}',
+          repo: '{{ theme.gitalk.repo }}',
+          owner: '{{ theme.gitalk.githubID }}',
+          admin: ['{{ theme.gitalk.adminUser }}'],
+          id: location.pathname,
+          distractionFreeMode: '{{ theme.gitalk.distractionFreeMode }}'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+{% endif %}
+
+3. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/layout/_partials/comments.swig
+{% elseif theme.gitalk.enable %}
+ <div id="gitalk-container"></div>
+# 注意，添加的内容与前面的elseif同一级别上即可，但不要加在最后，测试时加在了18行左右的位置
+
+4. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89
+.github.io/themes/hexo-theme-next/layout/_third-party/comments/index.swig
+{% include 'gitalk.swig' %}
+# 在最后一行添加内容
+
+5. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/css/_common/components/third-party/third-party.styl
+@import "gitalk";
+# 在最后一行上添加内容
+
+6. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/css/_common/components/third-party/gitalk.styl
+.gt-header a, .gt-comments a, .gt-popup a
+  border-bottom: none;
+.gt-container .gt-popup .gt-action.is--active:before
+  top: 0.7em;
+# 新建文件，加入内容
+
+7. vim /media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/_config.yml                                               
+# Gitalk                                                                               # Demo: https://gitalk.github.io
+# Reference: https://asdfv1929.github.io/2018/01/20/gitalk/, https://liujunzhou.top/2018/8/10/gitalk-error/
+gitalk:
+	enable: true
+	github_id: abc89  # github帐号，不用写邮箱地址
+	repo: abc   # 仓库名称
+	client_id: # 注册得到的
+	client_secret: # 注册得到的
+	admin_user: abc89  # github帐号
+	distraction_free_mode: true # Facebook-like distraction free mode
+	
+8. 问题
+描述：在文章底部评论框中出现错误信息“Error: Not Found”
+解决办法：和repo属性有关，换一个新的仓库，比如新建仓库guestbook。
+# 参考：https://extremegtr.github.io/2017/09/07/Add-Gitment-comment-system-to-hexo-theme-NexT/#%E4%BF%AE%E6%94%B9NexT%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6
+```
+
+
+
 ## 高亮显示代码
 
 1. 编辑主题配置文件E:\GitHub\ruopu89.github.io\themes\hexo-theme-next\_config.yml

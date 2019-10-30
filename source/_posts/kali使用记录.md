@@ -69,24 +69,59 @@ chsh -s /bin/zsh
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
 # 安装oh-my-zsh，前提是要先安装过git
 
+-------------------
+   oh-my-zsh配置
+-------------------
 ***下面是安装历史命令提示功能***
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 ***语法高亮功能***
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
+***history-substring-search 插件***
+$ git clone https://github.com/zsh-users/zsh-history-substring-search.git $ZSH_CUSTOM/plugins/history-substring-search
+# 历史命令搜索插件，如果和 zsh-syntax-highlighting 插件共用，要配置到语法高亮插件之后。
+# 效果是上下键查询历史命令记录，可模糊匹配历史命令记录中任意字符串。
+
+
 vim ~/.zshrc
 export ZSH="/home/shouyu/.oh-my-zsh"
 ZSH_THEME="agnoster"
-# 修改为这个主题，个人喜欢
+# 修改为这个主题，个人喜欢。主题也可以使用random，每次打开一个终端窗口时都会随机打开一个主题
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/opt/electron-ssr:/usr/local/bin:/usr/local/sbin:/usr/local/jdk1.8/jdk1.8.0_211/bin/:/home/shouyu/anaconda3/bin
 setopt no_nomatch
 if [[ -r /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh ]];then
     source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
 fi
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
-source $ZSH/oh-my-zsh.sh
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting z web-search sudo history-substring-search)
+# z插件可以快速跳转目录
+# web-search可以在命令行使用百度、必应、google搜索，如：google abc，这表示打开默认浏览器在google中搜索abc
+# sudo插件可以在使用sudo时按两次ECS
+# history-substring-search是历史自动补全命令，oh-my-zsh 自带插件
 
+export HISTSIZE=10000
+# 历史纪录条目数量，测试时用echo查看这个变量是50000，不知是在哪儿定义的
+export SAVEHIST=10000
+# 注销后保存的历史纪录条目数量
+export HISTFILE=~/.zhistory
+# 历史纪录文件，这会在家目录自动生成此文件
+setopt EXTENDED_HISTORY
+# 为历史纪录中的命令添加时间戳，在查看.zsh_history和.zhistory时可以看到命令前有时间戳
+setopt INC_APPEND_HISTORY
+#以附加的方式写入历史纪录
+setopt HIST_IGNORE_DUPS
+# 如果连续输入的命令相同，历史纪录中只保留一个
+setopt AUTO_PUSHD
+# 启用 cd 命令的历史纪录，cd -[TAB]进入历史路径
+setopt PUSHD_IGNORE_DUPS
+# 相同的历史路径只保留一个
+HIST_STAMPS="yyyy-mm-dd"
+# 给history命令的输出添加时间
+DISABLE_UPDATE_PROMPT=true
+# 自动更新oh-my-zsh
+
+source $ZSH/oh-my-zsh.sh
+=======================================================================================
 source .zshrc
 # 加载文件生效
 ls ~/.oh-my-zsh
@@ -97,20 +132,25 @@ zsh学习地址：https://www.ibm.com/developerworks/cn/linux/shell/z/
 ===============================
   在zsh中使用find命令不能使用星号
 ===============================
- ⚡ root@ruopu64  ~  vim .zshrc 
- setopt no_nomatch
- # 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
+⚡ root@ruopu64  ~  vim .zshrc 
+setopt no_nomatch
+# 在使用find / -name *.txt命令时，提示"zsh : no matchs found: *.txt"，在.zshrc文件中加入上面内容就可以在find命令中使用星号了。这是因为默认星号是由zsh解释的，不会传递给find命令。
  
- ====================================
-   除kde桌面外，其他桌面环境命令行显示问题
- ====================================
- # 原因是没有安装Powerline字体，按下面方法操作后，重启终端即可解决。
- wget https://raw.githubusercontent.com/powerline/powerline/develop/font/10-powerline-symbols.conf
+=====================================
+  除kde桌面外，其他桌面环境命令行显示问题
+=====================================
+# 原因是没有安装Powerline字体，按下面方法操作后，重启终端即可解决。
+wget https://raw.githubusercontent.com/powerline/powerline/develop/font/10-powerline-symbols.conf
 wget https://raw.githubusercontent.com/powerline/powerline/develop/font/PowerlineSymbols.otf
 sudo mkdir /usr/share/fonts/OTF
 sudo cp 10-powerline-symbols.conf /usr/share/fonts/OTF/
 sudo mv 10-powerline-symbols.conf /etc/fonts/conf.d/
 sudo mv PowerlineSymbols.otf /usr/share/fonts/OTF/
+
+=====================
+   手动更新oh-my-zsh
+=====================
+upgrade_oh_my_zsh 
 ```
 
 
@@ -167,6 +207,17 @@ bash -c  "$(wget -qO- https://git.io/vQgMr)"
 root@ruopu:~# mv /usr/bin/konsole{,.bak}
 root@ruopu:~# mv /usr/bin/mate-terminal.wrapper /usr/bin/konsole
 # 这只是修改默认终端的权宜之计，还没有找到更好的办法。另外，一定要修改mate-terminal.wrapper，如果修改的是mate-terminal是打不开终端的。
+```
+
+
+
+#### 远程终端Terminus & Termius
+
+```shell
+Terminus下载地址：https://github.com/Eugeny/terminus
+# 主题已经安装，无需像tilix那样自己再安装主题。可配置性很高。
+Termius下载地址：https://www.termius.com/
+# 这个软件可以创建用户并登录，它可以记录用户登录的帐户信息并在其他电脑上同步。
 ```
 
 
@@ -1030,7 +1081,7 @@ StartupNotify=false
 
 
 
-### 设置桥接
+#### 设置桥接
 
 ```shell
 # 目前有五种方法。因为需要锐捷客户端拨号上网，所以这里只测试通过nm-connection-editor连接成功。或者说，在测试nm-connection-editor才反应过来这里的问题。
@@ -1792,6 +1843,16 @@ sudo vmware-installer -u vmware-workstation
 
 ### VirtualBox
 
+#### 问题解决
+
+```shell
+1. 启动虚拟机时提示"Kernel driver not installed ... as root ... /sbin/vboxconfig"
+问题解决时发现自己只做了三件有用的事，但不确定是否是这些问题造成的虚拟机无法启动。一、关闭BIOS的安全启动功能；二、重装VirtualBox；三、启动虚拟机时无法启动，但提示要执行 
+sudo modprobe vboxdrv。当完成上面三步后，虚拟机可以启动了。
+```
+
+
+
 #### VirtualBox虚拟机安装Ubuntu 16.04.3 LTS后安装增强功能
 
 ```shell
@@ -1805,18 +1866,17 @@ sudo vmware-installer -u vmware-workstation
 
 ```shell
 1. 创建MacOS虚拟机，自定义虚拟机名称为MacOS
-2. 在命令行执行VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc" 
+2. 在命令行执行
+VBoxManage modifyvm "MacOS" --cpuidset 00000001 000106e5 00100800 0098e3fd bfebfbff
+VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiSystemProduct" "iMac11,3"
+VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiSystemVersion" "1.0"
+VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiBoardProduct" "Iloveapple"
+VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
+VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRealSMC" 1
 # MacOS为虚拟机名。
 # VirtualBox原生支持Mac OS X的安装，但是只有在系统环境为Mac的环境下，才能正常引导，因为在非Mac环境下，安装程序会检测出我们的CPU不是已经识别的型号，从而拒绝进一步的安装。为此，我们需要执行以下命令来Hack
 # 如果VBoxManage没有被加入PATH的话，可能会提示VBoxManage不是可执行的命令。只需要进入VirtualBox的安装目录下Shift+右键在当前目录打开命令行执行即可~
 # 原理非常简单：利用VBox的命令行工具在虚拟机的DeviceKey中加入Apple的声明即可。
-# 也有说要输入下面命令的：
-VBoxManage modifyvm "macosx" --cpuidset 00000001 000106e5 00100800 0098e3fd bfebfbff
-VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiSystemProduct" "iMac11,3"
-VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiSystemVersion" "1.0"
-VBoxManage setextradata "macosx" "VBoxInternal/Devices/efi/0/Config/DmiBoardProduct" "Iloveapple"
-VBoxManage setextradata "macosx" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
-VBoxManage setextradata "macosx" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRealSMC" 1
 ```
 
 
@@ -1852,7 +1912,7 @@ usbfs:x:1001:shouyu
 
 
 
-### NAT模式下宿主机与虚拟机通讯
+#### NAT模式下宿主机与虚拟机通讯
 
 ```shell
 # 默认情况下，桥接方式支持虚拟机到主机、主机到虚拟机、虚拟机到其他主机、其他主机到虚拟机以及虚拟机之间的通讯。NAT方式只支持虚拟机到主机、虚拟机到其他主机的通讯。如果需要用宿主机与虚拟
