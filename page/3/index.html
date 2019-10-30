@@ -350,6 +350,288 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/26/logstash基础知识/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/06/26/logstash基础知识/" itemprop="url">
+                  logstash基础知识
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-06-26 14:20:40 / 修改時間：17:39:57" itemprop="dateCreated datePublished" datetime="2019-06-26T14:20:40+08:00">2019-06-26</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ELK/" itemprop="url" rel="index"><span itemprop="name">ELK</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="配置语法"><a href="#配置语法" class="headerlink" title="配置语法"></a>配置语法</h3><p>Logstash 设计了自己的 DSL，包括有区域，注释，数据类型(布尔值，字符串，数值，数组，哈希)，条件判断，字段引用等。</p>
+<h4 id="区段-section"><a href="#区段-section" class="headerlink" title="区段(section)"></a>区段(section)</h4><p>Logstash 用 <code>{}</code> 来定义区域。区域内可以包括插件区域定义，你可以在一个区域内定义多个插件。插件区域内则可以定义键值对设置。示例如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">    stdin &#123;&#125;</span><br><span class="line">    syslog &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h4><p>Logstash 支持少量的数据值类型：</p>
+<ul>
+<li>bool</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debug =&gt; true</span><br></pre></td></tr></table></figure>
+<ul>
+<li>string</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host =&gt; <span class="string">"hostname"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>number</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">port =&gt; 514</span><br></pre></td></tr></table></figure>
+<ul>
+<li>array</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">match =&gt; ["datetime", "UNIX", "ISO8601"]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>hash</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">options =&gt; &#123;</span><br><span class="line">    key1 =&gt; "value1",</span><br><span class="line">    key2 =&gt; "value2"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>：如果你用的版本低于 1.2.0，<em>哈希</em>的语法跟<em>数组</em>是一样的，像下面这样写：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">match =&gt; [ "field1", "pattern1", "field2", "pattern2" ]</span><br></pre></td></tr></table></figure>
+<h4 id="字段引用-field-reference"><a href="#字段引用-field-reference" class="headerlink" title="字段引用(field reference)"></a>字段引用(field reference)</h4><p>字段是 <code>Logstash::Event</code> 对象的属性。我们之前提过事件就像一个哈希一样，所以你可以想象字段就像一个键值对。</p>
+<p><em>小贴士：我们叫它字段，因为 Elasticsearch 里是这么叫的。</em></p>
+<p>如果你想在 Logstash 配置中使用字段的值，只需要把字段的名字写在中括号 <code>[]</code> 里就行了，这就叫<strong>字段引用</strong>。</p>
+<p>对于 <strong>嵌套字段</strong>(也就是多维哈希表，或者叫哈希的哈希)，每层的字段名都写在 <code>[]</code> 里就可以了。比如，你可以从 geoip 里这样获取 <em>longitude</em> 值(是的，这是个笨办法，实际上有单独的字段专门存这个数据的)：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">geoip</span>][<span class="symbol">location</span>][<span class="string">0</span>]</span><br></pre></td></tr></table></figure>
+<p><em>小贴士：logstash 的数组也支持倒序下标，即 [geoip][location][-1] 可以获取数组最后一个元素的值。</em></p>
+<p>Logstash 还支持变量内插，在字符串里使用字段引用的方法是这样：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"the longitude is %&#123;[<span class="string">geoip</span>][<span class="symbol">location</span>][<span class="string">0</span>]&#125;"</span><br></pre></td></tr></table></figure>
+<h4 id="条件判断-condition"><a href="#条件判断-condition" class="headerlink" title="条件判断(condition)"></a>条件判断(condition)</h4><p>Logstash从 1.3.0 版开始支持条件判断和表达式。</p>
+<p>表达式支持下面这些操作符：</p>
+<ul>
+<li>equality, etc: ==, !=, &lt;, &gt;, &lt;=, &gt;=</li>
+<li>regexp: =~, !~</li>
+<li>inclusion: in, not in</li>
+<li>boolean: and, or, nand, xor</li>
+<li>unary: !()</li>
+</ul>
+<p>通常来说，你都会在表达式里用到字段引用。比如：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="string">"_grokparsefailure"</span> <span class="keyword">not</span> <span class="keyword">in</span> [tags] &#123;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> [status] !~ <span class="regexp">/^2\d\d/</span> <span class="keyword">and</span> [url] == <span class="string">"/noc.gif"</span> &#123;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h3><p>Logstash 提供了一个 shell 脚本叫 <code>logstash</code> 方便快速运行。它支持以下参数：</p>
+<ul>
+<li>-e</li>
+</ul>
+<p>意即<em>执行</em>。我们在 “Hello World” 的时候已经用过这个参数了。事实上你可以不写任何具体配置，直接运行 <code>bin/logstash -e &#39;&#39;</code> 达到相同效果。这个参数的默认值是下面这样：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">input </span>&#123;</span><br><span class="line">    <span class="class">stdin </span>&#123; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class">output </span>&#123;</span><br><span class="line">    <span class="class">stdout </span>&#123; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>–config 或 -f</li>
+</ul>
+<p>意即<em>文件</em>。真实运用中，我们会写很长的配置，甚至可能超过 shell 所能支持的 1024 个字符长度。所以我们必把配置固化到文件里，然后通过 <code>bin/logstash -f agent.conf</code> 这样的形式来运行。</p>
+<p>此外，logstash 还提供一个方便我们规划和书写配置的小功能。你可以直接用 <code>bin/logstash -f /etc/logstash.d/</code> 来运行。logstash 会自动读取 <code>/etc/logstash.d/</code> 目录下所有的文本文件，然后在自己内存里拼接成一个完整的大配置文件，再去执行。</p>
+<ul>
+<li>–configtest 或 -t</li>
+</ul>
+<p>意即<em>测试</em>。用来测试 Logstash 读取到的配置文件语法是否能正常解析。Logstash 配置语法是用 grammar.treetop 定义的。尤其是使用了上一条提到的读取目录方式的读者，尤其要提前测试。</p>
+<ul>
+<li>–log 或 -l</li>
+</ul>
+<p>意即<em>日志</em>。Logstash 默认输出日志到标准错误。生产环境下你可以通过 <code>bin/logstash -l logs/logstash.log</code> 命令来统一存储日志。</p>
+<ul>
+<li>–filterworkers 或 -w</li>
+</ul>
+<p>意即<em>工作线程</em>。Logstash 会运行多个线程。你可以用 <code>bin/logstash -w 5</code> 这样的方式强制 Logstash 为<strong>过滤</strong>插件运行 5 个线程。</p>
+<p><em>注意：Logstash目前还不支持输入插件的多线程。而输出插件的多线程需要在配置内部设置，这个命令行参数只是用来设置过滤插件的！</em></p>
+<p><strong>提示：Logstash 目前不支持对过滤器线程的监测管理。如果 filterworker 挂掉，Logstash 会处于一个无 filter 的僵死状态。这种情况在使用 filter/ruby 自己写代码时非常需要注意，很容易碰上 NoMethodError: undefined method ‘*‘ for nil:NilClass 错误。需要妥善处理，提前判断。</strong></p>
+<ul>
+<li>–pluginpath 或 -P</li>
+</ul>
+<p>可以写自己的插件，然后用 <code>bin/logstash --pluginpath /path/to/own/plugins</code> 加载它们。</p>
+<ul>
+<li>–verbose</li>
+</ul>
+<p>输出一定的调试日志。</p>
+<p><em>小贴士：如果你使用的 Logstash 版本低于 1.3.0，你只能用 bin/logstash -v 来代替。</em></p>
+<ul>
+<li>–debug</li>
+</ul>
+<p>输出更多的调试日志。</p>
+<p><em>小贴士：如果你使用的 Logstash 版本低于 1.3.0，你只能用 bin/logstash -vv 来代替。</em></p>
+<h3 id="输入插件-Input"><a href="#输入插件-Input" class="headerlink" title="输入插件(Input)"></a>输入插件(Input)</h3><p>Logstash 配置一定要有一个 input 和一个 output。</p>
+<h4 id="标准输入-Stdin"><a href="#标准输入-Stdin" class="headerlink" title="标准输入(Stdin)"></a>标准输入(Stdin)</h4><h5 id="配置示例"><a href="#配置示例" class="headerlink" title="配置示例"></a>配置示例</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/logstash/conf.d/system.conf</span><br><span class="line">input &#123;</span><br><span class="line">        stdin &#123;</span><br><span class="line">                add_field =&gt; &#123;"key" =&gt; "value"&#125;</span><br><span class="line">                codec =&gt; "plain"</span><br><span class="line">                tags =&gt; ["add"]</span><br><span class="line">                type =&gt; "std"</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">        stdout &#123;</span><br><span class="line">            # 这样写会输出到屏幕</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@A5_SW_3552P ~]# /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf </span><br><span class="line">WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults</span><br><span class="line">Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties. Using default config which logs errors to the console</span><br><span class="line">[WARN ] 2019-06-26 16:05:08.173 [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml' file because modules or command line options are specified</span><br><span class="line">[INFO ] 2019-06-26 16:05:08.213 [LogStash::Runner] runner - Starting Logstash &#123;"logstash.version"=&gt;"6.5.4"&#125;</span><br><span class="line">[INFO ] 2019-06-26 16:05:14.564 [Converge PipelineAction::Create&lt;main&gt;] pipeline - Starting pipeline &#123;:pipeline_id=&gt;"main", "pipeline.workers"=&gt;2, "pipeline.batch.size"=&gt;125, "pipeline.batch.delay"=&gt;50&#125;</span><br><span class="line">[INFO ] 2019-06-26 16:05:14.930 [[main]&gt;worker1] stdin - Automatically switching from plain to line codec &#123;:plugin=&gt;"stdin"&#125;</span><br><span class="line">[INFO ] 2019-06-26 16:05:15.043 [Converge PipelineAction::Create&lt;main&gt;] pipeline - Pipeline started successfully &#123;:pipeline_id=&gt;"main", :thread=&gt;"#&lt;Thread:0x55fda7a3 run&gt;"&#125;</span><br><span class="line">The stdin plugin is now waiting for input:</span><br><span class="line">[INFO ] 2019-06-26 16:05:15.171 [Ruby-0-Thread-1: /usr/share/logstash/lib/bootstrap/environment.rb:6] agent - Pipelines running &#123;:count=&gt;1, :running_pipelines=&gt;[:main], :non_running_pipelines=&gt;[]&#125;</span><br><span class="line">[INFO ] 2019-06-26 16:05:15.646 [Api Webserver] agent - Successfully started Logstash API endpoint &#123;:port=&gt;9600&#125;</span><br><span class="line">hello world</span><br><span class="line">&#123;</span><br><span class="line">       "message" =&gt; "hello world",</span><br><span class="line">    "@timestamp" =&gt; 2019-06-26T08:05:23.027Z,</span><br><span class="line">      "@version" =&gt; "1",</span><br><span class="line">          "host" =&gt; "A5_SW_3552P",</span><br><span class="line">           "key" =&gt; "value",</span><br><span class="line">          "tags" =&gt; [</span><br><span class="line">        [0] "add"</span><br><span class="line">    ],</span><br><span class="line">          "type" =&gt; "std"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h5><p><em>type</em> 和 <em>tags</em> 是 logstash 事件中两个特殊的字段。通常来说我们会在<em>输入区段</em>中通过 <em>type</em> 来标记事件类型 —— 我们肯定是提前能知道这个事件属于什么类型的。而 <em>tags</em> 则是在数据处理过程中，由具体的插件来添加或者删除的。</p>
+<p>最常见的用法是像下面这样：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">    stdin &#123;</span><br><span class="line">        type =&gt; "web"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">filter &#123;</span><br><span class="line">    if [type] == "web" &#123;</span><br><span class="line">        grok &#123;</span><br><span class="line">            match =&gt; ["message", %&#123;COMBINEDAPACHELOG&#125;]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">    if "_grokparsefailure" in [tags] &#123;</span><br><span class="line">        nagios_nsca &#123;</span><br><span class="line">            nagios_status =&gt; "1"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="读取文件-File"><a href="#读取文件-File" class="headerlink" title="读取文件(File)"></a>读取文件(File)</h4><p>​    Logstash 使用一个名叫 <em>FileWatch</em> 的 Ruby Gem 库来监听文件变化。这个库支持 glob 展开文件路径，而且会记录一个叫 <em>.sincedb</em> 的数据库文件来跟踪被监听的日志文件的当前读取位置。所以，不要担心 logstash 会漏过你的数据。</p>
+<p>​    <em>sincedb 文件中记录了每个被监听的文件的 inode, major number, minor number 和 pos。</em></p>
+<h5 id="配置示例-1"><a href="#配置示例-1" class="headerlink" title="配置示例"></a>配置示例</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">input</span><br><span class="line">    file &#123;</span><br><span class="line">        path =&gt; ["/var/log/*.log", "/var/log/message"]</span><br><span class="line">        type =&gt; "system"</span><br><span class="line">        start_position =&gt; "beginning"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="解释-1"><a href="#解释-1" class="headerlink" title="解释"></a>解释</h5><p>有一些比较有用的配置项，可以用来指定 <em>FileWatch</em> 库的行为：</p>
+<ul>
+<li>discover_interval</li>
+</ul>
+<p>logstash 每隔多久去检查一次被监听的 <code>path</code> 下是否有新文件。默认值是 15 秒。</p>
+<ul>
+<li>exclude</li>
+</ul>
+<p>不想被监听的文件可以排除出去，这里跟 <code>path</code> 一样支持 glob 展开。</p>
+<ul>
+<li>sincedb_path</li>
+</ul>
+<p>如果你不想用默认的 <code>$HOME/.sincedb</code>(Windows 平台上在 <code>C:\Windows\System32\config\systemprofile\.sincedb</code>)，可以通过这个配置定义 sincedb 文件到其他位置。</p>
+<ul>
+<li>sincedb_write_interval</li>
+</ul>
+<p>logstash 每隔多久写一次 sincedb 文件，默认是 15 秒。</p>
+<ul>
+<li>stat_interval</li>
+</ul>
+<p>logstash 每隔多久检查一次被监听文件状态（是否有更新），默认是 1 秒。</p>
+<ul>
+<li>start_position</li>
+</ul>
+<p>logstash 从什么位置开始读取文件数据，默认是结束位置，也就是说 logstash 进程会以类似 <code>tail -F</code> 的形式运行。如果你是要导入原有数据，把这个设定改成 “beginning”，logstash 进程就从头开始读取，有点类似 <code>cat</code>，但是读到最后一行不会终止，而是继续变成 <code>tail -F</code>。</p>
+<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><ol>
+<li>通常你要导入原有数据进 Elasticsearch 的话，你还需要 <a href="https://doc.yonyoucloud.com/doc/logstash-best-practice-cn/filter/date.html" target="_blank" rel="noopener">filter/date</a> 插件来修改默认的”@timestamp” 字段值。</li>
+<li><em>FileWatch</em> 只支持文件的<strong>绝对路径</strong>，而且会不自动递归目录。所以有需要的话，请用数组方式写明具体哪些文件。</li>
+<li><em>LogStash::Inputs::File</em> 只是在进程运行的注册阶段初始化一个 <em>FileWatch</em> 对象。所以它不能支持类似 fluentd 那样的 <code>path =&gt; &quot;/path/to/%{+yyyy/MM/dd/hh}.log&quot;</code> 写法。达到相同目的，你只能写成 <code>path =&gt; &quot;/path/to/*/*/*/*.log&quot;</code>。</li>
+<li><code>start_position</code> 仅在该文件从未被监听过的时候起作用。如果 sincedb 文件中已经有这个文件的 inode 记录了，那么 logstash 依然会从记录过的 pos 开始读取数据。所以重复测试的时候每回需要删除 sincedb 文件。使用locate查询，文件路径在/var/lib/logstash/plugins/inputs/file/目录下，也有一说在用户家目录中，但没有找到。</li>
+<li>因为 windows 平台上没有 inode 的概念，Logstash 某些版本在 windows 平台上监听文件不是很靠谱。windows 平台上，推荐考虑使用 nxlog 作为收集端。</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/26/ElasticSearch概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2179,178 +2461,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/24/网络工具使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/24/网络工具使用/" itemprop="url">
-                  网络工具使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-05-24 23:29:55" itemprop="dateCreated datePublished" datetime="2019-05-24T23:29:55+08:00">2019-05-24</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-06-11 11:32:42" itemprop="dateModified" datetime="2019-06-11T11:32:42+08:00">2019-06-11</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络/" itemprop="url" rel="index"><span itemprop="name">网络</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="针对协议抓包"><a href="#针对协议抓包" class="headerlink" title="针对协议抓包"></a>针对协议抓包</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i ens1f0 icmp -vv -nn</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以直接指定协议，但后面不能使用host参数。测试发现，如果不加-nn选项，tcpdump不会抓到任何包</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -n是对地址以数字方式显式，否则显式为主机名，也就是说-n选项不做主机名解析。-nn除了-n的作用外，还把端口显示为数值，否则显示端口服务名。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v是显示详细信息，加一个v就可以显示更详细的信息，最多是-vvv。</span></span><br></pre></td></tr></table></figure>
-<h3 id="使用指定网卡ping"><a href="#使用指定网卡ping" class="headerlink" title="使用指定网卡ping"></a>使用指定网卡ping</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping -I ens1f0 10.129.14.65</span><br></pre></td></tr></table></figure>
-<h3 id="CentOS服务器多网卡配置"><a href="#CentOS服务器多网卡配置" class="headerlink" title="CentOS服务器多网卡配置"></a>CentOS服务器多网卡配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">问题：在某服务器上安装CentOS7.3系统，配置两个网段的IP地址，一为10.129.14.16/27，一为10.129.14.40/27。客户端使用10.129.27/27，网关10.129.14.1。使用客户端ping服务器两地址时，只能ping能10.129.14.16/27，ping10.129.14.40/27时页面停住不动，查看服务器，应该是ping包可以到达服务器，但无法返回。</span><br><span class="line"></span><br><span class="line">解决：</span><br><span class="line">1. 配置服务器网卡</span><br><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-enp96s0f0</span><br><span class="line">TYPE="Ethernet"</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">DEFROUTE="yes"</span><br><span class="line">NAME="enp96s0f0"</span><br><span class="line">UUID="5f90c86f-c21f-489e-ae8f-cf36e6eac588"</span><br><span class="line">DEVICE="enp96s0f0"</span><br><span class="line">ONBOOT="yes"</span><br><span class="line">DNS1="202.96.209.6"</span><br><span class="line">DNS2="202.96.209.133"</span><br><span class="line">IPADDR=10.129.14.16</span><br><span class="line">PREFIX=27</span><br><span class="line"><span class="meta">#</span><span class="bash">GATEWAY=10.129.14.1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注释网卡配置中的GATEWAY一项，多块网卡都要注释</span></span><br><span class="line"></span><br><span class="line">2. 配置策略路由表</span><br><span class="line">vim /etc/iproute2/rt_tables </span><br><span class="line">252 enp96s0f1-32</span><br><span class="line">251 enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入上面两行，前面的数字是路由表的编号，后面是自定义的表名。路由表的编号是自定义的，但linux最多可管理255个表，不要超过这个数字，另外，rt_table中原有的编号不要动，自定义的表编号也不要与原有的编号冲突。</span></span><br><span class="line"></span><br><span class="line">3. 配置策略路由</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将路由规则加入CentOS7中的/etc/rc.d/init.d/network中可以使重启网卡时路由依然生效，方法如下</span></span><br><span class="line">vim /etc/rc.d/init.d/network</span><br><span class="line">ip route flush table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先清空策略路由表</span></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0 src 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一条策略路由规则，下一跳到10.129.14.1，网卡是enp96s0f0，源地址为10.129.14.16，添加到策略路由表enp96s0f0-0</span></span><br><span class="line">ip rule add from 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将从10.129.14.16经过的数据包都从enp96s0f0-0策略路由表中走</span></span><br><span class="line">ip route flush table enp96s0f1-32</span><br><span class="line">ip route add default via 10.129.14.33 dev enp96s0f1 src 10.129.14.40 table enp96s0f1-32</span><br><span class="line">ip rule add from 10.129.14.40 table enp96s0f1-32</span><br><span class="line"></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0</span><br><span class="line"></span><br><span class="line">exit $rc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里要注意，一定要添加在最后一行的<span class="built_in">exit</span> <span class="variable">$rc</span>之上。</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart network</span><br><span class="line">ip route</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看路由，加入的默认路由生效了</span></span><br><span class="line">ip rule</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看生效的策略路由表</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 最后，测试的机器上也要加一条到某网段的路由，如sudo ip route add 10.129.14.32/27 via 10.129.14.1。因为默认会从无线走如果不加这条路由规则，就要将无线断开或删除这条默认路由</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时客户端就可以ping通服务器的两个ip地址了</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2398,7 +2508,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">159</span>
+                    <span class="site-state-item-count">160</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2732,7 +2842,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">124</span>
+                      
+                    
+                    <span class="site-state-item-count">125</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

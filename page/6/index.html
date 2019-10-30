@@ -350,6 +350,217 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/集群概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/29/集群概念/" itemprop="url">
+                  集群概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-03-29 14:44:46 / 修改時間：17:30:10" itemprop="dateCreated datePublished" datetime="2019-03-29T14:44:46+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Cluster/" itemprop="url" rel="index"><span itemprop="name">Cluster</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="/images/cluster/架构.png" alt=""></p>
+<h3 id="消息交换和基础结构层"><a href="#消息交换和基础结构层" class="headerlink" title="消息交换和基础结构层"></a>消息交换和基础结构层</h3><blockquote>
+<p>Messaging and Infrastructure Layer：这一层也被称为心跳层，这一层主要包含了如发送心跳信息和集群中各种事务信息 </p>
+<p>Membership Layer：也叫CCM层，用来计算整个集群中的节点状态信息的大图景，以及同步这个信息给集群中的所有节点，如集群中有几个节点，可以投几票等信息。还有组织集群拓朴的组件，所以它可以拥有整个集群的全局视图。 </p>
+</blockquote>
+<h3 id="资源分配层"><a href="#资源分配层" class="headerlink" title="资源分配层"></a>资源分配层</h3><blockquote>
+<ul>
+<li>CRM：资源分配层所采取的每个动作都是通过CRM来实现的，所以它是基础核心层，在每个节点上，CRM负责生成一个CIB，使每个节点都能了解整个集群的所有配置状态等。CRM会在集群中选举出一个节点当作DC，DC负责维持主CIB文档，所有对CIB的修改都应该通过DC来实现，而后由DC同步给其他节点，对CIB的读写都应该通过主CIB，也就是DC上的CIB，不能修改非DC的CIB，因为非DC的CIB是不会同步的。在一个集群中DC是唯一的，而且能做集群范围的修改操作及其他所有操作都是由DC来做出的。CIB是一个位于内存中的（也会同步到磁盘中），XML格式的，保存了集群每个条目的相关信息，包括集群状态，节点成员关系，定义的资源，及资源的关系等，如果要修改CIB的话可以使用各种客户端工具，如cibadmin这样的命令行工具或heartbeat GUI这样的图形化工具。DC还拥有PE和TE两个组件，一旦DC要做一个集群全局范围的修改，Policy Engine将用于实现计算集群的下一个状态，如当某一个节点离去了，此时位于这个节点上的所有资源应该被转移，之后运行在哪个节点就要由DC来决策，决策后还要修改CIB文档，PE还要将状态变化保存到CIB中，DC所做出的决策，如约束，是否爆头等都是由PE计算得出的，之后由TE负责执行。由TE将PE的决策发放给每个CRM，各CRM收到信息后，将指令发送给LRM，LRM将指令发给RA去执行。RA是脚本，可以执行基本的三个操作，start/stop/monitor </li>
+</ul>
+</blockquote>
+<h4 id="群集资源管理器-CRM"><a href="#群集资源管理器-CRM" class="headerlink" title="群集资源管理器 (CRM)"></a>群集资源管理器 (CRM)</h4><blockquote>
+<p>在资源分配层中执行的每个操作都要经过群集资源管理器。如果资源分配层的其他组件（或更高层中的组件）需要通讯，则它们通过本地 CRM 进行。在每个节点上，CRM 都会维护群集信息库 (CIB)</p>
+</blockquote>
+<h4 id="群集信息库-CIB"><a href="#群集信息库-CIB" class="headerlink" title="群集信息库 (CIB)"></a>群集信息库 (CIB)</h4><blockquote>
+<p>群集信息库是整个群集配置和当前状态在内存中的 XML 表示。它包含所有群集选项、节点、资源、约束及其之间的关系的定义。CIB 还将更新同步到所有群集节点。群集中有一个主 CIB，由指定协调器 (DC)进行维护。所有其他节点都包含 CIB 复本。</p>
+</blockquote>
+<h4 id="指定协调器-DC"><a href="#指定协调器-DC" class="headerlink" title="指定协调器 (DC)"></a>指定协调器 (DC)</h4><blockquote>
+<p>群集中的一个 CRM 会被选为 DC。DC 是群集中唯一可以决定需要在整个群集执行更改（例如节点屏蔽或资源移动）的实体。DC 同时也是用于保存 CIB 主副本的节点。所有其他节点都从当前 DC 获取他们的配置和资源分配信息。DC 是在成员资格更改后从群集的所有节点中选出的。</p>
+</blockquote>
+<h4 id="策略引擎-PE"><a href="#策略引擎-PE" class="headerlink" title="策略引擎 (PE)"></a>策略引擎 (PE)</h4><blockquote>
+<p>只要指定协调程序需要进行群集范围的更改（对新 CIB 作出反应），策略引擎就会根据群集的当前状态和配置计算其下一个状态。PE 还生成一个转换图，包含用于达到下一个群集状态的（资源）操作和依赖性的列表。PE 始终在 DC 上运行。</p>
+</blockquote>
+<h4 id="本地资源管理器-LRM"><a href="#本地资源管理器-LRM" class="headerlink" title="本地资源管理器 (LRM)"></a>本地资源管理器 (LRM)</h4><blockquote>
+<p>LRM一般由CRM提供，代表 CRM 调用本地资源代理。因此它可以执行启动/停止/监视操作并将结果报告给 CRM。LRM 是其本地节点上所有资源相关信息的权威来源。</p>
+</blockquote>
+<h3 id="资源层"><a href="#资源层" class="headerlink" title="资源层"></a>资源层</h3><blockquote>
+<p>最高层是资源层。资源层包括一个或多个资源代理 (RA)。资源代理是已写入的用来启动、停止和监视某种服务（资源）的程序（通常是shell脚本）。资源代理仅由 LRM 调用。第三方可将他们自己的代理放在文件系统中定义的位置，这样就为各自的软件提供了现成群集集成。</p>
+<p>Resource Layer：这里是一堆脚本ocf格式或lsb格式，建议使用ocf格式 </p>
+</blockquote>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>群集最多可包含 32 个 Linux 服务器。如果群集内的一台服务器发生故障，则群集内的任何其他服务器均可重启动此服务器上的资源（应用程序、服务、IP 地址和文件系统）。</p>
+<p>集群中应该有奇数个节点，如果是偶数，应该引入仲裁设备，集群中的节点通过心跳信息通告自己的健康状态，而不是探测其他主机，这意味着每个节点上都要运行一个应用程序，这些应用程序在固定的IP地址和端口上工作，通常因为是一对多的通信关系，因此是通过多播的方式向多播域内发送心跳信息和集群事务信息，其他主机看到这个信息就知道这个主机是在线的，这种功能的实现的层次称为message layer，message layer不但能传送心跳，还能传送集群事务信息，比如：如果集群发生分裂的话，失去联系并不具备法定票数的主机会被杀死。这就是集群事务内的决策信息。任何应用要想实现高可用，就要调用message layer提供的多播模式传递心跳信息和集群事务信息完成集群内部资源运行的决策，但不是所有应用都有这种能力，这就需要由CRM集群资源管理器实现，它向上可以为不具备高可用能力的服务提供高可用性，让其可以利用message layer完成高可用。向下，它利用message layer传递过来的各节点的心跳和集群事务信息，形成一个大的决策图景，从而决策都由CRM决定。因为各种资源的启动方式各有不同，为了避免这种麻烦，在CRM之上又加入了一个层次，叫LRM本地资源管理器。本地资源管理器一般都是由集群资源管理器提供的，本地资源不能做出一个资源应该如何启动与关闭，而要借助资源代理RA来实现，这是第四个层次。在每个节点上都有众多的RA，它是帮助启动关闭监控资源的脚本 。</p>
+</blockquote>
+<h4 id="资源类型"><a href="#资源类型" class="headerlink" title="资源类型"></a>资源类型</h4><blockquote>
+<ul>
+<li>Primitive：主资源，只能运行于集群内的某单个节点；只能启动一份，也称作native </li>
+<li>Group：组资源，这是一个容器类资源，它可以包含一个或多个资源，这些资源可通过“组”这个资源统一进行调度 </li>
+<li>Clone：克隆资源，可以在同一个集群内的多个节点运行多份克隆； </li>
+<li>Master/slave：主从资源，在同一集群内部于两个节点运行两份资源，其中一个为主一个为从 </li>
+</ul>
+</blockquote>
+<h4 id="资源的约束的关系"><a href="#资源的约束的关系" class="headerlink" title="资源的约束的关系"></a>资源的约束的关系</h4><blockquote>
+<ul>
+<li>location：位置约束，定义资源对节点的倾向性；用数值表示，从负无穷到正无穷 </li>
+<li>colocation：排列约束，定义资源彼此间“在一起”的倾向性；从负无穷到正无穷</li>
+<li>分组：也能实现将多个资源绑定在一起；但不能让资源不在一起 </li>
+<li>Order：顺序约束，定义资源在同一个节点上启动时的先后顺序； </li>
+</ul>
+<p>运行在哪个节点，是在资源管理器的接口上进行配置，配置有三：1.这个资源更倾向运行在哪个节点上；2.这个资源更倾向与哪个资源运行在一起，注意：一个资源不能称之为服务，比如构建一个高可用的web集群，需要IP地址，进程，页面文件等，所以高可用服务与高可用资源是两回事。高可用服务可能包括多个高可用资源。一个高可用集群中的高可用资源可能有多个，而且要分类在一起才能构建成一个服务，比如，要启动三个资源，IP在第一个节点上，进程在第二个节点上，页面文件在第三个节点上，这是没用的，因为它们要同进退的。所以哪些资源要运行在一起，不能分开。这叫资源的排列约束。这主要是定义资源在一起的倾向性的。3. 如果多个资源必须运行在同一个节点上，并提供同一个服务工作，那是否有先后次序关系呢？是否要先启动一个再启动一个。比如：是先挂载页面文件还是先启动web进程。这就是次序约束。 </p>
+</blockquote>
+<blockquote>
+<p>参考：</p>
+<p><a href="https://www.suse.com/zh-cn/documentation/sle_ha/singlehtml/book_sleha/book_sleha.html#idm140043812445408" target="_blank" rel="noopener">SUSE Linux Enterprise High Availability Extension 11 SP4 高可用性指南</a></p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/corosync&pacemaker集群部署/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -965,7 +1176,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-10-12 18:14:11" itemprop="dateModified" datetime="2019-10-12T18:14:11+08:00">2019-10-12</time>
+                <time title="修改時間：2019-10-30 17:21:57" itemprop="dateModified" datetime="2019-10-30T17:21:57+08:00">2019-10-30</time>
               
             
           </span>
@@ -1053,8 +1264,8 @@
 <li>成员资格：表达式k in d(其中d 是一个字典)查找的是键而不是值，而表达式v in l(其中l是一个列表)查找的是值而不是索引。这看似不太一致，但你习惯后就会觉得相当自然。毕竟如果字典包含指定的键，检查相应的值就很容易。</li>
 </ul>
 <p>相比于检查列表是否包含指定的值，检查字典是否包含指定的键的效率更高。数据结构越大，效率差距就越大。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建与使用</span></span><br><span class="line">phonebook = &#123;<span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</span><br><span class="line"><span class="comment"># 字典由键及其相应的值组成，这种键值对称为项(item)。这里键为名字，而值为电话号码。每个键与</span></span><br><span class="line"><span class="comment"># 其值之间都用冒号(:)分隔，项之间用逗号分隔，而整个字典放在花括号内。空字典(没有任何项)用两</span></span><br><span class="line"><span class="comment"># 个花括号表示。</span></span><br><span class="line"><span class="comment"># 在字典(以及其他映射类型)中，键必须是独一无二的，而字典中的值无需如此。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建字典</span></span><br><span class="line">l1 = list(range(<span class="number">5</span>))</span><br><span class="line">d = dict(l1)</span><br><span class="line"><span class="comment"># 这样是不行是，因为l1里都是单值，字典需要两个值。</span></span><br><span class="line"></span><br><span class="line">d = dict(enumerate(l1))</span><br><span class="line"><span class="comment"># enumerate是给值加上索引的，这样也就是两个值了。</span></span><br><span class="line"></span><br><span class="line">e = enumerate(l1)</span><br><span class="line">print(type(e))</span><br><span class="line"><span class="comment"># e的类型枚举，是一个可迭代对象，可以使用list、set、tuple来包括这个类型，用什么方法包括这</span></span><br><span class="line"><span class="comment"># 个类型，这个类型就生成什么数据类型。也就是封装成什么就返回什么类型</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> e:</span><br><span class="line">    print(x)</span><br><span class="line"><span class="comment"># 返回的是二元组，在python命令行中执行要使用Ctrl + 回车</span></span><br><span class="line"></span><br><span class="line">d = dict(e)</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这是一个类似生成器的东西，走到头就不会再走了，所以d返回的是&#123;&#125;。</span></span><br><span class="line"></span><br><span class="line">e = enumerate(l1)</span><br><span class="line">d = dict(e)</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这样就生成了一个字典</span></span><br><span class="line"></span><br><span class="line">d = &#123;(<span class="string">'a'</span>,<span class="number">1</span>)&#125;</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这样是不可以的，因为结果不是key:value</span></span><br><span class="line">c = dict(((<span class="number">1</span>,<span class="string">'a'</span>),))</span><br><span class="line">print(c)</span><br><span class="line"><span class="comment"># 需要使用这种方式，dict中是一个元组，一般不用这种方式。((1,'a'),)表示一个元组，因为字典</span></span><br><span class="line"><span class="comment"># 需要两个值，所以定义成(1,'a')</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用dict函数创建</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>items = [(<span class="string">'name'</span>, <span class="string">'Gumby'</span>), (<span class="string">'age'</span>, <span class="number">42</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = dict(items)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>]</span><br><span class="line"><span class="string">'Gumby'</span></span><br><span class="line"><span class="comment"># 使用函数dict从其他映射(如其他字典)或键值对序列创建字典。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = dict(name=<span class="string">'Gumby'</span>, age=<span class="number">42</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="comment"># 使用关键字实参来调用这个函数</span></span><br><span class="line"><span class="comment"># 也可使用一个映射实参来调用它，这将创建一个字典，其中包含指定映射中的所有项。像函数list、</span></span><br><span class="line"><span class="comment"># tuple和str一样，如果调用这个函数时没有提供任何实参，将返回一个空字典。从映射创建字典时，</span></span><br><span class="line"><span class="comment"># 如果该映射也是字典(毕竟字典是Python中唯一的内置映射类型)，可不使用函数dict，而是使用字</span></span><br><span class="line"><span class="comment"># 典方法copy</span></span><br><span class="line"><span class="comment"># 与list、tuple和str一样，dict其实根本就不是函数，而是一个类。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = []</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="number">42</span>] = <span class="string">'Foobar'</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">File "&lt;stdin&gt;", line 1, in ?</span><br><span class="line">IndexError: list assignment index out of range</span><br><span class="line"><span class="comment"># 将字符串'Foobar'赋给一个空列表中索引为42的元素。这是不可以的，因为没有这样的元素。要让这</span></span><br><span class="line"><span class="comment"># 种操作可行，初始化x时，必须使用[None] * 43之类的代码，而不能使用[]。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="number">42</span>] = <span class="string">'Foobar'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x</span><br><span class="line">&#123;<span class="number">42</span>: <span class="string">'Foobar'</span>&#125;</span><br><span class="line"><span class="comment"># 将'Foobar'赋给一个空字典的键42，这样做一点问题都没有</span></span><br><span class="line"></span><br><span class="line">people = &#123;</span><br><span class="line">    <span class="string">'Alice'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'2341'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Foo drive 23'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Beth'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'9102'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Bar street 42'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Cecil'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'3158'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Baz avenue 90'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 一个将人名用作键的字典。每个人都用一个字典表示，字典包含键'phone'和'addr'，它们分别与电</span></span><br><span class="line"><span class="comment"># 话号码和地址相关联</span></span><br><span class="line"></span><br><span class="line">labels = &#123;</span><br><span class="line"><span class="string">'phone'</span>: <span class="string">'phone number'</span>,</span><br><span class="line"><span class="string">'addr'</span>: <span class="string">'address'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 电话号码和地址的描述性标签，供打印输出时使用</span></span><br><span class="line"></span><br><span class="line">name = input(<span class="string">'Name: '</span>)</span><br><span class="line"></span><br><span class="line">request = input(<span class="string">'Phone number (p) or address (a)? '</span>)</span><br><span class="line"><span class="comment"># 要查找电话号码还是地址?</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> request == <span class="string">'p'</span>: key = <span class="string">'phone'</span></span><br><span class="line"><span class="keyword">if</span> request == <span class="string">'a'</span>: key = <span class="string">'addr'</span></span><br><span class="line"><span class="comment"># 判断输入的是电话还是地址，如果是电话，key='phone'；如果是地址，key = 'addr'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> name <span class="keyword">in</span> people: print(<span class="string">"&#123;&#125;'s &#123;&#125; is &#123;&#125;."</span>.format(name, labels[key], people[name][key]))</span><br><span class="line"><span class="comment"># 仅当名字是字典包含的键时才打印信息，打印的格式为某人的电话或地址是什么，format指定三个值</span></span><br><span class="line"><span class="comment"># 对应前面的三个中括号，第一个值是用户输入的name；第二个值是key，key可以是phone或addr，</span></span><br><span class="line"><span class="comment"># 在labels字典中查找对应的电话号码或地址；第三个值是使用name和key的值在people字典中查找</span></span><br><span class="line"><span class="comment"># 对应的值。</span></span><br><span class="line">这个程序的运行情况类似于下面这样:</span><br><span class="line">Name: Beth</span><br><span class="line">Phone number (p) or address (a)? p</span><br><span class="line">Beth<span class="string">'s phone number is 9102.</span></span><br></pre></td></tr></table></figure>
-<h3 id="类与函数调用"><a href="#类与函数调用" class="headerlink" title="类与函数调用"></a>类与函数调用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">l1 = list()</span><br><span class="line">print(l1)</span><br><span class="line"><span class="comment"># 上面定义了l1是一个空列表</span></span><br><span class="line"></span><br><span class="line">a = list</span><br><span class="line">l2 = a</span><br><span class="line">type(l2)</span><br><span class="line"><span class="comment"># 这样定义后，l2是一个类而不是列表。因为定义了a等于list类</span></span><br><span class="line"></span><br><span class="line">l3 = a()</span><br><span class="line">print(l3)</span><br><span class="line"><span class="comment"># l3被定义成了一个空列表，因为a等于list，所以这里l3 = a()就等于l3 = list()</span></span><br><span class="line"><span class="comment"># a = list就是a把list的名称拿走了，等于把名称对应的地址拿走了</span></span><br><span class="line"><span class="comment"># 函数也是一个对象，对象在内存中有一个地方放。这个地方就是函数的地址。列表放在内存中是一个对</span></span><br><span class="line"><span class="comment"># 象，比如创建一个空列表，这是一个对象，我们把空列表赋值给了l3，l3拿的就是这个空列表对象的</span></span><br><span class="line"><span class="comment"># 地址。现在我们给出一个函数list，函数本身也是对象，一切皆对象。我们把这个对象给了a，就是把</span></span><br><span class="line"><span class="comment"># a覆盖掉了，这是把对象地址或叫对象引用给了a，这时a与list也就是等价的了。如果写成list()就</span></span><br><span class="line"><span class="comment"># 是调用了，只要加了括号就是调用了。</span></span><br><span class="line"><span class="comment"># 也就是说，a = list是将对象地址给了a，a与list等价。a = list()是调用，将调用list函数的结果给了a，a被定义成了一个空列表</span></span><br><span class="line"></span><br><span class="line">l4 = <span class="number">5</span>()</span><br><span class="line"><span class="comment"># 这样定义会提示"TypeError: 'int' object is not callable"，这说明int类型是不可以调</span></span><br><span class="line"><span class="comment"># 用的。这就说明了加括号是可以调用前面的对象或名称的，但前面的对象或名称需要是可调用的对象。</span></span><br><span class="line"><span class="comment"># list是一个写好的函数，这个函数已经被当前环境加载过了，所以这个名称可以直接拿来用，这个名</span></span><br><span class="line"><span class="comment"># 称指代的是list名称加载到内存中的位置，这就是引用类型。真正的引用并不是我们写一个列表，把</span></span><br><span class="line"><span class="comment"># 列表赋值给变量，这才是对它的引用，实际这个函数也是对象，它也在内存中，你要引用它，也要通过</span></span><br><span class="line"><span class="comment"># 它的名称才能引用，一加括号意义就变了，这个对象如果是可调用对象的话，我们就调用它了。如果函</span></span><br><span class="line"><span class="comment"># 数是一个可调用对象，调用时就会执行函数里的函数体了。之后的类也可以变成一个可调用对象，比如</span></span><br><span class="line"><span class="comment"># 把一个类实例化了，它就变成一个对象，这个对象后面也可以加括号，这就是python的技巧</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建与使用</span></span><br><span class="line">phonebook = &#123;<span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</span><br><span class="line"><span class="comment"># 字典由键及其相应的值组成，这种键值对称为项(item)。这里键为名字，而值为电话号码。每个键与其值之间都用</span></span><br><span class="line"><span class="comment"># 冒号(:)分隔，项之间用逗号分隔，而整个字典放在花括号内。空字典(没有任何项)用两个花括号表示。在字典(以</span></span><br><span class="line"><span class="comment"># 及其他映射类型)中，键必须是独一无二的，而字典中的值无需如此。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建字典</span></span><br><span class="line">l1 = list(range(<span class="number">5</span>))</span><br><span class="line">d = dict(l1)</span><br><span class="line"><span class="comment"># 这样是不行是，因为l1里都是单值，字典需要两个值。</span></span><br><span class="line"></span><br><span class="line">d = dict(enumerate(l1))</span><br><span class="line"><span class="comment"># enumerate是给值加上索引的，这样也就是两个值了。</span></span><br><span class="line"></span><br><span class="line">e = enumerate(l1)</span><br><span class="line">print(type(e))</span><br><span class="line"><span class="comment"># e的类型枚举，是一个可迭代对象，可以使用list、set、tuple来包括这个类型，用什么方法包括这个类型，这个</span></span><br><span class="line"><span class="comment"># 类型就生成什么数据类型。也就是封装成什么就返回什么类型</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> e:</span><br><span class="line">    print(x)</span><br><span class="line"><span class="comment"># 返回的是二元组，在python命令行中执行要使用Ctrl + 回车</span></span><br><span class="line"></span><br><span class="line">d = dict(e)</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这是一个类似生成器的东西，走到头就不会再走了，所以d返回的是&#123;&#125;。</span></span><br><span class="line"></span><br><span class="line">e = enumerate(l1)</span><br><span class="line">d = dict(e)</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这样就生成了一个字典</span></span><br><span class="line"></span><br><span class="line">d = &#123;(<span class="string">'a'</span>,<span class="number">1</span>)&#125;</span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这样是不可以的，因为结果不是key:value</span></span><br><span class="line">c = dict(((<span class="number">1</span>,<span class="string">'a'</span>),))</span><br><span class="line">print(c)</span><br><span class="line"><span class="comment"># 需要使用这种方式，dict中是一个元组，一般不用这种方式。((1,'a'),)表示一个元组，因为字典</span></span><br><span class="line"><span class="comment"># 需要两个值，所以定义成(1,'a')</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用dict函数创建</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>items = [(<span class="string">'name'</span>, <span class="string">'Gumby'</span>), (<span class="string">'age'</span>, <span class="number">42</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = dict(items)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>]</span><br><span class="line"><span class="string">'Gumby'</span></span><br><span class="line"><span class="comment"># 使用函数dict从其他映射(如其他字典)或键值对序列创建字典。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = dict(name=<span class="string">'Gumby'</span>, age=<span class="number">42</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="comment"># 使用关键字实参来调用这个函数</span></span><br><span class="line"><span class="comment"># 也可使用一个映射实参来调用它，这将创建一个字典，其中包含指定映射中的所有项。像函数list、tuple和str一</span></span><br><span class="line"><span class="comment"># 样，如果调用这个函数时没有提供任何实参，将返回一个空字典。从映射创建字典时，如果该映射也是字典(毕竟字</span></span><br><span class="line"><span class="comment"># 典是Python中唯一的内置映射类型)，可不使用函数dict，而是使用字典方法copy。与list、tuple和str一样，</span></span><br><span class="line"><span class="comment"># dict其实根本就不是函数，而是一个类。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = []</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="number">42</span>] = <span class="string">'Foobar'</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">File "&lt;stdin&gt;", line 1, in ?</span><br><span class="line">IndexError: list assignment index out of range</span><br><span class="line"><span class="comment"># 将字符串'Foobar'赋给一个空列表中索引为42的元素。这是不可以的，因为没有这样的元素。要让这种操作可行，</span></span><br><span class="line"><span class="comment"># 初始化x时，必须使用[None] * 43之类的代码，而不能使用[]。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="number">42</span>] = <span class="string">'Foobar'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x</span><br><span class="line">&#123;<span class="number">42</span>: <span class="string">'Foobar'</span>&#125;</span><br><span class="line"><span class="comment"># 将'Foobar'赋给一个空字典的键42，这样做一点问题都没有</span></span><br><span class="line"></span><br><span class="line">people = &#123;</span><br><span class="line">    <span class="string">'Alice'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'2341'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Foo drive 23'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Beth'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'9102'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Bar street 42'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Cecil'</span>: &#123;</span><br><span class="line">            <span class="string">'phone'</span>: <span class="string">'3158'</span>,</span><br><span class="line">            <span class="string">'addr'</span>: <span class="string">'Baz avenue 90'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 一个将人名用作键的字典。每个人都用一个字典表示，字典包含键'phone'和'addr'，它们分别与电</span></span><br><span class="line"><span class="comment"># 话号码和地址相关联</span></span><br><span class="line"></span><br><span class="line">labels = &#123;</span><br><span class="line"><span class="string">'phone'</span>: <span class="string">'phone number'</span>,</span><br><span class="line"><span class="string">'addr'</span>: <span class="string">'address'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 电话号码和地址的描述性标签，供打印输出时使用</span></span><br><span class="line"></span><br><span class="line">name = input(<span class="string">'Name: '</span>)</span><br><span class="line"></span><br><span class="line">request = input(<span class="string">'Phone number (p) or address (a)? '</span>)</span><br><span class="line"><span class="comment"># 要查找电话号码还是地址?</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> request == <span class="string">'p'</span>: key = <span class="string">'phone'</span></span><br><span class="line"><span class="keyword">if</span> request == <span class="string">'a'</span>: key = <span class="string">'addr'</span></span><br><span class="line"><span class="comment"># 判断输入的是电话还是地址，如果是电话，key='phone'；如果是地址，key = 'addr'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> name <span class="keyword">in</span> people: print(<span class="string">"&#123;&#125;'s &#123;&#125; is &#123;&#125;."</span>.format(name, labels[key], people[name][key]))</span><br><span class="line"><span class="comment"># 仅当名字是字典包含的键时才打印信息，打印的格式为某人的电话或地址是什么，format指定三个值</span></span><br><span class="line"><span class="comment"># 对应前面的三个中括号，第一个值是用户输入的name；第二个值是key，key可以是phone或addr，</span></span><br><span class="line"><span class="comment"># 在labels字典中查找对应的电话号码或地址；第三个值是使用name和key的值在people字典中查找</span></span><br><span class="line"><span class="comment"># 对应的值。</span></span><br><span class="line">这个程序的运行情况类似于下面这样:</span><br><span class="line">Name: Beth</span><br><span class="line">Phone number (p) or address (a)? p</span><br><span class="line">Beth<span class="string">'s phone number is 9102.</span></span><br></pre></td></tr></table></figure>
+<h3 id="类与函数调用"><a href="#类与函数调用" class="headerlink" title="类与函数调用"></a>类与函数调用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">l1 = list()</span><br><span class="line">print(l1)</span><br><span class="line"><span class="comment"># 上面定义了l1是一个空列表</span></span><br><span class="line"></span><br><span class="line">a = list</span><br><span class="line">l2 = a</span><br><span class="line">type(l2)</span><br><span class="line"><span class="comment"># 这样定义后，l2是一个类而不是列表。因为定义了a等于list类</span></span><br><span class="line"></span><br><span class="line">l3 = a()</span><br><span class="line">print(l3)</span><br><span class="line"><span class="comment"># l3被定义成了一个空列表，因为a等于list，所以这里l3 = a()就等于l3 = list()</span></span><br><span class="line"><span class="comment"># a = list就是a把list的名称拿走了，等于把名称对应的地址拿走了</span></span><br><span class="line"><span class="comment"># 函数也是一个对象，对象在内存中有一个地方放。这个地方就是函数的地址。列表放在内存中是一个对象，比如创建</span></span><br><span class="line"><span class="comment"># 一个空列表，这是一个对象，我们把空列表赋值给了l3，l3拿的就是这个空列表对象的地址。现在我们给出一个函数</span></span><br><span class="line"><span class="comment"># list，函数本身也是对象，一切皆对象。我们把这个对象给了a，就是把a覆盖掉了，这是把对象地址或叫对象引用</span></span><br><span class="line"><span class="comment"># 给了a，这时a与list也就是等价的了。如果写成list()就是调用了，只要加了括号就是调用了。也就是说，</span></span><br><span class="line"><span class="comment"># a = list是将对象地址给了a，a与list等价。a = list()是调用，将调用list函数的结果给了a，a被定义成了一个空列表</span></span><br><span class="line"></span><br><span class="line">l4 = <span class="number">5</span>()</span><br><span class="line"><span class="comment"># 这样定义会提示"TypeError: 'int' object is not callable"，这说明int类型是不可以调用的。这就说明</span></span><br><span class="line"><span class="comment"># 了加括号是可以调用前面的对象或名称的，但前面的对象或名称需要是可调用的对象。list是一个写好的函数，这个</span></span><br><span class="line"><span class="comment"># 函数已经被当前环境加载过了，所以这个名称可以直接拿来用，这个名称指代的是list名称加载到内存中的位置，这</span></span><br><span class="line"><span class="comment"># 就是引用类型。真正的引用并不是我们写一个列表，把列表赋值给变量，这才是对它的引用，实际这个函数也是对</span></span><br><span class="line"><span class="comment"># 象，它也在内存中，你要引用它，也要通过它的名称才能引用，一加括号意义就变了，这个对象如果是可调用对象的</span></span><br><span class="line"><span class="comment"># 话，我们就调用它了。如果函数是一个可调用对象，调用时就会执行函数里的函数体了。之后的类也可以变成一个可</span></span><br><span class="line"><span class="comment"># 调用对象，比如把一个类实例化了，它就变成一个对象，这个对象后面也可以加括号，这就是python的技巧</span></span><br></pre></td></tr></table></figure>
 <h3 id="字典元素的访问"><a href="#字典元素的访问" class="headerlink" title="字典元素的访问"></a>字典元素的访问</h3><ul>
 <li>d[key]<ul>
 <li>返回key对应的值value</li>
@@ -1075,7 +1286,7 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法setdefault 有点像 get，因为它也获取与指定键相关联的值，但除此之外，setdefault还在字典不包含指定的键时，在字典中添加指定的键值对。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.setdefault(<span class="string">'name'</span>, <span class="string">'N/A'</span>)</span><br><span class="line"><span class="string">'N/A'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'N/A'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>] = <span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.setdefault(<span class="string">'name'</span>, <span class="string">'N/A'</span>)  </span><br><span class="line"><span class="comment"># 这里不加'N/A'也可以，N/A是默认值，如果name没有对应值就返回此值</span></span><br><span class="line"><span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="comment"># 指定的键不存在时， setdefault返回指定的值并相应地更新字典。如果指定的键存在，就返回其</span></span><br><span class="line"><span class="comment"># 值，并保持字典不变。与get一样，值是可选的；如果没有指定，默认为None。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d.setdefault(<span class="string">'name'</span>))</span><br><span class="line"><span class="keyword">None</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="keyword">None</span>&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法setdefault 有点像 get，因为它也获取与指定键相关联的值，但除此之外，setdefault还在字典不包含指定的键时，在字典中添加指定的键值对。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.setdefault(<span class="string">'name'</span>, <span class="string">'N/A'</span>)</span><br><span class="line"><span class="string">'N/A'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'N/A'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>] = <span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.setdefault(<span class="string">'name'</span>, <span class="string">'N/A'</span>)  </span><br><span class="line"><span class="comment"># 这里不加'N/A'也可以，N/A是默认值，如果name没有对应值就返回此值</span></span><br><span class="line"><span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="comment"># 指定的键不存在时， setdefault返回指定的值并相应地更新字典。如果指定的键存在，就返回其值，并保持字典</span></span><br><span class="line"><span class="comment"># 不变。与get一样，值是可选的；如果没有指定，默认为None。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d.setdefault(<span class="string">'name'</span>))</span><br><span class="line"><span class="keyword">None</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="keyword">None</span>&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="字典增加和修改"><a href="#字典增加和修改" class="headerlink" title="字典增加和修改"></a>字典增加和修改</h3><ul>
 <li>d[key] = value<ul>
 <li>将key对应的值修改为value</li>
@@ -1099,7 +1310,7 @@
 <ul>
 <li>copy（返回一个新字典）</li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法copy返回一个新字典，其包含的键值对与原来的字典相同(这个方法执行的是浅复制，因为值本身</span></span><br><span class="line"><span class="comment"># 是原件，而非副本)。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;<span class="string">'username'</span>: <span class="string">'admin'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x.copy()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y[<span class="string">'username'</span>] = <span class="string">'mlh'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y[<span class="string">'machines'</span>].remove(<span class="string">'bar'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'username'</span>: <span class="string">'mlh'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x</span><br><span class="line">&#123;<span class="string">'username'</span>: <span class="string">'admin'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="comment"># 当替换副本中的值时，原件不受影响。然而，如果修改副本中的值(就地修改而不是替换)，原件也将</span></span><br><span class="line"><span class="comment"># 发生变化，因为原件指向的也是被修改的值</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> copy <span class="keyword">import</span> deepcopy</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'names'</span>] = [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c = d.copy()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dc = deepcopy(d)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'names'</span>].append(<span class="string">'Clive'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c</span><br><span class="line">&#123;<span class="string">'names'</span>: [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>, <span class="string">'Clive'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dc</span><br><span class="line">&#123;<span class="string">'names'</span>: [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>]&#125;</span><br><span class="line"><span class="comment"># 深复制，即同时复制值及其包含的所有值，等等。为此，可使用模块copy中的函数deepcopy。c和dc</span></span><br><span class="line"><span class="comment"># 的值都是从d复制过来的，只是c是浅复制，dc是深复制，在d中追加值后，c的值也有变化，dc没有。</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法copy返回一个新字典，其包含的键值对与原来的字典相同(这个方法执行的是浅复制，因为值本身是原件，而非副本)。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;<span class="string">'username'</span>: <span class="string">'admin'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x.copy()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y[<span class="string">'username'</span>] = <span class="string">'mlh'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y[<span class="string">'machines'</span>].remove(<span class="string">'bar'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'username'</span>: <span class="string">'mlh'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x</span><br><span class="line">&#123;<span class="string">'username'</span>: <span class="string">'admin'</span>, <span class="string">'machines'</span>: [<span class="string">'foo'</span>, <span class="string">'baz'</span>]&#125;</span><br><span class="line"><span class="comment"># 当替换副本中的值时，原件不受影响。然而，如果修改副本中的值(就地修改而不是替换)，原件也将发生变化，因为</span></span><br><span class="line"><span class="comment"># 原件指向的也是被修改的值</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> copy <span class="keyword">import</span> deepcopy</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'names'</span>] = [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c = d.copy()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dc = deepcopy(d)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'names'</span>].append(<span class="string">'Clive'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c</span><br><span class="line">&#123;<span class="string">'names'</span>: [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>, <span class="string">'Clive'</span>]&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dc</span><br><span class="line">&#123;<span class="string">'names'</span>: [<span class="string">'Alfred'</span>, <span class="string">'Bertrand'</span>]&#125;</span><br><span class="line"><span class="comment"># 深复制，即同时复制值及其包含的所有值，等等。为此，可使用模块copy中的函数deepcopy。c和dc的值都是从d</span></span><br><span class="line"><span class="comment"># 复制过来的，只是c是浅复制，dc是深复制，在d中追加值后，c的值也有变化，dc没有。</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>fromkeys（创建新字典）</li>
 </ul>
@@ -1122,75 +1333,32 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法popitem类似于list.pop ，但 list.pop弹出列表中的最后一个元素，而popitem随机地弹</span></span><br><span class="line"><span class="comment"># 出一个字典项，因为字典项的顺序是不确定的，没有“最后一个元素”的概念。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'url'</span>: <span class="string">'http://www.python.org'</span>, <span class="string">'spam'</span>: <span class="number">0</span>, <span class="string">'title'</span>: <span class="string">'Python Web Site'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.popitem()</span><br><span class="line">(<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'spam'</span>: <span class="number">0</span>, <span class="string">'title'</span>: <span class="string">'Python Web Site'</span>&#125;</span><br><span class="line"><span class="comment"># 虽然popitem 类似于列表方法pop，但字典没有与append(它在列表末尾添加一个元素)对应的方</span></span><br><span class="line"><span class="comment"># 法。这是因为字典是无序的，类似的方法毫无意义。</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法popitem类似于list.pop ，但 list.pop弹出列表中的最后一个元素，而popitem随机地弹出一个字典项，</span></span><br><span class="line"><span class="comment"># 因为字典项的顺序是不确定的，没有“最后一个元素”的概念。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'url'</span>: <span class="string">'http://www.python.org'</span>, <span class="string">'spam'</span>: <span class="number">0</span>, <span class="string">'title'</span>: <span class="string">'Python Web Site'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.popitem()</span><br><span class="line">(<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'spam'</span>: <span class="number">0</span>, <span class="string">'title'</span>: <span class="string">'Python Web Site'</span>&#125;</span><br><span class="line"><span class="comment"># 虽然popitem 类似于列表方法pop，但字典没有与append(它在列表末尾添加一个元素)对应的方法。这是因为字典</span></span><br><span class="line"><span class="comment"># 是无序的，类似的方法毫无意义。</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li><p>clear()</p>
 <ul>
 <li>清空字典</li>
+<li>就地修改</li>
 </ul>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># clear（删除所有字典项）</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>] = <span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'age'</span>] = <span class="number">42</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>returned_value = d.clear()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(returned_value)</span><br><span class="line"><span class="keyword">None</span></span><br><span class="line"><span class="comment"># 这种操作是就地执行的(就像list.sort一样)，因此什么都不返回(或者说返回None)。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="string">'key'</span>] = <span class="string">'value'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="comment"># x和y最初都指向同一个字典。通过将一个空字典赋给x来“清空”它。这对y没有任何影响，它依然指向</span></span><br><span class="line"><span class="comment"># 原来的字典。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="string">'key'</span>] = <span class="string">'value'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x.clear()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="comment"># 要删除原来字典的所有元素，必须使用clear。如果这样做，y也将是空的</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># clear（删除所有字典项）</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'name'</span>] = <span class="string">'Gumby'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'age'</span>] = <span class="number">42</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'age'</span>: <span class="number">42</span>, <span class="string">'name'</span>: <span class="string">'Gumby'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>returned_value = d.clear()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(returned_value)</span><br><span class="line"><span class="keyword">None</span></span><br><span class="line"><span class="comment"># 这种操作是就地执行的(就像list.sort一样)，因此什么都不返回(或者说返回None)。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="string">'key'</span>] = <span class="string">'value'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="comment"># x和y最初都指向同一个字典。通过将一个空字典赋给x来“清空”它。这对y没有任何影响，它依然指向原来的字典。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = x</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x[<span class="string">'key'</span>] = <span class="string">'value'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;<span class="string">'key'</span>: <span class="string">'value'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x.clear()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="comment"># 要删除原来字典的所有元素，必须使用clear。如果这样做，y也将是空的</span></span><br></pre></td></tr></table></figure>
 <ul>
-<li><p>del语句</p>
-<p>a = True</p>
-<p>b = [6]</p>
-<p>d = {‘a’:1,’b’:b,’c’:[1,3,5]}</p>
-<p>del a</p>
-<p>del d[‘c’]   # 删除了一个对象[1,3,5]？</p>
-<p>del b[0]</p>
-<p>c = b</p>
-<p>del c</p>
-<p>del b</p>
-<p>b = d[‘b’]</p>
-<ul>
-<li>del a[‘c’]看着像删除了一个对象，本质上减少了一个对象的引用，del实际上删除的是名称，而不是对象</li>
+<li>del语句</li>
 </ul>
-</li>
-</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="keyword">True</span></span><br><span class="line">b = [<span class="number">6</span>]</span><br><span class="line">d = &#123;<span class="string">'a'</span>:<span class="number">1</span>,<span class="string">'b'</span>:b,<span class="string">'c'</span>:[<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>]&#125;</span><br><span class="line"><span class="keyword">del</span> a</span><br><span class="line"><span class="keyword">del</span> d[<span class="string">'c'</span>]   <span class="comment"># 删除了'c'键及其值</span></span><br><span class="line"><span class="keyword">del</span> b[<span class="number">0</span>]   <span class="comment"># 变成了空列表</span></span><br><span class="line">c = b</span><br><span class="line"><span class="keyword">del</span> c</span><br><span class="line"><span class="keyword">del</span> b</span><br><span class="line">b = d[<span class="string">'b'</span>]</span><br><span class="line"><span class="comment"># del d['c']看着像删除了一个对象，本质上减少了一个对象的引用，del实际上删除的是名称，而不是对象</span></span><br></pre></td></tr></table></figure>
 <h3 id="字典遍历"><a href="#字典遍历" class="headerlink" title="字典遍历"></a>字典遍历</h3><ul>
-<li><p>for … in dict</p>
-<ul>
 <li>遍历key，方法keys返回一个字典视图，其中包含指定字典中的键。</li>
 </ul>
-<p>for k in d:</p>
-<p>​    print(k)</p>
-<p>for k in d.keys():</p>
-<p>​    print(k)</p>
-<p>//下面这种方法较常用</p>
-</li>
-<li><p>for … in dict</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Method：</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d:</span><br><span class="line">	print(k)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d.keys():</span><br><span class="line">	print(k)</span><br><span class="line"><span class="comment"># 下面这种方法较常用</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>遍历value</li>
 </ul>
-<p>for k in d:</p>
-<p>​    print(d[k])</p>
-<p>for k in d.keys():</p>
-<p>​    print(d.get(k))</p>
-<p>for v in d.values():</p>
-<p>​    print(v)</p>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法values返回一个由字典中的值组成的字典视图。不同于方法keys，方法values返回的视图可能包含重复的值。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">2</span>] = <span class="number">2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">3</span>] = <span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.values()</span><br><span class="line">dict_values([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Method：</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d:</span><br><span class="line">	print(d[k])</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d.keys():</span><br><span class="line">	print(d.get(k))</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> v <span class="keyword">in</span> d.values():</span><br><span class="line">	print(v)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 方法values返回一个由字典中的值组成的字典视图。不同于方法keys，方法values返回的视图可能包含重复的值。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">1</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">2</span>] = <span class="number">2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">3</span>] = <span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="number">4</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d           </span><br><span class="line">&#123;<span class="number">1</span>: <span class="number">1</span>, <span class="number">2</span>: <span class="number">2</span>, <span class="number">3</span>: <span class="number">3</span>, <span class="number">4</span>: <span class="number">4</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.values()</span><br><span class="line">dict_values([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
 <ul>
-<li><p>for … in dict</p>
-<ul>
-<li><p>遍历item，即kv对</p>
-<p>for item in d.items():</p>
-<p>​    print(item)</p>
-<p>for item in d.items():</p>
-<p>​    print(item[0],item[1])</p>
-<p>for k,v in d.items():</p>
-<p>​    print(k,v)</p>
-<p>for k,_ in d.items():</p>
-<p>​    print(k)</p>
-<p>for _,v in d.items():</p>
-<p>​    print(v)</p>
-</li>
+<li>遍历item，即kv对</li>
 </ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法items返回一个包含所有字典项的列表，其中每个元素都为(key, value)的形式。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'title'</span>: <span class="string">'Python Web Site'</span>, <span class="string">'url'</span>: <span class="string">'http://www.python.org'</span>, <span class="string">'spam'</span>: <span class="number">0</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.items()</span><br><span class="line">dict_items([(<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>), (<span class="string">'spam'</span>, <span class="number">0</span>), (<span class="string">'title'</span>, <span class="string">'Python Web Site'</span>)])</span><br><span class="line"><span class="comment"># 字典项在列表中的排列顺序不确定。返回值属于一种名为字典视图的特殊类型。字典视图可用于迭代</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>it = d.items()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(it)</span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="comment"># 还可确定其长度以及对其执行成员资格检查。如下 ：</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'spam'</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'spam'</span>] = <span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="comment"># 视图的一个优点是不复制，它们始终是底层字典的反映，即便你修改了底层字典亦如此</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(d.items())</span><br><span class="line">[(<span class="string">'spam'</span>, <span class="number">0</span>), (<span class="string">'title'</span>, <span class="string">'Python Web Site'</span>), (<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>)]</span><br><span class="line"><span class="comment"># 将字典项复制到列表中</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">Method:</span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> d.items():</span><br><span class="line">	print(item)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> d.items():</span><br><span class="line">	print(item[<span class="number">0</span>],item[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> d.items():</span><br><span class="line">	print(k,v)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,_ <span class="keyword">in</span> d.items():</span><br><span class="line">	print(k)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _,v <span class="keyword">in</span> d.items():</span><br><span class="line">	print(v)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法items返回一个包含所有字典项的列表，其中每个元素都为(key, value)的形式。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'title'</span>: <span class="string">'Python Web Site'</span>, <span class="string">'url'</span>: <span class="string">'http://www.python.org'</span>, <span class="string">'spam'</span>: <span class="number">0</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d.items()</span><br><span class="line">dict_items([(<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>), (<span class="string">'spam'</span>, <span class="number">0</span>), (<span class="string">'title'</span>, <span class="string">'Python Web Site'</span>)])</span><br><span class="line"><span class="comment"># 字典项在列表中的排列顺序不确定。返回值属于一种名为字典视图的特殊类型。字典视图可用于迭代</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>it = d.items()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(it)</span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="comment"># 还可确定其长度以及对其执行成员资格检查。如下 ：</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'spam'</span>] = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'spam'</span>] = <span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>(<span class="string">'spam'</span>, <span class="number">0</span>) <span class="keyword">in</span> it</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="comment"># 视图的一个优点是不复制，它们始终是底层字典的反映，即便你修改了底层字典亦如此</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(d.items())</span><br><span class="line">[(<span class="string">'spam'</span>, <span class="number">0</span>), (<span class="string">'title'</span>, <span class="string">'Python Web Site'</span>), (<span class="string">'url'</span>, <span class="string">'http://www.python.org'</span>)]</span><br><span class="line"><span class="comment"># 将字典项复制到列表中</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>总结<ul>
 <li>Python3中，keys、values、items方法返回一个类似一个生成器的可迭代对象，不会把函数的返回结果复制到内存中<ul>
@@ -1203,116 +1371,42 @@
 </li>
 </ul>
 <h3 id="字典遍历和移除"><a href="#字典遍历和移除" class="headerlink" title="字典遍历和移除"></a>字典遍历和移除</h3><ul>
-<li><p>如何在遍历的时候移除元素</p>
-</li>
-<li><p>错误的做法</p>
-<p>d = dict(a=1,b=2,c=’abc’)</p>
-<p>for k,v in d.items():</p>
-<p>​    d.pop(k)   # 异常</p>
-</li>
+<li>如何在遍历的时候移除元素</li>
 </ul>
-<p>​     while len(d):   # 相当于清空，不如直接clear()</p>
-<p>​        print(d.popitem())</p>
-<ul>
-<li><p>正确的做法</p>
-<p>d = dict(a=1,b=2,c=’abc’)</p>
-<p>keys = []</p>
-<p>for k,v in d.items():</p>
-<p>​    if isinstance(v,str)</p>
-<p>​        keys.append(k)</p>
-</li>
-</ul>
-<p>​    for k in keys:</p>
-<p>​        d.pop(k)</p>
-<p>​    print(d)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">错误的做法</span><br><span class="line">d = dict(a=<span class="number">1</span>,b=<span class="number">2</span>,c=<span class="string">'abc'</span>)</span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> d.items():</span><br><span class="line">	d.pop(k)   <span class="comment"># 异常</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">while</span> len(d):   <span class="comment"># 相当于清空，不如直接clear()</span></span><br><span class="line">	print(d.popitem())</span><br><span class="line"></span><br><span class="line">正确的做法</span><br><span class="line">d = dict(a=<span class="number">1</span>,b=<span class="number">2</span>,c=<span class="string">'abc'</span>)</span><br><span class="line">keys = []</span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> d.items():</span><br><span class="line">	<span class="keyword">if</span> isinstance(v,str):</span><br><span class="line">		keys.append(k)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> keys:</span><br><span class="line">	d.pop(k)</span><br><span class="line">print(d)</span><br></pre></td></tr></table></figure>
 <h3 id="字典的key"><a href="#字典的key" class="headerlink" title="字典的key"></a>字典的key</h3><ul>
 <li>key的要求和set的元素要求一致<ul>
 <li>set的元素可以看做key，set可以看做dict的简化版</li>
 <li>hashable可哈希才可以作为key，可以使用hash()测试。可hash的类型是不可变的，可变类型是不可hash的</li>
-<li>d = {1:0,2.0:3,”abc”:None,(‘hello’,’world’,’python’):”string”,b’abc’:’135’}</li>
 </ul>
 </li>
 </ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;<span class="number">1</span>:<span class="number">0</span>,<span class="number">2.0</span>:<span class="number">3</span>,<span class="string">"abc"</span>:<span class="keyword">None</span>,(<span class="string">'hello'</span>,<span class="string">'world'</span>,<span class="string">'python'</span>):<span class="string">"string"</span>,<span class="string">b'abc'</span>:<span class="string">'135'</span>&#125;</span><br><span class="line"><span class="comment"># 同理，这里要用&#123;&#125;大括号，不能用dict()，不然会报错。个人还是认为dict()是转换类型的，&#123;&#125;是定义的</span></span><br></pre></td></tr></table></figure>
 <h3 id="defaultdict"><a href="#defaultdict" class="headerlink" title="defaultdict"></a>defaultdict</h3><ul>
 <li><p>collections.defaultdict([default_factory[,…]])</p>
 <ul>
 <li>第一个参数是default_factory，缺省是None，它提供一个初始化函数。当key不存在的时候，会调用这个工厂函数来生成key对应的value</li>
 </ul>
-<p>import random</p>
-<p>d1 = {}</p>
-<p>for k in ‘abcdef’:</p>
-<p>​    for i in range(random.randint(1,5)):</p>
-<p>​        if k not in d1.keys():</p>
-<p>​            d1[k] = []</p>
-<p>​        d1[k].append(i)</p>
-<p>print(d1)</p>
 </li>
 </ul>
-<p>​    from collections import defaultdict</p>
-<p>​    import random</p>
-<p>​    d1 = defaultdict(list)</p>
-<p>​    for k in ‘abcdef’:</p>
-<p>​        for i in range(random.randint(1,5)):</p>
-<p>​            d1[k].append(i)</p>
-<p>​    print(d1)</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># defaultdict</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line">d1 = &#123;&#125;</span><br><span class="line">d2 = defaultdict(list)</span><br><span class="line"><span class="comment"># list放在这里相当于传了一个工厂方法，要求是一个初始化函数，这就是以后的初始化函数</span></span><br><span class="line"><span class="comment"># default_factory，初始化函数什么时候用，只有在key不存在的时候，会调用这个工厂函数来生成</span></span><br><span class="line"><span class="comment"># key对应的value，也就是生成一个缺省值，用来给这个没有value的key赋值，这样就可以凑上一个</span></span><br><span class="line"><span class="comment"># kv对，也就可以加入字典当中了。</span></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">"abcde"</span>:    <span class="comment"># 迭代a到e，这里要创建的是key</span></span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> range(<span class="number">5</span>):     <span class="comment"># 迭代0到4，这里要生成value</span></span><br><span class="line">        <span class="keyword">if</span> k <span class="keyword">not</span> <span class="keyword">in</span> d1.keys():    </span><br><span class="line">        <span class="comment"># d1.keys()开始是空的，第一次的时候找不到上面循环的k是a</span></span><br><span class="line">            d1[k] = []   <span class="comment"># 这里表示，如果上面判断k不存在，就给d1[k]初始化一个空列表</span></span><br><span class="line">        d1[k].append(v)   </span><br><span class="line">        <span class="comment"># 这里把0-4依次追加到d1[k]中，第一次d1[a].append[0]，第二次d1[a].append[1]</span></span><br><span class="line">print(d1)   <span class="comment"># 最后打印出来，这是第一种方式</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">'mnopq'</span>:</span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> range(<span class="number">3</span>):   <span class="comment"># 这里是3是为了说明v与上面的k的数量可以不一样 </span></span><br><span class="line">        d2[k].append(v)   </span><br><span class="line"><span class="comment"># 这里不做判断，直接赋值。是为了说明上面的key如果不存在，就调用上面定义的</span></span><br><span class="line"><span class="comment"># d2 = defaultdict(list)中的list，这时就是在做创建空列表的动作，也就是list()，因为上</span></span><br><span class="line"><span class="comment"># 面已经说明了当key不存在时调用工厂函数生成key对应的value，并且也定义了d2等于这个工厂函数</span></span><br><span class="line"><span class="comment"># d2[k]就相当于测试一下这个k是否存在，不存在就调用工厂函数。之后也可以自定义函数，并调用。</span></span><br><span class="line"><span class="comment"># 这就相当于替换了d1[k] = []中后面的中括号</span></span><br><span class="line"><span class="comment"># 个人想，如果将list改成tuple是否可以，好像不行，因为tuple是不可变的，没有append这样的方</span></span><br><span class="line"><span class="comment"># 法，那么改成set是不是就可以了？</span></span><br><span class="line">print(d2)</span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'b'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'c'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'d'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'e'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]&#125;</span><br><span class="line">defaultdict(&lt;class 'list'&gt;, &#123;'m': [0, 1, 2], 'n': [0, 1, 2], 'o': [0, 1, 2], 'p': [0, 1, 2], 'q': [0, 1, 2]&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">例：</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">d1 = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">'abcdef'</span>:</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(random.randint(<span class="number">1</span>,<span class="number">5</span>)):</span><br><span class="line">		<span class="keyword">if</span> k <span class="keyword">not</span> <span class="keyword">in</span> d1.keys():</span><br><span class="line">			d1[k] = []</span><br><span class="line">		d1[k].append(i)</span><br><span class="line">print(d1)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">d1 = defaultdict(list)</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">'abcdef'</span>:</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(random.randint(<span class="number">1</span>,<span class="number">5</span>)):</span><br><span class="line">		d1[k].append(i)</span><br><span class="line">print(d1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># defaultdict</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line">d1 = &#123;&#125;</span><br><span class="line">d2 = defaultdict(list)</span><br><span class="line"><span class="comment"># list放在这里相当于传了一个工厂方法，要求是一个初始化函数，这就是以后的初始化函数default_factory，初</span></span><br><span class="line"><span class="comment"># 始化函数什么时候用，只有在key不存在的时候，会调用这个工厂函数来生成key对应的value，也就是生成一个缺</span></span><br><span class="line"><span class="comment"># 省值，用来给这个没有value的key赋值，这样就可以凑上一个kv对，也就可以加入字典当中了。</span></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">"abcde"</span>:    <span class="comment"># 迭代a到e，这里要创建的是key</span></span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> range(<span class="number">5</span>):     <span class="comment"># 迭代0到4，这里要生成value</span></span><br><span class="line">        <span class="keyword">if</span> k <span class="keyword">not</span> <span class="keyword">in</span> d1.keys():    </span><br><span class="line"><span class="comment"># d1.keys()开始是空的，第一次的时候找不到上面循环的k是a，只有在每次循环的第一次key不存在时会进入这里</span></span><br><span class="line">            d1[k] = []   <span class="comment"># 这里表示，如果上面判断k不存在，就给d1[k]初始化一个空列表</span></span><br><span class="line">        d1[k].append(v)   </span><br><span class="line">        <span class="comment"># 这里把0-4依次追加到d1[k]中，第一次d1[a].append[0]，第二次d1[a].append[1]</span></span><br><span class="line">print(d1)   <span class="comment"># 最后打印出来，这是第一种方式</span></span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'b'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'c'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'d'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="string">'e'</span>: [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]&#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="string">'mnopq'</span>:</span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> range(<span class="number">3</span>):   <span class="comment"># 这里是3是为了说明v与上面的k的数量可以不一样 </span></span><br><span class="line">        d2[k].append(v)   </span><br><span class="line"><span class="comment"># 这里不做判断，直接赋值。是为了说明上面的k(key)如果不存在，就调用上面定义的d2 = defaultdict(list)</span></span><br><span class="line"><span class="comment"># 中的list，这时就是在做创建空列表的动作，也就是list()，因为上面已经说明了当key不存在时调用工厂函数生</span></span><br><span class="line"><span class="comment"># 成key对应的value，并且也定义了d2等于这个工厂函数d2[k]就相当于测试一下这个k是否存在，不存在就调用工</span></span><br><span class="line"><span class="comment"># 厂函数。之后也可以自定义函数，并调用。</span></span><br><span class="line"><span class="comment"># 这就相当于替换了d1[k] = []中后面的中括号</span></span><br><span class="line"><span class="comment"># 个人想，如果将list改成tuple是否可以，也许不行，因为tuple是不可变的，没有append这样的方法，那么改成</span></span><br><span class="line"><span class="comment"># set是不是就可以了？测试发现，当使用tuple或set时会提示没有append属性</span></span><br><span class="line">print(d2)</span><br><span class="line">输出：</span><br><span class="line">defaultdict(&lt;class 'list'&gt;, &#123;'m': [0, 1, 2], 'n': [0, 1, 2], 'o': [0, 1, 2], 'p': [0, 1, 2], 'q': [0, 1, 2]&#125;)</span><br></pre></td></tr></table></figure>
 <h3 id="OrderedDict"><a href="#OrderedDict" class="headerlink" title="OrderedDict"></a>OrderedDict</h3><ul>
 <li><p>collections.OrderedDict([items])</p>
 <ul>
 <li>key并不是按照加入的顺序排列，可以使用OrderedDict记录顺序</li>
 </ul>
-<p>from collections import OrderedDict</p>
-<p>import random</p>
-<p>d = {‘banana’:3,’apple’:4,’pear’:1,’orange’:2}</p>
-<p>print(d)</p>
-<p>keys = list(d.keys())</p>
-<p>random.shuffle(keys)</p>
-<p>print(keys)</p>
-<p>od = OrderedDict()</p>
-<p>for key in keys:</p>
-<p>​    od[key] = d[key]</p>
-<p>print(od)</p>
-<p>print(od.keys())</p>
 </li>
 <li><p>有序字典可以记录元素插入的顺序，打印的时候也是按照这个顺序输出打印</p>
 </li>
 <li>3.6版本的Python的字典就是记录key插入的顺序（IPython不一定有效果）</li>
 <li>应用场景<ul>
 <li>假如使用字典记录了N个产品，这些产品使用ID由小到大加入到字典中</li>
-<li>除了使用字典检索的遍历，有进修需要取出ID，但是希望是按照输入的顺序，因为输入顺序是有序的</li>
+<li>除了使用字典检索的遍历，有时候需要取出ID，但是希望是按照输入的顺序，因为输入顺序是有序的</li>
 <li>否则还需要重新把遍历到的值排序</li>
 </ul>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># OrderedDict顺序的字典，这里指key要按顺序而不是值输出。key的顺序应该和我们放入的顺序是</span></span><br><span class="line"><span class="comment"># 一样的</span></span><br><span class="line">d = &#123;&#125;</span><br><span class="line">d[<span class="string">'a'</span>] = <span class="number">1</span></span><br><span class="line">d[<span class="string">'b'</span>] = <span class="number">2</span></span><br><span class="line">d[<span class="number">1</span>] = <span class="number">3</span></span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这里显示的d的值应该是按hash值排列的</span></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d:</span><br><span class="line">    print(k)</span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a'</span>: <span class="number">1</span>, <span class="string">'b'</span>: <span class="number">2</span>, <span class="number">1</span>: <span class="number">3</span>&#125;</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line"><span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">d = &#123;<span class="string">'banana'</span>:<span class="number">3</span>,<span class="string">'apple'</span>:<span class="number">4</span>,<span class="string">'pear'</span>:<span class="number">1</span>,<span class="string">'orange'</span>:<span class="number">2</span>&#125;</span><br><span class="line">print(d)</span><br><span class="line">keys = list(d.keys())</span><br><span class="line">random.shuffle(keys)   <span class="comment"># 用shuffle把keys列表打乱</span></span><br><span class="line">od = OrderedDict()</span><br><span class="line"><span class="keyword">for</span> key <span class="keyword">in</span> keys:</span><br><span class="line">    od[key] = d[key]   <span class="comment"># 创建od的kv对</span></span><br><span class="line">    </span><br><span class="line">print(od)</span><br><span class="line">print(od.keys())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这种方法可能在ipython中不再起作用，因为显示的值与输入的顺序是一样的。3.5版本之前是解决不</span></span><br><span class="line"><span class="comment"># 了这个问题的。或者是在jupeter中就是可以按顺序显示的？需要在python命令行中再测试一下。视</span></span><br><span class="line"><span class="comment"># 频中测试的3.6.1版本时，发现和这里的显示是一样的，按顺序显示。所以最好在python环境中测</span></span><br><span class="line"><span class="comment"># 试，也就是在命令行输入python，之后执行上面的命令测试。之前视频中用ipython测试会打乱顺序</span></span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'banana'</span>: <span class="number">3</span>, <span class="string">'apple'</span>: <span class="number">4</span>, <span class="string">'pear'</span>: <span class="number">1</span>, <span class="string">'orange'</span>: <span class="number">2</span>&#125;</span><br><span class="line">OrderedDict([(<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'apple'</span>, <span class="number">4</span>)])</span><br><span class="line">odict_keys([<span class="string">'banana'</span>, <span class="string">'pear'</span>, <span class="string">'orange'</span>, <span class="string">'apple'</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="字典练习"><a href="#字典练习" class="headerlink" title="字典练习"></a>字典练习</h3><ul>
-<li>用户输入一个数字<ul>
-<li>打印每一位数字及其重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">num = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> d.get(c):</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    d[c] += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">print(d)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> c <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[c] += <span class="number">1</span></span><br><span class="line">print(d)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>数字重复统计<ul>
-<li>随机产生100个整数</li>
-<li>数字的范围[-1000,1000]</li>
-<li>升序输出所有不同的数字及其重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">n = <span class="number">100</span></span><br><span class="line">nums = [<span class="number">0</span>] * n</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">    nums[i] = random.randint(<span class="number">-1000</span>,<span class="number">1000</span>)</span><br><span class="line">print(nums)</span><br><span class="line">t = nums.copy()</span><br><span class="line">t.sort()</span><br><span class="line">print(t)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> nums:</span><br><span class="line">    <span class="keyword">if</span> x <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[x] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[x] += <span class="number">1</span></span><br><span class="line">print(d)</span><br><span class="line">d1 = sorted(d.items())</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>字符串重复统计<ul>
-<li>字符表’abcdefghijklmnopqrstuvwxyz’</li>
-<li>随机挑选2个字母组成字符串，共挑选100个</li>
-<li>降序输出所有不同的字符串及重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">alphabet = <span class="string">'abcdefghijklmnopqrstuvwxyz'</span></span><br><span class="line"></span><br><span class="line">words = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    <span class="comment"># words.append(random.choice(alphabet)+random.choice(alphabet))</span></span><br><span class="line">    <span class="comment"># words.append(''.join(random.sample(alphabet,2)))   随机采样</span></span><br><span class="line">    words.append(<span class="string">''</span>.join(random.choice(alphabet) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2</span>))) <span class="comment"># 生成器</span></span><br><span class="line">    </span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> words:</span><br><span class="line">    d[x] = d.get(x,<span class="number">0</span>) + <span class="number">1</span></span><br><span class="line">print(d)</span><br><span class="line"></span><br><span class="line">d1 = sorted(d.items(),reverse=<span class="keyword">True</span>)</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
-<h4 id="将字符串格式设置功能用于字典"><a href="#将字符串格式设置功能用于字典" class="headerlink" title="将字符串格式设置功能用于字典"></a>将字符串格式设置功能用于字典</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; phonebook</span><br><span class="line">&#123;<span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Cecil's phone number is &#123;Cecil&#125;."</span>.format_map(phonebook)</span><br><span class="line"><span class="string">"Cecil's phone number is 3258."</span></span><br><span class="line"><span class="comment"># 可在字典中包含各种信息，这样只需在格式字符串中提取所需的信息即可。使用format_map来指出你</span></span><br><span class="line"><span class="comment"># 将通过一个映射来提供所需的信息。可使用字符串格式设置功能来设置值的格式，这些值是作为命名或</span></span><br><span class="line"><span class="comment"># 非命名参数提供给方法format的。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>template = <span class="string">'''&lt;html&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;head&gt;&lt;title&gt;&#123;title&#125;&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;body&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;h1&gt;&#123;title&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;p&gt;&#123;text&#125;&lt;/p&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;/body&gt;'''</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>data = &#123;<span class="string">'title'</span>: <span class="string">'My Home Page'</span>, <span class="string">'text'</span>: <span class="string">'Welcome to my home page!'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(template.format_map(data))</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;My Home Page&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;h1&gt;My Home Page&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;Welcome to my home page!&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line"><span class="comment"># 将data字典的值代入template中。像这样使用字典时，可指定任意数量的转换说明符，条件是所有</span></span><br><span class="line"><span class="comment"># 的字段名都是包含在字典中的键。</span></span><br></pre></td></tr></table></figure>
-<p>##### </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">d = &#123;<span class="string">'banana'</span>:<span class="number">3</span>,<span class="string">'apple'</span>:<span class="number">4</span>,<span class="string">'pear'</span>:<span class="number">1</span>,<span class="string">'orange'</span>:<span class="number">2</span>&#125;</span><br><span class="line">print(d)</span><br><span class="line">keys = list(d.keys())</span><br><span class="line">random.shuffle(keys)</span><br><span class="line">print(keys)</span><br><span class="line">od = OrderedDict()</span><br><span class="line"><span class="keyword">for</span> key <span class="keyword">in</span> keys:</span><br><span class="line">	od[key] = d[key]</span><br><span class="line">print(od)</span><br><span class="line">print(od.keys())</span><br><span class="line"></span><br><span class="line"><span class="comment"># OrderedDict顺序的字典，这里指key要按顺序而不是值输出。key的顺序应该和我们放入的顺序是一样的</span></span><br><span class="line">d = &#123;&#125;</span><br><span class="line">d[<span class="string">'a'</span>] = <span class="number">1</span></span><br><span class="line">d[<span class="string">'b'</span>] = <span class="number">2</span></span><br><span class="line">d[<span class="number">1</span>] = <span class="number">3</span></span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这里显示的d的值应该是按hash值排列的</span></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> d:</span><br><span class="line">    print(k)</span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a'</span>: <span class="number">1</span>, <span class="string">'b'</span>: <span class="number">2</span>, <span class="number">1</span>: <span class="number">3</span>&#125;</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line"><span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">d = &#123;<span class="string">'banana'</span>:<span class="number">3</span>,<span class="string">'apple'</span>:<span class="number">4</span>,<span class="string">'pear'</span>:<span class="number">1</span>,<span class="string">'orange'</span>:<span class="number">2</span>&#125;</span><br><span class="line">print(d)</span><br><span class="line">keys = list(d.keys())</span><br><span class="line">random.shuffle(keys)   <span class="comment"># 用shuffle把keys列表打乱</span></span><br><span class="line">od = OrderedDict()</span><br><span class="line"><span class="keyword">for</span> key <span class="keyword">in</span> keys:</span><br><span class="line">    od[key] = d[key]   <span class="comment"># 创建od的kv对，这里就是od['pear'] = 1这样的形式</span></span><br><span class="line">    </span><br><span class="line">print(od)</span><br><span class="line">print(od.keys())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这种方法可能在ipython中不再起作用，因为显示的值与输入的顺序是一样的。3.5版本之前是解决不了这个问题</span></span><br><span class="line"><span class="comment"># 的。或者是在jupeter中就是可以按顺序显示的？需要在python命令行中再测试一下。视频中测试的3.6.1版本</span></span><br><span class="line"><span class="comment"># 时，发现和这里的显示是一样的，按顺序显示。所以最好在python环境中测试，也就是在命令行输入python，之后</span></span><br><span class="line"><span class="comment"># 执行上面的命令测试。之前视频中用ipython测试会打乱顺序</span></span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'banana'</span>: <span class="number">3</span>, <span class="string">'apple'</span>: <span class="number">4</span>, <span class="string">'pear'</span>: <span class="number">1</span>, <span class="string">'orange'</span>: <span class="number">2</span>&#125;</span><br><span class="line">OrderedDict([(<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'apple'</span>, <span class="number">4</span>)])</span><br><span class="line">odict_keys([<span class="string">'banana'</span>, <span class="string">'pear'</span>, <span class="string">'orange'</span>, <span class="string">'apple'</span>])</span><br></pre></td></tr></table></figure>
 
           
         
@@ -1616,7 +1710,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-10-28 14:02:54" itemprop="dateModified" datetime="2019-10-28T14:02:54+08:00">2019-10-28</time>
+                <time title="修改時間：2019-10-30 10:40:01" itemprop="dateModified" datetime="2019-10-30T10:40:01+08:00">2019-10-30</time>
               
             
           </span>
@@ -1675,7 +1769,7 @@
 <h4 id="序列"><a href="#序列" class="headerlink" title="序列"></a>序列</h4><blockquote>
 <p>在Python中，最基本的数据结构为序列(sequence) 。序列中的每个元素都有编号，即其位置或索引，其中第一个元素的索引为0，第二个元素的索引为1，依此类推。Python内置了多种序列，如列表、元组、字符串。列表和元组的主要不同在于，列表是可以修改的，而元组不可以。</p>
 </blockquote>
-<h5 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 一个队列，一个排列整齐的队伍</span></span><br><span class="line"><span class="comment"># 列表内的个体称作元素，由若干元素组成列表</span></span><br><span class="line"><span class="comment"># 元素可以是任意对象（数字、字符串、对象、列表等）</span></span><br><span class="line"><span class="comment"># 列表内元素有顺序，可以使用索引</span></span><br><span class="line"><span class="comment"># 线性的数据结构</span></span><br><span class="line"><span class="comment"># 使用[]表示</span></span><br><span class="line"><span class="comment"># 列表是可变的</span></span><br><span class="line"><span class="comment"># 列表list、链表、queue、stack的差异</span></span><br><span class="line"><span class="comment"># 列表不能一开始就定义大小</span></span><br><span class="line">list()</span><br><span class="line"><span class="comment"># 定义一个空列表</span></span><br><span class="line">list(iterable)</span><br><span class="line"><span class="comment"># 从可交互项初始化的新列表</span></span><br><span class="line">例</span><br><span class="line">lst = list()</span><br><span class="line">lst = []</span><br><span class="line">lst = [<span class="number">2</span>,<span class="number">6</span>,<span class="number">9</span>,<span class="string">'ab'</span>]</span><br><span class="line">lst = list(range(<span class="number">5</span>))</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>edward = [<span class="string">'Edward Gumby'</span>, <span class="number">42</span>]</span><br><span class="line"><span class="comment"># 使用列表来表示</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>edward = [<span class="string">'Edward Gumby'</span>, <span class="number">42</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>john = [<span class="string">'John Smith'</span>, <span class="number">50</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>database = [edward, john]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>database</span><br><span class="line">[[<span class="string">'Edward Gumby'</span>, <span class="number">42</span>], [<span class="string">'John Smith'</span>, <span class="number">50</span>]]</span><br><span class="line"><span class="comment"># 序列还可包含其他序列，上面是创建一个由数据库中所有人员组成的列表。Python支持一种数据结构的基本概念，名为容器(container)。容器基本上就是可包含其他对象的对象。两种主要的容器是序列(如列表和元组)和映射(如字典) 。在序列中，每个元素都有编号，而在映射中，每个元素都有名称(也叫键)。</span></span><br></pre></td></tr></table></figure>
+<h5 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 一个队列，一个排列整齐的队伍</span></span><br><span class="line"><span class="comment"># 列表内的个体称作元素，由若干元素组成列表</span></span><br><span class="line"><span class="comment"># 元素可以是任意对象（数字、字符串、对象、列表等）</span></span><br><span class="line"><span class="comment"># 列表内元素有顺序，可以使用索引</span></span><br><span class="line"><span class="comment"># 线性的数据结构</span></span><br><span class="line"><span class="comment"># 使用[]表示</span></span><br><span class="line"><span class="comment"># 列表是可变的</span></span><br><span class="line"><span class="comment"># 列表list、链表、queue、stack的差异</span></span><br><span class="line"><span class="comment"># 列表不能一开始就定义大小</span></span><br><span class="line">list()</span><br><span class="line"><span class="comment"># 定义一个空列表</span></span><br><span class="line">list(iterable)</span><br><span class="line"><span class="comment"># 从可交互项初始化的新列表</span></span><br><span class="line">例</span><br><span class="line">lst = list()</span><br><span class="line"><span class="comment"># list()中需要是一个可迭代序列，如range()。或一个列表，如list([1,2])，不能使用list(2)这样的方法来定义，会提示int是不可迭代的</span></span><br><span class="line">lst = []</span><br><span class="line">lst = [<span class="number">2</span>,<span class="number">6</span>,<span class="number">9</span>,<span class="string">'ab'</span>]</span><br><span class="line">lst = list(range(<span class="number">5</span>))</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>edward = [<span class="string">'Edward Gumby'</span>, <span class="number">42</span>]</span><br><span class="line"><span class="comment"># 使用列表来表示</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>edward = [<span class="string">'Edward Gumby'</span>, <span class="number">42</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>john = [<span class="string">'John Smith'</span>, <span class="number">50</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>database = [edward, john]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>database</span><br><span class="line">[[<span class="string">'Edward Gumby'</span>, <span class="number">42</span>], [<span class="string">'John Smith'</span>, <span class="number">50</span>]]</span><br><span class="line"><span class="comment"># 序列还可包含其他序列，上面是创建一个由数据库中所有人员组成的列表。Python支持一种数据结构的基本概念，名为容器(container)。容器基本上就是可包含其他对象的对象。两种主要的容器是序列(如列表和元组)和映射(如字典) 。在序列中，每个元素都有编号，而在映射中，每个元素都有名称(也叫键)。</span></span><br></pre></td></tr></table></figure>
 <h4 id="数字的处理函数"><a href="#数字的处理函数" class="headerlink" title="数字的处理函数"></a>数字的处理函数</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">round()</span><br><span class="line"><span class="comment"># 这个函数是四舍六入五取偶的</span></span><br><span class="line">floor()</span><br><span class="line"><span class="comment"># 这个函数是向下取整的</span></span><br><span class="line">ceil()</span><br><span class="line"><span class="comment"># 这个函数是向上取整的</span></span><br><span class="line">int()</span><br><span class="line"><span class="comment"># 这个函数是取整数部分的</span></span><br><span class="line">//</span><br><span class="line"><span class="comment"># 整除且向下取整</span></span><br><span class="line"><span class="comment"># python只有长整型，数值没有上限。int也是取整的，如int(1.5)，得1。floor是向下取整的。ceil是向上取整的。round是4舍6入5取偶。 bin是二进制，返回的是字符串。oct是八进制。pi是派。 </span></span><br><span class="line">bin()</span><br><span class="line">oct()</span><br><span class="line">hex()</span><br><span class="line"><span class="comment"># 上面三个是进制函数，返回值是字符串</span></span><br><span class="line">math.pi</span><br><span class="line"><span class="comment"># 派</span></span><br><span class="line">math.e</span><br><span class="line"><span class="comment"># 自然常数</span></span><br></pre></td></tr></table></figure>
 <h4 id="类型判断"><a href="#类型判断" class="headerlink" title="类型判断"></a>类型判断</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">type(a) == str </span><br><span class="line"><span class="comment"># 这是类型比较的方式</span></span><br><span class="line">type(obj)</span><br><span class="line"><span class="comment"># 返回类型，而不是字符串</span></span><br><span class="line">isinstance(obj,class_or_tuple)</span><br><span class="line"><span class="comment"># 返回布尔值</span></span><br><span class="line">例：</span><br><span class="line">type(a)</span><br><span class="line">type(<span class="string">'abc'</span>)</span><br><span class="line">type(<span class="number">123</span>)</span><br><span class="line">isinstance(<span class="number">6</span>,str)</span><br><span class="line">isinstance(<span class="number">6</span>,(str,bool,int))</span><br><span class="line">type(<span class="number">1</span>+<span class="keyword">True</span>)</span><br><span class="line">type(<span class="number">1</span>+<span class="keyword">True</span>+<span class="number">2.0</span>)</span><br></pre></td></tr></table></figure>
 <h3 id="通用的序列操作"><a href="#通用的序列操作" class="headerlink" title="通用的序列操作"></a>通用的序列操作</h3><h4 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 索引，也叫下标</span></span><br><span class="line"><span class="comment"># 正索引：从左至右，从0开始，为列表中每一个元素编号</span></span><br><span class="line"><span class="comment"># 负索引：从右至左，从-1开始</span></span><br><span class="line"><span class="comment"># 正负索引不可以超界，否则引发异常IndexError</span></span><br><span class="line"><span class="comment"># 为了理解方便，可以认为列表是从左至右排列的，左边是头部，右边是尾部，左边是下界，右边是上界</span></span><br><span class="line"><span class="comment"># 列表通过索引访问</span></span><br><span class="line"><span class="comment"># list[index]，index就是索引，使用中括号访问</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>greeting = <span class="string">'Hello'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>greeting[<span class="number">0</span>]</span><br><span class="line"><span class="string">'H'</span></span><br><span class="line"><span class="comment"># 字符串就是由字符组成的序列。索引0指向第一个元素,这里为字母H。Python没有专门用于表示字符的类型，因此一个字符就是只包含一个元素的字符串。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>greeting[<span class="number">-1</span>]</span><br><span class="line"><span class="string">'o'</span></span><br><span class="line"><span class="comment"># 当你使用负数索引时，Python将从右(即从最后一个元素)开始往左数，因此-1是最后一个元素的位置。对于字符串字面量(以及其他的序列字面量)，可直接对其执行索引操作,无需先将其赋给变量。这与先赋给变量再对变量执行索引操作的效果是一样的。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">'Hello'</span>[<span class="number">1</span>]</span><br><span class="line"><span class="string">'e'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fourth = input(<span class="string">'Year: '</span>)[<span class="number">3</span>]</span><br><span class="line">Year: <span class="number">2005</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>fourth</span><br><span class="line"><span class="string">'5'</span></span><br><span class="line"><span class="comment"># 如果函数调用返回一个序列，可直接对其执行索引操作。例如：如果你只想获取用户输入的年份的第4位</span></span><br><span class="line"></span><br><span class="line">months = [</span><br><span class="line"><span class="string">'January'</span>,</span><br><span class="line"><span class="string">'February'</span>,</span><br><span class="line"><span class="string">'March'</span>,</span><br><span class="line"><span class="string">'April'</span>,</span><br><span class="line"><span class="string">'May'</span>,</span><br><span class="line"><span class="string">'June'</span>,</span><br><span class="line"><span class="string">'July'</span>,</span><br><span class="line"><span class="string">'August'</span>,</span><br><span class="line"><span class="string">'September'</span>,</span><br><span class="line"><span class="string">'October'</span>,</span><br><span class="line"><span class="string">'November'</span>,</span><br><span class="line"><span class="string">'December'</span></span><br><span class="line">]</span><br><span class="line">endings = [<span class="string">'st'</span>, <span class="string">'nd'</span>, <span class="string">'rd'</span>] + <span class="number">17</span> * [<span class="string">'th'</span>] \</span><br><span class="line">+ [<span class="string">'st'</span>, <span class="string">'nd'</span>, <span class="string">'rd'</span>] + <span class="number">7</span> * [<span class="string">'th'</span>] \</span><br><span class="line">+ [<span class="string">'st'</span>]</span><br><span class="line"><span class="comment"># 这是一个列表的拼接，st,nd,rd表示1,2,3号，4-20使用th，之后只要有1,2,3就要用st,nd,rd表示，其他用th表示</span></span><br><span class="line">year= input(<span class="string">'Year: '</span>)</span><br><span class="line">month= input(<span class="string">'Month (1-12): '</span>)</span><br><span class="line">day= input(<span class="string">'Day (1-31): '</span>)</span><br><span class="line">month_number = int(month)</span><br><span class="line">day_number = int(day)</span><br><span class="line">month_name = months[month_number<span class="number">-1</span>]</span><br><span class="line">ordinal = day + endings[day_number<span class="number">-1</span>]</span><br><span class="line"><span class="comment"># 将表示月和日的数要减1，这样才能得到正确的索引。因为months是一个列表，其索引是从0开始的，所以要减1。</span></span><br><span class="line">print(month_name + <span class="string">' '</span> + ordinal + <span class="string">', '</span> + year)</span><br><span class="line">上面的程序执行结果如下：</span><br><span class="line">Year: <span class="number">1974</span></span><br><span class="line">Month (<span class="number">1</span><span class="number">-12</span>): <span class="number">8</span></span><br><span class="line">Day (<span class="number">1</span><span class="number">-31</span>): <span class="number">16</span></span><br><span class="line">August <span class="number">16</span>th, <span class="number">1974</span></span><br></pre></td></tr></table></figure>
@@ -2622,310 +2716,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/11/storm概念/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/11/storm概念/" itemprop="url">
-                  storm概念
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-03-11 17:00:54" itemprop="dateCreated datePublished" datetime="2019-03-11T17:00:54+08:00">2019-03-11</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-03-13 13:00:26" itemprop="dateModified" datetime="2019-03-13T13:00:26+08:00">2019-03-13</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/大数据/" itemprop="url" rel="index"><span itemprop="name">大数据</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
-<p>Storm 是一个分布式的，可靠的，容错的数据流处理系统。它会把工作任务委托给不同类型的组件，每个组件负责处理一项简单特定的任务。Storm 集群的输入流由一个被称作 spout 的组件管理，spout 把数据传递给 bolt， bolt 要么把数据保存到某种存储器，要么把数据传递给其它的 bolt。你可以想象一下，一个 Storm 集群就是在一连串的 bolt 之间转换 spout 传过来的数据。</p>
-<p>这里用一个简单的例子来说明这个概念。昨晚我在新闻节目里看到主持人在谈论政治人物和他们对于各种政治话题的立场。他们一直重复着不同的名字，而我开始考虑这些名字是否被提到了相同的次数，以及不同次数之间的偏差。</p>
-<p>想像播音员读的字幕作为你的数据输入流。你可以用一个 spout 读取一个文件（或者 socket，通过 HTTP，或者别的方法）。文本行被 spout 传给一个 bolt，再被 bolt 按单词切割。单词流又被传给另一个 bolt，在这里每个单词与一张政治人名列表比较。每遇到一个匹配的名字，第二个 bolt 为这个名字在数据库的计数加1。你可以随时查询数据库查看结果， 而且这些计数是随着数据到达实时更新的。</p>
-<p>现在想象一下，很容易在整个 Storm 集群定义每个 bolt 和 spout 的并行性级别，因此你可以无限的扩展你的拓扑结构。很神奇，是吗？尽管这是个简单例子，你也可以看到 Storm 的强大。</p>
-</blockquote>
-<h3 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h3><blockquote>
-<ul>
-<li><p>数据处理流</p>
-<p>正如上例所展示的，不像其它的流处理系统，Storm 不需要中间队列。</p>
-</li>
-<li><p>连续计算</p>
-<p>连续发送数据到客户端，使它们能够实时更新并显示结果，如网站指标。</p>
-</li>
-<li><p>分布式远程过程调用</p>
-<p>频繁的 CPU 密集型操作并行化。</p>
-</li>
-</ul>
-</blockquote>
-<h3 id="Storm-组件"><a href="#Storm-组件" class="headerlink" title="Storm 组件"></a>Storm 组件</h3><blockquote>
-<p>Storm 集群由一个主节点(也可称为控制节点)和多个工作节点组成。主节点运行一个名为“Nimbus”的守护进程，工作节点都运行一个名为“Supervisor”的守护进程，两者的协调工作由 ZooKeeper 来完成， ZooKeeper 用于管理集群中的不同组件。</p>
-<p>每一个工作节点上运行的 Supervisor 监听分配给它那台机器的工作，根据需要启动 / 关闭工作进程，每一个工作进程执行一个 Topology 的一个子集；一个运行的 Topology 由运行在很多机器上的很多工作进程 Worker 组成。那么Storm 的核心就是主节点（Nimbus）、工作节点（Supervisor）、协调器（ZooKeeper）、工作进程（ Worker）、任务线程（Task）。</p>
-<p>在系统底层，Storm 使用了 zeromq(0mq, zeromq(<a href="http://www.zeromq.org/" target="_blank" rel="noopener">http://www.zeromq.org</a>))。这是一种先进的，可嵌入的网络通讯库，它提供的绝妙功能使 Storm 成为可能。下面列出一些 zeromq 的特性。</p>
-<ul>
-<li>一个并发架构的 Socket 库</li>
-<li>对于集群产品和超级计算，比 TCP 要快</li>
-<li>可通过 inproc（进程内）, IPC（进程间）, TCP 和 multicast(多播协议)通信</li>
-<li>异步 I / O 的可扩展的多核消息传递应用程序</li>
-<li>利用扇出(fanout), 发布订阅（PUB-SUB）,管道（pipeline）, 请求应答（REQ-REP），等方式实现 N-N 连接</li>
-</ul>
-<p>Storm 只用了 push/pull sockets</p>
-</blockquote>
-<h4 id="Nimbus"><a href="#Nimbus" class="headerlink" title="Nimbus"></a>Nimbus</h4><blockquote>
-<p>主节点通常运行一个后台程序——Nimbus，用于响应分布在集群中的节点，分配任务和监测故障，这类似于 Hadoop 中的 JobTracker。<br>Nimbus 进程是快速失败（ fail-fast）和无状态的，所有的状态要么在 ZooKeeper 中，要么在本地磁盘上。可以使用 kill -9 来杀死 Nimbus 进程，然后重启即可继续工作。</p>
-</blockquote>
-<h4 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h4><blockquote>
-<p>工作节点同样会运行一个后台程序——Supervisor，用于收听工作指派并基于要求运行工作进程。每个工作节点都是Topology中一个子集的实现。而Nimbus 和 Supervisor 之间的协调则通过 ZooKeeper 系统。<br>同 样，Supervisor进程也是快速失败（fail-fast）和无状态的， 所有的状态要么在ZooKeeper中，要么在本地磁盘上，用kill -9来杀死Supervisor进程，然后重启就可以继续工作。这个设计使得storm不可思议的稳定。</p>
-</blockquote>
-<h4 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h4><blockquote>
-<p>ZooKeeper 是完成 Nimbus 和 Supervisor 之间协调的服务。 Storm使用ZooKeeper 协调集群，由于ZooKeeper 并不用于消息传递，所以Storm给ZooKeeper 带来的压力相当低。<strong>在大多数情况下，单个节点的 ZooKeeper 集群足够胜任，不过为了确保故障恢复或者部署大规模Storm集群，可能需要更大规模的 ZooKeeper 集群</strong>。</p>
-</blockquote>
-<h4 id="worker"><a href="#worker" class="headerlink" title="worker"></a>worker</h4><blockquote>
-<p>运行具体处理组件逻辑的进程。</p>
-</blockquote>
-<h4 id="Topology"><a href="#Topology" class="headerlink" title="Topology"></a>Topology</h4><blockquote>
-<p>拓扑。一个Storm拓扑打包了一个实时处理程序的逻辑。一个Storm拓扑类似一个Hadoop的MapReduce任务(Job)。主要区别是MapReduce任务最终会结束，而拓扑会一直运行（当然直到你杀死它)。一个拓扑是一个通过流分组(stream grouping)把Spout和Bolt连接到一起的拓扑结构。一个拓扑就是一个复杂的多阶段的流计算。</p>
-<p>所有Topology任务的提交必须在Storm客户端节点上进行(需要配置~/.storm/storm.yaml文件)，由Nimbus节点分配给其他Supervisor节点进行处理。Nimbus节点首先将提交的Topology进行分片，分成一个个的Task，并将Task和Supervisor相关的信息提交到<strong>zookeeper</strong>集群上，Supervisor会去zookeeper集群上认领自己的Task，通知自己的Worker进程进行Task的处理。总体的Topology处理流程图为：</p>
-</blockquote>
-<p><img src="/images/storm/topology处理流程.png" alt=""></p>
-<blockquote>
-<p>每个Topology都由<strong>Spout和Bolt</strong>组成，在Spout和Bolt传递信息的基本单位叫做<strong>Tuple</strong>，由Spout发出的连续不断的Tuple及其在相应Bolt上处理的子Tuple连起来称为一个<strong>Steam</strong>，每个Stream的命名是在其首个Tuple被Spout发出的时候，此时Storm会利用内部的<strong>Ackor机制</strong>保证每个Tuple可靠的被处理。</p>
-<p>而Tuple可以理解成键值对，其中，键就是定义在declareStream方法中的Fields字段，而值就是在emit方法中发送的Values字段。</p>
-<p>在运行Topology之前，可以通过一些参数的配置来调节运行时的状态，参数的配置是通过Storm框架部署目录下的<strong>conf/storm.yaml</strong>文件来完成的。在此文件中可以配置运行时的Storm本地目录路径、运行时Worker的数目等。</p>
-<p>在代码中，也可以设置Config的一些参数，但是优先级是不同的，不同位置配置Config参数的优先级顺序为：外部组件的special configuration &gt; 内部组件的special configuration &gt; topology内部的configuration &gt; storm.yaml &gt; default.yaml</p>
-</blockquote>
-<h4 id="Spout"><a href="#Spout" class="headerlink" title="Spout"></a>Spout</h4><blockquote>
-<p>一个在Topology中产生源数据流的组件。通常情况下Spout会从外部数据源中读取数据，然后转换为Topology内部的源数据。Spout 是一个主动的角色，其接口中有个nextTuple()函数， Storm框架会不停地调用此函数，用户只要在其中生成源数据即可。</p>
-</blockquote>
-<h4 id="Bolt"><a href="#Bolt" class="headerlink" title="Bolt"></a>Bolt</h4><blockquote>
-<p>一个在Topology中接收由Spout或者其他上游Bolt类发来的Tuple数据然后执行处理的组件。Bolt可以执行过滤、函数操作、合并、写数据库等任何操作。Bolt是一个被动的角色，其接口中有个execute(Tuple input)函数，在接收到消息后会调用此函数，用户可以在其中执行自己想要的操作。</p>
-</blockquote>
-<h4 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h4><blockquote>
-<p>Worker中每一个Spout/Bolt的线程称为一个Task。在 Storm 0.8之后，task不再与物理线程对应，同一个Spout/Bolt的Task可能会共享一个物理线程，该线程称为Executor。</p>
-</blockquote>
-<h4 id="Tuple"><a href="#Tuple" class="headerlink" title="Tuple"></a>Tuple</h4><blockquote>
-<p>元组，一次消息传递的基本单元。</p>
-</blockquote>
-<h4 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h4><blockquote>
-<p>源源不断传递的Tuple就组成了stream。</p>
-</blockquote>
-<h4 id="Stream-Grouping"><a href="#Stream-Grouping" class="headerlink" title="Stream Grouping"></a>Stream Grouping</h4><blockquote>
-<p>即消息的partition方法。流分组策略告诉Topology如何在两个组件之间发送Tuple。 Storm 中提供若干种实用的grouping方式，包括shuffle, fields hash, all, global, none, direct和localOrShuffle等。</p>
-<ul>
-<li>ShuffleGrouping:随机分组，随机分发Stream中的tuple，保证每个Bolt的Task接收Tuple数量大致一致；</li>
-<li>FieldsGrouping：按照字段分组，保证相同字段的Tuple分配到同一个Task中；</li>
-<li>AllGrouping：广播发送，每一个Task都会受到所有的Tuple；</li>
-<li>GlobalGrouping：全局分组，所有的Tuple都发送到同一个Task中，此时一般将当前Component的并发数目设置为1；</li>
-<li>NonGrouping：不分组，和ShuffleGrouping类似，当前Task的执行会和它的被订阅者在同一个线程中执行；</li>
-<li>DirectGrouping：直接分组，直接指定由某个Task来执行Tuple的处理，而且，此时必须有emitDirect方法来发送；</li>
-<li>localOrShuffleGrouping：和ShuffleGrouping类似，若Bolt有多个Task在同一个进程中，Tuple会随机发给这些Task。</li>
-</ul>
-</blockquote>
-<h3 id="Storm-的特性"><a href="#Storm-的特性" class="headerlink" title="Storm 的特性"></a>Storm 的特性</h3><blockquote>
-<p>在所有这些设计思想与决策中，有一些非常棒的特性成就了独一无二的 Storm。</p>
-<ul>
-<li>简化编程：如果你曾试着从零开始实现实时处理，你应该明白这是一件多么痛苦的事情。使用 Storm，复杂性被大大降低了。</li>
-<li>使用一门基于 JVM 的语言开发会更容易，但是你可以借助一个小的中间件，在 Storm 上使用任何语言开发。有现成的中间件可供选择，当然也可以自己开发中间件。</li>
-<li>容错：Storm 集群会关注工作节点状态，如果宕机了必要的时候会重新分配任务。</li>
-<li>可扩展：所有你需要为扩展集群所做的工作就是增加机器。Storm 会在新机器就绪时向它们分配任务。</li>
-<li>可靠的：所有消息都可保证至少处理一次。如果出错了，消息可能处理不只一次，不过你永远不会丢失消息。</li>
-<li>快速：速度是驱动 Storm 设计的一个关键因素</li>
-<li>事务性：You can get exactly once messaging semantics for pretty much any computation. 你可以为几乎任何计算得到恰好一次消息语义。</li>
-</ul>
-</blockquote>
-<h3 id="Topology运行流程"><a href="#Topology运行流程" class="headerlink" title="Topology运行流程"></a>Topology运行流程</h3><blockquote>
-<p>Topology的运行可以分为<strong>本地模式</strong>和<strong>分布式模式</strong>，模式的设置可以在配置文件中设定，也可以在代码中设置。需要注意的是，在Storm代码编写完成之后，需要打包成jar包放到Nimbus中运行，打包的时候，不需要把依赖的jar都打进去，否则如果把依赖的storm.jar包打进去的话，运行时会出现重复的配置文件错误导致Topology无法运行。因为Topology运行之前，会加载本地的storm.yaml配置文件。</p>
-<ul>
-<li>Storm提交后，会把代码首先存放到<strong>Nimbus节点的inbox目录</strong>下，之后，会把当前Storm运行的配置生成一个<strong>stormconf.ser文件</strong>放到<strong>Nimbus节点的stormdist目录</strong>中，在此目录中同时还有<strong>序列化之后的Topology代码文件</strong>；</li>
-<li>在<strong>设定Topology所关联的Spouts和Bolts</strong>时，可以同时<strong>设置当前Spout和Bolt的executor数目和task数目</strong>，默认情况下，一个Topology的task的总和是和executor的总和一致的。之后，系统根据worker的数目，尽量平均的分配这些task的执行。worker在哪个supervisor节点上运行是由storm本身决定的；</li>
-<li>任务分配好之后，Nimbus节点会将任务的信息提交到<strong>zookeeper集群</strong>，同时在zookeeper集群中会有<strong>workerbeats节点</strong>，这里<strong>存储了当前Topology的所有worker进程的心跳信息</strong>；</li>
-<li>Supervisor节点会不断的<strong>轮询</strong>zookeeper集群，在<strong>zookeeper的assignments节点中保存了所有Topology的任务分配信息、代码存储目录、任务之间的关联关系</strong>等，Supervisor通过轮询此节点的内容，来领取自己的任务，启动worker进程运行；</li>
-<li>一个Topology运行之后，就会不断的通过Spouts来发送Stream流，通过Bolts来不断的处理接收到的Stream流，Stream流是无界的。这一步会不间断的执行，除非<strong>手动结束Topology</strong>。</li>
-</ul>
-</blockquote>
-<h3 id="Topology并行度"><a href="#Topology并行度" class="headerlink" title="Topology并行度"></a>Topology并行度</h3><blockquote>
-<ul>
-<li>worker：每个worker都属于一个特定的Topology，每个Supervisor节点的worker可以有多个，每个worker使用一个单独的端口，它对Topology中的每个component运行一个或者多个executor线程来提供task的运行服务。</li>
-<li>executor：executor是产生于worker进程内部的线程，会执行同一个component的一个或者多个task。</li>
-<li>task：实际的数据处理由task完成，在Topology的生命周期中，每个组件的task数目是不会发生变化的，而executor的数目却不一定。executor数目小于等于task的数目，默认情况下，二者是相等的。</li>
-</ul>
-<p>​    在运行一个Topology时，可以根据具体的情况来设置不同数量的worker、task、executor，而<strong>设置的位置</strong>也可以在多个地方。</p>
-<ul>
-<li><p>worker设置：</p>
-<ul>
-<li>可以通过设置yaml中的topology.workers属性</li>
-<li>在代码中通过<strong>Config的setNumWorkers方法设定</strong></li>
-</ul>
-</li>
-<li><p>executor设置：</p>
-<ul>
-<li>通过<strong>在Topology的入口类中setBolt、setSpout方法的最后一个参数指定</strong>，不指定的话，默认为1；</li>
-</ul>
-</li>
-<li><p>task设置：</p>
-<ul>
-<li>默认情况下，<strong>和executor数目一致</strong>；</li>
-<li>在代码中通过<strong>TopologyBuilder的setNumTasks方法设定具体某个组件的task数目</strong>；</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<p>参考：</p>
-<p><a href="http://www.cnblogs.com/zlslch/p/5989256.html" target="_blank" rel="noopener">http://www.cnblogs.com/zlslch/p/5989256.html</a></p>
-<p><a href="https://blog.yaodataking.com/2017/03/07/storm-2/" target="_blank" rel="noopener">https://blog.yaodataking.com/2017/03/07/storm-2/</a></p>
-<p><a href="http://www.cnblogs.com/xymqx/p/4366429.html" target="_blank" rel="noopener">http://www.cnblogs.com/xymqx/p/4366429.html</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2973,7 +2763,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">159</span>
+                    <span class="site-state-item-count">160</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3307,7 +3097,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">124</span>
+                      
+                    
+                    <span class="site-state-item-count">125</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
