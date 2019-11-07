@@ -627,6 +627,295 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/27/iptables概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/27/iptables概念/" itemprop="url">
+                  iptables概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-27 10:49:11" itemprop="dateCreated datePublished" datetime="2018-09-27T10:49:11+08:00">2018-09-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-15 10:11:00" itemprop="dateModified" datetime="2019-01-15T10:11:00+08:00">2019-01-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="防火墙概念"><a href="#防火墙概念" class="headerlink" title="防火墙概念"></a>防火墙概念</h1><ul>
+<li><p>主机防火墙：针对于单个主机进行防护。</p>
+</li>
+<li><p>网络防火墙：往往处于网络入口或边缘，针对于网络入口进行防护，服务于防火墙背后的本地局域网。网络防火墙和主机防火墙并不冲突，可以理解为，网络防火墙主外（集体）， 主机防火墙主内（个人）。</p>
+</li>
+<li><p>iptables是工作在linux内核中的网络防火墙，netfilter才是防火墙真正的安全框架（framework），iptables和netfilter是一组工具，真正起到防火墙作用的是netfilter，netfilter是内核中的一個過濾框架，iptables是一個生成防火牆規則，並能將其符加在netfilter上，真正實現數據報文過濾、NAT、mangle等規則生成的工具。</p>
+</li>
+<li><p>防火牆工作在主機或網絡的邊緣，對進出的數據報文進行檢查監控，按事先定義的規則進行相應處理。防火牆可以是硬件或軟件，規則包括匹配標準和處理辦法。</p>
+</li>
+<li><p>防火牆規則必須放在內核上，因爲我們是不能和內核打交道的，有人在內核的TCP/IP協議棧上開放了幾個位置，開放給用戶空間的應用程序</p>
+</li>
+<li><p>netfile就是內核中可以放規則的位置；iptables是工作在用戶空間可以寫規則並可通過系統調用放置在內核相應位置的應用程序；報文流向有三種：進來的，出去的和轉發的，在<code>/proc/sys/net/ipv4/ip_forward</code>中就是定義是否轉發的；根據IP地址完成路由表中的路由決策，無論從哪進來的只要到了TCPIP協議棧後，下一個就是路由決策</p>
+</li>
+<li><p>Netfilter是Linux操作系统核心层内部的一个数据包处理模块，它具有如下功能：</p>
+<p>网络地址转换(Network Address Translate)</p>
+<p>数据包内容修改</p>
+<p>以及数据包过滤的防火墙功能</p>
+</li>
+</ul>
+<h1 id="iptables概念"><a href="#iptables概念" class="headerlink" title="iptables概念"></a>iptables概念</h1><ul>
+<li>当客户端访问服务器的web服务时，客户端发送报文到网卡，而tcp/ip协议栈是属于内核的一部分，所以，客户端的信息会通过内核的TCP协议传输到用户空间中的web服务中，而此时，客户端报文的目标终点为web服务所监听的套接字（IP：Port）上，当web服务需要响应客户端请求时，web服务发出的响应报文的目标终点则为客户端，这个时候，web服务所监听的IP与端口反而变成了原点，我们说过，netfilter才是真正的防火墙，它是内核的一部分，所以，如果我们想要防火墙能够达到”防火”的目的，则需要在内核中设置关卡，所有进出的报文都要通过这些关卡，经过检查后，符合放行条件的才能放行，符合阻拦条件的则需要被阻止，于是，就出现了input关卡和output关卡，而这些关卡在iptables中不被称为”关卡”,而被称为”链”。当客户端发来的报文访问的目标地址是其他服务器时，本机的内核要支持IP_FORWARD，我们就可以将报文转发给其他服务器，所以，这个时候，我们就会提到iptables中的其他”链”，他们就是  “路由前”、”转发”、”路由后”，他们的英文名是：PREROUTING、FORWARD、POSTROUTING。如果报文需要转发，那么报文则不会经过input链发往用户空间，而是直接在内核空间中经过forward链和postrouting链转发出去的。</li>
+</ul>
+<p><img src="/images/iptables/朱双印2.jpg"></p>
+<ul>
+<li><p>报文的流向：</p>
+<p>到本机某进程的报文：PREROUTING –&gt; INPUT</p>
+<p>由本机转发的报文：PREROUTING –&gt; FORWARD –&gt; POSTROUTING</p>
+<p>由本机的某进程发出报文（通常为响应报文）：OUTPUT –&gt; POSTROUTING</p>
+</li>
+<li><p>将具有相同功能的规则放在一起就是“表”</p>
+</li>
+<li><p>hook function：鈎子函數，有五個位置。分別是input（進）, output（出）, forward（轉發）, prerouting（路由做出前）, postrouting（路由之後再發出）</p>
+</li>
+<li><p>鈎子函數的規則鏈：INPUT，OUTPUT，FORWARD，PREROUTING，POSTROUTING；</p>
+</li>
+<li><p>PREROUTING的规则可以存在于：raw表，mangle表，nat表。</p>
+<p>INPUT的规则可以存在于：mangle表，filter表，（centos7中还有nat表，centos6中没有）。</p>
+<p>FORWARD的规则可以存在于：mangle表，filter表。</p>
+<p>OUTPUT的规则可以存在于：raw表，mangle表，nat表，filter表。</p>
+<p>POSTROUTING的规则可以存在于：mangle表，nat表。</p>
+</li>
+<li><p>filter表：INPUT，OUTPUT，FORWARD；负责过滤功能；内核模块：iptables_filter</p>
+</li>
+<li><p>nat表：PREROUTING，POSTROUTING，OUTPUT（centos7中还有INPUT，centos6中没有）；network address translation，网络地址转换功能；内核模块：iptable_nat</p>
+</li>
+<li><p>mangle表：INPUT，OUTPUT，FORWARD，PREROUTING，POSTROUTING；拆解报文，做出修改，并重新封装報文首部的功能；内核模块：iptable_mangle</p>
+</li>
+<li><p>過濾與mangle是不能放在一起的；</p>
+</li>
+<li><p>raw表：PREROUTING，OUTPUT；关闭nat表上启用的连接追踪机制；iptable_raw</p>
+</li>
+<li><p>iptables为我们定义了4张”表”,当他们处于同一条”链”时，执行的优先级如下。</p>
+<p>优先级次序（由高而低）：</p>
+<p>raw –&gt; mangle –&gt; nat –&gt; filter</p>
+<p>某些链天生就不能使用某些表中的规则，所以，4张表中的规则处于同一条链的目前只有output链</p>
+</li>
+<li><p>数据转发流程</p>
+</li>
+</ul>
+<p><img src="/images/iptables/朱双印数据转发流程.jpg"></p>
+<ul>
+<li>INPUT、OUTPUT是從內核空間到用戶空間實現過濾的，是主機防火牆設置，通過本機轉發的通過FORWARD鏈，是網絡防火牆的設置。路由的轉發功能可以是一臺主機上的兩個網段的地址。一臺交換機上可以配置多個網段的地址，但它們之間不能通信，但如果不同網段的主機的網關指向了一臺網關服務器上一塊網卡的兩個不同網段的地址，且服務器上開通了路由的功能，那麼就可以通信了；因爲IP地址不是屬於網卡的，而是屬於主機的，所以一塊網卡可以连接兩個網絡</li>
+<li>啓用了ip_forward鏈，默認所有報文都要轉發</li>
+<li>應該隔離可以被公網訪問的主機與不能被公網訪問的主機，如在網關服務器上放三塊網卡，其中一塊是面對互聯網的，另一塊是面對內網的，最後一塊面對服務器，開放互聯網訪問時只能從面對互聯網的網卡到面對服務器的網卡；所有在面對內網網卡上的報文要想進來必須得是一個響應，其他不允許，網關服務器被叫做三宿主的主機</li>
+<li>netfilter：是一個框架，在TCP/IP協議橈上有5個鈎子函數分別對應5個規則鏈，工作在內核中。不能手動向netfilter中添加數據，要用iptables編寫規則送達netfilter的某個鏈上，但它必須先屬於某張表。默認表是filter，還有nat、mangle表</li>
+<li>目標地址轉換在進入時改，源地址轉換在出去的時候改。</li>
+<li>可以使用自定義鏈，但只在被默認鏈調用時才能發揮作用，而且如果沒有自定義鏈中的任何規則匹配，還應該有返回機制。用戶可以刪除自定義的空鏈，默認鏈不能刪除。</li>
+<li>每個規則都有兩個內置的計數器，一個記錄被匹配的報文個數，一個記錄被匹配的報文大小之和</li>
+<li>DNAT：目標地址轉換，轉換IP報文中的目標IP地址。目標地址轉換DNAT，指在返回結果時將地址轉換爲請求的地址。如一臺服務器上沒有服務，但将其設置成轉換到后端兩臺服務器的地址，一臺80一臺21,用户訪問時訪問的是這臺沒有服務的主機，但返回結果是有服務的兩臺主機的內容，在返回結果時就要將地址轉換成沒有服務的主機的IP。也就是当用户访问一个地址时，这个地址本没有服务，但可将此请求转到相应的地址服务上，并在服务返回结果时自动将源地址转为用户请求的地址，这就是目标地址转换。源地址转换与目标地址转换效果相反。我们只操作一半，另一半转换由服务器自动完成</li>
+<li>SNAT：源地址轉換，轉換IP報文中的源IP地址（可在POSTROUTING或OUTPUT上做，對網關來講只在POSTROUTING上作）。雖然稱爲源地址轉換，但目標IP地址也會轉換，只不過回程的目標地址會轉換</li>
+<li>在互聯網上發送報文的時候，無論經過任何路由設備源IP與目標IP是不會改變的</li>
+<li>對linux主機而言，IP地址是屬於主機的，不屬於網卡,配在什麼網卡上並不重要，關鍵是是否屬於這臺主機，無論是否打開轉發功能。這裏所說指一臺主機ping自己的網關地址，在網關這臺主機上的IP網關地址即使不在一個網段上也沒有開轉發功能，同樣可以被ping通。只有在ping第三臺網關指向這臺網關主機另一個網段IP的主機時，才需要轉發。</li>
+<li>對linux主機而言，IP地址是屬於主機的，不屬於網卡,配在什麼網卡上並不重要，關鍵是是否屬於這臺主機，無論是否打開轉發功能。這裏所說指一臺主機ping自己的網關地址，在網關這臺主機上的IP網關地址即使不在一個網段上也沒有開轉發功能，同樣可以被ping通。只有在ping第三臺網關指向了這臺網關主機另一個網段IP的主機時，才需要轉發。</li>
+<li>涉及到轉發與本機無關時一定是在FORWARD鏈上做</li>
+<li>iptables在二三四層上進行過濾</li>
+</ul>
+<h2 id="处理动作"><a href="#处理动作" class="headerlink" title="处理动作"></a>处理动作</h2><ul>
+<li><p>ACCEPT：允许数据包通过。</p>
+</li>
+<li><p>DROP：直接丢弃数据包，不给任何回应信息，这时候客户端会感觉自己的请求泥牛入海了，过了超时时间才会有反应。</p>
+</li>
+<li><p>REJECT：拒绝数据包通过，必要时会给数据发送端一个响应的信息，客户端刚请求就会收到拒绝的信息。</p>
+</li>
+<li><p>SNAT：源地址转换，解决内网用户用同一个公网地址上网的问题。</p>
+</li>
+<li><p>MASQUERADE：是SNAT的一种特殊形式，适用于动态的、临时会变的ip上。</p>
+</li>
+<li><p>DNAT：目标地址转换。</p>
+</li>
+<li><p>REDIRECT：在本机做端口映射。</p>
+</li>
+<li><p>LOG：在/var/log/messages文件中记录日志信息，然后将数据包传递给下一条规则，也就是说除了记录以外不对数据包做任何其他操作，仍然让下一条规则去匹配。</p>
+</li>
+</ul>
+<h2 id="四表五链"><a href="#四表五链" class="headerlink" title="四表五链"></a>四表五链</h2><ul>
+<li><p>filter表——过滤数据包</p>
+</li>
+<li><p>Nat表——用于网络地址转换（IP、端口）</p>
+</li>
+<li><p>Mangle表——修改数据包的服务类型、TTL、并且可以配置路由实现QOS</p>
+</li>
+<li><p>Raw表——决定数据包是否被状态跟踪机制处理</p>
+</li>
+</ul>
+<ul>
+<li>INPUT链——进来的数据包应用此规则链中的策略</li>
+<li>OUTPUT链——外出的数据包应用此规则链中的策略</li>
+<li>FORWARD链——转发数据包时应用此规则链中的策略</li>
+<li>PREROUTING链——对数据包作路由选择前应用此链中的规则（所有的数据包进来的时侯都先由这个链处理）</li>
+<li>POSTROUTING链——对数据包作路由选择后应用此链中的规则（所有的数据包出来的时侯都先由这个链处理）</li>
+</ul>
+<p><img src="/images/iptables/四表五链详细.jpg" alt=""></p>
+<p><img src="/images/iptables/四表五链.png" alt=""></p>
+<p><img src="/images/iptables/四表五链鸟哥.jpg" alt=""></p>
+<h2 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h2><ul>
+<li>NEW：新連接請求。主机连接目标主机，在目标主机上看到的第一个想要连接的包</li>
+<li>ESTABLISHED：已建立的連接。主机已与目标主机进行通信，判断标准只要目标主机回应了第一个包，就进入该状态。</li>
+<li>INVALID：非法連接請求。无效的封包，例如数据破损的封包状态</li>
+<li>RELATED：相關聯的。主机已与目标主机进行通信，目标主机发起新的链接方式，例如ftp</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/27/ip命令的使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -690,7 +979,7 @@
                 
                   <span class="post-meta-item-text">更新於</span>
                 
-                <time title="修改時間：2019-05-31 13:09:09" itemprop="dateModified" datetime="2019-05-31T13:09:09+08:00">2019-05-31</time>
+                <time title="修改時間：2019-11-07 12:25:02" itemprop="dateModified" datetime="2019-11-07T12:25:02+08:00">2019-11-07</time>
               
             
           </span>
@@ -752,7 +1041,7 @@
 <h3 id="例-1"><a href="#例-1" class="headerlink" title="例"></a>例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ip addr show</span><br><span class="line"><span class="meta">#</span><span class="bash">显示所有IP地址</span></span><br><span class="line">ip addr list</span><br><span class="line">ifconfig eth1 0</span><br><span class="line"><span class="meta">#</span><span class="bash">删除eth1上的地址</span></span><br><span class="line">ip addr add 192.168.1.22/24 dev eno16777736</span><br><span class="line"><span class="meta">#</span><span class="bash">添加地址，可以在一块网卡上添加多个地址，只有在一个网段的地址上才会有secondary，不同网段不会有。添加的地址用ifconfig是显示不了的，如果要显示需要加接口别名</span></span><br><span class="line">ip addr add 192.168.1.43/24 dev eno16777736 lable eno16777736:0</span><br><span class="line"><span class="meta">#</span><span class="bash">这样用ifconfig就能显示了</span></span><br><span class="line">ip link show</span><br><span class="line"><span class="meta">#</span><span class="bash">这样可以查看到地址</span></span><br><span class="line">ip addr del 192.168.1.43/24 dev eno16777736</span><br><span class="line"><span class="meta">#</span><span class="bash">删除地址</span></span><br><span class="line">ip addr flush dev eth1</span><br><span class="line"><span class="meta">#</span><span class="bash">清空eth1上的所有地址</span></span><br></pre></td></tr></table></figure>
 <h2 id="route"><a href="#route" class="headerlink" title="route"></a>route</h2><h3 id="语法-4"><a href="#语法-4" class="headerlink" title="语法"></a>语法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">ip route - routing table management</span><br><span class="line">				</span><br><span class="line">ip route add - add new route</span><br><span class="line"><span class="meta">#</span><span class="bash">添加路由</span></span><br><span class="line">ip route change - change route</span><br><span class="line"><span class="meta">#</span><span class="bash">修改路由</span></span><br><span class="line">ip route delete - delete route</span><br><span class="line">ip  route  del  TYPE PRIFIX</span><br><span class="line"><span class="meta">#</span><span class="bash">删除路由</span></span><br><span class="line">ip route show - list routes</span><br><span class="line"><span class="meta">#</span><span class="bash">显示路由	</span></span><br><span class="line">ip route flush - flush routing tables</span><br><span class="line"><span class="meta">#</span><span class="bash">清空路由表</span></span><br><span class="line">ip route get - get a single route</span><br><span class="line">ip route get TYPE PRIFIX</span><br><span class="line"><span class="meta">#</span><span class="bash">获取单条路由</span></span><br><span class="line">ip route replace - change or add new one</span><br><span class="line"><span class="meta">#</span><span class="bash">替换路由，有老的就改老的，没有就加新的</span></span><br><span class="line">ip route add TYPE PREFIX  via GW  [dev  IFACE]  [src SOURCE_IP]</span><br><span class="line">ip route add default via GW	</span><br><span class="line"><span class="meta">#</span><span class="bash">添加默认网关</span></span><br></pre></td></tr></table></figure>
 <h3 id="例-2"><a href="#例-2" class="headerlink" title="例"></a>例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ip route add 192.168.0.0/24 via 10.0.0.1 dev eth1 src 10.0.20.100</span><br><span class="line"><span class="meta">#</span><span class="bash">添加一条到192.168.0.0/24网络的路由，（via是指明下一跳地址的）下一跳的地址是10.0.0.1，设备是eth1，源地址是10.0.20.100。（src指定源地址，源地址应该是本地网卡上的地址中的一个）也就是本机地址是10.0.20.100，如果想到达192的网络，就要通过eth1设备，走10.0.0.1这个网关。</span></span><br><span class="line">ip route delete 192.168.1.0/24</span><br><span class="line">ip route get 192.168.0.0/24</span><br><span class="line">ip route list</span><br><span class="line"><span class="meta">#</span><span class="bash">显示路由</span></span><br><span class="line">ip route add 192.168.122.0/24 via 192.168.1.10 dev eno16777736 src 192.168.1.109</span><br><span class="line"><span class="meta">#</span><span class="bash">有两个虚拟机，分别位于两台主机上，一台主机地址是192.168.1.10，一台是192.168.1.4，10主机上的虚拟机是用NAT方式联网的，地址是192.168.122.103/24；4主机上的虚拟机是桥接联网的，地址是192.168.1.109/24。现在要用109地址ssh登录192.168.122.103.添加路由，意为到192.168.122.0网络的下一跳地址是192.168.1.10，通过本机的eno16777736网卡，源地址是192.168.1.109。加完此条路由后，可以ping通192.168.122.1，但ping 192.168.122.103时显示Destination Port Unreachable。原因是在192.168.1.10的ubuntu主机上有iptables规则，用/sbin/iptables -F清除规则后，暂时解决了问题</span></span><br><span class="line">ip route add default via 172.16.0.1 dev eno16777736</span><br><span class="line"><span class="meta">#</span><span class="bash">添加默认网关</span></span><br><span class="line">ip route delete 192.168.1.0/24</span><br><span class="line"><span class="meta">#</span><span class="bash">删除到192网络的路由</span></span><br><span class="line">ip route show src 172.16.100.6</span><br><span class="line"><span class="meta">#</span><span class="bash">只显示源地址是172的路由条目</span></span><br><span class="line">ip route get 192.168.0.0/24</span><br><span class="line"><span class="meta">#</span><span class="bash">显示到192网络的路由</span></span><br><span class="line">ip route flush 10/8</span><br><span class="line"><span class="meta">#</span><span class="bash">清除10开头的网络路由，如果删除不了，就要将地址写的再详细些</span></span><br></pre></td></tr></table></figure>
-<h2 id="策略路由"><a href="#策略路由" class="headerlink" title="策略路由"></a>策略路由</h2><h3 id="设置策略路由"><a href="#设置策略路由" class="headerlink" title="设置策略路由"></a>设置策略路由</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">问题：在某服务器上安装CentOS7.3系统，配置两个网段的IP地址，一为10.129.14.16/27，一为10.129.14.40/27。客户端使用10.129.27/27，网关10.129.14.1。使用客户端ping服务器两地址时，只能ping能10.129.14.16/27，ping10.129.14.40/27时页面停住不动，查看服务器，应该是ping包可以到达服务器，但无法返回。</span><br><span class="line"></span><br><span class="line">解决：</span><br><span class="line">1. 配置服务器网卡</span><br><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-enp96s0f0</span><br><span class="line">TYPE="Ethernet"</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">DEFROUTE="yes"</span><br><span class="line">NAME="enp96s0f0"</span><br><span class="line">UUID="5f90c86f-c21f-489e-ae8f-cf36e6eac588"</span><br><span class="line">DEVICE="enp96s0f0"</span><br><span class="line">ONBOOT="yes"</span><br><span class="line">DNS1="202.96.209.6"</span><br><span class="line">DNS2="202.96.209.133"</span><br><span class="line">IPADDR=10.129.14.16</span><br><span class="line">PREFIX=27</span><br><span class="line"><span class="meta">#</span><span class="bash">GATEWAY=10.129.14.1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注释网卡配置中的GATEWAY一项，多块网卡都要注释</span></span><br><span class="line"></span><br><span class="line">2. 配置策略路由表</span><br><span class="line">vim /etc/iproute2/rt_tables </span><br><span class="line">252 enp96s0f1-32</span><br><span class="line">251 enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入上面两行，前面的数字是路由表的编号，后面是自定义的表名。路由表的编号是自定义的，但linux最多可管理255个表，不要超过这个数字，另外，rt_table中原有的编号不要动，自定义的表编号也不要与原有的编号冲突。</span></span><br><span class="line"></span><br><span class="line">3. 配置策略路由</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将路由规则加入CentOS7中的/etc/rc.d/init.d/network中可以使重启网卡时路由依然生效，方法如下</span></span><br><span class="line">vim /etc/rc.d/init.d/network</span><br><span class="line">ip route flush table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先清空策略路由表</span></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0 src 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一条策略路由规则，下一跳到10.129.14.1，网卡是enp96s0f0，源地址为10.129.14.16，添加到策略路由表enp96s0f0-0</span></span><br><span class="line">ip rule add from 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将从10.129.14.16经过的数据包都从enp96s0f0-0策略路由表中走</span></span><br><span class="line">ip route flush table enp96s0f1-32</span><br><span class="line">ip route add default via 10.129.14.33 dev enp96s0f1 src 10.129.14.40 table enp96s0f1-32</span><br><span class="line">ip rule add from 10.129.14.40 table enp96s0f1-32</span><br><span class="line"></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0</span><br><span class="line"></span><br><span class="line">exit $rc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里要注意，一定要添加在最后一行的<span class="built_in">exit</span> <span class="variable">$rc</span>之上。</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart network</span><br><span class="line">ip route</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看路由，加入的默认路由生效了</span></span><br><span class="line">ip rule</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看生效的策略路由表</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 最后，测试的机器上也要加一条到某网段的路由，如sudo ip route add 10.129.14.32/27 via 10.129.14.1。因为默认会从无线走如果不加这条路由规则，就要将无线断开或删除这条默认路由</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时客户端就可以ping通服务器的两个ip地址了</span></span><br></pre></td></tr></table></figure>
+<h2 id="策略路由"><a href="#策略路由" class="headerlink" title="策略路由"></a>策略路由</h2><h3 id="设置策略路由"><a href="#设置策略路由" class="headerlink" title="设置策略路由"></a>设置策略路由</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">问题：在某服务器上安装CentOS7.3系统，配置两个网段的IP地址，一为10.129.14.16/27，一为</span><br><span class="line">10.129.14.40/27。客户端使用10.129.14.27/27，网关10.129.14.1。使用客户端ping服务器两地址时，只能</span><br><span class="line">ping通10.129.14.16/27，ping10.129.14.40/27时页面停住不动，查看服务器，应该是ping包可以到达服务</span><br><span class="line">器，但无法返回。</span><br><span class="line"></span><br><span class="line">解决：</span><br><span class="line">1. 配置服务器网卡</span><br><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-enp96s0f0</span><br><span class="line">TYPE="Ethernet"</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">DEFROUTE="yes"</span><br><span class="line">NAME="enp96s0f0"</span><br><span class="line">UUID="5f90c86f-c21f-489e-ae8f-cf36e6eac588"</span><br><span class="line">DEVICE="enp96s0f0"</span><br><span class="line">ONBOOT="yes"</span><br><span class="line">DNS1="202.96.209.6"</span><br><span class="line">DNS2="202.96.209.133"</span><br><span class="line">IPADDR=10.129.14.16</span><br><span class="line">PREFIX=27</span><br><span class="line"><span class="meta">#</span><span class="bash">GATEWAY=10.129.14.1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注释网卡配置中的GATEWAY一项，多块网卡都要注释</span></span><br><span class="line"></span><br><span class="line">2. 配置策略路由表</span><br><span class="line">vim /etc/iproute2/rt_tables </span><br><span class="line">252 enp96s0f1-32</span><br><span class="line">251 enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入上面两行，前面的数字是路由表的编号，后面是自定义的表名。路由表的编号是自定义的，但linux最多可管理255个表，不要超过这个数字，另外，rt_table中原有的编号不要动，自定义的表编号也不要与原有的编号冲突。</span></span><br><span class="line"></span><br><span class="line">3. 配置策略路由</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将路由规则加入CentOS7中的/etc/rc.d/init.d/network中可以使重启网卡时路由依然生效，方法如下</span></span><br><span class="line">vim /etc/rc.d/init.d/network</span><br><span class="line">ip route flush table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 先清空策略路由表</span></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0 src 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一条策略路由规则，下一跳到10.129.14.1，网卡是enp96s0f0，源地址为10.129.14.16，添加到策略路由表enp96s0f0-0</span></span><br><span class="line">ip rule add from 10.129.14.16 table enp96s0f0-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将从10.129.14.16经过的数据包都从enp96s0f0-0策略路由表中走</span></span><br><span class="line">ip route flush table enp96s0f1-32</span><br><span class="line">ip route add default via 10.129.14.33 dev enp96s0f1 src 10.129.14.40 table enp96s0f1-32</span><br><span class="line">ip rule add from 10.129.14.40 table enp96s0f1-32</span><br><span class="line"></span><br><span class="line">ip route add default via 10.129.14.1 dev enp96s0f0</span><br><span class="line"></span><br><span class="line">exit $rc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里要注意，一定要添加在最后一行的<span class="built_in">exit</span> <span class="variable">$rc</span>之上。</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart network</span><br><span class="line">ip route</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看路由，加入的默认路由生效了</span></span><br><span class="line">ip rule</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看生效的策略路由表</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 最后，测试的机器上也要加一条到某网段的路由，如sudo ip route add 10.129.14.32/27 via 10.129.14.1。因为默认会从无线走如果不加这条路由规则，就要将无线断开或删除这条默认路由</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时客户端就可以ping通服务器的两个ip地址了</span></span><br></pre></td></tr></table></figure>
 <h3 id="查看策略"><a href="#查看策略" class="headerlink" title="查看策略"></a>查看策略</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ip route show table all</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示所有路由表</span></span><br><span class="line">ip rule</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示所有转发策略</span></span><br><span class="line">ip route list table eno2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示某个策略路由表的规则</span></span><br><span class="line">ip route list table all</span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示全部策略路由表</span></span><br></pre></td></tr></table></figure>
 
           
@@ -2308,178 +2597,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/nginx功能测试二/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/17/nginx功能测试二/" itemprop="url">
-                  nginx功能测试二
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-17 11:10:22" itemprop="dateCreated datePublished" datetime="2018-09-17T11:10:22+08:00">2018-09-17</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-09-29 16:25:46" itemprop="dateModified" datetime="2018-09-29T16:25:46+08:00">2018-09-29</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="https"><a href="#https" class="headerlink" title="https"></a>https</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">* 创建CA服务器</span><br><span class="line">cd /etc/pki/CA</span><br><span class="line">(umask 077;openssl genrsa -out private/cakey.pem 2048)</span><br><span class="line">openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 365</span><br><span class="line">touch index.txt serial</span><br><span class="line">echo 01 &gt; serial</span><br><span class="line">* 到web服务器</span><br><span class="line">mkdir /etc/nginx/ssl</span><br><span class="line">cd /etc/nginx/ssl</span><br><span class="line">(umask 077;openssl genrsa -out nginx.key 2048)</span><br><span class="line">openssl req -new -key http.key -out nginx.csr</span><br><span class="line">scp nginx.csr 192.168.1.2:/tmp</span><br><span class="line">* 到CA服务器</span><br><span class="line">openssl ca -in /tmp/nginx.csr -out /etc/pki/CA/certs/nginx.crt -days 365</span><br><span class="line"><span class="meta">#</span><span class="bash">newcerts中的也是证书，是pem格式的</span></span><br><span class="line">scp certs/nginx.crt 192.168.1.3:/etc/nginx/ssl</span><br><span class="line">* 到web服务器</span><br><span class="line">cp conf.d/vhost1.conf conf.d/vhost1_ssl.conf</span><br><span class="line">vim conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 443 ssl;</span><br><span class="line">        server_name www.ruopu.com;</span><br><span class="line">        root /data/nginx/vhost1;</span><br><span class="line">        access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">        #当前虚拟主机使用PEM格式的证书文件</span><br><span class="line">        ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">        #当前虚拟主机上与其证书匹配的私钥文件</span><br><span class="line">        ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">        #支持ssl协议版本，默认为后三个</span><br><span class="line">        ssl_session_cache shared:SSL:10m;</span><br><span class="line">        #在各worker之间使用一个共享的缓存。SSL是自定义的名字，1m内存空间可以缓存4000个会话，这里定义10M。</span><br><span class="line">    &#125;    </span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">ss -tln</span><br><span class="line">访问https://www.ruopu.com，将cacert.pem传到主机，这里定义的CA服务器与客户端的主机名是一样的，访问时通过了。</span><br></pre></td></tr></table></figure>
-<h1 id="重写"><a href="#重写" class="headerlink" title="重写"></a><strong>重写</strong></h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">    	rewrite /(.*)\.png$ /$1.jpg;</span><br><span class="line">    	#rewrite放在server中，另外放在location或if中也可以。上面配置表示，所有以.png结尾的文件都转成.jpg格式的。括号是为了后面的$1引用，/是根，png前面的点需要转义，后面的.jpg的点不需要转义</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">访问www.ruopu.com/images/fish.png，这里实际访问的是一个叫fish.jpg的文件，名字一样但格式不同。</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       error_page 404 /notfound.html;</span><br><span class="line">    #   rewrite /(.*)$ https://www.ruopu.com/$1;</span><br><span class="line">       rewrite /(.*)\.png$ https://www.ruopu.com/$1.jpg;</span><br><span class="line">       #用户请求任何内容，都转到https的页面上。但两条不要一起写，如果一起写，在访问www.ruopu.com/images/night.png时会先匹配上面的规则，下面的规则就不会生效了。</span><br><span class="line">       location = /notfound.html &#123;</span><br><span class="line">            root /data/nginx/error_pages;</span><br><span class="line">       &#125;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* ^/(admin|login) &#123;</span><br><span class="line">            auth_basic "admin area or login url";</span><br><span class="line">            auth_basic_user_file /etc/nginx/.ngxpasswd;</span><br><span class="line">       &#125;</span><br><span class="line">       location /ngxstatus &#123;</span><br><span class="line">            stub_status;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">vim /etc/nginx/conf.d/vhost1_ssl.conf</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 443 ssl;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       root /data/nginx/vhost1;</span><br><span class="line">       location ^~ /images/ &#123;</span><br><span class="line">            alias /data/pictures/;</span><br><span class="line">       &#125;</span><br><span class="line">       access_log /var/log/nginx/vhost1_ssl_access.log main;</span><br><span class="line">       ssl on;</span><br><span class="line">       ssl_certificate /etc/nginx/ssl/nginx.crt;</span><br><span class="line">       ssl_certificate_key /etc/nginx/ssl/nginx.key;</span><br><span class="line">       ssl_protocols sslv3 tlsv1 tlsv1.1 tlsv1.2;</span><br><span class="line">       ssl_session_cache shared:SSL:10m;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">vhost1_ssl.conf配置文件中也要有与vhost1.conf中相同的配置，这样才能正常访问，这里是定义的别名与vhost1.conf中是一样的，也就是要有相同的访问路径，不然不能正常访问，会有404的错误提示。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">上面的重写要写在监听80端口的server中，不能写在监听在443端口的server中，如果写在监听在443端口的server中，那么请求会无限重定向，最后是无法访问的。监听80端口与监听443端口的两个server中定义的内容应该是一样的。不然访问80端口时能访问的路径被重定向到443端口时就访问不到了。如果想让访问80端口的任何以png结尾的文件，都被重定向到443端口的.jpg文件，那么就要在监听443端口的配置文件中加入 rewrite /(.*)\.png$ /<span class="variable">$1</span>.jpg;，如果在监听80端口的server中定义是不起作用的。这是在要将所有访问的内容都重定向到443端口，并且还要让访问png文件的请求重定向到443端口的jpg文件，这两个条件都存在的情况下需要的配置。但如果只是将访问80端口的以png结尾的文件重定向到443端口的jpg文件的话，只要在监听80端口的server中写入 rewrite /(.*)\.png$ https://www.ruopu.com/<span class="variable">$1</span>.jpg; 就行了。</span></span><br><span class="line">nginx -s reload</span><br><span class="line">访问https://www.ruopu.com/images/night.png，rewrite规则可以写多条，rewrite匹配并重写url后会以新的url地址重新匹配配置文件或重新检查location的规则，如果可以匹配到，就会再重写一遍，直到匹配不到。默认的行为是last，就是重写的url会被重新再匹配一遍规则。还有break、redirect、permanent</span><br><span class="line">vim /etc/nginx/conf.d/vhost1.conf</span><br><span class="line">    server&#123;</span><br><span class="line">		rewrite /(.*)\.png$ /$1.jpg redirect;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">redirect是重定向，客户端要重新发起请求。如果是permanent就是永久重定向，也需要客户端重新发请求。last和<span class="built_in">break</span>是不需要客户端重新发请求的，只是服务器内部做了转换</span></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="meta">#</span><span class="bash">[flag]：</span></span><br><span class="line">	last：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后对新的URI启动新一轮重写检查；提前重启新一轮循环；</span><br><span class="line">    break：重写完成后停止对当前URI在当前location中后续的其它重写操作，而后直接跳转至重写规则配置块之后的其它配置；结束循环；</span><br><span class="line">    redirect：重写完成后以临时重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；不能以http://或https://开头；302</span><br><span class="line">    permanent：重写完成后以永久重定向方式直接返回重写后生成的新URI给客户端，由客户端重新发起请求；301</span><br></pre></td></tr></table></figure>
-<h1 id="反代"><a href="#反代" class="headerlink" title="反代"></a>反代</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">* 准备三台主机，一台反代，两台web服务，反代服务器的地址有两个，一个外网192.168.1.90，一个内网172.16.0.1。web服务器有两个内网地址，一个172.16.0.2，一个172.16.0.3。设置内网地址，就是将虚拟机网卡改为仅主机，然后设置仅主机的IP地址</span><br><span class="line">yum install httpd mod_ssl</span><br><span class="line">//到web服务器上安装httpd，mod_ssl，并提供主页，最后改为内网网卡并配置地址。改为内网地址172.16.0.2</span><br><span class="line">vim /var/www/html/index.html</span><br><span class="line">	&lt;h1&gt;Real Server 1&lt;/h1&gt;</span><br><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-eno16777736</span><br><span class="line">    IPADDR=172.16.0.2</span><br><span class="line">    NETMASK=255.255.0.0</span><br><span class="line">systemctl start httpd</span><br><span class="line">setenforce 0</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">* 到反代服务器</span><br><span class="line">vim /etc/yum.repos.d/nginx.repo</span><br><span class="line">    [nginx]</span><br><span class="line">    name=nginx repository</span><br><span class="line">    baseurl=http://nginx.org/packages/centos/7/$basearch/</span><br><span class="line">    gpgcheck=0</span><br><span class="line">    enabled=1</span><br><span class="line">yum install nginx</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.conf</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        server_name www.ruopu.com</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://172.16.0.2:80；</span><br><span class="line">        //这里要看web服务器是基于什么做的虚拟主机，是IP，port还是FQDN，是哪个就在http后输入哪个</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">systemctl start nginx</span><br><span class="line">* 修改客户端hosts文件，让主机可以解析nginx的域名</span><br><span class="line">* 访问测试</span><br><span class="line">* 到web服务器上</span><br><span class="line">tcpdump -i eno16777736 tcp port 80</span><br><span class="line">//监听80端口，看一下请求是否为反代服务器发来的</span><br><span class="line">* 到第二台web服务器上</span><br><span class="line">yum install httpd</span><br><span class="line">改为内网地址172.16.0.3</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">setenforce 0</span><br><span class="line">vim /var/www/html/index.html</span><br><span class="line">	&lt;h1&gt;Real Server 2&lt;/h1&gt;</span><br><span class="line">find /usr/share -iname "*.jpg" -exec cp &#123;&#125; /var/www/html \;</span><br><span class="line">//这一次准备将图片文件都反代到这台服务器</span><br><span class="line">systemctl start httpd</span><br><span class="line">* 到反代服务器，加入</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.conf</span><br><span class="line">    location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">        proxy_pass http://172.16.0.3:80;</span><br><span class="line">    //将访问图片的请求代理到另一台服务器上</span><br><span class="line">    &#125;</span><br><span class="line">* 到客户端访问，如果是访问域名就返回第一台web服务器的内容，如果访问域名/*.jpg就返回第二台服务器的内容。在配置文件中，如果location中用了正则表达式，在proxy_pass指向的地址中的80端口后是不能加斜线/的，如果没用正则表达式，可以加斜线。像上边的第一个location设置，如果80后有斜线，表示将location中的斜线替换成80后的斜线，如果没有斜线，表示将location中的斜线补在80后</span><br><span class="line">* 测试斜线的功能，到反代服务器上</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.com</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        server_name www.ruopu.com;</span><br><span class="line">        location / &#123;</span><br><span class="line">        	root /data/nginx/html;</span><br><span class="line">        &#125;</span><br><span class="line">        location /admin/ &#123;</span><br><span class="line">            proxy_pass http://172.16.0.2:80;</span><br><span class="line">            //这个反代的意思是在172.16.0.2的根目录下找admin目录，下面的反代是在访问以jpg等为后缀名的文件时到172.16.0.3:80的根目录下找</span><br><span class="line">        &#125;</span><br><span class="line">        location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">        	proxy_pass http://172.16.0.3:80;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //修改配置文件，将admin代理过去</span><br><span class="line">mkdir -pv /data/nginx/html</span><br><span class="line">nginx -s reload</span><br><span class="line">* 到客户端访问www.ruopu.com/admin，提示Not Found，因为web服务器上没有admin目录。但是，如果location /admin/中的80后有斜线，那么访问的就是172.16.0.2的根目录，也就是/var/www/html/index.html文件。也就是，没有斜线，就将/admin补在80后，因为172.16.0.2中没有admin目录，所以提示Not Found。如果有斜线，就表示访问http://172.16.0.2/admin就是在访问172.16.0.2的根目录，/admin/就等于/。</span><br><span class="line">* 到web服务器上</span><br><span class="line">mkdir /var/www/html/admin</span><br><span class="line">vim /var/www/html/admin/index.html</span><br><span class="line">	admin</span><br><span class="line">* 到客户端测试，这时显示admin</span><br><span class="line">* 到反代服务器上加一个斜线</span><br><span class="line">vim /etc/nginx/conf.d/ruopu.com</span><br><span class="line">    server &#123;</span><br><span class="line">       listen 80;</span><br><span class="line">       server_name www.ruopu.com;</span><br><span class="line">       location / &#123;</span><br><span class="line">            root /data/nginx/html;</span><br><span class="line">       &#125;</span><br><span class="line">       location /admin/ &#123;</span><br><span class="line">            proxy_pass http://10.5.5.204:80/;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~* \.(jpg|jpeg|png)$ &#123;</span><br><span class="line">            proxy_pass http://10.5.5.205:80;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line">* 到客户端访问www.ruopu.com/admin，这时显示的是Real Server 1，也就是web服务器上html中定义的内容，配置的意思就是，当访问admin时，就替换成web服务器根下的内容。当location中定义的是根时，这个斜线就没有意义了，因为访问的都是根</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2527,7 +2644,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">162</span>
+                    <span class="site-state-item-count">163</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2867,7 +2984,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">127</span>
+                      
+                    
+                    <span class="site-state-item-count">128</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
