@@ -350,6 +350,328 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/mysql备份与还原/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/17/mysql备份与还原/" itemprop="url">
+                  mysql备份与还原
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-17 14:08:03" itemprop="dateCreated datePublished" datetime="2018-09-17T14:08:03+08:00">2018-09-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-01-07 13:05:18" itemprop="dateModified" datetime="2019-01-07T13:05:18+08:00">2019-01-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><blockquote>
+<p>備份：副本</p>
+<p>如果在RAID1或RAID10上，是保證硬件損壞而不會業務中止，所以與mysql的備份無關，因其無法避免邏輯上的破壞</p>
+<ul>
+<li><p>備份類型：</p>
+<p>比如文件有50G，我們用CP復制的是時間點不一致的數據文件，所以不可以。服務器停了再復制是可以的，但服務器是不能停的。</p>
+<ul>
+<li>熱備份（在線備份）：讀寫不受影響</li>
+<li>溫備份：能讀不能寫，僅可以執行讀操作</li>
+<li>冷備份：離線備份，讀寫操作均不能進行</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>物理備份和邏輯備份</p>
+<ul>
+<li>物理備份：復制數據文件</li>
+<li>邏輯備份：將數據導出至文本文件中</li>
+</ul>
+<p>物理與邏輯備份可以热備、溫備或冷備份</p>
+</li>
+</ul>
+<ul>
+<li><p>完全備份、增量備份和差異備份</p>
+<ul>
+<li>完全備份：備份全部數據（可以是某個庫的某個單獨數據的全部備份）</li>
+<li>增量備份：僅備份上次完全或增量備份以後變化的數據</li>
+<li>差異備份：僅備份上次完全備份以來變化的數據</li>
+</ul>
+<p>差異備份與增量備份的區別是，增量備份在備份時每次都是和前一次比較，備份那些不同的數據，而恢復時是先恢復完全備份再按時間點恢復每次的增量備份；差異備份是先完全備份，之後每天都和完全備份比較，備份那些增長的數據，在恢復時先恢復完全備份，再恢復最後一天的差異備份即可。差異備份的數據量要比增量備份的數據量大很多</p>
+<p>備份策略是完全加差異或完全加增量。可使用物理或邏輯方式進行完全、增量或差異備份，可以自由組合</p>
+<p>還原，最好經常測試還原數據功能。要有還原方案</p>
+</li>
+<li><p>備份什麼？</p>
+</li>
+</ul>
+<p>​        數據、配置文件、日志（二進制日志、事務日志）</p>
+<ul>
+<li><p>熱備份</p>
+<ul>
+<li><p>MyISAM幾乎不可能熱備。可使用邏輯卷的快照備份，但最好是溫備份，以共享方式鎖定MyISAM中的所有表</p>
+</li>
+<li><p>InnoDB：可以熱備不影響進程，但會影響服務器性能。有專門熱備工具：xtrabackup, mysqldump</p>
+</li>
+</ul>
+<p>可把Mysql做成從服務器，需要備份時把從服務器停下來備份，之後再啟動與主服務器同步</p>
+<ul>
+<li><p>物理備份：速度快，不用再借助mysql服務器做任何事</p>
+</li>
+<li><p>邏輯備份：需要mysql服務器進程參與，速度慢，可能會丟失浮點數精度。可以方便使用文本處理工具直接對其處理、可移植性強</p>
+</li>
+</ul>
+</li>
+<li><p>備份策略：</p>
+<ul>
+<li><p>完全+增量           </p>
+</li>
+<li><p>完全+差異</p>
+</li>
+</ul>
+</li>
+<li><p>選擇多長時間備份一次取決於兩點</p>
+<ol>
+<li><p>數據變化的頻度和變化量；</p>
+</li>
+<li><p>能夠忍受的還原時長；完全備份是物理還是邏輯方式取決於我們自己的需要，增量備份使用哪種方式也一樣</p>
+</li>
+</ol>
+</li>
+<li><p>mysql備份工具</p>
+<ul>
+<li><p>mysqldump：邏輯備份工具、MyISAM（溫）、InnoDB（熱備份）</p>
+</li>
+<li><p>mysqlhotcopy：物理備份工具，是溫備工具實際是冷備份</p>
+</li>
+</ul>
+</li>
+<li><p>文件系統工具</p>
+<ul>
+<li><p>cp：只能冷備份</p>
+</li>
+<li><p>lvm：借助邏輯卷的快照功能，可實現幾乎熱備</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>​           mysql&gt; FLUSH TABLES</p>
+<p>​           mysql&gt; LOCK TABLES</p>
+<p>​           創建快照：釋放鎖，而後復制數據</p>
+<ul>
+<li><p>第三組工具</p>
+<ul>
+<li><p>ibbackup：商業工具</p>
+</li>
+<li><p>xtrabackup：開源工具</p>
+</li>
+</ul>
+</li>
+<li><p>mysqldump：邏輯備份</p>
+<ul>
+<li><p>mysqldump（完全備份）+ 二進制日志</p>
+</li>
+<li><p>完全 + 增量</p>
+</li>
+</ul>
+</li>
+<li><p>邏輯備份缺點</p>
+<ol>
+<li>可能使浮點數據丟失精度</li>
+<li>備份出的數據更佔用存儲空間，壓縮後可大大節省空間</li>
+<li>不適合對大數據庫做完全備份</li>
+</ol>
+</li>
+</ul>
+<p>​       </p>
+<ul>
+<li><p>對InnoDB做熱備，不建議用溫備份</p>
+<p>就算執行了FLUSH TABLES WITH READ LOCK;，如果此時有其他執行程序的話，這個加鎖過程可能要等很長時間，就算鎖上了背後可能還有寫操作，mysql後台每隔一段時間會將事務日志中的數據同步到事務文件中，後台可能還在寫，這時要等待事務日志同步到數據文件中，用命令SHOW ENGINE INNODB STATUS;可查看InnoDB的存儲狀態，所以建議熱備。</p>
+<p>MVCC多版本並發控制，如果事務隔離級別是REPEATABLE-READ時，這也是默認級別，–single-transaction會啟動一個大事務，直到我們完成備份，這樣意味著在整個讀取過程中我們讀取的數據都是一致的，就算有人改了，我們看到的也是原來的數據，這就是能做熱備的原因</p>
+</li>
+</ul>
+<ul>
+<li><p>幾乎熱備：LVM</p>
+<p>snapshot快照：LVM在熱備上是這樣提供技術手段的，我們可對邏輯卷創建快照，快照完成以後，在執行快照那一刻，以後所有變化的數據，通過快照路徑來訪問的話都不會改變的，所以快照的訪問路徑，就是讓數據停留在了過去快照創建的那一刻，任何此後改變了的數據，在改變之前，先把他們復制到快照上然後再改變原始數據所以我們通過快照去訪問的時候，訪問到的都是原始數據，這就是邏輯卷備份，我們在執行快照的那一刻，將整個數據庫鎖定，執行讀鎖，只要能施加上鎖，立即對數據所在的卷創建一個快照，接著並立即釋放那個鎖，而後我們通過快照卷將數據復制出來就能完成備份了。於是我們就有個前提：</p>
+<ol>
+<li>數據文件要在邏輯卷上</li>
+<li>此邏輯卷所在卷組必須有足夠空間使用快照卷，備份數據要放在快照卷上，快照卷主要是用來備份，備份後就沒用了，可以估計一下數據，如果數據備份要三小時，三小時的數據變化量是100M，我們創建一個500M的快照卷就可以了，如果超出快照卷大小，數據會崩潰的，所以我們要給出足夠的預估</li>
+<li>數據文件和事務日志要在同一個邏輯卷上（如果使用快照卷做備份的話事務日志與數據文件一定要在一個卷上，因為我們創建的快照，如果事務日志與數據文件不在同一個卷上，那我們就在給兩個卷各做一個快照，但兩個卷的時間點未必一致，事務日志的主要目的是為了向事務存儲引擎提供ACID功能的，如果時間點不一致的話，是不能拿來執行數據恢復的。事務日志結合數據文件一起完成數據管理，用戶的寫操作是先寫到事務日志中，再由事務日志一點點與數據文件同步。所以我們在創建快照時，我們執行的命令會鎖定所有表，其他用戶不能向這裡寫，但這不意味著數據文件與日志已經統一了，事務日志中的某些語句在後台仍在向數據文件中寫，如果我們把他們放在不同的卷上分別進行快照，快照的時間點有可能不一致，那事務日志就無法向數據文件同步數據。所以一定要放在同一個卷上。如果事務日志正在與數據文件同步，這時我們做一快照，這個快照的備份文件是可以用的，但mysql會做一個內部的修復，在mysql服務器看來這就是一個服務器發生崩潰需要還原的版本。同理，如果我們想執行那些未完成的操作繼續執行的話，還要依賴二進制日志。就算我們使用邏輯卷做了一次完全的物理備份，將來做即時點還原仍然依賴於二進制日志）這裏指的是InnoDB，不包括MyISAM</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<h1 id="mysqldump"><a href="#mysqldump" class="headerlink" title="mysqldump"></a>mysqldump</h1><h2 id="mysqldump备份恢复"><a href="#mysqldump备份恢复" class="headerlink" title="mysqldump备份恢复"></a>mysqldump备份恢复</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">备份</span><br><span class="line">vim /etc/my.cnf.d/server.cnf</span><br><span class="line">    [mysqld]</span><br><span class="line">    log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">vim /root/.my.cnf</span><br><span class="line">	[client]</span><br><span class="line">    user = 'root'</span><br><span class="line">    password = 'centos'</span><br><span class="line">    host = 'localhost'</span><br><span class="line"><span class="meta">#</span><span class="bash">实现免用户名密码登录</span></span><br><span class="line">mysql -uroot -p &lt; /root/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">将jiaowu.sql文件导入到数据库中</span></span><br><span class="line">mysql</span><br><span class="line">SHOW DATABASES;</span><br><span class="line"><span class="meta">#</span><span class="bash">有jiaowu库了</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置</span></span><br><span class="line">FLUSH TABLES WITH READ LOCK;</span><br><span class="line"><span class="meta">#</span><span class="bash">再打开一个终端执行此命令，刷新表並且以只讀的方式鎖定所有表，這時再備分</span></span><br><span class="line">mysqldump -uroot -p jiaowu &gt; /tmp/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">导出jiaowu库</span></span><br><span class="line">FLUSH LOGS;</span><br><span class="line">UNLOCK TABLES;</span><br><span class="line"><span class="meta">#</span><span class="bash">備份完成後立即釋放鎖</span></span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看二进制日志位置，只取滾動後新建的日志</span></span><br><span class="line"></span><br><span class="line">恢复</span><br><span class="line">DROP DATABASE jiaowu;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 刪除jiaowu庫</span></span><br><span class="line">CREATE DATABASE studb;</span><br><span class="line">mysql studb &lt; /tmp/jiaowu.sql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将数据库导入</span></span><br></pre></td></tr></table></figure>
+<h2 id="mysqldump命令选项"><a href="#mysqldump命令选项" class="headerlink" title="mysqldump命令选项"></a>mysqldump命令选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -uroot -p jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">備份</span></span><br><span class="line">mysqldump -uroot -p --master-data=2 jiaowu &gt; /root/jiaowu-`date +%F-%H-%M-%S`.sql</span><br><span class="line"><span class="meta">#</span><span class="bash">用了第二條命令會在備份的文件中有CHANGE MASTER TO NASTER_LOG_FILE=`mysql-bin.000008, MASTER_LOG_POS=107`指明現在的日志名稱及位置</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases &gt; /root/all.sql  </span><br><span class="line"><span class="meta">#</span><span class="bash">因為不是所有庫都是InnoDB引擎的，所以要用--lock-all-tables選項，之後備份所有庫，還可以加上--master-data=2選項</span></span><br><span class="line">mysqldump -uroot -p --lock-all-tables --flush-logs --all-databases --master-data=2 &gt; /root/all.sql</span><br><span class="line">less /root/all.sql         </span><br><span class="line"><span class="meta">#</span><span class="bash">查看</span></span><br><span class="line">=======================================================================================</span><br><span class="line">mysqldump</span><br><span class="line">    --master-data=n	    n=&#123;0、1、2&#125;</span><br><span class="line">        0表示不記錄二進制日志文件记录位置</span><br><span class="line">        1表示以CHNAGER MASTER TO的方式記錄位置，可用於恢復後直接啟動從服務器</span><br><span class="line">        2表示以CHNAGER MASTER TO的方式記錄位置，但默認被注釋了</span><br><span class="line">    --lock-all-tables：備份前鎖定所有表</span><br><span class="line">    --flush-logs：備份前鎖完表執行日志滾動             flush滾動</span><br><span class="line">    #如果指定庫中的表類型均為InnoDB，可使用--single-transaction啟動熱備，這時就不用鎖定表了--lock-all-tables，這個過程可能很長</span><br><span class="line">    * 備份多個庫</span><br><span class="line">    --all-databases：備份所有庫</span><br><span class="line">    --databases DB_NAME,DB_NAME,…：備份指定庫              </span><br><span class="line">    #這兩個命令由於備份不只一個數據庫，所以會自動創建create databases命令，還原前就不用手動再指定庫了</span><br><span class="line">    --events：備份事件</span><br><span class="line">    --routines：備份存儲過程存儲函數</span><br><span class="line">    --triggers：備份觸發器</span><br></pre></td></tr></table></figure>
+<h2 id="備份及即時點還原"><a href="#備份及即時點還原" class="headerlink" title="備份及即時點還原"></a>備份及即時點還原</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">備份及即時點還原</span><br><span class="line">備份策略：每周完全+每日增量</span><br><span class="line">    完全備份：mysqldump</span><br><span class="line">    增量備份：備份二進制日志文件（先flush logs）</span><br><span class="line">    </span><br><span class="line">步骤：</span><br><span class="line">1. 做全量备份</span><br><span class="line">2. 删除现有二进制日志之前的所有日志</span><br><span class="line">3. 删除某表中的一些行，以便下面测试</span><br><span class="line">4. 滚动日志</span><br><span class="line">5. 复制滚动前二进制日志到其他路径或将滚动前二进制日志转为sql文件保存到其他目录，实现增量备份</span><br><span class="line">6. 在删除了行的表中插入新行</span><br><span class="line">7. 将滚动后的日志（也是现在的日志）复制到其他路径</span><br><span class="line">8. 删除数据目录中的所有文件</span><br><span class="line">9. 停止、启动服务器，实现数据初始</span><br><span class="line">10. 修改root密码</span><br><span class="line">11. 导入全量备份的sql文件</span><br><span class="line">12. 导入增量备份的sql文件</span><br><span class="line">13. 将最新的日志文件转为sql文件并导入，实现即时点还原。</span><br><span class="line">14. 这里全量备份不存在对应的二进制日志，因为被删除了。删除后仅剩一个二进制日志，这个日志就是增量备份的日志。之后做其他操作后又滚动过一次日志，也就是最新的日志。这个过程涉及两个日志和一个全量备份的sql文件。</span><br><span class="line"></span><br><span class="line">* 完全备份</span><br><span class="line">mysqldump -uroot -p --master-data=2 --flush-logs --all-databases --lock-all-tables &gt; /root/alldatabases.sql</span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash">建議在刪除備份前的二進制日志前先將其備份一份，可能以後有用。</span></span><br><span class="line">less /root/ alldatabases.sql</span><br><span class="line">SHOW BINARY LOGS;</span><br><span class="line">PURGE BINARY LOGS TO 'mysql_bin.000011'; </span><br><span class="line"><span class="meta">#</span><span class="bash">purge[pə:dʒ]：清除。刪除二進制文件，這是為了避免空間被佔滿，这是删除最后的mysql_bin.000011之前的所有二进制日志</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">DELETE FROM tutors WHERE Age&gt;80;            </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除一些数据</span></span><br><span class="line"></span><br><span class="line">* 下面做增量備份</span><br><span class="line">mysql</span><br><span class="line">FLUSH LOGS;         </span><br><span class="line"><span class="meta">#</span><span class="bash">滾動</span></span><br><span class="line">quit        </span><br><span class="line"><span class="meta">#</span><span class="bash">退出mysql</span></span><br><span class="line">cd /mydata/data              </span><br><span class="line"><span class="meta">#</span><span class="bash">到數據目錄中</span></span><br><span class="line">cp mysql-bin.000011 /root/          </span><br><span class="line"><span class="meta">#</span><span class="bash">因之前已經滾動了日志，所以倒數第二個就是我們要增量備份的日志，將其拷貝到root目錄即可。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000011 &gt; /root/mon-incremental.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">這種方式的增量備份更好一些</span></span><br><span class="line">mysql</span><br><span class="line">use studb;</span><br><span class="line">INSERT INTO tutors (Tname) Values (‘stu123’);</span><br><span class="line">退出</span><br><span class="line">* 模擬刪除了數據庫，而不能刪二進制日志</span><br><span class="line">cp mysql-bin.000012 /root           </span><br><span class="line"><span class="meta">#</span><span class="bash">將二進制日志拷出去</span></span><br><span class="line">rm -rf ./*        </span><br><span class="line"><span class="meta">#</span><span class="bash">刪除數據目錄中的所有文件</span></span><br><span class="line">service mysqld stop        </span><br><span class="line"><span class="meta">#</span><span class="bash">現在無法停止mysql</span></span><br><span class="line">killall mysqld              </span><br><span class="line"><span class="meta">#</span><span class="bash">殺死mysql進程</span></span><br><span class="line">cd /usr/local/mysql/            </span><br><span class="line"><span class="meta">#</span><span class="bash">到此目錄初始化mysql</span></span><br><span class="line">scripts/mysql_install_db --user=mysql --datadir=/mydata/data         </span><br><span class="line"><span class="meta">#</span><span class="bash">初始化，这是编译安装的。如果是yum安装的可以直接启动，就会初始化</span></span><br><span class="line">service mysqld start        </span><br><span class="line"><span class="meta">#</span><span class="bash">啟動mysql</span></span><br><span class="line">mysql</span><br><span class="line">UPDATE mysql.user SET PASSWORD=PASSWORD('centos') WHERE User='root';</span><br><span class="line"><span class="meta">#</span><span class="bash">设置root的密码。或执行mysql_secure_installation</span></span><br><span class="line">mysql -uroot -p &lt; alldatabases.sql            </span><br><span class="line"><span class="meta">#</span><span class="bash">還原完全備份</span></span><br><span class="line">mysql</span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line">退出             </span><br><span class="line"><span class="meta">#</span><span class="bash">這一過程是為了驗證增量備份恢復後的變化</span></span><br><span class="line">mysql -uroot -p &lt; mon-incremental.sql          </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復增量備份</span></span><br><span class="line">mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">進入</span></span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;             </span><br><span class="line"><span class="meta">#</span><span class="bash">查看證明有變化</span></span><br><span class="line">退出</span><br><span class="line">mysqlbinlog mysql-bin.000012 &gt; temp.sql    </span><br><span class="line"><span class="meta">#</span><span class="bash">把日志文件導出為.sql文件</span></span><br><span class="line">mysql -uroot -p &lt; temp.sql           </span><br><span class="line"><span class="meta">#</span><span class="bash">即時點還原。</span></span><br><span class="line">或</span><br><span class="line">mysqlbinlog mysql-bin.000012 | mysql -uroot -p         </span><br><span class="line"><span class="meta">#</span><span class="bash">這樣一條命令即可實現即時點還原</span></span><br><span class="line">mysql -uroot -p</span><br><span class="line">use studb;</span><br><span class="line">SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">上面這樣的試驗只適合在數據量小的時候，如果大的話，mysqldump備份會很慢。視頻中要求寫一個mysql完全備份腳本，增量備份寫成另一個腳本，盡量使用變量定義保存位置，使用日期保存備份的文件名稱。還可用腳本還原</span></span><br></pre></td></tr></table></figure>
+<h1 id="xtrabackup"><a href="#xtrabackup" class="headerlink" title="xtrabackup"></a>xtrabackup</h1><h2 id="完全备份与恢复"><a href="#完全备份与恢复" class="headerlink" title="完全备份与恢复"></a>完全备份与恢复</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line">* 安装</span><br><span class="line">wget https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-2.4.9/binary/redhat/7/x86_64/Percona-XtraBackup-2.4.9-ra467167cdd4-el7-x86_64-bundle.tar</span><br><span class="line">＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝</span><br><span class="line">* rpm包安装</span><br><span class="line">	* CentOS6</span><br><span class="line">yum install http://www.percona.com/downloads/percona-release/redhat/0.1-4/percona-release-0.1-4.noarch.rpm</span><br><span class="line">yum list|grep percona</span><br><span class="line">yum install percona-xtrabackup</span><br><span class="line">	* CentOS7</span><br><span class="line">yum install http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm</span><br><span class="line">yum list|grep percona</span><br><span class="line">yum install percona-xtrabackup-24</span><br><span class="line"><span class="meta">#</span><span class="bash">阿里云建议MySQL5.6及之前的版本需要安装 Percona XtraBackup 2.3。MySQL5.7版本需要安装 Percona XtraBackup 2.4。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Percona XtraBackup 2.3地址：https://www.percona.com/doc/percona-xtrabackup/2.3/installation/yum_repo.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Percona XtraBackup 2.4地址：https://www.percona.com/doc/percona-xtrabackup/2.4/installation/yum_repo.html</span></span><br><span class="line">========================================================</span><br><span class="line">innobackupex --help</span><br><span class="line">innobackupex --user=DBUSER --password=DBUSERPASS /path/to/BACKUP-DIR/(保存位置)</span><br><span class="line"><span class="meta">#</span><span class="bash">完全備份。innobackupex是一個腳本，在裡面封裝了一些命令行工具，--user=DBUSER --password=DBUSERPASS是連接服務器要用的帳號密碼。服務器可指定，如--host=localhost，這裡被省略了，因為一般都是在本機上進行備份。/path/to/BACKUP-DIR/指要保存的位置。備份的用戶要有權限，如果要使用一個最小權限的用戶進行備份，則可基於如下命令創建此類用戶。可以創建一個專門備份的用戶，或用管理員也可以</span></span><br><span class="line">========================================================</span><br><span class="line">* 授权</span><br><span class="line">mysql</span><br><span class="line">MariaDB [(none)]&gt; CREATE USER 'bkpuser'@'localhost' IDENTIFIED BY 'centos';</span><br><span class="line"><span class="meta">#</span><span class="bash">创建用户</span></span><br><span class="line">MariaDB [(none)]&gt; REVOKE ALL PRIVILEGES,GRANT OPTION FROM 'bkpuser'@'localhost';</span><br><span class="line"><span class="meta">#</span><span class="bash">取消用户所有权限与授权权限</span></span><br><span class="line">MariaDB [(none)]&gt; GRANT RELOAD,LOCK TABLES,REPLICATION CLIENT ON *.* TO 'bkpuser'@'localhost';</span><br><span class="line"><span class="meta">#</span><span class="bash">只需要RELOAD, LOCK TABLES, REPLICATION CLIENT這三個權限就可備份了</span></span><br><span class="line">MariaDB [(none)]&gt; FLUSH PRIVILEGES;</span><br><span class="line">MariaDB [(none)]&gt; SHOW GRANTS;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看当前用户的授权。grant[grɑ:nt]：授权。</span></span><br><span class="line">MariaDB [(none)]&gt; SHOW GRANTS FOR bkpuser@localhost;</span><br><span class="line"><span class="meta">#</span><span class="bash">查看指定用户的授权</span></span><br><span class="line">* 备份</span><br><span class="line">innobackupex --user=root /backup          </span><br><span class="line"><span class="meta">#</span><span class="bash">備份數據庫，backup目录是自动创建的。因为在/root/.my.cnf文件中写明了用户名和密码，所以这里的密碼是空，所以省略了，服務器是本機。另外，備份時需要mysql服務器是啟動狀態。備份好後在/backup下有一個以當前時間命名的目錄。使用上面的bkpuser用户备份时会提示有授权问题，也就是缺少某些权限，待解决</span></span><br><span class="line">cd /backup/2016-12-09_22-17-27           </span><br><span class="line"><span class="meta">#</span><span class="bash"> 目錄中的內容如下:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> jiaowu、mysql、<span class="built_in">test</span>、mydb等是數據庫，ibdata1是表空間文件，backup-my.cnf是服務器的配置文件， 備份好以後可以看到備份好的文件中有一個xtrabackup_binlog_info文件，這是二進制日志信息的文件，可用cat打開，裏面是備份這一刻的二進制文件名與相應的號碼。xtrabackup_binary中有在備份時使用了哪個命令進行的備份的信息，視頻中顯示的是xtrabackup 55，测试时没有这个文件。xtrabackup_logfile文件是data數據文件，不能用cat打開；xtrabackup_checkpoints文件裡有備份類型及從哪個邏輯版本號開始的備份，其中to_lsn指的是InnoDB的每一個數據塊InnoDB存儲引擎的數據要存儲在磁盤上，它是存儲數據塊的，每一個數據塊都有一個日志序列號，InnoDB會在內部維持着當前每一數據塊的日志序列號，如果這個塊上的數據發生了改變，這個號碼會加1,下一次可以根據這個號碼做增量備份。如果某一個塊的號碼發生了改變，可以將某一個塊備份一下。這就是可以對InnoDB存儲引擎做增量備份的原因；這裏的信息顯示從0號開始，到1637454結束，下一次就從1637454開始</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 這些備份的數據備份完以後是不能直接恢復的，因為備份的數據中有些事務可能只提交了一半，為了避免mysql啟動的修復過程，我們要對備份出來的文件做一些准備工作，然後才能恢復。准備工作包括：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    2.將尚未提交的事務做回滾</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    用--apply-log選項可完成上面的兩項</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> innobackupex --apply-log /backup/*****         </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 最後的路徑是我們備份的數據的路徑。這樣就會完成上面提到的兩項工作，不做這項工作的話恢復後mysql是啟動不了的</span></span><br><span class="line">* 测试恢复</span><br><span class="line">mysql</span><br><span class="line">MariaDB [(none)]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0005');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0006');</span><br><span class="line"><span class="meta">#</span><span class="bash">插入两条数据</span></span><br><span class="line">MariaDB [jiaowu]&gt; FLUSH LOGS;</span><br><span class="line"><span class="meta">#</span><span class="bash">做這步是因為備份當前使用的二進制日志會報錯，所以才滾動一次</span></span><br><span class="line">cp /var/lib/mysql/mysql_bin.000003 /root</span><br><span class="line"><span class="meta">#</span><span class="bash">复制滚动前的日志到其他路径，以备数据恢复时使用</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf /var/lib/mysql/*</span><br><span class="line">innobackupex --copy-back /backup/2018-09-19_11-06-30</span><br><span class="line"><span class="meta">#</span><span class="bash">恢复数据。/恢復時用--copy-back選項，這樣就可以了。這時的數據文件存儲位置（/var/lib/mysql/）一定要是空的，不然會報錯</span></span><br><span class="line">cd /var/lib/mysql/</span><br><span class="line">chown -R mysql.mysql /var/lib/mysql/</span><br><span class="line"><span class="meta">#</span><span class="bash">修改数据目录中文件的属主属组为mysql</span></span><br><span class="line">systemctl start mariadb</span><br><span class="line"><span class="meta">#</span><span class="bash">启动报错，无法启动。提示：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:48 mysqld_safe Starting mysqld daemon with databases from /var/lib/mysql</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:48 [Note] /usr/libexec/mysqld (mysqld 5.5.60-MariaDB) starting as process 8893 ..</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: The InnoDB memory heap is disabled</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Mutexes and rw_locks use GCC atomic builtins</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Compressed tables use zlib 1.2.7</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Using Linux native AIO</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:49 InnoDB: Initializing buffer pool, size = 2.0G</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:50 InnoDB: Completed initialization of buffer pool</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:51:51 InnoDB: highest supported file format is Barracuda.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: No valid checkpoint found.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If you are attempting downgrade from MySQL 5.7.9 or later,</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: please refer to http://dev.mysql.com/doc/refman/5.5/en/upgrading-downgrading.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If this error appears when you are creating an InnoDB database,</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: the problem may be that during an earlier attempt you managed</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: to create the InnoDB data files, but <span class="built_in">log</span> file creation failed.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: If that is the <span class="keyword">case</span>, please refer to</span></span><br><span class="line"><span class="meta">#</span><span class="bash">InnoDB: http://dev.mysql.com/doc/refman/5.5/en/error-creating-innodb.html</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Plugin <span class="string">'InnoDB'</span> init <span class="keyword">function</span> returned error.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Plugin <span class="string">'InnoDB'</span> registration as a STORAGE ENGINE failed.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [Note] Plugin <span class="string">'FEEDBACK'</span> is disabled.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Unknown/unsupported storage engine: InnoDB</span></span><br><span class="line"><span class="meta">#</span><span class="bash">180919 11:52:00 [ERROR] Aborting</span></span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">	[mysqld]</span><br><span class="line">	innodb_force_recovery=6</span><br><span class="line">	log_bin = mysql_bin</span><br><span class="line"><span class="meta">#</span><span class="bash">加入上面一行后，就可以启动了。启动后可以取消这个选项。也可能是没有开启二进制日志的原因，所以可以加入log_bin = mysql_bin。测试发现，加入开启二进制日志后，就不需要innodb_force_recovery选项了，另外，使用innodb_force_recovery启动后，进入数据库是不能操作的，需要将innodb_force_recovery注释后，再重启才能操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">innodb_force_recovery可以设置为1-6,大的数字包含前面所有数字的影响。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">1. (SRV_FORCE_IGNORE_CORRUPT):忽略检查到的corrupt页。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">2. (SRV_FORCE_NO_BACKGROUND):阻止主线程的运行，如主线程需要执行full purge操作，会导致crash。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">3. (SRV_FORCE_NO_TRX_UNDO):不执行事务回滚操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">4. (SRV_FORCE_NO_IBUF_MERGE):不执行插入缓冲的合并操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">5. (SRV_FORCE_NO_UNDO_LOG_SCAN):不查看重做日志，InnoDB存储引擎会将未提交的事务视为已提交。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">6. (SRV_FORCE_NO_LOG_REDO):不执行前滚的操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">参考：https://www.jb51.net/article/66951.htm</span></span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; SHOW DATABASES;</span><br><span class="line">MariaDB [jiaowu]&gt; USE jiaowu;</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">這時是沒有後來加的00006和000005的，要把剛才備份的二進制日志導入即可</span></span><br><span class="line">mysqlbinlog /root/mysql-bin.000003 &gt; /tmp/abc.sql</span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; SET sql_log_bin=0;</span><br><span class="line"><span class="meta">#</span><span class="bash">临时关闭二进制日志</span></span><br><span class="line">MariaDB [jiaowu]&gt; SOURCE /tmp/abc.sql;</span><br><span class="line"><span class="meta">#</span><span class="bash">导入滚动后的二进制日志生成的sql文件，因为stu00005和00006是在完全备份后加入的</span></span><br><span class="line">MariaDB [jiaowu]&gt; SET sql_log_bin=1;</span><br><span class="line"><span class="meta">#</span><span class="bash">开启二进制日志</span></span><br><span class="line">MariaDB [jiaowu]&gt; USE jiaowu;</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">现在有刚加入的00006和000005的信息了</span></span><br></pre></td></tr></table></figure>
+<h2 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h2><p>xtrabackup支持對innodb做增量備份，對MyISAM不支持，對MyISAM如果有就做完全備份；MyISAM適合讀多寫少的情況</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0007');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0008');</span><br><span class="line"><span class="meta">#</span><span class="bash">加入两条数据</span></span><br><span class="line">innobackupex --user=root /backup    </span><br><span class="line"><span class="meta">#</span><span class="bash">恢復過一次後必須再重新做一次完全備份，因爲當前的數據庫沒有完全備份</span></span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu0009');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00010');</span><br><span class="line">innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-04-31/</span><br><span class="line"><span class="meta">#</span><span class="bash">先要指定增量備份的保存位置/backup，--incremental-basedir是指定完全備份的保存位置，它會針對完全備份以後的數據做備份，備份後保存在/backup目錄下。這是第一次增量備份。如果是再一次增量備份時，--incremental-basedir應該指向上一次的增量備份所在的目錄；如果數據庫再次損壞且沒有數據增長，用完全和增量備份就能恢復，如果有數據增長就要再加上二進制日志才能恢復。</span></span><br><span class="line">mysql</span><br><span class="line">use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00011');</span><br><span class="line">MariaDB [jiaowu]&gt; INSERT INTO tutors (Tname) VALUES ('stu00012');</span><br><span class="line">innobackupex --incremental /backup --incremental-basedir=/backup/2018-09-19_16-05-33/</span><br><span class="line"><span class="meta">#</span><span class="bash">最後指定的是上一次的增量備份位置,2018-09-19_16-05-33是上一次備份後的目錄。如果之前未做過增量備份，就要指向完全備份</span></span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/</span><br><span class="line"><span class="meta">#</span><span class="bash">/如果有增量備份，這裡一定要指定--redo-only選項；2018-09-19_16-04-34是第一次完全備份；有增量備份的時候我們在實現提交的情況時，只執行redo不要執行endo。这里一定要用--apply-log选项，实现1.將已經提交的事務同步到數據文件，從日志文件同步到數據文件；2.將尚未提交的事務做回滾。不然下面的命令是不能执行的。</span></span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-05-33/</span><br><span class="line"><span class="meta">#</span><span class="bash">在准備第一次增量備份時要將完全備份寫在前面，還要將增量備份位置寫在最後，用--incremental-dir選項。这是将第一次增量备份合并到完全备份</span></span><br><span class="line">innobackupex --apply-log --redo-only /backup/2018-09-19_16-04-34/ --incremental-dir=/backup/2018-09-19_16-06-15</span><br><span class="line"><span class="meta">#</span><span class="bash">這是第二次增量備份，還是前面寫完全備份位置，後面是第二次增量備份的位置</span></span><br><span class="line"><span class="meta">#</span><span class="bash">之後的還原只需要還原完全備份即可，因為此時所有的提交操作都已合並到完全備份上去了，所以在還原時兩個增量備份就用不上了</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf /var/lib/mysql/*</span><br><span class="line">innobackupex --copy-back /backup/2018-09-19_16-04-34/</span><br><span class="line">chown -R mysql.mysql /var/lib/mysql/</span><br><span class="line">systemctl start mariadb</span><br><span class="line">mysql</span><br><span class="line">MariaDB [jiaowu]&gt; use jiaowu</span><br><span class="line">MariaDB [jiaowu]&gt; SELECT * FROM tutors;</span><br><span class="line"><span class="meta">#</span><span class="bash">这里有上面插入的所有数据</span></span><br></pre></td></tr></table></figure>
+<h2 id="導入或導出單張表，前提是每表一個表空間才可以"><a href="#導入或導出單張表，前提是每表一個表空間才可以" class="headerlink" title="導入或導出單張表，前提是每表一個表空間才可以"></a>導入或導出單張表，前提是每表一個表空間才可以</h2><p>&emsp;&emsp;默認情況下，InnoDB表不能通過直接復制表文件的方式在mysql服務器之間進行移植，即便使用了innodb_file_per_table選項。而使用xtrabackup工具可以實現此種功能，不過，此時需要導出表的mysql服務器啟用了innodb_file_per_table選項（嚴格來說，是要導出的表在其創建之前，mysql服務器就啟用了innodb_file_per_table選項），並且導入表的服務器同時啟用了innodb_file_per_table和innodb_expand_import選項</p>
+<ol>
+<li>導出表</li>
+</ol>
+<p>導出表是在備份的prepare階段進行的，因此，一旦完全備份完成，就可以在prepare過程中通過–export選項將某表導出了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">innobackupex --apply-log --export /path/to/backup</span><br><span class="line"><span class="meta">#</span><span class="bash">此命令會為每個innodb表的表空間創建一個以.exp結尾的文件，這些以.exp結尾的文件則可以用於導入至其它服務器。</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>導入表</li>
+</ol>
+<p>要在mysql服務器上導入來自於其它服務器的某innodb表，需要先在當前服務器上創建一個跟原表表結構一致的表，而後才能實現將表導入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash">CREATE TABLE mytable (…) ENGINE=InnoDB;</span></span><br></pre></td></tr></table></figure>
+<p>然後將此表的表空間刪除</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash">ALTER TABLE mydatabase.mytable DISCARD TABLESPACE;</span></span><br></pre></td></tr></table></figure>
+<p>接下來，將來自於導出表的服務器的mytable表的mytable.ibd和mytable.exp文件復制到當前服務器的數據目錄，然後使用如下命令將其導入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER TABLE mydatabase.mytable IMPORT TABLESPACE;</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/nginx功能测试二/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2049,878 +2371,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/05/Python标识符与操作符及基础知识/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/05/Python标识符与操作符及基础知识/" itemprop="url">
-                  Python标识符与操作符及基础知识
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-05 16:46:25" itemprop="dateCreated datePublished" datetime="2018-09-05T16:46:25+08:00">2018-09-05</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-10-17 17:13:45" itemprop="dateModified" datetime="2019-10-17T17:13:45+08:00">2019-10-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="编程基础"><a href="#编程基础" class="headerlink" title="编程基础"></a>编程基础</h2><ul>
-<li>计算机语言<ul>
-<li>人与计算机之间交互的语言</li>
-</ul>
-</li>
-<li>机器语言<ul>
-<li>一定位数组成二进制的0和1的序列，称为机器指令。机器指令的集合就是机器语言</li>
-<li>与自然语言差异太大，难学、难懂、难写、难记、难查错</li>
-</ul>
-</li>
-<li>汇编语言<ul>
-<li>用一些助记符号替代机器指令，称为汇编语言。ADD A,B指的是将寄存器A的数与寄存器B的数相加得到的数放到寄存器A中</li>
-<li>汇编语言写好的程序需要汇编程序转换成机器指令</li>
-<li>汇编语言只是稍微好记了些，可以认为就是机器指令对应的助记符。只是符号本身接近自然语言</li>
-</ul>
-</li>
-</ul>
-<h2 id="语言分类"><a href="#语言分类" class="headerlink" title="语言分类"></a>语言分类</h2><ul>
-<li>低级语言<ul>
-<li>面向机器的语言，包括机器语言、汇编语言</li>
-<li>不同的机器不能通用，不同的机器需要不同的机器指令或者汇编程序</li>
-</ul>
-</li>
-<li>高级语言<ul>
-<li>接近自然语言和数学语言的计算机语言</li>
-<li>高级语言首先要书写源程序，通过编译程序把源程序转换成机器指令的程序</li>
-<li>1954年正式发布的Fortran语言是最早的高级语言，本意是公式翻译</li>
-<li>人们只需要关心怎么书写源程序，针对不同机器的编译的事 交给编译器关心处理</li>
-</ul>
-</li>
-</ul>
-<h2 id="低级语言到高级语言"><a href="#低级语言到高级语言" class="headerlink" title="低级语言到高级语言"></a>低级语言到高级语言</h2><ul>
-<li>语言越高级，越接近人类的自然语言和数学语言</li>
-<li>语言越低级，越能让机器理解</li>
-<li>高级语言和低级语言之间需要一个转换的工具：编译器、解释器</li>
-<li>C、C++等语言的源代码需要本地编译</li>
-<li>Java、Python、C#的源代码需要被解释器编译成中间代码(Bytecode)，在虚拟机上运行</li>
-<li>编译语言，把源代码转换成目标机器的CPU指令</li>
-<li>解释语言，解释后转换成字节码，运行在虚拟机上，解释器执行中间代码</li>
-</ul>
-<h2 id="高级语言的发展"><a href="#高级语言的发展" class="headerlink" title="高级语言的发展"></a>高级语言的发展</h2><ul>
-<li>非结构化语言<ul>
-<li>编号或标签、GOTO、子程序可以有多个入口和出口</li>
-<li>有分支、循环</li>
-</ul>
-</li>
-<li>结构化语言<ul>
-<li>任何基本结构只允许是唯一入口和唯一出口</li>
-<li>顺序、分支、循环，废弃GOTO</li>
-</ul>
-</li>
-<li>面向对象语言<ul>
-<li>更加接近人类认知世界的方式，万事万物抽象成对象，对象间关系抽象成类和继承</li>
-<li>封装、继承、多态</li>
-</ul>
-</li>
-<li>函数式语言<ul>
-<li>古老的编程范式，应用在数学计算、并行处理的场景。引入到了很多现代高级语言中</li>
-<li>函数是”一等公民”，高阶函数</li>
-</ul>
-</li>
-</ul>
-<h2 id="程序Program"><a href="#程序Program" class="headerlink" title="程序Program"></a>程序Program</h2><ul>
-<li>程序<ul>
-<li>算法 + 数据结构 = 程序</li>
-<li>数据是一切程序的核心</li>
-<li>数据结构是数据在计算机中的类型和组织方式</li>
-<li>算法是处理数据的方式，算法有优劣之分</li>
-</ul>
-</li>
-<li>写程序难点<ul>
-<li>理不清数据</li>
-<li>搞不清处理方法</li>
-<li>无法把数据设计转换成数据结构，无法把处理方法转换成算法</li>
-<li>无法用设计范式来进行程序设计</li>
-<li>世间程序皆有bug，但不会debug</li>
-</ul>
-</li>
-</ul>
-<h2 id="Python解释器"><a href="#Python解释器" class="headerlink" title="Python解释器"></a>Python解释器</h2><ul>
-<li>官方CPython<ul>
-<li>C语言开发，最广泛的Python解释器</li>
-</ul>
-</li>
-<li>IPython<ul>
-<li>一个交互式、功能增强的CPython</li>
-</ul>
-</li>
-<li>PyPy<ul>
-<li>Python语言写的Python解释器，JIT技术，动态编译Python代码。JIT指动态编译，实时编译，动态优化。</li>
-</ul>
-</li>
-<li>Jython<ul>
-<li>Python的源代码编译成Java的字节码，跑在JVM上</li>
-</ul>
-</li>
-<li>IronPython<ul>
-<li>与Jython类似，运行在.Net平台上的解释器，Python代码被编译成.Net的字节码</li>
-</ul>
-</li>
-</ul>
-<h2 id="Python的语言类型"><a href="#Python的语言类型" class="headerlink" title="Python的语言类型"></a>Python的语言类型</h2><p>python是动态语言、强类型语言</p>
-<ul>
-<li><p>静态编译语言</p>
-<ul>
-<li><p>事先声明变量类型，类型不能再改变</p>
-</li>
-<li><p>编译时检查</p>
-</li>
-</ul>
-</li>
-<li><p>动态编译语言</p>
-<ul>
-<li><p>不用事先声明类型，随时可以赋值为其他类型</p>
-</li>
-<li><p>编程时不知道是什么类型，很难推断</p>
-</li>
-<li><p>动态编译语言需要先编译成自解码，再给本地CPU执行代码</p>
-</li>
-</ul>
-</li>
-<li><p>强类型语言</p>
-<ul>
-<li>不同类型之间操作，必须先强制类型转换为同一类型。print(‘a’+1)是不能执行的</li>
-</ul>
-</li>
-<li><p>弱类型语言</p>
-<ul>
-<li>不同类型间可以操作，自动隐式转换，JavaScript中console.log(1+’a’)可以执行</li>
-</ul>
-</li>
-</ul>
-<h1 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h1><ul>
-<li>注释：python中单行注释采用 # 开头。<ul>
-<li>python 中多行注释使用三个单引号(‘’’)或三个双引号(“””)。</li>
-</ul>
-</li>
-<li><p>数字</p>
-<ul>
-<li><p>整数，不区分long和int。</p>
-<ul>
-<li>进制有二进制，八进制，十六进制，如：0xa、0o10、0b10。bool布尔值有两个True、False</li>
-</ul>
-</li>
-<li><p>浮点数</p>
-<ul>
-<li>1.2、3.1415、-0.12、1.46e9等价于1.46*10的9次方</li>
-</ul>
-</li>
-<li><p>复数</p>
-<ul>
-<li>1+2j</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>字符串<ul>
-<li>使用 ‘ “ 单双引号引用的字符的序列</li>
-<li>‘’’和”””单双三引号，可以跨行、可以在其中自由的使用单双引号</li>
-<li>在字符串前面加上r或者R前缀，表示该字符串不做特殊的处理</li>
-<li>字符串或串(String)是由数字、字母、下划线组成的一串字符。</li>
-</ul>
-</li>
-<li><p>转义序列</p>
-<ul>
-<li><p>\\    \t     \r     \n     \‘     \“</p>
-</li>
-<li><p>前缀r，把里面的所有字符当普通字符对待</p>
-</li>
-</ul>
-</li>
-<li><p>缩进</p>
-<ul>
-<li>未使用C等语言的花括号，而是采用缩进的方式表示层次关系</li>
-<li>约定使用4个空格缩进</li>
-</ul>
-</li>
-<li><p>续行</p>
-<ul>
-<li>在行尾使用 \</li>
-<li>如果使用各种括号，认为括号内是一个整体，内部跨行不用 \</li>
-</ul>
-</li>
-<li><p>标识符</p>
-<ul>
-<li>一个名字，用来指化一个值</li>
-<li>只能用字母、下划线和数字</li>
-<li>只能以字母或下划线开头</li>
-<li>不能是python的关键字，例如def、class就不能作为标识符</li>
-<li>Python是大小写敏感的</li>
-<li>约定：不允许使用中文；不允许使用歧义单词，例如class_；在python中不要随便使用下划线开头的表示符</li>
-</ul>
-</li>
-<li><p>常量</p>
-<ul>
-<li>一旦赋值就不能改变值的标识符</li>
-<li>python中无法定义常量</li>
-</ul>
-</li>
-<li>字面常量<ul>
-<li>一个单独的量，例如12、”abc”、’242356613.03e-9’</li>
-</ul>
-</li>
-<li>变量<ul>
-<li>赋值后，可以改变值的标识符</li>
-</ul>
-</li>
-</ul>
-<h2 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h2><h3 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h3><p>以下假设变量： <strong>a=10，b=20</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>+</td>
-<td>加 - 两个对象相加</td>
-<td>a + b 输出结果 30</td>
-</tr>
-<tr>
-<td>-</td>
-<td>减 - 得到负数或是一个数减去另一个数</td>
-<td>a - b 输出结果 -10</td>
-</tr>
-<tr>
-<td>*</td>
-<td>乘 - 两个数相乘或是返回一个被重复若干次的字符串</td>
-<td>a * b 输出结果 200</td>
-</tr>
-<tr>
-<td>/</td>
-<td>除 - x除以y</td>
-<td>b / a 输出结果 2</td>
-</tr>
-<tr>
-<td>%</td>
-<td>取模 - 返回除法的余数</td>
-<td>b % a 输出结果 0</td>
-</tr>
-<tr>
-<td>**</td>
-<td>幂 - 返回x的y次幂</td>
-<td>a**b 为10的20次方， 输出结果 100000000000000000000</td>
-</tr>
-<tr>
-<td>//</td>
-<td>取整除 - 返回商的整数部分（<strong>向下取整</strong>）</td>
-<td>9//2 输出结果 4 , 9.0//2.0 输出结果 4.0</td>
-</tr>
-</tbody>
-</table>
-<h3 id="位-bit-运算符"><a href="#位-bit-运算符" class="headerlink" title="位(bit)运算符"></a>位(bit)运算符</h3><p>按位运算符是把数字看作二进制来进行计算的。Python中的按位运算法则如下：</p>
-<p>下表中变量 a 为 60，b 为 13，二进制格式如下：</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">0011</span> <span class="number">1100</span></span><br><span class="line"></span><br><span class="line">b = <span class="number">0000</span> <span class="number">1101</span></span><br><span class="line"></span><br><span class="line">-----------------</span><br><span class="line"></span><br><span class="line">a&amp;b = <span class="number">0000</span> <span class="number">1100</span></span><br><span class="line"></span><br><span class="line">a|b = <span class="number">0011</span> <span class="number">1101</span></span><br><span class="line"></span><br><span class="line">a^b = <span class="number">0011</span> <span class="number">0001</span></span><br><span class="line"></span><br><span class="line">~a  = <span class="number">1100</span> <span class="number">0011</span></span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&amp;</td>
-<td>按位与运算符：参与运算的两个值,如果两个相应位都为1,则该位的结果为1,否则为0</td>
-<td>(a &amp; b) 输出结果 12 ，二进制解释： 0000 1100</td>
-</tr>
-<tr>
-<td>\</td>
-<td></td>
-<td>按位或运算符：只要对应的二个二进位有一个为1时，结果位就为1。</td>
-<td>(a \</td>
-<td>b) 输出结果 61 ，二进制解释： 0011 1101</td>
-</tr>
-<tr>
-<td>^</td>
-<td>按位异或运算符：当两对应的二进位相异时，结果为1</td>
-<td>(a ^ b) 输出结果 49 ，二进制解释： 0011 0001</td>
-</tr>
-<tr>
-<td>~</td>
-<td>按位取反运算符：对数据的每个二进制位取反,即把1变为0,把0变为1 。~x 类似于 -x-1</td>
-<td>(~a ) 输出结果 -61 ，二进制解释： 1100 0011，在一个有符号二进制数的补码形式。</td>
-</tr>
-<tr>
-<td>&lt;&lt;</td>
-<td>左移动运算符：运算数的各二进位全部左移若干位，由 &lt;&lt; 右边的数字指定了移动的位数，高位丢弃，低位补0。</td>
-<td>a &lt;&lt; 2 输出结果 240 ，二进制解释： 1111 0000</td>
-</tr>
-<tr>
-<td>&gt;&gt;</td>
-<td>右移动运算符：把”&gt;&gt;”左边的运算数的各二进位全部右移若干位，&gt;&gt; 右边的数字指定了移动的位数</td>
-<td>a &gt;&gt; 2 输出结果 15 ，二进制解释： 0000 1111</td>
-</tr>
-</tbody>
-</table>
-<h4 id="原码、反码、补码，负数表示法"><a href="#原码、反码、补码，负数表示法" class="headerlink" title="原码、反码、补码，负数表示法"></a>原码、反码、补码，负数表示法</h4><ul>
-<li><p>原码：正数是其二进制本身；负数是符号位为1,数值部分取X绝对值的二进制。</p>
-</li>
-<li><p>反码：正数的反码和原码相同；负数是符号位为1,其它位是原码取反。</p>
-</li>
-<li><p>补码：正数的补码和原码，反码相同；负数是符号位为1，其它位是原码取反，未位加1。（或者说负数的补码是其绝对值反码未位加1）</p>
-</li>
-<li><p>移码：将符号位取反的补码（不区分正负）</p>
-</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>编码</th>
-<th>10810（sbyte）</th>
-<th>-10810（sbyte）</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>原码</td>
-<td><strong>0</strong>1101100</td>
-<td><strong>1</strong>1101100</td>
-</tr>
-<tr>
-<td>反码</td>
-<td><strong>0</strong>1101100</td>
-<td><strong>1</strong>0010011</td>
-</tr>
-<tr>
-<td>补码</td>
-<td><strong>0</strong>1101100</td>
-<td><strong>1</strong>0010100</td>
-</tr>
-<tr>
-<td>移码</td>
-<td><strong>1</strong>1101100</td>
-<td><strong>0</strong>0010100</td>
-</tr>
-</tbody>
-</table>
-<p>注：这里的原码、反码、补码表示计算机在存储数据时形式。</p>
-<h3 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h3><p>以下假设变量a为10，变量b为20：</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>==</td>
-<td>等于 - 比较对象是否相等</td>
-<td>(a == b) 返回 False。</td>
-</tr>
-<tr>
-<td>!=</td>
-<td>不等于 - 比较两个对象是否不相等</td>
-<td>(a != b) 返回 true.</td>
-</tr>
-<tr>
-<td>&lt;&gt;</td>
-<td>不等于 - 比较两个对象是否不相等</td>
-<td>(a &lt;&gt; b) 返回 true。这个运算符类似 != 。</td>
-</tr>
-<tr>
-<td>&gt;</td>
-<td>大于 - 返回x是否大于y</td>
-<td>(a &gt; b) 返回 False。</td>
-</tr>
-<tr>
-<td>&lt;</td>
-<td>小于 - 返回x是否小于y。所有比较运算符返回1表示真，返回0表示假。这分别与特殊的变量True和False等价。</td>
-<td>(a &lt; b) 返回 true。</td>
-</tr>
-<tr>
-<td>&gt;=</td>
-<td>大于等于    - 返回x是否大于等于y。</td>
-<td>(a &gt;= b) 返回 False。</td>
-</tr>
-<tr>
-<td>&lt;=</td>
-<td>小于等于 -    返回x是否小于等于y。</td>
-<td>(a &lt;= b) 返回 true。</td>
-</tr>
-</tbody>
-</table>
-<h3 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h3><p>Python语言支持逻辑运算符，以下假设变量 a 为 10, b为 20:</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>逻辑表达式</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>and</td>
-<td>x and y</td>
-<td>布尔”与” - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。</td>
-<td>(a and b) 返回 20。</td>
-</tr>
-<tr>
-<td>or</td>
-<td>x or y</td>
-<td>布尔”或”    - 如果 x 是非 0，它返回 x 的值，否则它返回 y 的计算值。</td>
-<td>(a or b) 返回 10。</td>
-</tr>
-<tr>
-<td>not</td>
-<td>not x</td>
-<td>布尔”非” - 如果 x 为 True，返回 False 。如果 x 为 False，它返回 True。</td>
-<td>not(a and b) 返回 False</td>
-</tr>
-</tbody>
-</table>
-<h3 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h3><p>以下假设变量a为10，变量b为20：</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>=</td>
-<td>简单的赋值运算符</td>
-<td>c = a + b 将 a + b 的运算结果赋值为 c</td>
-</tr>
-<tr>
-<td>+=</td>
-<td>加法赋值运算符</td>
-<td>c += a 等效于 c = c + a</td>
-</tr>
-<tr>
-<td>-=</td>
-<td>减法赋值运算符</td>
-<td>c -= a 等效于 c = c - a</td>
-</tr>
-<tr>
-<td>*=</td>
-<td>乘法赋值运算符</td>
-<td>c <em>= a 等效于 c = c </em> a</td>
-</tr>
-<tr>
-<td>/=</td>
-<td>除法赋值运算符</td>
-<td>c /= a 等效于 c = c / a</td>
-</tr>
-<tr>
-<td>%=</td>
-<td>取模赋值运算符</td>
-<td>c %= a 等效于 c = c % a</td>
-</tr>
-<tr>
-<td>**=</td>
-<td>幂赋值运算符</td>
-<td>c <strong>= a 等效于 c = c </strong> a</td>
-</tr>
-<tr>
-<td>//=</td>
-<td>取整除赋值运算符</td>
-<td>c //= a 等效于 c = c // a</td>
-</tr>
-</tbody>
-</table>
-<h3 id="成员运算符"><a href="#成员运算符" class="headerlink" title="成员运算符"></a>成员运算符</h3><p>除了以上的一些运算符之外，Python还支持成员运算符，测试实例中包含了一系列的成员，包括字符串，列表或元组。</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>in</td>
-<td>如果在指定的序列中找到值返回 True，否则返回 False。</td>
-<td>x 在 y 序列中 , 如果 x 在 y 序列中返回 True。</td>
-</tr>
-<tr>
-<td>not in</td>
-<td>如果在指定的序列中没有找到值返回 True，否则返回 False。</td>
-<td>x 不在 y 序列中 , 如果 x 不在 y 序列中返回 True。</td>
-</tr>
-</tbody>
-</table>
-<h3 id="身份运算符"><a href="#身份运算符" class="headerlink" title="身份运算符"></a>身份运算符</h3><p>身份运算符用于比较两个对象的存储单元</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-<th>实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>is</td>
-<td>is 是判断两个标识符是不是引用自一个对象</td>
-<td><strong>x is y</strong>, 类似 <strong>id(x) == id(y)</strong> , 如果引用的是同一个对象则返回 True，否则返回 False</td>
-</tr>
-<tr>
-<td>is not</td>
-<td>is not 是判断两个标识符是不是引用自不同对象</td>
-<td><strong>x is not y</strong> ， 类似 <strong>id(a) != id(b)</strong>。如果引用的不是同一个对象则返回结果 True，否则返回 False。</td>
-</tr>
-</tbody>
-</table>
-<p><strong>注：</strong> <a href="https://www.runoob.com/python/python-func-id.html" target="_blank" rel="noopener">id()</a> 函数用于获取对象内存地址。</p>
-<p>is 与 == 区别：</p>
-<p>is 用于判断两个变量引用对象是否为同一个， == 用于判断引用变量的值是否相等。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b = a</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b <span class="keyword">is</span> a </span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b == a</span><br><span class="line"><span class="keyword">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b = a[:]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b <span class="keyword">is</span> a</span><br><span class="line"><span class="keyword">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b == a</span><br><span class="line"><span class="keyword">True</span></span><br></pre></td></tr></table></figure>
-<h3 id="运算符的优先级"><a href="#运算符的优先级" class="headerlink" title="运算符的优先级"></a>运算符的优先级</h3><ul>
-<li>算术运算符 &gt; 位运算符 &gt; 身份运算符 &gt; 成员运算符 &gt; 逻辑运算符</li>
-<li>记不住，用括号</li>
-<li>长表达式，多用括号，易懂、易读</li>
-</ul>
-<p>以下表格列出了从最高到最低优先级的所有运算符：</p>
-<table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>**</td>
-<td>指数 (最高优先级)</td>
-</tr>
-<tr>
-<td>~ + -</td>
-<td>按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@)</td>
-</tr>
-<tr>
-<td>* / % //</td>
-<td>乘，除，取模和取整除</td>
-</tr>
-<tr>
-<td>+ -</td>
-<td>加法减法</td>
-</tr>
-<tr>
-<td>&gt;&gt; &lt;&lt;</td>
-<td>右移，左移运算符</td>
-</tr>
-<tr>
-<td>&amp;</td>
-<td>位 ‘AND’</td>
-</tr>
-<tr>
-<td>^\</td>
-<td></td>
-<td>位运算符</td>
-</tr>
-<tr>
-<td>&lt;= &lt; &gt; &gt;=</td>
-<td>比较运算符</td>
-</tr>
-<tr>
-<td>&lt;&gt; == !=</td>
-<td>等于运算符</td>
-</tr>
-<tr>
-<td>= %= /= //= -= += *= **=</td>
-<td>赋值运算符</td>
-</tr>
-<tr>
-<td>is is not</td>
-<td>身份运算符</td>
-</tr>
-<tr>
-<td>in not in</td>
-<td>成员运算符</td>
-</tr>
-<tr>
-<td>not and or</td>
-<td>逻辑运算符</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Python保留字符"><a href="#Python保留字符" class="headerlink" title="Python保留字符"></a>Python保留字符</h2><p>下面的列表显示了在Python中的保留字。这些保留字不能用作常数或变数，或任何其他标识符名称。</p>
-<p>所有Python的关键字只包含小写字母。</p>
-<table>
-<thead>
-<tr>
-<th>and</th>
-<th>exec</th>
-<th>not</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>assert</td>
-<td>finally</td>
-<td>or</td>
-</tr>
-<tr>
-<td>break</td>
-<td>for</td>
-<td>pass</td>
-</tr>
-<tr>
-<td>class</td>
-<td>from</td>
-<td>print</td>
-</tr>
-<tr>
-<td>continue</td>
-<td>global</td>
-<td>raise</td>
-</tr>
-<tr>
-<td>def</td>
-<td>if</td>
-<td>return</td>
-</tr>
-<tr>
-<td>del</td>
-<td>import</td>
-<td>try</td>
-</tr>
-<tr>
-<td>elif</td>
-<td>in</td>
-<td>while</td>
-</tr>
-<tr>
-<td>else</td>
-<td>is</td>
-<td>with</td>
-</tr>
-<tr>
-<td>except</td>
-<td>lambda</td>
-<td>yield</td>
-</tr>
-</tbody>
-</table>
-<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><ul>
-<li>由数字、符号、括号、变量等的组合<ul>
-<li>算术表达式</li>
-<li>逻辑表达式</li>
-<li>赋值表达式<ul>
-<li>python中，赋值即定义，如果一个变量已经定义，赋值相当于重新定义</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h1><ol>
-<li>计算~12</li>
-</ol>
-<p>这是对12取反，首先，12保存到计算机中时要转为二进制，也就是0000 1100，按题目要求对12取反后，得到1111 0011，取反后的数是计算机使用的，如果要给人看还要将此数转换为十进制数，又因为取反后的最高位是1，表示这是一个负数，负数保存到计算机中时使用的是取反的二进制数或说是二进制数的补数，在计算机中保存的是数字的补数，所以转换为十进制时也要取这个二进制数的补数。这里取1111 0011的补数是1000 1101，也就是-13了。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> -1的补码如下</span></span><br><span class="line">1000 0001      # 原码</span><br><span class="line">1111 1110 + 1 = 1111 1111       # 负数的补码是最高位不变，其余位取反，最后再加1，所以是1111 1111，内存中是0xff</span><br><span class="line">0000 0101     # 这是5，和上面的1111 1111相与得到下面</span><br><span class="line">0000 0100 </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里用原码的5与补码的1计算，用二进制的5最后的1先与正面的1111 1111相加，得到1 0000 0000，最前面的1溢出了，所以抛弃，得到0000 0000。之后就变成了二进制的0000 0100 + 0000 0000，也就是4了。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 12取反如下</span></span><br><span class="line">0000 1100      # 这是12</span><br><span class="line">1111 0011       # 这是取反，这是计算机存储的值，也是给计算机看的，如果要给人看，还要将其转为原码。因为计算机中要存补码，所以这个数在计算机看来就是补码，要转为原码才是给人看的，补码的补码就是原码，所以要求这个数的补码。</span><br><span class="line">1000 1101       # 这是上面数字的补码，转为原码时最高位不变，之后按位取反再加1。所以12取反是-13</span><br><span class="line"><span class="meta">#</span><span class="bash"> 正数的补码还是正数本身，所以不会变。负数的补码要转换为原码时，要按上面的方法求补码的补码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1. 计算机中存储的只会是补码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 正数的补码还是正数本身，负数的补码最高位不变，其余位按位取反再加1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 计算机中存储的负数要显示出来时，要按负数的补码求一次才是要显示的内容</span></span><br></pre></td></tr></table></figure>
-<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="为何要使用原码-反码和补码"><a href="#为何要使用原码-反码和补码" class="headerlink" title="为何要使用原码, 反码和补码"></a>为何要使用原码, 反码和补码</h2><p>在开始深入学习前，我的学习建议是先”死记硬背”上面的原码，反码和补码的表示方式以及计算方法。现在我们知道了计算机可以有三种编码方式表示一个数。对于正数因为三种编码方式的结果都相同：</p>
-<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
-<p>所以不需要过多解释. 但是对于负数:</p>
-<p>[-1] = [10000001]原= [11111110]反= [11111111]补</p>
-<p>可见原码，反码和补码是完全不同的。既然原码才是被人脑直接识别并用于计算表示方式，为何还会有反码和补码呢？</p>
-<p>首先，因为人脑可以知道第一位是符号位，在计算的时候我们会根据符号位，选择对真值区域的加减。（补码的绝对值称为真值即去掉符号位的二进制数字）。但是对于计算机，加减乘除已经是最基础的运算，要设计的尽量简单。计算机辨别“符号位”显然会让计算机的基础电路设计变得十分复杂！于是人们想出了将符号位也参与运算的方法。我们知道，根据运算法则减去一个正数等于加上一个负数，即：1-1 = 1 + (-1) = 0 ，所以机器可以只有加法而没有减法，这样计算机运算的设计就更简单了。</p>
-<p>于是人们开始探索将符号位参与运算，并且只保留加法的方法。首先来看原码：</p>
-<p>计算十进制的表达式：1-1=0</p>
-<p>1 - 1 = 1 + (-1) = [00000001]原 + [10000001]原= [10000010]原 = -2</p>
-<p>如果用原码表示，让符号位也参与计算，显然对于减法来说，结果是不正确的。这也就是为何计算机内部不使用原码表示一个数。</p>
-<p>为了解决原码做减法的问题，出现了反码：</p>
-<p>计算十进制的表达式：1-1=0</p>
-<p>1 - 1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原= [0000 0001]反+ [1111 1110]反= [1111 1111]反= [1000 0000]原= -0</p>
-<p>发现用反码计算减法，结果的真值部分是正确的。而唯一的问题其实就出现在”0”这个特殊的数值上。虽然人们理解上+0和-0是一样的，但是0带符号是没有任何意义的。而且会有[0000 0000]原和[1000 0000]原两个编码表示0。</p>
-<p>于是补码的出现，解决了0的符号以及两个编码的问题：</p>
-<p>1-1 = 1 + (-1) = [0000 0001]原 + [1000 0001]原 = [0000 0001]补+ [1111 1111]补= [0000 0000]补=[0000 0000]原</p>
-<p>这样0用[0000 0000]表示，而以前出现问题的-0则不存在了。而且可以用[1000 0000]表示-128：</p>
-<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补+ [1000 0001]补= [1000 0000]补</p>
-<p>-1-127的结果应该是-128，在用补码运算的结果中，[1000 0000]补就是-128。但是注意因为实际上是使用以前的-0的补码来表示-128，所以-128并没有原码和反码表示。（对-128的补码表示[1000 0000]补算出来的原码是[0000 0000]原，这是不正确的）</p>
-<p>使用补码，不仅仅修复了0的符号以及存在两个编码的问题，而且还能够多表示一个最低数。这就是为什么8位二进制，使用原码或反码表示的范围为[-127, +127]，而使用补码表示的范围为[-128, 127]。</p>
-<p>因为机器使用补码，所以对于编程中常用到的32位int类型，可以表示范围是：[-231, 231-1] 因为第一位表示的是符号位。而使用补码表示时又可以多保存一个最小值。</p>
-<h2 id="比特和字节"><a href="#比特和字节" class="headerlink" title="比特和字节"></a>比特和字节</h2><p>Bit，比特，也叫二进制位，是信息的最小单位。一个比特可以理解为一个开关量，0就是关，1就是开。<br>Byte，字节，由8个Bit组成。它通常用作计算机信息计量单位。字节在一些规范中称作Octet。<br>Bit简写为b，Byte简写为B。</p>
-<h2 id="字节的进制"><a href="#字节的进制" class="headerlink" title="字节的进制"></a>字节的进制</h2><p>字节一般以1024(2^10)为进制，目前常用的进制如下。</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>byte=<span class="number">8</span>bit	<span class="comment">//bit就是位，也叫比特位，是计算机表示数据最小的单位</span></span><br><span class="line"><span class="number">1</span>B(byte字节)	<span class="comment">//byte就是字节</span></span><br><span class="line"><span class="number">1</span>KB(Kilobyte千) = <span class="number">2</span>^<span class="number">10</span> B = <span class="number">1024</span> B</span><br><span class="line"><span class="number">1</span>MB(Megabyte兆) = <span class="number">2</span>^<span class="number">10</span> KB = <span class="number">1024</span> KB = <span class="number">2</span>^<span class="number">20</span> B</span><br><span class="line"><span class="number">1</span>GB(Gigabyte吉) = <span class="number">2</span>^<span class="number">10</span> MB = <span class="number">1024</span> MB = <span class="number">2</span>^<span class="number">30</span> B</span><br><span class="line"><span class="number">1</span>TB(Trillionbyte太) = <span class="number">2</span>^<span class="number">10</span> GB = <span class="number">1024</span> GB = <span class="number">2</span>^<span class="number">40</span> B</span><br><span class="line"><span class="number">1</span>PB(Petabyte拍) = <span class="number">2</span>^<span class="number">10</span> TB = <span class="number">1024</span> TB = <span class="number">2</span>^<span class="number">50</span> B</span><br><span class="line"><span class="number">1</span>EB(Exabyte艾) = <span class="number">2</span>^<span class="number">10</span> PB = <span class="number">1024</span> PB = <span class="number">2</span>^<span class="number">60</span> B</span><br><span class="line"><span class="number">1</span>ZB(Zettabyte泽) = <span class="number">2</span>^<span class="number">10</span> EB = <span class="number">1024</span> EB = <span class="number">2</span>^<span class="number">70</span> B</span><br><span class="line"><span class="number">1</span>YB(YottaByte尧) = <span class="number">2</span>^<span class="number">10</span> ZB = <span class="number">1024</span> ZB = <span class="number">2</span>^<span class="number">80</span> B</span><br><span class="line"><span class="number">1</span>BB(Brontobyte) = <span class="number">2</span>^<span class="number">10</span> YB = <span class="number">1024</span> YB = <span class="number">2</span>^<span class="number">90</span> B</span><br><span class="line"><span class="number">1</span>NB(NonaByte) = <span class="number">2</span>^<span class="number">10</span> BB = <span class="number">1024</span> BB = <span class="number">2</span>^<span class="number">100</span> B</span><br><span class="line"><span class="number">1</span>DB(DoggaByte) = <span class="number">2</span>^<span class="number">10</span> NB = <span class="number">1024</span> NB = <span class="number">2</span>^<span class="number">110</span> B</span><br></pre></td></tr></table></figure>
-<h2 id="容易混淆的情景"><a href="#容易混淆的情景" class="headerlink" title="容易混淆的情景"></a>容易混淆的情景</h2><p><strong>情景1</strong> 看各种协议时，要看清楚是比特还是字节<br>例：以太帧格式与IPv4包格式。</p>
-<p><img src="https://raw.githubusercontent.com/higoge/image/master/basic01/01.png" alt=""></p>
-<p><img src="https://raw.githubusercontent.com/higoge/image/master/basic01/02.png" alt=""></p>
-<p>以太帧格式直接用字节(octet)进行展示，而IP包则采用比特表进行展示。实际读文档的过程中，一定要看仔细是比特还是字节。</p>
-<p><strong>情况2</strong> 硬盘容量<br>涉及到硬盘、文件等存储类的信息，都以字节为单位。<br>例：买了2T的硬盘，为毛放到计算机上少了那么多？<br>因为硬盘的进制是1000，2TB的硬盘，实际是2000GB，以此类推。计算机统计的进制是采用1024。<br>所以，2TB实际容量是2*1000^4/1024^4，约为1.189T(1862G，这一换算直接少了140G啊)。</p>
-<p><strong>情况3</strong> 网络带宽<br>网络带宽统计的是比特，所以也叫比特率，单位表示一般用Mbps，Gbps。其进制也不是1024，而是1000。即1Kbps=1000bps 1Mbps=1000Kbps 1Gbps=1000Mbps，以此类推。<br>例：家里面宽带是4兆的，最高的下载速度能达到多少？<br>答：因为网络带宽统计的是比特，而下载统计的是字节，所以换算时有8的除法。即4Mbps/8=0.5MBps=500KBps。所以下载速度最高不超过500K。<br>从最早的下载软件网络蚂蚁(NetAnt)，到后来的FlashGet，迅雷等，都采用的Bps为下载单位，因为下载的是文件，使用存储单位。</p>
-<p>有时候，为了不引起歧义，将1024进制用特殊方式单独表示，称为Mebibyte或Megabyte。</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>KiB = <span class="number">1024</span> Byte</span><br><span class="line"><span class="number">1</span>MiB = <span class="number">1024</span> KiB = <span class="number">1024</span>^<span class="number">2</span> Byte</span><br><span class="line"><span class="number">1</span>GiB = <span class="number">1024</span> MiB = <span class="number">1048576</span> (<span class="number">1024</span>^<span class="number">2</span>)KiB</span><br><span class="line"><span class="number">1</span>TiB = <span class="number">1024</span> GiB = <span class="number">1073741824</span> (<span class="number">1024</span>^<span class="number">3</span>)KiB</span><br></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>比特和字节，1000进制还是1024进制较为容易混淆。</li>
-<li>在计算机科学领域采用1024进制，在信息技术领域，采用1000进制。</li>
-<li>1024进制在单位上加字母i进行单独表示。</li>
-</ol>
-<p>参考：<a href="https://www.jianshu.com/p/abbdae4f3841" target="_blank" rel="noopener">https://www.jianshu.com/p/abbdae4f3841</a></p>
-<p>参考：<a href="https://higoge.github.io/2015/06/23/basic01/" target="_blank" rel="noopener">https://higoge.github.io/2015/06/23/basic01/</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2968,7 +2418,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">163</span>
+                    <span class="site-state-item-count">164</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
