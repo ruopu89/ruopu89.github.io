@@ -1070,6 +1070,20 @@ git push origin :refs/tags/v1.1
 
 
 
+### 查看配置信息
+
+```shell
+# config配置有system(系统级别)、global(用户级别)和local(当前仓库)三种级别，生效级别为local->global->system
+git config --system --list
+# 查看系统config
+git config --global --list
+# 查看当前用户（global）配置
+git config --local --list
+# 查看当前仓库配置信息
+```
+
+
+
 ### 忽略特殊文件
 
 ```shell

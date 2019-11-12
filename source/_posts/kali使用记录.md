@@ -10,7 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -36,6 +36,7 @@ sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfet
 # iptables 而开发的一款工具。使用本机及本机中的虚拟机测试不出防火墙的效果，使用其他主机可以。原因是虚拟
 # 机使用了NAT联网的方式
 # fish是一个命令行提示工具，安装后，要运行fish到一个新的shell中才能使用其功能。源：apt-add-repository ppa:fish-shell/release-2
+# audacity为录音软件
 ```
 
 

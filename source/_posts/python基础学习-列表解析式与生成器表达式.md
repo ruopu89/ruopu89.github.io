@@ -23,7 +23,7 @@ categories: python
 - datetime对象
 
   - 构造方法 datetime.datetime(2016,12,6,16,29,43,79043)
-  - year、month、day、hour、minute、second、microsecond，取datetime对象的年月日 时分秒及微秒
+  - year、month、day、hour、minute、second、microsecond，取datetime对象的年月日时分秒及微秒
   - weekday() 返回星期的天，周一为0，周日为6
   - isoweekday() 返回星期的天，周一为1，周日为7
   - date() 返回日期date对象
@@ -165,27 +165,61 @@ print(type(l2))
 
 - 语法
   - [返回值 for 元素 in 可迭代对象 if 条件]
-  - 使用中括号[],内部是for循环,if条件语句可选
+  - 使用中括号[]，内部是for循环，if条件语句可选
   - 返回一个新的列表
 - 列表解析式是一种语法糖
-  - 编译器会优化,不会因为简写而影响效率,反而因优化提高了效率
-  - 减少程序员工作量,减少出错
-  - 简化了代码,但可读性增强
+  - 编译器会优化，不会因为简写而影响效率，反而因优化提高了效率
+  - 减少程序员工作量，减少出错
+  - 简化了代码，但可读性增强
+  - **语法糖**（Syntactic sugar）是由英国计算机科学家彼得·兰丁发明的一个术语，指计算机语言中添加的某种语法，这种语法对语言的功能没有影响，但是更方便程序员使用。语法糖让程序更加简洁，有更高的可读性。**糖在不改变其所在位置的语法结构的前提下，实现了运行时等价**。
 - 举例
-  - 获取10以内的偶数,比较执行效率
+  - 获取10以内的偶数，比较执行效率
 
 ```python
 even = []
 even = [x for x in range(10) if x%2==0]
+
 for x in range(10):
-if x % 2 == 0:
-even.append(x)
+	if x % 2 == 0:
+		even.append(x)
 ```
 
 - 思考
-  - 有这样的赋值语句newlist = [print(i) for i in range(10)],请问newlist的元素打印出来是什么?
-  - 获取20以内的偶数,如果数是3的倍数也打印[i for i in range(20) if i%2==0 elif i%3==0] 行
-    吗?
+  - 有这样的赋值语句newlist = [print(i) for i in range(10)]，请问newlist的元素打印出来是什么？
+```python
+newlist = [print(i) for i in range(10)]
+print(newlist)
+输出：
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+[None, None, None, None, None, None, None, None, None, None]
+# 可以看到，标准输出的是None的列表。这是因为必须要把函数执行完了用print(i)的返回值来填充列表，而print(i)的返回值是None。所以这里应该用newlist = [i for i in range(10)]
+```
+
+
+  - 获取20以内的偶数，如果数是3的倍数也打印[i for i in range(20) if i%2==0 elif i%3==0] 行
+    吗？
+
+```python
+[i for i in range(20) if i%2==0 elif i%3==0]
+输出：
+  File "<ipython-input-20-8aea5f5e5abc>", line 1
+    [i for i in range(20) if i%2==0 elif i%3==0]
+                                       ^
+SyntaxError: invalid syntax
+# 不能使用elif。
+[i for i in range(20) if i%2==0 or i%3 == 0]
+输出：
+[0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
+```
 
 
 
@@ -200,11 +234,16 @@ for item in iterable:
 		if cond2:
 			ret.append(expr)
             
-例：20以内,既能被2整除又能被3整除的数
+例：20以内，既能被2整除又能被3整除的数
 [i for i in range(20) if i%2==0 and i%3==0]
-[i for i in range(20) if i%2==0 if i%3==0]
+输出：
+[0, 6, 12, 18]
 
-=============================================================================
+[i for i in range(20) if i%2==0 if i%3==0]
+输出：
+[0, 6, 12, 18]
+# 这两种方法的结果都是一个标准输出，如果最后用print()打印，会显示9。所以这里一定要将列表解析的结果赋值给一个变量才行。
+=======================================================================================
 [expr for i in iterable1 for j in iterable2 ]
 等价于
 ret = []
@@ -213,13 +252,71 @@ for i in iterable1:
 		ret.append(expr)
 例：
 [(x, y) for x in 'abcde' for y in range(3)]
-[[x, y] for x in 'abcde' for y in range(3)]
-[{x: y} for x in 'abcde' for y in range(3)]
+输出：
+[('a', 0),
+ ('a', 1),
+ ('a', 2),
+ ('b', 0),
+ ('b', 1),
+ ('b', 2),
+ ('c', 0),
+ ('c', 1),
+ ('c', 2),
+ ('d', 0),
+ ('d', 1),
+ ('d', 2),
+ ('e', 0),
+ ('e', 1),
+ ('e', 2)]
 
-请问下面3种输出各是什么?为什么
+[[x, y] for x in 'abcde' for y in range(3)]
+输出：
+[['a', 0],
+ ['a', 1],
+ ['a', 2],
+ ['b', 0],
+ ['b', 1],
+ ['b', 2],
+ ['c', 0],
+ ['c', 1],
+ ['c', 2],
+ ['d', 0],
+ ['d', 1],
+ ['d', 2],
+ ['e', 0],
+ ['e', 1],
+ ['e', 2]]
+
+[{x: y} for x in 'abcde' for y in range(3)]
+输出：
+[{'a': 0},
+ {'a': 1},
+ {'a': 2},
+ {'b': 0},
+ {'b': 1},
+ {'b': 2},
+ {'c': 0},
+ {'c': 1},
+ {'c': 2},
+ {'d': 0},
+ {'d': 1},
+ {'d': 2},
+ {'e': 0},
+ {'e': 1},
+ {'e': 2}]
+
+请问下面3种输出各是什么？为什么
 [(i,j) for i in range(7) if i>4 for j in range(20,25) if j>23]
+输出：
+[(5, 24), (6, 24)]
+
 [(i,j) for i in range(7) for j in range(20,25) if i>4 if j>23]
+输出：
+[(5, 24), (6, 24)]
+
 [(i,j) for i in range(7) for j in range(20,25) if i>4 and j>23]
+输出：
+[(5, 24), (6, 24)]
 ```
 
 
@@ -237,15 +334,59 @@ lst = [1,4,9,16,2,5,10,15]
 
 3. 打印九九乘法表
 [print('{}*{}={:<3}{}'.format(j,i,i*j,'\n' if i==j else ''),end="") for i in range(1,10) for j in range(1,i+1)]
+# j,i,i*j,'\n' if i==j else ''是一个三目运算
+输出：
+1*1=1  
+1*2=2  2*2=4  
+1*3=3  2*3=6  3*3=9  
+1*4=4  2*4=8  3*4=12 4*4=16 
+1*5=5  2*5=10 3*5=15 4*5=20 5*5=25 
+1*6=6  2*6=12 3*6=18 4*6=24 5*6=30 6*6=36 
+1*7=7  2*7=14 3*7=21 4*7=28 5*7=35 6*7=42 7*7=49 
+1*8=8  2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64 
+1*9=9  2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
+[None,
+...
+ None]
+# 可以看到，标准输出的是None的列表。这是因为必须要把函数执行完了用print(i)的返回值来填充列表，而print(i)的返回值是None。
 
 4. "0001.abadicddws" 是ID格式,要求ID格式是以点号分割,左边是4位从1开始的整数,右边是10位
 随机小写英文字母。请依次生成前100个ID的列表
 import random
 ['{:04}.{}'.format(n,''.join([random.choice(bytes(range(97,123)).decode()) for _ in range(10)])) for n in range(1,101)]
+输出：
+['0001.fbyzrdzoif',
+ '0002.loirmqauym',
+ ...
+ '0098.cjbghrvfmh',
+ '0099.xljsgucscx',
+ '0100.nieckficgn']
+# 可以看到这是标准输出的
+# random.choice 此模块的意思指在()内随机生成一个值。bytes(range(97,123)).decode 指生成97至123，前包后不包
+
 ['{:04}.{}'.format(i,"".join([chr(random.randint(97,122)) for j in range(10)])) for i in range(1,101)]
+输出：
+['0001.peiqgmjxix',
+ '0002.nspwscivaz',
+ ...
+ '0099.gavzudepld',
+ '0100.fmpdsztsie']
+# 这同样是标准输出。
+# {:04}指宽度为4，默认右对齐，其余空白部分用0填充。random.randint(97,122)指生成指定区间的整数，前包
+# 后不包。chr()给定一个范围的整数返回对应的字符，即ASCII编码值。
+# 如chr(48)为0；chr(57)为9；chr(65)为A；chr(90)为Z；chr(97)为a；chr(122)为z。
 
 import string
 ['{:>04}.{}'.format(i,''.join(random.choice(string.ascii_lowercase) for _ in range(0,10))) for i in range(1,101)]
+输出：
+['0001.anbhqpafcz',
+ '0002.dkbzbypera',
+ ...
+ '0099.otxpmioqpp',
+ '0100.jazkayuqfu']
+# 这还是标准输出
+# string.ascii_lowercase 指默认生成所有小写字母。random.choice 此模块的意思指在()内随机生成一个值
+# join：指将可迭代对象连接起来,使用’’’'作为分隔符，默认在""内不填写为空白符；可迭代对象本身元素都是字符串；返回一个新字符串
 ```
 
 
@@ -306,14 +447,30 @@ second = next(it)
 val = first + second
 # val的值是什么?
 # val = first + second 语句之后能否再次next(it)?
+输出：
+1
+2
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-20-9bc925c5dd92> in <module>
+      2 first = next(it)
+      3 second = next(it)
+----> 4 val = first + second
 
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'NoneType'
+# 不要在列表解析式或生成器表达式中使用print()函数
+        
 习题2
 it = (x for x in range(10) if x % 2)
+# Python程序语言指定任何非0和非空（null）值为true，0 或者 null为false。所以这里的if后的条件x%2的结果如果是1就满足条件。
 first = next(it)
 second = next(it)
 val = first + second
+print(val)
 # val的值是什么?
 # val = first + second 语句之后能否再次next(it)?
+输出：
+4
 ```
 
 
@@ -323,8 +480,7 @@ val = first + second
     - 生成器表达式延迟计算,列表解析式立即计算
   - 内存占用
     - 单从返回值本身来说,生成器表达式省内存,列表解析式返回新的列表
-    - 生成器没有数据,内存占用极少,但是使用的时候,虽然一个个返回数据,但是合起来占
-      用的内存也差不多
+    - 生成器没有数据,内存占用极少,但是使用的时候,虽然一个个返回数据,但是合起来占用的内存也差不多
     - 列表解析式构造新的列表需要占用内存
   - 计算速度
     - 单看计算时间看,生成器表达式耗时非常短,列表解析式耗时长
@@ -369,6 +525,8 @@ ret = {}
 for x in range(3):
 	for y in range(4):
 		ret[str(x)] = y
+输出：
+Out: {'0': 3, '1': 3, '2': 3}
 ```
 
 
@@ -377,8 +535,8 @@ for x in range(3):
 
 - Python2 引入列表解析式
 - Python2.4 引入生成器表达式
-- Python3 引入集合、字典解析式,并迁移到了2.7
-- 一般来说,应该多应用解析式,简短、高效
-- 如果一个解析式非常复杂,难以读懂,要考虑拆解成for循环
-- 生成器和迭代器是不同的对象,但都是可迭代对象
+- Python3 引入集合、字典解析式，并迁移到了2.7
+- 一般来说，应该多应用解析式，简短、高效
+- 如果一个解析式非常复杂，难以读懂，要考虑拆解成for循环
+- 生成器和迭代器是不同的对象，但都是可迭代对象
 
