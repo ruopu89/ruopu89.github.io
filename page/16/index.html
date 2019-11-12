@@ -350,6 +350,373 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云日志文件备份/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/18/阿里云日志文件备份/" itemprop="url">
+                  阿里云日志文件备份
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-18 16:09:41" itemprop="dateCreated datePublished" datetime="2018-09-18T16:09:41+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-21 10:56:20" itemprop="dateModified" datetime="2018-11-21T10:56:20+08:00">2018-11-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li>密钥访问</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* 准备备份日志的服务器</span><br><span class="line">ssh-keygen -t rsa -P ''</span><br><span class="line">ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.2.250</span><br></pre></td></tr></table></figure>
+<ul>
+<li>脚本</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">vim /root/sh</span><br><span class="line">    #!/bin/bash</span><br><span class="line">    #</span><br><span class="line">    nettylog=/apps/echarging/log/nettylog</span><br><span class="line">    processorlog=/apps/echarging/log/processor_1_log</span><br><span class="line">    nettyback=/home/nettylog</span><br><span class="line">    processorback=/home/processorlog1</span><br><span class="line">    nettybackR=/home/logbackup/nettylog</span><br><span class="line">    processorbackR=/home/logbackup/processorlog1</span><br><span class="line"></span><br><span class="line">    cd $nettylog</span><br><span class="line">    find ./ -name netty.log-`date -d yesterday +%F`."*".log -exec cp &#123;&#125; $nettyback \;</span><br><span class="line">    tar -zcf $nettyback/netty-log.`date -d yesterday +%F`.tar.gz $nettyback/*.log</span><br><span class="line">    scp $nettyback/netty-log.`date -d yesterday +%F`.tar.gz 192.168.2.250:$nettybackR</span><br><span class="line">    rm -rf $nettyback/*</span><br><span class="line"></span><br><span class="line">    cd $processorlog</span><br><span class="line">    find ./ -name processor_1.log-`date -d yesterday +%F`."*".log -exec cp &#123;&#125; $processorback \;</span><br><span class="line">    tar -zcf $processorback/processor_1.log-`date -d yesterday +%F`.tar.gz $processorback/*.log</span><br><span class="line">    scp $processorback/processor_1.log-`date  -d yesterday +%F`.tar.gz 192.168.2.250:$processorbackR</span><br><span class="line">    rm -rf $processorback/*</span><br><span class="line"><span class="meta">#</span><span class="bash">本打算使用find ./ -name processor_1.log-`date -d yesterday +%F`.<span class="string">"*"</span>.<span class="built_in">log</span> -<span class="built_in">exec</span> tar -zcf processor_log-`date -d yesterday +%F`.tar.gz &#123;&#125; \;命令来直接打包，但测试发现打出的包中只有find查到的最后一个文件。所以将命令改为了两条，先将找到的文件移到一个临时目录，再打包发送。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>定时任务</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br><span class="line">	* 4 * * * /bin/bash /root/sh/scplog.sh</span><br><span class="line">crontab -l</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/阿里云RDS数据库备份下载/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/18/阿里云RDS数据库备份下载/" itemprop="url">
+                  阿里云RDS数据库备份下载
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-18 10:20:56" itemprop="dateCreated datePublished" datetime="2018-09-18T10:20:56+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-21 10:54:58" itemprop="dateModified" datetime="2018-11-21T10:54:58+08:00">2018-11-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li><p>下载RDS数据备份或日志备份</p>
+<ol>
+<li>登录RDS管理控制台</li>
+<li>选择目标实例所在地域。</li>
+<li>单击目标实例的ID，进入基本信息页面</li>
+<li>在左侧导航栏中，选择备份恢复，进入备份恢复页面</li>
+<li>选择数据备份标签页</li>
+<li>选择查询的时间范围，然后单击查询。</li>
+<li>在数据备份列表中，找到要下载的数据备份，并单击其对应的下载</li>
+<li>在实例备份文件下载窗口，单击复制外网地址，获取数据备份文件外网下载地址。这里可以直接下载到本地，也可以通过内网或外网地址下载</li>
+<li>登录云服务器ECS</li>
+<li>下载数据备份文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget -c '&lt;数据备份文件内网或外网下载地址&gt;' -O &lt;自定义文件名&gt;.tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash">-c：启用断点续传模式。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">-O：将下载的结果保存为指定的文件（建议使用URL中包含的文件名）。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">说明：若提示显示100%进度，则表示文件下载完成。</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/17/mysql备份与还原/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1918,459 +2285,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/修改tomcat默认页面/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/12/修改tomcat默认页面/" itemprop="url">
-                  修改tomcat默认页面
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-12 12:50:03 / 修改時間：13:09:51" itemprop="dateCreated datePublished" datetime="2018-09-12T12:50:03+08:00">2018-09-12</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tomcat/" itemprop="url" rel="index"><span itemprop="name">tomcat</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>修改tomcat的默认页面为自己的主页，再使用nginx反代到tomcat。实现访问域名即可打开主页。</p>
-</blockquote>
-<ul>
-<li>tomcat</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">	&lt;Host name="localhost"  appBase="webapps"</span><br><span class="line">            unpackWARs="true" autoDeploy="true"&gt;</span><br><span class="line">        &lt;Context path="" docBase="echarge" reloadable="true" /&gt;</span><br><span class="line">//在Host下面加入Context一行，设置path为空，这样就不会访问到默认页了。之后用docBase指定主页的路径，这里写echarge表示是在webapps下的echarge目录。reloadable表示是否自动装载。</span><br><span class="line">/usr/local/tomcat/bin/shutdown.sh</span><br><span class="line">/usr/local/tomcat/bin/startup.sh</span><br><span class="line">//此例中已将主机的IP地址解析为域名了，另外tomcat监听在8081端口。这时可以通过"域名:8081"访问到主页了。</span><br></pre></td></tr></table></figure>
-<ul>
-<li>nginx</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/web.conf</span><br><span class="line">	proxy_cache_path /etc/nginx/cache levels=1:2:2 keys_zone=web_cache:10m max_size=2g;</span><br><span class="line">    server&#123;</span><br><span class="line">       server_name web.jdyichong.com;</span><br><span class="line">       index index.html index.htm;</span><br><span class="line">       charset utf-8;</span><br><span class="line">       proxy_cache web_cache;</span><br><span class="line">       proxy_cache_key $request_uri;</span><br><span class="line">       proxy_cache_methods GET HEAD;</span><br><span class="line">       proxy_cache_min_uses 1;</span><br><span class="line">       proxy_cache_valid 200 302 10m;</span><br><span class="line">       proxy_cache_valid 400 1m;</span><br><span class="line">       proxy_cache_use_stale http_502;</span><br><span class="line"></span><br><span class="line">       location / &#123;</span><br><span class="line">            proxy_pass http://web.jdyichong.com:8081;</span><br><span class="line">            //这里只要将所有访问都反代到本机的tomcat上即可。</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">//用nginx加入缓存设置，之后反向代理到本机的tomcat上，这样使用域名即可访问到主页了。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/IO基础知识/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/12/IO基础知识/" itemprop="url">
-                  IO基础知识
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-09-12 12:46:45" itemprop="dateCreated datePublished" datetime="2018-09-12T12:46:45+08:00">2018-09-12</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-06 21:08:20" itemprop="dateModified" datetime="2019-01-06T21:08:20+08:00">2019-01-06</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>同步</li>
-</ul>
-<p>等待对方返回消息； 发出调用以后不可进行其他工作。</p>
-<ul>
-<li>异步</li>
-</ul>
-<p>被调用者通过状态、通知或回调机制通知调用者被调用者。发出调用以后还可以进行其他工作。</p>
-<ul>
-<li>阻塞I/O模型</li>
-</ul>
-<p>blocking，调用结果返回之前，调用者会被挂起，处于不可中断睡眠状态。在这个状态下，cpu不会给线程分配时间片，即线程暂停运行。属于闲等</p>
-<p>对于同步调用来说，很多时候当前线程还是激活的，只是从逻辑上当前函数没有返回而已。 例如，我们在socket中调用recv函数，如果缓冲区中没有数据，这个函数就会一直等待，直到有数据才返回。而此时，当前线程还会继续处理各种各样的消息。</p>
-<ul>
-<li>非阻塞I/O模型</li>
-</ul>
-<p>nonblocking，调用结果返回之前，调用者不会被挂起；在规定时间内不停询问进程执行结果。在不能立刻得到结果之前，该函数不会阻塞当前线程，而会立刻返回。属于忙等</p>
-<ul>
-<li>区别</li>
-</ul>
-<p>阻塞和非阻塞是指当server端的进程访问的数据如果尚未就绪，进程是否需要等待，简单说这相当于函数内部的实现区别，也就是未就绪时是直接返回还是等待就绪</p>
-<p>而同步和异步是指client端访问数据的机制，同步一般指主动请求并等待I/O操作完毕的方式，当数据就绪后在读写的时候必须阻塞(区别就绪与读写二个阶段，同步的读写必须阻塞)，异步则指主动请求数据后便可以继续处理其它任务，随后等待I/O，操作完毕的通知，这可以使进程在数据读写时也不阻塞。(等待”通知”)</p>
-<p>同步IO和异步IO的区别：数据访问的时候进程是否阻塞</p>
-<p>阻塞IO和非阻塞IO的区别：应用程序的调用是否立即返回</p>
-<p>同步/异步与阻塞/非阻塞经常看到是成对出现：</p>
-<p>同步阻塞，异步非阻塞，同步非阻塞</p>
-<p>一次文件IO请求，都会由两阶段组成：<br>第一步：等待数据，即数据从磁盘到内核内存；<br>第二步：复制数据，即数据从内核内存到进程内存；</p>
-<ul>
-<li>node.js</li>
-</ul>
-<p>线程在执行中如果遇到磁盘读写或网络通信（统称为I/O 操作），通常要耗费较长的时间，这时操作系统会剥夺这个线程的CPU 控制权，使其暂停执行，同时将资源让给其他的工作线程，这种线程调度方式称为 阻塞。当I/O 操作完毕时，操作系统将这个线程的阻塞状态解除，恢复其对CPU的控制权，令其继续执行。这种I/O 模式就是通常的同步式I/O（Synchronous I/O）或阻塞式I/O （Blocking I/O）。</p>
-<p>相应地，异步式I/O （Asynchronous I/O）或非阻塞式I/O （Non-blocking I/O）则针对所有I/O 操作不采用阻塞的策略。当线程遇到I/O 操作时，不会以阻塞的方式等待I/O 操作的完成或数据的返回，而只是将I/O 请求发送给操作系统，继续执行下一条语句。当操作系统完成I/O 操作时，以事件的形式通知执行I/O 操作的线程，线程会在特定时候处理这个事件。为了处理异步I/O，线程必须有事件循环，不断地检查有没有未处理的事件，依次予以处理。阻塞模式下，一个线程只能处理一项任务，要想提高吞吐量必须通过多线程。而非阻塞模式下，一个线程永远在执行计算操作，这个线程所使用的CPU 核心利用率永远是100%&gt;，I/O 以事件的方式通知。在阻塞模式下，多线程往往能提高系统吞吐量，因为一个线程阻塞时还有其他线程在工作，多线程可以让CPU 资源不被阻塞中的线程浪费。而在非阻塞模式下，线程不会被I/O 阻塞，永远在利用CPU。多线程带来的好处仅仅是在多核CPU 的情况下利用更多的核，而Node.js的单线程也能带来同样的好处。这就是为什么Node.js 使用了单线程、非阻塞的事件编程模式。</p>
-<ul>
-<li>I/O复用模型</li>
-</ul>
-<p>主要是select和epoll；对一个IO端口，两次调用，两次返回，比阻塞IO并没有什么优越性；关键是能实现同时对多个IO端口进行监听</p>
-<p>I/O复用模型会用到select、poll、epoll函数，这几个函数也会使进程阻塞，但是和阻塞I/O所不同的的，这两个函数可以同时阻塞多个I/O操作。而且可以同时对多个读操作，多个写操作的I/O函数进行检测，直到有数据可读或可写时，才真正调用I/O操作函数。</p>
-<ul>
-<li>信号驱动I/O模型</li>
-</ul>
-<p>两次调用，两次返回</p>
-<p>首先我们允许套接口进行信号驱动I/O，并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I/O操作函数处理数据。</p>
-<ul>
-<li>异步I/O</li>
-</ul>
-<p>数据拷贝的时候进程无需阻塞。</p>
-<p>当一个异步过程调用发出后，调用者不能立刻得到结果。实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者的输入输出操作</p>
-<ul>
-<li>select() &amp; poll() &amp; epoll()</li>
-</ul>
-<p>epoll跟select都能提供多路I/O复用的解决方案。在现在的Linux内核里有都能够支持，其中epoll是Linux所特有，而select则应该是POSIX所规定，一般操作系统均有实现</p>
-<ul>
-<li><ul>
-<li>select本质上是通过设置或者检查存放fd标志位的数据结构来进行下一步处理。这样所带来的缺点是：</li>
-</ul>
-<ol>
-<li>单个进程可监视的fd数量被限制，即能监听端口的大小有限。<br>  一般来说这个数目和系统内存关系很大，具体数目可以cat /proc/sys/fs/file-max察看。32位机默认是1024个。64位机默认是2048.</li>
-<li><p>对socket进行扫描时是线性扫描，即采用轮询的方法，效率较低：<br> 当套接字比较多的时候，每次select()都要通过遍历FD_SETSIZE个Socket来完成调度，不管哪个Socket是活跃的，都遍历一遍。这会浪费很多CPU时间。如果能给套接字注册某个回调函数，当他们活跃时，自动完成相关操作，那就避免了轮询，这正是epoll(Linux)与kqueue(BSD)做的。</p>
-<ol start="3">
-<li>需要维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递该结构时复制开销大</li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-<ul>
-<li><ul>
-<li><p>poll本质上和select没有区别，它将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，如果设备就绪则在设备等待队列中加入一项并继续遍历，如果遍历完所有fd后没有发现就绪设备，则挂起当前进程，直到设备就绪或者主动超时，被唤醒后它又要再次遍历fd。这个过程经历了多次无谓的遍历。</p>
-<p>它没有最大连接数的限制，原因是它是基于链表来存储的，但是同样有一个缺点：</p>
-</li>
-</ul>
-<ol>
-<li>大量的fd的数组被整体复制于用户态和内核地址空间之间，而不管这样的复制是不是有意义。</li>
-<li>poll还有一个特点是“水平触发”，如果报告了fd后，没有被处理，那么下次poll时会再次报告该fd。</li>
-</ol>
-</li>
-<li><ul>
-<li>epoll</li>
-</ul>
-</li>
-</ul>
-<p>epoll支持水平触发和边缘触发，最大的特点在于边缘触发，它只告诉进程哪些fd刚刚变为就需态，并且只会通知一次。还有一个特点是，epoll使用“事件”的就绪通知方式，通过epoll_ctl注册fd，一旦该fd就绪，内核就会采用类似callback的回调机制来激活该fd，epoll_wait便可以收到通知</p>
-<p>epoll的优点：</p>
-<pre><code>1. 没有最大并发连接的限制，能打开的FD的上限远大于1024（1G的内存上能监听约10万个端口）；
-2. 效率提升，不是轮询的方式，不会随着FD数目的增加效率下降。只有活跃可用的FD才会调用callback函数；即epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此在实际的网络环境中，Epoll的效率就会远远高于select和poll。
-3. 内存拷贝，利用mmap()文件映射内存加速与内核空间的消息传递；即epoll使用mmap减少复制开销。
-</code></pre><ul>
-<li><p>select、poll、epoll 区别总结：</p>
-<ol>
-<li>支持一个进程所能打开的最大连接数</li>
-</ol>
-<p>select单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32<em>32，同理64位机器上FD_SETSIZE为32</em>64），当然我们可以对其进行修改，然后重新编译内核，但是性能可能会受到影响，这需要进一步的测试。</p>
-<p>poll本质上和select没有区别，但是它没有最大连接数的限制，原因是它是基于链表来存储的</p>
-<p>epoll虽然连接数有上限，但是很大，1G内存的机器上可以打开10万左右的连接，2G内存的机器可以打开20万左右的连接</p>
-<ol start="2">
-<li>FD剧增后带来的IO效率问题</li>
-</ol>
-<p>select因为每次调用时都会对连接进行线性遍历，所以随着FD的增加会造成遍历速度慢的“线性下降性能问题”。</p>
-<p>poll同上</p>
-<p>epoll因为内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题。</p>
-<ol start="3">
-<li>消息传递方式</li>
-</ol>
-<p>select内核需要将消息传递到用户空间，都需要内核拷贝动作</p>
-<p>poll同上</p>
-<p>epoll通过内核和用户空间共享一块内存来实现的。</p>
-</li>
-</ul>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>总结</strong></p>
-<p>综上，在选择select，poll，epoll时要根据具体的使用场合以及这三种方式的自身特点。</p>
-<ol>
-<li><p>表面上看epoll的性能最好，但是在连接数少并且连接都十分活跃的情况下，select和poll的性能可能比epoll好，毕竟epoll的通知机制需要很多函数回调。</p>
-</li>
-<li><p>select低效是因为每次它都需要轮询。但低效也是相对的，视情况而定，也可通过良好的设计改善</p>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2418,7 +2332,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">164</span>
+                    <span class="site-state-item-count">166</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
