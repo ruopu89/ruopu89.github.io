@@ -350,6 +350,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/11/mysql问题解决/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/06/11/mysql问题解决/" itemprop="url">
+                  mysql问题解决
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-06-11 16:59:50 / 修改時間：17:08:18" itemprop="dateCreated datePublished" datetime="2019-06-11T16:59:50+08:00">2019-06-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="登录数据库后无法对数据库操作"><a href="#登录数据库后无法对数据库操作" class="headerlink" title="登录数据库后无法对数据库操作"></a>登录数据库后无法对数据库操作</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 登录数据库后无法对数据库操作，使用任何命令都会提示“You must reset your password using ALTER USER statement before executing this statement.”</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有一说是因为密码过期，所以会这样。解决方法如下：</span></span><br><span class="line">vim /usr/lib/systemd/system/mysqld.service </span><br><span class="line">ExecStart=/usr/sbin/mysqld --daemonize --skip-grant-tables --skip-networking --pid-file=/var/run/mysqld/mysqld.pid $MYSQLD_OPTS</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入--skip-grant-tables --skip-networking，可以免密码登录</span></span><br><span class="line">mysql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 登录</span></span><br><span class="line">use mysql；</span><br><span class="line">desc user；</span><br><span class="line">authentication_string  | text                              | YES  |     | NULL                  |       |</span><br><span class="line">| password_expired       | enum('N','Y')                     | NO   |     | N </span><br><span class="line"><span class="meta">#</span><span class="bash"> 说是从上面两条信息可以看出password_expired过期。</span></span><br><span class="line">UPDATE user SET authentication_string=PASSWORD('DaaS_mysql_201!'),password_expired='N' WHERE User='root'; </span><br><span class="line">select authentication_string,password_expired from user where user='root';</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">| authentication_string                     | password_expired |</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">| *5ECB9CC025100F03131724B02A092F02D9417C96 | N                |</span><br><span class="line">+-------------------------------------------+------------------+</span><br><span class="line">desc user;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令又看了一次，与上面查询的没有区别。所以不知道如何证明是过期了？</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 之后将上面的免密码登录恢复回去。再操作就正常了。</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/30/解决服务器千兆网卡显示只有百兆速度/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1994,200 +2152,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/07/cobbler部署/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/05/07/cobbler部署/" itemprop="url">
-                  cobbler部署
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-05-07 16:24:34 / 修改時間：23:45:29" itemprop="dateCreated datePublished" datetime="2019-05-07T16:24:34+08:00">2019-05-07</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
-<p>Cobbler是一个Linux服务器安装的服务，可以通过网络启动(PXE)的方式来快速安装、重装物理服务器和虚拟机，同时还可以管理DHCP，DNS等。</p>
-<p>Cobbler可以使用命令行方式管理，也提供了基于Web的界面管理工具(cobbler-web)，还提供了API接口，可以方便二次开发使用。</p>
-<p>Cobbler是较早前的kickstart的升级版，优点是比较容易配置，还自带web界面比较易于管理。</p>
-<p>Cobbler内置了一个轻量级配置管理系统，但它也支持和其它配置管理系统集成，如Puppet，暂时不支持SaltStack。</p>
-<p><a href="http://cobbler.github.io/" target="_blank" rel="noopener">Cobbler官网</a></p>
-</blockquote>
-<h3 id="cobbler集成的服务"><a href="#cobbler集成的服务" class="headerlink" title="cobbler集成的服务"></a>cobbler集成的服务</h3><blockquote>
-<ul>
-<li>PXE服务支持</li>
-<li>DHCP服务管理</li>
-<li>DNS服务管理(可选bind,dnsmasq)</li>
-<li>电源管理</li>
-<li>Kickstart服务支持</li>
-<li>YUM仓库管理</li>
-<li>TFTP(PXE启动时需要)</li>
-<li>Apache(提供kickstart的安装源，并提供定制化的kickstart配置)</li>
-</ul>
-</blockquote>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">=======================================================================================</span><br><span class="line">环境：</span><br><span class="line">系统：CentOS7.3.1611</span><br><span class="line">防火墙：关闭</span><br><span class="line">SELinux：关闭</span><br><span class="line">=======================================================================================</span><br><span class="line">[root@cobbler ~]# yum install -y epel-release</span><br><span class="line">[root@cobbler ~]# yum install -y cobbler cobbler-web tftp-server tftp dhcp httpd syslinux rsync pykickstart</span><br><span class="line">[root@cobbler ~]# rpm -ql cobbler</span><br><span class="line">/etc/cobbler # 配置文件目录</span><br><span class="line">/etc/cobbler/settings # cobbler主配置文件，这个文件是YAML格式，Cobbler是python写的程序。</span><br><span class="line">/etc/cobbler/dhcp.template # DHCP服务的配置模板</span><br><span class="line">/etc/cobbler/tftpd.template # tftp服务的配置模板</span><br><span class="line">/etc/cobbler/rsync.template # rsync服务的配置模板</span><br><span class="line">/etc/cobbler/iso # iso模板配置文件目录</span><br><span class="line">/etc/cobbler/pxe # pxe模板文件目录</span><br><span class="line">/etc/cobbler/power # 电源的配置文件目录</span><br><span class="line">/etc/cobbler/users.conf # Web服务授权配置文件</span><br><span class="line">/etc/cobbler/users.digest # 用于web访问的用户名密码配置文件</span><br><span class="line">/etc/cobbler/dnsmasq.template # DNS服务的配置模板</span><br><span class="line">/etc/cobbler/modules.conf # Cobbler模块配置文件</span><br><span class="line">/var/lib/cobbler # Cobbler数据目录</span><br><span class="line">/var/lib/cobbler/config # 配置文件</span><br><span class="line">/var/lib/cobbler/kickstarts # 默认存放kickstart文件</span><br><span class="line">/var/lib/cobbler/loaders # 存放的各种引导程序</span><br><span class="line">/var/www/cobbler # 系统安装镜像目录</span><br><span class="line">/var/www/cobbler/ks_mirror # 导入的系统镜像列表</span><br><span class="line">/var/www/cobbler/images # 导入的系统镜像启动文件</span><br><span class="line">/var/www/cobbler/repo_mirror # yum源存储目录</span><br><span class="line">/var/log/cobbler # 日志目录</span><br><span class="line">/var/log/cobbler/install.log # 客户端系统安装日志</span><br><span class="line">/var/log/cobbler/cobbler.log # cobbler日志</span><br></pre></td></tr></table></figure>
-<h3 id="配置dhcp"><a href="#配置dhcp" class="headerlink" title="配置dhcp"></a>配置dhcp</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler dhcp]# mv dhcpd.conf&#123;,.bak&#125;</span><br><span class="line">[root@cobbler dhcp]# cp /usr/share/doc/dhcp-4.2.5/dhcpd.conf.example /etc/dhcp/dhcpd.conf</span><br><span class="line">[root@cobbler dhcp]# vim dhcpd.conf</span><br><span class="line">option domain-name "yhsm.com";</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定域名，与/etc/resolv.conf中的是一样的。</span></span><br><span class="line">option domain-name-servers 114.114.114.114;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这应该是一个可用的DNS地址</span></span><br><span class="line">option routers 172.16.99.2;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定网关，因为是虚拟机，所以这里指定的网关也就是NAT网卡的网关</span></span><br><span class="line">default-lease-time 3600;</span><br><span class="line">max-lease-time 86400;</span><br><span class="line">log-facility local7;</span><br><span class="line">subnet 172.16.99.0 netmask 255.255.255.0 &#123;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为哪个网段分配IP地址</span></span><br><span class="line">    range 172.16.99.100 172.16.99.120;</span><br><span class="line">    # 分配地址的范围</span><br><span class="line">    filename "pxelinux.0";</span><br><span class="line">    # filename: 指明引导文件名称；基于网络引导时用到的bootloder文件</span><br><span class="line">    next-server 172.16.99.100;</span><br><span class="line">    # next-server：提供引导文件的服务器IP地址；一般指定的服务器是一个tftp服务器，这里的tftp与cobbler服务在同一台主机上</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意，每行以分号结尾。除了这些行，其他行均可注释</span></span><br><span class="line">[root@cobbler dhcp]# systemctl start dhcpd</span><br><span class="line">[root@cobbler dhcp]# ss -tlun</span><br><span class="line"><span class="meta">#</span><span class="bash"> DHCP监听在UDP的67号端口，客户端监听在UDP的68号端口</span></span><br><span class="line">[root@cobbler ~]# dhclient -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令可以将dhcp分配的地址删除掉</span></span><br><span class="line">[root@cobbler ~]# dhclient -d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令可能重新获取地址，如果已经有了dhcp分配的地址，可以续租</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面两条命令也可以在客户端操作，这里直接使用服务端来测试了。所以地址可以会有变化。另外，要关闭虚拟机NAT的dhcp功能，并查看一下NAT的网关。如下图</span></span><br><span class="line">[root@cobbler ~]# less /var/lib/dhcpd/dhcpd.leases</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看分配出去的地址，这个是租约文件</span></span><br></pre></td></tr></table></figure>
-<ol>
-<li>选择正在使用的NAT网卡，关闭dhcp功能，再查看NAT配置</li>
-</ol>
-<p><img src="/images/cobbler/NAT网卡1.png" alt=""></p>
-<ol start="2">
-<li>查看NAT配置</li>
-</ol>
-<p><img src="/images/cobbler/NAT网卡2.png" alt=""></p>
-<h3 id="启动tftp服务"><a href="#启动tftp服务" class="headerlink" title="启动tftp服务"></a>启动tftp服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# systemctl start tftp.socket</span><br><span class="line">[root@cobbler ~]# systemctl enable tftp.socket</span><br></pre></td></tr></table></figure>
-<h3 id="启动rsync服务"><a href="#启动rsync服务" class="headerlink" title="启动rsync服务"></a>启动rsync服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# systemctl start rsyncd.socket</span><br><span class="line">[root@cobbler ~]# systemctl enable rsyncd.socket</span><br></pre></td></tr></table></figure>
-<h3 id="启动httpd服务"><a href="#启动httpd服务" class="headerlink" title="启动httpd服务"></a>启动httpd服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# systemctl start httpd</span><br><span class="line">[root@cobbler ~]# systemctl enable httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要先启动httpd才能启动cobbler</span></span><br></pre></td></tr></table></figure>
-<h3 id="准备PXE"><a href="#准备PXE" class="headerlink" title="准备PXE"></a>准备PXE</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# cp /usr/share/syslinux/&#123;pxelinux.0,menu.c32&#125; /var/lib/cobbler//loaders/</span><br><span class="line"><span class="meta">#</span><span class="bash"> pxelinux.0是基于网络引导时用到的bootloder引导文件，menu.c32是菜单文件</span></span><br></pre></td></tr></table></figure>
-<h3 id="配置cobbler"><a href="#配置cobbler" class="headerlink" title="配置cobbler"></a>配置cobbler</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# useradd cblrtest</span><br><span class="line">[root@cobbler ~]# echo "centos" | passwd --stdin cblrtest</span><br><span class="line">[root@cobbler ~]# cat /etc/shadow|grep cblrtest</span><br><span class="line">[root@cobbler ~]# vim /etc/cobbler/settings</span><br><span class="line">---</span><br><span class="line">allow_duplicate_hostnames: 0</span><br><span class="line">allow_duplicate_ips: 0</span><br><span class="line">allow_duplicate_macs: 0</span><br><span class="line">allow_dynamic_settings: 0</span><br><span class="line">anamon_enabled: 0</span><br><span class="line">authn_pam_service: "login"</span><br><span class="line">auth_token_expiration: 3600</span><br><span class="line">build_reporting_enabled: 0</span><br><span class="line">build_reporting_sender: ""</span><br><span class="line">build_reporting_email: [ 'root@localhost' ]</span><br><span class="line">build_reporting_smtp_server: "localhost"</span><br><span class="line">build_reporting_subject: ""</span><br><span class="line">build_reporting_ignorelist: [ "" ]</span><br><span class="line">cheetah_import_whitelist:</span><br><span class="line"> - "random"</span><br><span class="line"> - "re"</span><br><span class="line"> - "time"</span><br><span class="line">createrepo_flags: "-c cache -s sha"</span><br><span class="line">default_kickstart: /var/lib/cobbler/kickstarts/default.ks</span><br><span class="line">default_name_servers: []</span><br><span class="line">default_ownership:</span><br><span class="line"> - "admin"</span><br><span class="line">default_password_crypted: "6$5CswA7bf$4o4nzSBWsCEU3IzWcpAloQ07P9SXp4fhHRJTkI9yxbPK9g49wsrINHMPeUjVp4JUzaiPUQfkpDW4COCJpRW0E."</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置新装系统的默认root密码，这是现在的root用户的密码</span></span><br><span class="line">default_template_type: "cheetah"</span><br><span class="line">default_virt_bridge: xenbr0</span><br><span class="line">default_virt_file_size: 5</span><br><span class="line">default_virt_ram: 512</span><br><span class="line">default_virt_type: xenpv</span><br><span class="line">enable_gpxe: 0</span><br><span class="line">enable_menu: 1</span><br><span class="line">func_auto_setup: 0</span><br><span class="line">func_master: overlord.example.org</span><br><span class="line">http_port: 80</span><br><span class="line">kernel_options:</span><br><span class="line"> ksdevice: bootif</span><br><span class="line"> lang: ' '</span><br><span class="line"> text: ~</span><br><span class="line">kernel_options_s390x:</span><br><span class="line"> RUNKS: 1</span><br><span class="line"> ramdisk_size: 40000</span><br><span class="line"> root: /dev/ram0</span><br><span class="line"> ro: ~</span><br><span class="line"> ip: off</span><br><span class="line"> vnc: ~</span><br><span class="line">ldap_server: "ldap.example.com"</span><br><span class="line">ldap_base_dn: "DC=example,DC=com"</span><br><span class="line">ldap_port: 389</span><br><span class="line">ldap_tls: 1</span><br><span class="line">ldap_anonymous_bind: 1</span><br><span class="line">ldap_search_bind_dn: ''</span><br><span class="line">ldap_search_passwd: ''</span><br><span class="line">ldap_search_prefix: 'uid='</span><br><span class="line">ldap_tls_cacertfile: ''</span><br><span class="line">ldap_tls_keyfile: ''</span><br><span class="line">ldap_tls_certfile: ''</span><br><span class="line">mgmt_classes: []</span><br><span class="line">mgmt_parameters:</span><br><span class="line"> from_cobbler: 1</span><br><span class="line">puppet_auto_setup: 0</span><br><span class="line">sign_puppet_certs_automatically: 0</span><br><span class="line">puppetca_path: "/usr/bin/puppet"</span><br><span class="line">remove_old_puppet_certs_automatically: 0</span><br><span class="line">manage_dhcp: 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用Cobbler管理DHCP就改为1，但重启后不知什么原因dhcpd.conf文件与之前配置的不同，所以这里使用默认的0。</span></span><br><span class="line">manage_dns: 0</span><br><span class="line">bind_chroot_path: ""</span><br><span class="line">bind_master: 127.0.0.1</span><br><span class="line">manage_tftpd: 1</span><br><span class="line">manage_rsync: 0</span><br><span class="line">manage_forward_zones: []</span><br><span class="line">manage_reverse_zones: []</span><br><span class="line">next_server: 172.16.99.100</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是提供PXE对外的地址的。如果用Cobbler管理DHCP，修改本项</span></span><br><span class="line">power_management_default_type: 'ipmitool'</span><br><span class="line">power_template_dir: "/etc/cobbler/power"</span><br><span class="line">pxe_just_once: 1</span><br><span class="line">pxe_template_dir: "/etc/cobbler/pxe"</span><br><span class="line">consoles: "/var/consoles"</span><br><span class="line">redhat_management_type: "off"</span><br><span class="line">redhat_management_server: "xmlrpc.rhn.redhat.com"</span><br><span class="line">redhat_management_key: ""</span><br><span class="line">redhat_management_permissive: 0</span><br><span class="line">register_new_installs: 0</span><br><span class="line">reposync_flags: "-l -n -d"</span><br><span class="line">restart_dns: 1</span><br><span class="line">restart_dhcp: 1</span><br><span class="line">run_install_triggers: 1</span><br><span class="line">scm_track_enabled: 0</span><br><span class="line">scm_track_mode: "git"</span><br><span class="line">server: 172.16.99.100</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置cobbler对外联系的地址</span></span><br><span class="line">client_use_localhost: 0</span><br><span class="line">client_use_https: 0</span><br><span class="line">snippetsdir: /var/lib/cobbler/snippets</span><br><span class="line">template_remote_kickstarts: 0</span><br><span class="line">virt_auto_boot: 1</span><br><span class="line">webdir: /var/www/cobbler</span><br><span class="line">xmlrpc_port: 25151</span><br><span class="line">yum_post_install_mirror: 1</span><br><span class="line">yum_distro_priority: 1</span><br><span class="line">yumdownloader_flags: "--resolve"</span><br><span class="line">serializer_pretty_json: 0</span><br><span class="line">replicate_rsync_options: "-avzH"</span><br><span class="line">replicate_repo_rsync_options: "-avzH"</span><br><span class="line">always_write_dhcp_entries: 0</span><br><span class="line">proxy_url_ext: ""</span><br><span class="line">proxy_url_int: ""</span><br><span class="line">[root@cobbler ~]# systemctl start cobblerd</span><br><span class="line">[root@cobbler ~]# systemctl enable cobblerd</span><br><span class="line">[root@cobbler ~]# cobbler check</span><br><span class="line">The following are potential configuration items that you may want to fix:</span><br><span class="line"></span><br><span class="line">1 : SELinux is enabled. Please review the following wiki page for details on ensuring cobbler works correctly in your SELinux environment:</span><br><span class="line">    https://github.com/cobbler/cobbler/wiki/Selinux</span><br><span class="line">2 : change 'disable' to 'no' in /etc/xinetd.d/tftp</span><br><span class="line">3 : Some network boot-loaders are missing from /var/lib/cobbler/loaders, you may run 'cobbler get-loaders' to download them, or, if you only want to handle x86/x86_64 netbooting, you may ensure that you have installed a *recent* version of the syslinux package installed and can ignore this message entirely.  Files in this directory, should you want to support all architectures, should include pxelinux.0, menu.c32, elilo.efi, and yaboot. The 'cobbler get-loaders' command is the easiest way to resolve these requirements.</span><br><span class="line">4 : enable and start rsyncd.service with systemctl</span><br><span class="line">5 : debmirror package is not installed, it will be required to manage debian deployments and repositories</span><br><span class="line">6 : fencing tools were not found, and are required to use the (optional) power management features. install cman or fence-agents to use them</span><br><span class="line"></span><br><span class="line">Restart cobblerd and then run 'cobbler sync' to apply changes.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果有“httpd does not appear to be running and proxying cobbler, or SELinux is <span class="keyword">in</span> the way. Original traceback:”的提示，那么就重启一下http服务器。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是检查的结果，1是没有关SElinux，实际已经关了；2是需要将/etc/xinetd.d/tftp中的<span class="built_in">disable</span>改为no。3是没有loader文件，可以运行提示的命令下载，没有必要；4是没有启动rsync服务，实际启动了，监听在873端口；5是与debian相关的，没有用；6是与fence设备相关，不需要</span></span><br><span class="line">[root@cobbler ~]# vim /etc/xinetd.d/tftp </span><br><span class="line">service tftp</span><br><span class="line">&#123;</span><br><span class="line">        socket_type             = dgram</span><br><span class="line">        protocol                = udp</span><br><span class="line">        wait                    = yes</span><br><span class="line">        user                    = root</span><br><span class="line">        server                  = /usr/sbin/in.tftpd</span><br><span class="line">        server_args             = -s /var/lib/tftpboot</span><br><span class="line">        disable                 = no</span><br><span class="line">        # 此项之前是yes</span><br><span class="line">        per_source              = 11</span><br><span class="line">        cps                     = 100 2</span><br><span class="line">        flags                   = IPv4</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@cobbler ~]# systemctl restart tftp.socket</span><br><span class="line">[root@cobbler ~]# cobbler check</span><br><span class="line">The following are potential configuration items that you may want to fix:</span><br><span class="line"></span><br><span class="line">1 : SELinux is enabled. Please review the following wiki page for details on ensuring cobbler works correctly in your SELinux environment:</span><br><span class="line">    https://github.com/cobbler/cobbler/wiki/Selinux</span><br><span class="line">2 : Some network boot-loaders are missing from /var/lib/cobbler/loaders, you may run 'cobbler get-loaders' to download them, or, if you only want to handle x86/x86_64 netbooting, you may ensure that you have installed a *recent* version of the syslinux package installed and can ignore this message entirely.  Files in this directory, should you want to support all architectures, should include pxelinux.0, menu.c32, elilo.efi, and yaboot. The 'cobbler get-loaders' command is the easiest way to resolve these requirements.</span><br><span class="line">3 : enable and start rsyncd.service with systemctl</span><br><span class="line">4 : debmirror package is not installed, it will be required to manage debian deployments and repositories</span><br><span class="line">5 : fencing tools were not found, and are required to use the (optional) power management features. install cman or fence-agents to use them</span><br><span class="line"></span><br><span class="line">Restart cobblerd and then run 'cobbler sync' to apply changes.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 再次检查就没有上面第二项提示了，但要求重启cobblerd并执行命令。</span></span><br><span class="line">[root@cobbler ~]# systemctl restart cobblerd</span><br><span class="line">[root@cobbler ~]# cobbler sync</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步所有配置</span></span><br><span class="line">task started: 2019-05-07_200411_sync</span><br><span class="line">task started (id=Sync, time=Tue May  7 20:04:11 2019)</span><br><span class="line">running pre-sync triggers</span><br><span class="line">cleaning trees</span><br><span class="line">removing: /var/lib/tftpboot/grub/images</span><br><span class="line">copying bootloaders</span><br><span class="line">copying: /var/lib/cobbler/loaders/pxelinux.0 -&gt; /var/lib/tftpboot/pxelinux.0</span><br><span class="line">copying: /var/lib/cobbler/loaders/menu.c32 -&gt; /var/lib/tftpboot/menu.c32</span><br><span class="line">copying: /usr/share/syslinux/memdisk -&gt; /var/lib/tftpboot/memdisk</span><br><span class="line">copying distros to tftpboot</span><br><span class="line">copying images</span><br><span class="line">generating PXE configuration files</span><br><span class="line">generating PXE menu structure</span><br><span class="line">rendering TFTPD files</span><br><span class="line">generating /etc/xinetd.d/tftp</span><br><span class="line">cleaning link caches</span><br><span class="line">running post-sync triggers</span><br><span class="line">running python triggers from /var/lib/cobbler/triggers/sync/post/*</span><br><span class="line">running python trigger cobbler.modules.sync_post_restart_services</span><br><span class="line">running shell triggers from /var/lib/cobbler/triggers/sync/post/*</span><br><span class="line">running python triggers from /var/lib/cobbler/triggers/change/*</span><br><span class="line">running python trigger cobbler.modules.manage_genders</span><br><span class="line">running python trigger cobbler.modules.scm_track</span><br><span class="line">running shell triggers from /var/lib/cobbler/triggers/change/*</span><br><span class="line">*** TASK COMPLETE ***</span><br><span class="line">上传镜像到服务器</span><br><span class="line">[root@cobbler ~]# mount -o loop /root/CentOS-7-x86_64-DVD-1611.iso /media/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将系统中的镜像挂载到media/目录</span></span><br><span class="line">[root@cobbler ~]# cobbler import --name="CentOS-7_x86_64-1503" --path=/media</span><br><span class="line">task started: 2019-05-07_201016_import</span><br><span class="line">task started (id=Media import, time=Tue May  7 20:10:16 2019)</span><br><span class="line">Found a candidate signature: breed=redhat, version=rhel6</span><br><span class="line">Found a candidate signature: breed=redhat, version=rhel7</span><br><span class="line">Found a matching signature: breed=redhat, version=rhel7</span><br><span class="line">Adding distros from path /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503:</span><br><span class="line">creating new distro: CentOS-7-1503-x86_64</span><br><span class="line">trying symlink: /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503 -&gt; /var/www/cobbler/links/CentOS-7-1503-x86_64</span><br><span class="line">creating new profile: CentOS-7-1503-x86_64</span><br><span class="line">associating repos</span><br><span class="line">checking for rsync repo(s)</span><br><span class="line">checking for rhn repo(s)</span><br><span class="line">checking for yum repo(s)</span><br><span class="line">starting descent into /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503 for CentOS-7-1503-x86_64</span><br><span class="line">processing repo at : /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503</span><br><span class="line">need to process repo/comps: /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503</span><br><span class="line">looking for /var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503/repodata/*comps*.xml</span><br><span class="line">Keeping repodata as-is :/var/www/cobbler/ks_mirror/CentOS-7_x86_64-1503/repodata</span><br><span class="line">*** TASK COMPLETE ***</span><br><span class="line"><span class="meta">#</span><span class="bash"> 导入镜像，生成distro，生成的镜像存在/var/www/cobbler/ks_mirror下。所以/var/www/cobbler要有足够的空间。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --path 镜像路径</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --name 为安装源定义一个名字</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --arch 指定安装源是32位、64位、ia64, 目前支持的选项有: x86│x86_64│ia64</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装源的唯一标示就是根据name参数来定义，本例导入成功后，安装源的唯一标示就是：CentOS-7_x86_64-1503，如果重复，系统会提示导入失败。</span></span><br><span class="line">[root@cobbler ~]# cobbler distro list</span><br><span class="line">   CentOS-7-1503-x86_64</span><br><span class="line">[root@cobbler ~]# cobbler profile list</span><br><span class="line">   CentOS-7-1503-x86_64</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时查看都应该有一个刚才创建的文件名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 镜像存放目录，cobbler会将镜像中的所有安装文件拷贝到本地一份，放在/var/www/cobbler/ks_mirror下的CentOS-7_x86_64-1503目录下。因此/var/www/cobbler目录必须具有足够容纳安装文件的空间。</span></span><br><span class="line">[root@cobbler ~]# cobbler sync</span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步数据。这个命令是为了将数据同步到/var/lib/tftpboot/pxelinux.cfg/default文件，也就是安装时的菜单</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler check 核对当前设置是否有问题</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler list 列出所有的cobbler元素</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler report 列出元素的详细信息</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler sync 同步配置到数据目录,更改配置最好都要执行下</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler reposync 同步yum仓库</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler distro 查看导入的发行版系统信息</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler system 查看添加的系统信息</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cobbler profile 查看配置信息</span></span><br></pre></td></tr></table></figure>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">创建虚拟机，使用网络启动，之后会被分配IP地址，并提供一个安装界面。上面的cobbler会自动提供一个最小化安装的kickstart</span><br><span class="line">问题：</span><br><span class="line">1. No space left on device</span><br><span class="line">这是因为虚拟机内存不到2G，调整为2G后解决。</span><br></pre></td></tr></table></figure>
-<h3 id="指定ks-cfg文件"><a href="#指定ks-cfg文件" class="headerlink" title="指定ks.cfg文件"></a>指定ks.cfg文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">[root@cobbler ~]# cd /var/lib/cobbler/kickstarts/</span><br><span class="line">[root@cobbler kickstarts]# ls</span><br><span class="line">default.ks        legacy.ks            sample_esx4.ks   sample.ks</span><br><span class="line">esxi4-ks.cfg      pxerescue.ks         sample_esxi4.ks  sample_old.seed</span><br><span class="line">esxi5-ks.cfg      sample_autoyast.xml  sample_esxi5.ks  sample.seed</span><br><span class="line">install_profiles  sample_end.ks        sample_esxi6.ks</span><br><span class="line"><span class="meta">#</span><span class="bash"> 自带很多。默认使用的ks文件为sample_end.ks。<span class="comment"># 在第一次导入系统镜像后，Cobbler会给镜像指定一个默认的kickstart自动安装文件在/var/lib/cobbler/kickstarts下的sample_end.ks。</span></span></span><br><span class="line">[root@cobbler kickstarts]# vim sample_end.ks</span><br><span class="line">auth  --useshadow  --enablemd5</span><br><span class="line">bootloader --location=mbr</span><br><span class="line">clearpart --all --initlabel</span><br><span class="line">text</span><br><span class="line">firewall --enabled</span><br><span class="line">firstboot --disable</span><br><span class="line">keyboard us</span><br><span class="line">lang en_US</span><br><span class="line">url --url=$tree</span><br><span class="line">selinux --disabled</span><br><span class="line">firewall --disabled</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入关闭selinux和firewall</span></span><br><span class="line"><span class="meta">$</span><span class="bash">yum_repo_stanza</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'network_config'</span>)</span></span><br><span class="line">reboot</span><br><span class="line">rootpw --iscrypted $default_password_crypted</span><br><span class="line">selinux --disabled</span><br><span class="line">skipx</span><br><span class="line">timezone  America/New_York</span><br><span class="line">install</span><br><span class="line">zerombr</span><br><span class="line">autopart</span><br><span class="line"><span class="meta">%</span><span class="bash">pre</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'log_ks_pre'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'kickstart_start'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'pre_install_network_config'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'pre_anamon'</span>)</span></span><br><span class="line"><span class="meta">%</span><span class="bash">end</span></span><br><span class="line"><span class="meta">%</span><span class="bash">packages</span></span><br><span class="line">@^web-server-environment</span><br><span class="line">@base</span><br><span class="line">@core</span><br><span class="line">@web-server</span><br><span class="line">kexec-tools</span><br><span class="line"><span class="meta">%</span><span class="bash">end</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改%packages段，这是要安装的包，这里选择安装web-server的包。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">post --nochroot</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'log_ks_post_nochroot'</span>)</span></span><br><span class="line"><span class="meta">%</span><span class="bash">end</span></span><br><span class="line"><span class="meta">%</span><span class="bash">post</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'log_ks_post'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">yum_config_stanza</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'post_install_kernel_options'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'post_install_network_config'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'func_register_if_enabled'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'download_config_files'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'koan_environment'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'redhat_register'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'cobbler_register'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'post_anamon'</span>)</span></span><br><span class="line"><span class="meta">$</span><span class="bash">SNIPPET(<span class="string">'kickstart_done'</span>)</span></span><br><span class="line"><span class="meta">%</span><span class="bash">end</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [root@cobbler kickstarts]<span class="comment"># cobbler profile edit --name=CentOS-7-1503-x86_64 --kickstart=/var/lib/cobbler/kickstarts/anaconda-ks.cfg</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编辑profile，此命令可以修改关联的ks文件，也就是不再使用默认的ks文件。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外，安装后只有根分区、boot分区和swap</span></span><br></pre></td></tr></table></figure>
-<p>参考：老男孩Cobbler无人值守安装教程</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2235,7 +2199,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">173</span>
+                    <span class="site-state-item-count">174</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2587,7 +2551,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">133</span>
+                      
+                    
+                    <span class="site-state-item-count">134</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
