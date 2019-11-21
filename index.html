@@ -350,7 +350,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/20/python基础练习-递归与生成器/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/21/一篇文章彻底弄懂Base64编码原理-转/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ruopu">
@@ -369,8 +369,8 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/11/20/python基础练习-递归与生成器/" itemprop="url">
-                  python基础练习-递归与生成器
+                <a class="post-title-link" href="/2019/11/21/一篇文章彻底弄懂Base64编码原理-转/" itemprop="url">
+                  一篇文章彻底弄懂Base64编码原理(转)
                 </a>
               
             
@@ -396,7 +396,7 @@
                 
               
 
-              <time title="創建時間：2019-11-20 17:27:02 / 修改時間：17:52:42" itemprop="dateCreated datePublished" datetime="2019-11-20T17:27:02+08:00">2019-11-20</time>
+              <time title="創建時間：2019-11-21 08:16:13 / 修改時間：08:33:13" itemprop="dateCreated datePublished" datetime="2019-11-21T08:16:13+08:00">2019-11-21</time>
             
 
             
@@ -454,11 +454,222 @@
       
         
           
+            <h1 id="一篇文章彻底弄懂Base64编码原理"><a href="#一篇文章彻底弄懂Base64编码原理" class="headerlink" title="一篇文章彻底弄懂Base64编码原理"></a>一篇文章彻底弄懂Base64编码原理</h1><p>本文链接：<a href="https://blog.csdn.net/wo541075754/article/details/81734770" target="_blank" rel="noopener">https://blog.csdn.net/wo541075754/article/details/81734770</a></p>
+<blockquote>
+<p>在互联网中的每一刻，你可能都在享受着Base64带来的便捷，但对于Base64的基础原理又了解多少？今天这篇博文带领大家了解一下Base64的底层实现。</p>
+</blockquote>
+<h2 id="Base64的由来"><a href="#Base64的由来" class="headerlink" title="Base64的由来"></a>Base64的由来</h2><p>目前Base64已经成为网络上常见的传输8Bit字节代码的编码方式之一。在做支付系统时，系统之间的报文交互都需要使用Base64对明文进行转码，然后再进行签名或加密，之后再进行（或再次Base64）传输。那么，Base64到底起到什么作用呢？</p>
+<p>在参数传输的过程中经常遇到的一种情况：使用全英文的没问题，但一旦涉及到中文就会出现乱码情况。与此类似，网络上传输的字符并不全是可打印的字符，比如二进制文件、图片等。Base64的出现就是为了解决此问题，它是基于64个可打印的字符来表示二进制的数据的一种方法。</p>
+<p>电子邮件刚问世的时候，只能传输英文，但后来随着用户的增加，中文、日文等文字的用户也有需求，但这些字符并不能被服务器或网关有效处理，因此Base64就登场了。随之，Base64在URL、Cookie、网页传输少量二进制文件中也有相应的使用。</p>
+<h2 id="Base64的编码原理"><a href="#Base64的编码原理" class="headerlink" title="Base64的编码原理"></a>Base64的编码原理</h2><p>Base64的原理比较简单，每当我们使用Base64时都会先定义一个类似这样的数组：</p>
+<p><code>[&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, ... &#39;a&#39;, &#39;b&#39;, &#39;c&#39;, ... &#39;0&#39;, &#39;1&#39;, ... &#39;+&#39;, &#39;/&#39;]</code></p>
+<p>上面就是Base64的索引表，字符选用了”A-Z、a-z、0-9、+、/“ 64个可打印字符，这是标准的Base64协议规定。在日常使用中我们还会看到“=”或“==”号出现在Base64的编码结果中，“=”在此是作为填充字符出现，后面会讲到。</p>
+<h3 id="具体转换步骤"><a href="#具体转换步骤" class="headerlink" title="具体转换步骤"></a>具体转换步骤</h3><ul>
+<li>第一步，将待转换的字符串每三个字节分为一组，每个字节占8bit，那么共有24个二进制位。</li>
+<li>第二步，将上面的24个二进制位每6个一组，共分为4组。</li>
+<li>第三步，在每组前面添加两个0，每组由6个变为8个二进制位，总共32个二进制位，即四个字节。</li>
+<li>第四步，根据Base64编码对照表（见下图）获得对应的值。</li>
+</ul>
+<p><img src="/images/python递归函数/作业2.png" alt=""></p>
+<p>从上面的步骤我们发现：</p>
+<ul>
+<li>Base64字符表中的字符原本用6个bit就可以表示，现在前面添加2个0，变为8个bit，会造成一定的浪费。因此，Base64编码之后的文本，要比原文大约三分之一。</li>
+<li>为什么使用3个字节一组呢？因为6和8的最小公倍数为24，三个字节正好24个二进制位，每6个bit位一组，恰好能够分为4组。</li>
+</ul>
+<h3 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h3><p>以下图的表格为示例，我们具体分析一下整个过程。</p>
+<p><img src="/images/python递归函数/Base64-1.png" alt=""></p>
+<ul>
+<li>第一步：“M”、“a”、”n”对应的ASCII码值分别为77，97，110，对应的二进制值是01001101、01100001、01101110。如图第二三行所示，由此组成一个24位的二进制字符串。</li>
+<li>第二步：如图红色框，将24位每6位二进制位一组分成四组。</li>
+<li>第三步：在上面每一组前面补两个0，扩展成32个二进制位，此时变为四个字节：00010011、00010110、00000101、00101110。分别对应的值（Base64编码索引）为：19、22、5、46。</li>
+<li>第四步：用上面的值在Base64编码表中进行查找，分别对应：T、W、F、u。因此“Man”Base64编码之后就变为：TWFu。</li>
+</ul>
+<h3 id="位数不足情况"><a href="#位数不足情况" class="headerlink" title="位数不足情况"></a>位数不足情况</h3><p>上面是按照三个字节来举例说明的，如果字节数不足三个，那么该如何处理？</p>
+<p><img src="/images/python递归函数/Base64-2.png" alt=""></p>
+<ul>
+<li>两个字节：两个字节共16个二进制位，依旧按照规则进行分组。此时总共16个二进制位，每6个一组，则第三组缺少2位，用0补齐，得到三个Base64编码，第四组完全没有数据则用“=”补上。因此，上图中“BC”转换之后为“QKM=”；</li>
+<li>一个字节：一个字节共8个二进制位，依旧按照规则进行分组。此时共8个二进制位，每6个一组，则第二组缺少4位，用0补齐，得到两个Base64编码，而后面两组没有对应数据，都用“=”补上。因此，上图中“A”转换之后为“QQ==”；</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>大多数编码都是由字符串转化成二进制的过程，而Base64的编码则是从二进制转换为字符串。与常规恰恰相反。</li>
+<li>Base64编码主要用在传输、存储、表示二进制领域，不能算得上加密，只是无法直接看到明文。也可以通过打乱Base64编码来进行加密。</li>
+<li>中文有多种编码（比如：utf-8、gb2312、gbk等），不同编码对应Base64编码结果都不一样。</li>
+</ul>
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><p>上面我们已经看到了Base64就是用6位（2的6次幂就是64）表示字符，因此成为Base64。同理，Base32就是用5位，Base16就是用4位。大家可以按照上面的步骤进行演化一下。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/20/python基础练习-递归与生成器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/20/python基础练习-递归与生成器/" itemprop="url">
+                  python基础练习-递归与生成器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-20 17:27:02" itemprop="dateCreated datePublished" datetime="2019-11-20T17:27:02+08:00">2019-11-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-11-21 11:05:11" itemprop="dateModified" datetime="2019-11-21T11:05:11+08:00">2019-11-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
             <h3 id="把一个字典扁平化"><a href="#把一个字典扁平化" class="headerlink" title="把一个字典扁平化"></a>把一个字典扁平化</h3><p><img src="/images/python递归函数/作业1.png" alt=""></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 源字典&#123;'a':&#123;'b':1,'c':2&#125;,'d':&#123;'e':3,'f':&#123;'g':4&#125;&#125;&#125;</span></span><br><span class="line"><span class="comment"># 目标字典 &#123;'a.c':2,'d.e':3,'d.f'g':4,'a.b':1&#125;</span></span><br><span class="line"></span><br><span class="line">source = &#123;<span class="string">'a'</span>:&#123;<span class="string">'b'</span>:<span class="number">1</span>,<span class="string">'c'</span>:<span class="number">2</span>&#125;,<span class="string">'d'</span>:&#123;<span class="string">'e'</span>:<span class="number">3</span>,<span class="string">'f'</span>:&#123;<span class="string">'g'</span>:<span class="number">4</span>&#125;&#125;&#125;</span><br><span class="line">target = &#123;&#125;</span><br><span class="line"><span class="comment"># recursion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatmap</span><span class="params">(src,prefix=<span class="string">''</span>)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> src.items():</span><br><span class="line">        <span class="keyword">if</span> isinstance(v,(list,tuple,set,dict)):</span><br><span class="line">            flatmap(v,prefix=prefix+k+<span class="string">'.'</span>)  <span class="comment"># 递归调用</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            target[prefix+k] = v</span><br><span class="line">            </span><br><span class="line">flatmap(source)</span><br><span class="line">print(target)</span><br><span class="line"></span><br><span class="line">- 一般这种函数都会生成一个新的字典，因此改造一下dest字典可以由内部创建，也可以由外部提供 </span><br><span class="line">source = &#123;<span class="string">'a'</span>:&#123;<span class="string">'b'</span>:<span class="number">1</span>,<span class="string">'c'</span>:<span class="number">2</span>&#125;,<span class="string">'d'</span>:&#123;<span class="string">'e'</span>:<span class="number">3</span>,<span class="string">'f'</span>:&#123;<span class="string">'g'</span>:<span class="number">4</span>&#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># recursion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatmap</span><span class="params">(src,dest=None,prefix=<span class="string">''</span>)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> dest == <span class="keyword">None</span>:</span><br><span class="line">        dest = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> src.items():</span><br><span class="line">        <span class="keyword">if</span> isinstance(v,(list,tuple,set,dict)):</span><br><span class="line">            flatmap(v,dest,prefix=prefix+k+<span class="string">'.'</span>)   <span class="comment"># 递归调用</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            dest[prefix+k] = v</span><br><span class="line">    <span class="keyword">return</span> dest</span><br><span class="line"></span><br><span class="line">print(flatmap(source))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 源字典&#123;'a':&#123;'b':1,'c':2&#125;,'d':&#123;'e':3,'f':&#123;'g':4&#125;&#125;&#125;</span></span><br><span class="line"><span class="comment"># 目标字典 &#123;'a.c':2,'d.e':3,'d.f'g':4,'a.b':1&#125;</span></span><br><span class="line"></span><br><span class="line">source = &#123;<span class="string">'a'</span>:&#123;<span class="string">'b'</span>:<span class="number">1</span>,<span class="string">'c'</span>:<span class="number">2</span>&#125;,<span class="string">'d'</span>:&#123;<span class="string">'e'</span>:<span class="number">3</span>,<span class="string">'f'</span>:&#123;<span class="string">'g'</span>:<span class="number">4</span>&#125;&#125;&#125;</span><br><span class="line">target = &#123;&#125;</span><br><span class="line"><span class="comment"># recursion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatmap</span><span class="params">(src,prefix=<span class="string">''</span>)</span>:</span>  <span class="comment"># 给prefix设置一个默认值为空</span></span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> src.items():</span><br><span class="line">        <span class="keyword">if</span> isinstance(v,(list,tuple,set,dict)):</span><br><span class="line">            flatmap(v,prefix=prefix+k+<span class="string">'.'</span>)  <span class="comment"># 递归调用</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            target[prefix+k] = v</span><br><span class="line">            </span><br><span class="line">flatmap(source)</span><br><span class="line">print(target)</span><br><span class="line"><span class="comment"># 代码执行时，进入函数，将传入的src拆分成kv对，分别给k和v变量，之后判断值是不是列表、元组、集合或字典中</span></span><br><span class="line"><span class="comment"># 的一个，如果是，就使用递归将v的值当src再传入flatmap，prefix也重新赋值为键值加点，再次判断时，如果v</span></span><br><span class="line"><span class="comment"># 是一个单值，那么就将target字典中重新拼好的键值如a.c赋值一个v，这样就能得到目标字典了。</span></span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a.b'</span>: <span class="number">1</span>, <span class="string">'a.c'</span>: <span class="number">2</span>, <span class="string">'d.e'</span>: <span class="number">3</span>, <span class="string">'d.f.g'</span>: <span class="number">4</span>&#125;</span><br><span class="line"></span><br><span class="line">- 一般这种函数都会生成一个新的字典，因此改造一下dest字典可以由内部创建，也可以由外部提供 </span><br><span class="line">source = &#123;<span class="string">'a'</span>:&#123;<span class="string">'b'</span>:<span class="number">1</span>,<span class="string">'c'</span>:<span class="number">2</span>&#125;,<span class="string">'d'</span>:&#123;<span class="string">'e'</span>:<span class="number">3</span>,<span class="string">'f'</span>:&#123;<span class="string">'g'</span>:<span class="number">4</span>&#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># recursion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatmap</span><span class="params">(src,dest=None,prefix=<span class="string">''</span>)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> dest == <span class="keyword">None</span>:</span><br><span class="line">        dest = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> src.items():</span><br><span class="line">        <span class="keyword">if</span> isinstance(v,(list,tuple,set,dict)):</span><br><span class="line">            flatmap(v,dest,prefix=prefix+k+<span class="string">'.'</span>)   <span class="comment"># 递归调用</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            dest[prefix+k] = v</span><br><span class="line">    <span class="keyword">return</span> dest</span><br><span class="line"></span><br><span class="line">print(flatmap(source))</span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a.b'</span>: <span class="number">1</span>, <span class="string">'a.c'</span>: <span class="number">2</span>, <span class="string">'d.e'</span>: <span class="number">3</span>, <span class="string">'d.f.g'</span>: <span class="number">4</span>&#125;</span><br><span class="line"></span><br><span class="line">- 不暴露给外界内部的字典呢？能否函数就提供一个参数源字典，返回一个新的扁平化字典呢？递归的时候要把目标字</span><br><span class="line">- 典的引用传递多层，怎么处理？</span><br><span class="line"></span><br><span class="line">source = &#123;<span class="string">'a'</span>:&#123;<span class="string">'b'</span>:<span class="number">1</span>,<span class="string">'c'</span>:<span class="number">2</span>&#125;,<span class="string">'d'</span>:&#123;<span class="string">'e'</span>:<span class="number">3</span>,<span class="string">'f'</span>:&#123;<span class="string">'g'</span>:<span class="number">4</span>&#125;&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># recursion递归</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatmap</span><span class="params">(src)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_flatmap</span><span class="params">(src,dest=None,prefix=<span class="string">''</span>)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> k,v <span class="keyword">in</span> src.items():</span><br><span class="line">            key = prefix + k</span><br><span class="line">            <span class="keyword">if</span> isinstance(v,(list,tuple,set,dict)):</span><br><span class="line">                _flatmap(v,dest,key + <span class="string">'.'</span>)   <span class="comment"># 递归调用</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                dest[key] = v</span><br><span class="line">                </span><br><span class="line">    dest = &#123;&#125;</span><br><span class="line">    _flatmap(src,dest)</span><br><span class="line">    <span class="keyword">return</span> dest</span><br><span class="line"></span><br><span class="line">print(flatmap(source))</span><br><span class="line">输出：</span><br><span class="line">&#123;<span class="string">'a.b'</span>: <span class="number">1</span>, <span class="string">'a.c'</span>: <span class="number">2</span>, <span class="string">'d.e'</span>: <span class="number">3</span>, <span class="string">'d.f.g'</span>: <span class="number">4</span>&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="实现Base64编码"><a href="#实现Base64编码" class="headerlink" title="实现Base64编码"></a>实现Base64编码</h3><p><img src="/images/python递归函数/作业2.png" alt=""></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 要求自己实现算法</span></span><br></pre></td></tr></table></figure>
-<h3 id="求2个字符串的最长公共子串"><a href="#求2个字符串的最长公共子串" class="headerlink" title="求2个字符串的最长公共子串"></a>求2个字符串的最长公共子串</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 要求自己实现算法，不用库</span></span><br><span class="line"><span class="comment"># 原理：https://blog.csdn.net/wo541075754/article/details/81734770</span></span><br><span class="line">- 将输入每<span class="number">3</span>个字节断开，拿出一个<span class="number">3</span>个字节，每<span class="number">6</span>个bit断开成<span class="number">4</span>段</span><br><span class="line">- <span class="number">2</span>**<span class="number">6</span> = <span class="number">64</span>，因此有了base64的编码表</span><br><span class="line">- 每一段当做一个<span class="number">8</span>bit看它的值，这个值就是Base64编码表的索引值，找到对应字符。再取<span class="number">3</span>个字节，同样处理，直到最后</span><br><span class="line"></span><br><span class="line">- 举例：</span><br><span class="line">abc对应的ASCII码为：<span class="number">0x61</span> <span class="number">0x62</span> <span class="number">0x63</span></span><br><span class="line"><span class="number">01100001</span> <span class="number">01100010</span> <span class="number">01100011</span>   <span class="comment"># abc</span></span><br><span class="line"><span class="number">011000</span> <span class="number">010110</span> <span class="number">001001</span> <span class="number">100011</span></span><br><span class="line"><span class="number">00011000</span> <span class="number">00010110</span> <span class="number">00001001</span> <span class="number">00100011</span>   <span class="comment"># 每6位补齐为8位</span></span><br><span class="line"><span class="number">24</span> <span class="number">22</span> <span class="number">9</span> <span class="number">35</span></span><br><span class="line"></span><br><span class="line">- 末尾的处理</span><br><span class="line">- <span class="number">1.</span> 正好<span class="number">3</span>个字节，处理方式同上</span><br><span class="line">- <span class="number">2.</span> 剩<span class="number">1</span>个字节或<span class="number">2</span>个字节，用<span class="number">0</span>补满<span class="number">3</span>个字节</span><br><span class="line">- <span class="number">3.</span> 补<span class="number">0</span>的字节用=表示</span><br><span class="line"></span><br><span class="line"><span class="comment"># 用自己实现对一段字符串进行Base64编码</span></span><br><span class="line">alphabet = <span class="string">b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"</span></span><br><span class="line">teststr = <span class="string">"abcd"</span></span><br><span class="line">teststr = <span class="string">"ManMa"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">base64</span><span class="params">(src)</span>:</span></span><br><span class="line">    ret = bytearray()</span><br><span class="line">    length = len(src)</span><br><span class="line">    <span class="comment"># r记录补0的个数</span></span><br><span class="line">    r = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> offset <span class="keyword">in</span> range(<span class="number">0</span>,length,<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">if</span> offset + <span class="number">3</span> &lt;= length:</span><br><span class="line">            triple = src[offset:offset + <span class="number">3</span>]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            triple = src[offset:]</span><br><span class="line">            r = <span class="number">3</span> - len(triple)</span><br><span class="line">            triple = triple + <span class="string">'\x00'</span>*r   <span class="comment"># 补几个0</span></span><br><span class="line">        <span class="comment"># print(triple,r)</span></span><br><span class="line">        <span class="comment"># 将3个字节看成一个整体围成字节bytes，大端模式</span></span><br><span class="line">        <span class="comment"># abc =&gt; 0x616263</span></span><br><span class="line">        b = int.from_bytes(triple.encode(),<span class="string">'big'</span>)   <span class="comment"># 小商模式为'little'</span></span><br><span class="line">        print(hex(b))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 01100001 01100010 01100011   # abc</span></span><br><span class="line">        <span class="comment"># 011000 010110 001001 100011   # 每6位断开</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">18</span>,<span class="number">-1</span>,<span class="number">-6</span>):</span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">18</span>:</span><br><span class="line">                index = b &gt;&gt; i</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                index = b &gt;&gt; i &amp; <span class="number">0x3F</span>   <span class="comment"># 0b0011 1111</span></span><br><span class="line">            ret.append(alphabet[index])   <span class="comment"># 得到base64编码的列表</span></span><br><span class="line">            <span class="comment"># 策略是不管是不是补零，都填满，只有最后一次可能出现补零的</span></span><br><span class="line">            <span class="comment"># 在最后替换掉就是了，代码清晰，而且替换至多2次</span></span><br><span class="line">            <span class="comment"># 在上一个循环中判断 r!=0，效率可能会高些</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,r+<span class="number">1</span>):   <span class="comment"># 1到r，补几个0替换几个=</span></span><br><span class="line">            ret[-i] = <span class="number">0x3D</span></span><br><span class="line"><span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line">print(base64(teststr))</span><br><span class="line">print(<span class="string">'*'</span>*<span class="number">40</span>)</span><br><span class="line">print(base64(teststr1))</span><br><span class="line">输出：</span><br><span class="line"><span class="number">0x616263</span></span><br><span class="line"><span class="number">0x640000</span></span><br><span class="line">bytearray(<span class="string">b'YWJjZA=='</span>)</span><br><span class="line">****************************************</span><br><span class="line"><span class="number">0x4d616e</span></span><br><span class="line"><span class="number">0x4d6100</span></span><br><span class="line">bytearray(<span class="string">b'TWFuTWE='</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面是base64实现</span></span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line">print(base64.b64encode(teststr.encode()))</span><br><span class="line">输出：</span><br><span class="line"><span class="string">b'YWJjZA=='</span></span><br></pre></td></tr></table></figure>
+<h3 id="求2个字符串的最长公共子串"><a href="#求2个字符串的最长公共子串" class="headerlink" title="求2个字符串的最长公共子串"></a>求2个字符串的最长公共子串</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br></pre></td><td class="code"><pre><span class="line">思考：</span><br><span class="line">s1 = <span class="string">'abcdefg'</span></span><br><span class="line">s2 = <span class="string">'defabcd'</span></span><br><span class="line"></span><br><span class="line">- 方法一：矩阵算法</span><br><span class="line">让s2的每一个元素，去分别和s1的每一个元素比较，相同就是<span class="number">1</span>，不同就是<span class="number">0</span>，有下面的矩阵</span><br><span class="line">	 s1</span><br><span class="line">s1 <span class="number">0001000</span></span><br><span class="line">s1 <span class="number">0000100</span></span><br><span class="line">s1 <span class="number">0000010</span></span><br><span class="line">s1 <span class="number">1000000</span></span><br><span class="line">s1 <span class="number">0100000</span></span><br><span class="line">s1 <span class="number">0010000</span></span><br><span class="line">s1 <span class="number">0001000</span></span><br><span class="line"></span><br><span class="line">上面都是s1的索引。看与斜对角线平行的线，这个线是穿过<span class="number">1</span>的，那么最长的就是最长子串。</span><br><span class="line">print(s1[<span class="number">3</span>:<span class="number">3</span>+<span class="number">3</span>])</span><br><span class="line">print(s1[<span class="number">0</span>:<span class="number">0</span>+<span class="number">4</span>])    最长</span><br><span class="line"></span><br><span class="line">矩阵求法还需要一个字符扫描最长子串的过程，扫描的过程就是len(s1) len(s2)次，O(n m)。</span><br><span class="line">有办法一遍循环就找出最长的子串吗？</span><br><span class="line"><span class="number">0001000</span>第一行，索引为<span class="number">3</span>,<span class="number">0</span></span><br><span class="line">第二行的时候如果<span class="number">4</span>,<span class="number">1</span>是<span class="number">1</span>，就判断<span class="number">3</span>,<span class="number">0</span>是否为<span class="number">1</span>，为<span class="number">1</span>就把<span class="number">3</span>,<span class="number">0</span>加<span class="number">1</span>。</span><br><span class="line">第二行的时候如果<span class="number">5</span>,<span class="number">2</span>是<span class="number">1</span>，就判断<span class="number">4</span>,<span class="number">1</span>是否为<span class="number">1</span>，是<span class="number">1</span>就加<span class="number">1</span>，再就判断<span class="number">3</span>,<span class="number">0</span>是否为<span class="number">1</span>，为<span class="number">1</span>就把<span class="number">3</span>,<span class="number">0</span>加<span class="number">1</span>。</span><br><span class="line"></span><br><span class="line">	 s1</span><br><span class="line">s1 <span class="number">0003000</span></span><br><span class="line">s1 <span class="number">0000200</span></span><br><span class="line">s1 <span class="number">0000010</span></span><br><span class="line">s1 <span class="number">4000000</span></span><br><span class="line">s1 <span class="number">0300000</span></span><br><span class="line">s1 <span class="number">0020000</span></span><br><span class="line">s1 <span class="number">0001000</span></span><br><span class="line"></span><br><span class="line">上面的方法是个递归问题，不好。</span><br><span class="line">最后在矩阵中找到最大的元素，从它开始就能写出最长的子串了。</span><br><span class="line">但是这个不好算，因为是逆推的，改为顺推。</span><br><span class="line"></span><br><span class="line">	 s1</span><br><span class="line">s1 <span class="number">0001000</span></span><br><span class="line">s1 <span class="number">0000200</span></span><br><span class="line">s1 <span class="number">0000030</span></span><br><span class="line">s1 <span class="number">1000000</span></span><br><span class="line">s1 <span class="number">0200000</span></span><br><span class="line">s1 <span class="number">0030000</span></span><br><span class="line">s1 <span class="number">0004000</span></span><br><span class="line"></span><br><span class="line">顺推的意思，就是如果找到一个就看前一个的数字是几，然后在它的上加上。</span><br><span class="line"></span><br><span class="line"><span class="comment"># www.magedu.com</span></span><br><span class="line"></span><br><span class="line">s1 = <span class="string">'abcdefg'</span></span><br><span class="line">s2 = <span class="string">'defabcd'</span></span><br><span class="line">s2 = <span class="string">'defabcdoabcdeftw'</span></span><br><span class="line">s3 = <span class="string">'1234a'</span></span><br><span class="line">s4 = <span class="string">"5678"</span></span><br><span class="line">s5 = <span class="string">'abcdd'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findit</span><span class="params">(str1, str2)</span>:</span></span><br><span class="line">    matrix = []</span><br><span class="line">    <span class="comment"># 从x轴或者y轴取都可以，选择x轴，xmax和xindex</span></span><br><span class="line">    xmax = <span class="number">0</span></span><br><span class="line">    xindex = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i,x <span class="keyword">in</span> enumerate(str2):</span><br><span class="line">        matrix.append([])</span><br><span class="line">        <span class="keyword">for</span> j,y <span class="keyword">in</span> enumerate(str1):</span><br><span class="line">            <span class="keyword">if</span> x != y:   <span class="comment"># 若两个字符不相等 </span></span><br><span class="line">                matrix[i].append(<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">if</span> i == <span class="number">0</span> <span class="keyword">or</span> j == <span class="number">0</span>:   <span class="comment"># 两个字符相等，有字符在边上的</span></span><br><span class="line">                    matrix[i].append(<span class="number">1</span>)</span><br><span class="line">                <span class="keyword">else</span>:   <span class="comment"># 不在边上</span></span><br><span class="line">                    matrix[i].append(matrix[i<span class="number">-1</span>][j<span class="number">-1</span>]+<span class="number">1</span>)</span><br><span class="line">                    </span><br><span class="line">                <span class="keyword">if</span> matrix[i][j] &gt; xmax:   <span class="comment"># 判断当前加入的值和记录的最大值比较</span></span><br><span class="line">                    xmax = matrix[i][j]   <span class="comment"># 记录最大值，用于下次比较</span></span><br><span class="line">                    xindex = j   <span class="comment"># 记录当前值的x轴偏移量，和str1[xindex+1-xmax:xindex+1]匹配</span></span><br><span class="line">                    xindex += <span class="number">1</span>   <span class="comment"># 只是为了计算的需要才+1，和str1[xindex - max: xindex]匹配</span></span><br><span class="line">   <span class="comment"># return str1[xindex+1-xmax:xindex+1]</span></span><br><span class="line">	<span class="keyword">return</span> str1[xindex - xmax: xindex]</span><br><span class="line"></span><br><span class="line">print(findit(s1,s2))</span><br><span class="line">print(findit(s1,s3))   <span class="comment"># a</span></span><br><span class="line">print(findit(s1,s4))   <span class="comment"># 空串</span></span><br><span class="line">print(findit(s1,s5))   <span class="comment"># abcd</span></span><br><span class="line">s1 = <span class="string">'abcdefg'</span></span><br><span class="line">s5 = <span class="string">'304abcdd'</span></span><br><span class="line">print(findit(s1,s5))   <span class="comment"># abcd</span></span><br><span class="line">输出：</span><br><span class="line">abcdef</span><br><span class="line">a</span><br><span class="line"></span><br><span class="line">abcd</span><br><span class="line">abcd</span><br><span class="line"></span><br><span class="line">- 方法二</span><br><span class="line">可不可以这样思考，字符串都是连续的字符，所以才有了下面的思路。</span><br><span class="line">思路一：</span><br><span class="line">第一轮：从s1中依次取<span class="number">1</span>个字符，在s2查找，看是否能够找到子串。如果没有一个字符在s2中找到，说明就没有公共子</span><br><span class="line">串，直接退出。如果找到了至少一个公共子串，则很有可能还有更长的公共子串，可以进入下一轮。</span><br><span class="line">第二轮：然后从s1中取连续的<span class="number">2</span>个字符，在s2中查找，看看能否找到公共的子串。如果没找到，说明最大公共子串就是</span><br><span class="line">上一轮的随便的哪一个就行了。如果找到至少一个，则说明公共子串可能还可以再长一些。可以进入下一轮。</span><br><span class="line">改进，只要找到第一轮的公共子串的索引，最长公共子串也是从它开始的，所以以后的轮次都从这些索引位置开始，可</span><br><span class="line">以减少比较的次数。</span><br><span class="line"></span><br><span class="line">思路二：</span><br><span class="line">既然是求最大子串，我先看s1全长作为子串。在s2中搜索，是否返回正常的index，正常就找到了最长子串。没有找</span><br><span class="line">到，把s1按照length<span class="number">-1</span>取多个子串。在s2中搜索，是否能返回正常的index。</span><br><span class="line">注意：不要一次把s1的所有子串生成，用不了，也不要从最短开始，因为题目要最长的。但是也要注意，万一他们的公</span><br><span class="line">共子串就只有一个字符，或者很少字符的，思路一就会占优势。</span><br><span class="line"></span><br><span class="line">s1 = <span class="string">'abcdefg'</span></span><br><span class="line">s2 = <span class="string">'defabcdoabcdeftw'</span></span><br><span class="line">s3 = <span class="string">'1234a'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findit</span><span class="params">(str1,str2)</span>:</span></span><br><span class="line">    count = <span class="number">0</span>   <span class="comment"># 看看效率，计数</span></span><br><span class="line">    length = len(str1)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> sublen <span class="keyword">in</span> range(length,<span class="number">0</span>,<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">for</span> start <span class="keyword">in</span> range(<span class="number">0</span>,length-sublen+<span class="number">1</span>):</span><br><span class="line">            substr = str1[start:start+sublen]</span><br><span class="line">            count += <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> str2.find(substr) &gt; <span class="number">-1</span>:   <span class="comment"># found</span></span><br><span class="line">                print(<span class="string">"count=&#123;&#125;,substrlen=&#123;&#125;"</span>.format(count,sublen))</span><br><span class="line">                <span class="keyword">return</span> substr</span><br><span class="line">            </span><br><span class="line">print(findit(s1,s2))</span><br><span class="line">print(findit(s1,s3))</span><br><span class="line">输出：</span><br><span class="line">count=<span class="number">2</span>,substrlen=<span class="number">6</span></span><br><span class="line">abcdef</span><br><span class="line">count=<span class="number">22</span>,substrlen=<span class="number">1</span></span><br><span class="line">a</span><br></pre></td></tr></table></figure>
 
           
         
@@ -2300,199 +2511,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/11/python算法-插入排序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/11/11/python算法-插入排序/" itemprop="url">
-                  python算法-插入排序
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-11-11 08:19:40 / 修改時間：09:59:30" itemprop="dateCreated datePublished" datetime="2019-11-11T08:19:40+08:00">2019-11-11</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="直接插入排序-Direct-Insertion-Sort"><a href="#直接插入排序-Direct-Insertion-Sort" class="headerlink" title="直接插入排序 Direct Insertion Sort"></a>直接插入排序 Direct Insertion Sort</h3><ul>
-<li>直接插入排序原理<ul>
-<li>在未排序序列中，构建一个子排序序列,直至全部数据排序完成</li>
-<li>将待排序的数，插入到<strong><em>已经排序</em></strong>的序列中合适的位置</li>
-<li>增加一个哨兵，放入待比较值，让它和后面已经排好序的序列比较，找到合适的插入点</li>
-</ul>
-</li>
-</ul>
-<p><img src="/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python插入排序/插入排序1.png" alt=""></p>
-<ul>
-<li><p>初始的0及下面开头的红色数字为哨兵，即待插入值</p>
-</li>
-<li><p>从第二个数字开始排序，即9</p>
-</li>
-<li><p>第一趟，哨兵是9，用1和哨兵比较，1小，哨兵插入，本轮比较结束</p>
-</li>
-<li><p>第二趟，哨兵是8，用9和哨兵比较大于哨兵，9向右移，1和哨兵比较，1小，哨兵插入本轮比较结束</p>
-</li>
-<li><p>以此类推，直至把最后一个数字放到哨兵并比较，插入完成</p>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">m_list = [[<span class="number">1</span>,<span class="number">9</span>,<span class="number">8</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">4</span>,<span class="number">3</span>,<span class="number">2</span>],[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>],[<span class="number">9</span>,<span class="number">8</span>,<span class="number">7</span>,<span class="number">6</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>],[<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>],[<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>]]</span><br><span class="line">nums = [<span class="number">0</span>] + m_list[<span class="number">0</span>]    <span class="comment"># nums为[0,1,9,8,5,6,7,4,3,2]</span></span><br><span class="line"><span class="comment"># print(nums)</span></span><br><span class="line">sentinel,*origin = nums   <span class="comment"># 哨兵位，待比较数字。sentinel为0，origin为[1,9,8,5,6,7,4,3,2]</span></span><br><span class="line"><span class="comment"># print(sentinel)</span></span><br><span class="line"><span class="comment"># print(origin)</span></span><br><span class="line">count_swap = <span class="number">0</span>   <span class="comment"># 计算每轮循环中，与哨兵位比较后要交换的次数</span></span><br><span class="line">count_iter = <span class="number">0</span>   <span class="comment"># 计算从第二个数字到最后一个数字，一共要循环的资源</span></span><br><span class="line">length = len(nums)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>,length):   <span class="comment"># 从第二个数字开始</span></span><br><span class="line">    nums[<span class="number">0</span>] = nums[i]    </span><br><span class="line"><span class="comment"># 放置哨兵，把比较的数字赋值给第一个数字，第一个数字就是哨兵位。如第一次就是把9放到哨兵位。这里的哨兵是在按列表中的数字不停顺序变化的，</span></span><br><span class="line"><span class="comment"># ，第一次是9，之后是8,5,6，一直到最后，如果要比较的数字比哨兵位的数字小，就不动，如果比哨兵位的数字大，就向右移</span></span><br><span class="line">    j = i - <span class="number">1</span>    <span class="comment"># 得出要比较数字的索引位置，下面就要用1和9比较</span></span><br><span class="line">    count_iter += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> nums[j] &gt; nums[<span class="number">0</span>]:    <span class="comment"># 大数右移，找到插入位置。如果要比较的数字比哨兵位的数字大</span></span><br><span class="line">        <span class="keyword">while</span> nums[j] &gt; nums[<span class="number">0</span>]:</span><br><span class="line">            nums[j+<span class="number">1</span>] = nums[j]    <span class="comment"># 依次右移</span></span><br><span class="line">            j -= <span class="number">1</span></span><br><span class="line"><span class="comment"># 如果索引j比哨兵位的数字大，就把索引j向后移一个位置，之后把索引j减1，再进行同样的比较。当8是哨兵位时，9与8比较，因为比8大，就会把9</span></span><br><span class="line"><span class="comment"># 的索引向后移动，之后再用1和哨兵位的8比较，1小于8,那么执行下面的哨兵插入，这时正好插入到了之前9的位置</span></span><br><span class="line">            count_swap += <span class="number">1</span></span><br><span class="line">        nums[j+<span class="number">1</span>] = nums[<span class="number">0</span>]    <span class="comment"># 将哨兵插入，注意插入在右侧要+1</span></span><br><span class="line">print(nums, count_swap, count_iter)</span><br><span class="line">输出：</span><br><span class="line">[<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>] <span class="number">25</span> <span class="number">8</span></span><br><span class="line"><span class="comment"># 可以看到最后一个数字2在哨兵位上。</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>增加一个哨兵位，每轮比较将待比较数放入</li>
-<li>哨兵依次和待比较数的前一个数据比较，大数向右移动，找到哨兵中值的插入位置</li>
-<li>每一轮结束后，得到一个从开始到待比较数位置的一个有序序列</li>
-<li>最好情况，正好是升序排列，比较迭代n-1次</li>
-<li>最差情况，正好是降序排列，比较迭代1,2,…,n-1即n(n-1)/2</li>
-<li>使用两层嵌套循环，时间复杂度O(n^2)</li>
-<li>稳定排序算法</li>
-<li>使用在小规模数据比较</li>
-<li>优化<ul>
-<li>如果比较操作耗时大的话，可以采用二分查找来提高效率，即二分查找插入排序</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2540,7 +2558,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">174</span>
+                    <span class="site-state-item-count">175</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2894,7 +2912,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">134</span>
+                      
+                    
+                    <span class="site-state-item-count">135</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
