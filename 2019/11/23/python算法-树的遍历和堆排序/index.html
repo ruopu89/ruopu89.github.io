@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="二叉树的遍历 遍历：迭代所有元素一遍 树的遍历：对树中所有元素不重复地访问一遍，也称作扫描 广度优先遍历 层序遍历   深度优先遍历 前序遍历 中序遍历 后序遍历   遍历序列：将树中所有元素遍历一遍后，得到的元素的序列。将层次结构转换成了线性结构。 层序遍历 按照树的层次，从第一层开始，自左向右遍历元素 遍历序列 ABCDEFGHI        深度优先遍历 设树的根结点为D，左子树为L，右子">
+<meta name="keywords" content="算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python算法-树的遍历和堆排序">
+<meta property="og:url" content="http://yoursite.com/2019/11/23/python算法-树的遍历和堆排序/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="二叉树的遍历 遍历：迭代所有元素一遍 树的遍历：对树中所有元素不重复地访问一遍，也称作扫描 广度优先遍历 层序遍历   深度优先遍历 前序遍历 中序遍历 后序遍历   遍历序列：将树中所有元素遍历一遍后，得到的元素的序列。将层次结构转换成了线性结构。 层序遍历 按照树的层次，从第一层开始，自左向右遍历元素 遍历序列 ABCDEFGHI        深度优先遍历 设树的根结点为D，左子树为L，右子">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/二叉树遍历1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/前序遍历1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/中序遍历1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/中序遍历2.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/后序遍历1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序大顶堆1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序小顶堆1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树1.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树2.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树3.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树4.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树5.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序构建完全二叉树6.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序排序7.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序排序8.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序排序9.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序排序10.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/堆排序排序11.png">
+<meta property="og:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/总结1.png">
+<meta property="og:updated_time" content="2019-11-24T12:50:49.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python算法-树的遍历和堆排序">
+<meta name="twitter:description" content="二叉树的遍历 遍历：迭代所有元素一遍 树的遍历：对树中所有元素不重复地访问一遍，也称作扫描 广度优先遍历 层序遍历   深度优先遍历 前序遍历 中序遍历 后序遍历   遍历序列：将树中所有元素遍历一遍后，得到的元素的序列。将层次结构转换成了线性结构。 层序遍历 按照树的层次，从第一层开始，自左向右遍历元素 遍历序列 ABCDEFGHI        深度优先遍历 设树的根结点为D，左子树为L，右子">
+<meta name="twitter:image" content="http://yoursite.com/images/python二叉树遍历和堆排序/二叉树遍历1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/23/python算法-树的遍历和堆排序/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python算法-树的遍历和堆排序 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/23/python算法-树的遍历和堆排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python算法-树的遍历和堆排序
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-23 14:43:18" itemprop="dateCreated datePublished" datetime="2019-11-23T14:43:18+08:00">2019-11-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-11-24 20:50:49" itemprop="dateModified" datetime="2019-11-24T20:50:49+08:00">2019-11-24</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><ul>
+<li>遍历：迭代所有元素一遍</li>
+<li>树的遍历：对树中所有元素不重复地访问一遍，也称作扫描</li>
+<li>广度优先遍历<ul>
+<li>层序遍历</li>
+</ul>
+</li>
+<li>深度优先遍历<ul>
+<li>前序遍历</li>
+<li>中序遍历</li>
+<li>后序遍历</li>
+</ul>
+</li>
+<li>遍历序列：将树中所有元素遍历一遍后，得到的元素的序列。将层次结构转换成了线性结构。</li>
+<li>层序遍历<ul>
+<li>按照树的层次，从第一层开始，自左向右遍历元素</li>
+<li>遍历序列<ul>
+<li>ABCDEFGHI</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/二叉树遍历1.png" alt=""></p>
+<ul>
+<li>深度优先遍历<ul>
+<li>设树的根结点为D，左子树为L，右子树为R，且要求L一定在R之前，则有下面几种遍历方式：</li>
+<li>前序遍历，也叫先序遍历或先根遍历，DLR</li>
+<li>中序遍历，也叫中根遍历，LDR</li>
+<li>后序遍历，也叫后根遍历，LRD</li>
+</ul>
+</li>
+<li>前序遍历DLR<ul>
+<li>从根结点开始，先左子树后右子树</li>
+<li>每个子树内部依然是先根结点，再左子树后右子树。递归遍历</li>
+<li>遍历序列<ul>
+<li>A BDGH CEIF</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/前序遍历1.png" alt=""></p>
+<ul>
+<li>中序遍历LDR<ul>
+<li>从根结点的左子树开始遍历，然后是根结点，再右子树</li>
+<li>每个子树内部，也是先左子树，后根结点，再右子树。递归遍历</li>
+<li>遍历序列<ul>
+<li>图1<ul>
+<li>GDHB A IECF</li>
+</ul>
+</li>
+<li>图2<ul>
+<li>GDHB A EICF</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/中序遍历1.png" alt=""></p>
+<p><img src="/images/python二叉树遍历和堆排序/中序遍历2.png" alt=""></p>
+<ul>
+<li>后序遍历LRD<ul>
+<li>先左子树，后右子树，再根结点</li>
+<li>每个子树内部依然是先左子树，后右子树，再根结点。递归遍历</li>
+<li>遍历序列<ul>
+<li>GHDB IEFC A</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/后序遍历1.png" alt=""></p>
+<h3 id="堆排序-Heap-Sort"><a href="#堆排序-Heap-Sort" class="headerlink" title="堆排序 Heap Sort"></a>堆排序 Heap Sort</h3><ul>
+<li>堆 Heap<ul>
+<li>堆是一个完全二叉树</li>
+<li>每个非叶子结点都要大于或者等于其左右孩子结点的值称为大顶堆</li>
+<li>每个非叶子结点都要小于或者等于其左右孩子结点的值称为小顶堆</li>
+<li>根结点一定是大顶堆中的最大值，一定是小顶堆中的最小值</li>
+</ul>
+</li>
+<li>大顶堆<ul>
+<li>完全二叉树的每个非叶子结点都要大于或者等于其左右孩子结点的值称为大顶堆</li>
+<li>根结点一定是大顶堆中的最大值</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序大顶堆1.png" alt=""></p>
+<ul>
+<li>小顶堆<ul>
+<li>完全二叉树的每个叶子结点都要小于或者等于其左右孩子结点的值称为小顶堆</li>
+<li>根结点一定是小顶堆中的最小值</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序小顶堆1.png" alt=""></p>
+<ul>
+<li>1、构建完全二叉树<ul>
+<li>待排序数字为30,20,80,40,50,10,60,70,90</li>
+<li>构建一个完全二叉树存放数据，并根据性质5对元素编号，放入顺序的数据结构中</li>
+<li>性质5<ul>
+<li>如果有一棵n个结点的完全二叉树(深度为性质4)，结点按照层序编号，如下图</li>
+<li>如果i=1，则结点i是二叉树的根，无双新；如果i&gt;1，则其双亲是int(i/2)，向下取整。就是子结点的编号整除2得到的就是父结点的编号。父结点如果是i，那么左孩子结点就是2i，右孩子结点就是2i+1</li>
+<li>如果2i&gt;n，则结点i无左孩子，即结点i为叶子结点；否则其左孩子结点存在编号为2i</li>
+<li>如果2i+1&gt;n，则结点i无右孩子，注意这里并不能说明结点i没有左孩子；否则右孩子结点存在编号为2i+1</li>
+</ul>
+</li>
+<li>构造一个列表为[0,30,20,80,40,50,10,60,70,90]</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树1.png" alt=""></p>
+<ul>
+<li>2、构建大顶堆–核心算法<ul>
+<li>度数为2的结点A，如果它的左右孩子结点的最大值比它大的，将这个最大值和该结点<strong><em>交换</em></strong></li>
+<li>度数为1的结点A，如果它的左孩子的值大于它，则<strong><em>交换</em></strong></li>
+<li>如果结点A被交换到新的位置，还需要和其孩子结点重复上面的过程</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树2.png" alt=""></p>
+<ul>
+<li>2、构建大顶堆–起点结点的选择<ul>
+<li>从完全二叉树的最后一个结点的双新结点开始，即最后一层的最右边叶子结点的父结点开始</li>
+<li>结点数为n，则起始结点的编号为n//2(性质5)</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树3.png" alt=""></p>
+<ul>
+<li>2、构建大顶堆–下一个结点的选择<ul>
+<li>从起始结点开始向左找其同层结点，到头后再从上一层的最右边结点开始继续向左逐个查找，直至根结点</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树4.png" alt=""></p>
+<ul>
+<li>2、大顶堆的目标<ul>
+<li>确保每个结点的都比左右结点的值大</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树5.png" alt=""></p>
+<ul>
+<li>3、排序<ul>
+<li>将大顶堆根结点这个最大值和最后一个叶子结点交换，那么最后一个叶子结点就是最大值，将这个叶子结点排除在待排序结点之外</li>
+<li>从根结点开始（新的根结点），重新调整为大顶堆后，重复上一步</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序构建完全二叉树6.png" alt=""></p>
+<ul>
+<li>3、排序<ul>
+<li>堆顶和最后一个结点交换，并排除最后一个结点</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序排序7.png" alt=""></p>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序排序8.png" alt=""></p>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序排序9.png" alt=""></p>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序排序10.png" alt=""></p>
+<p><img src="/images/python二叉树遍历和堆排序/堆排序排序11.png" alt=""></p>
+<ul>
+<li>算法实现</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 堆排序</span></span><br><span class="line"><span class="comment">## 辅助代码，让每次挪动数字后，都打印出现在的二叉树状况，帮助判断挪动是否正确。有一个树，打印下面的样子</span></span><br><span class="line"><span class="comment">### origin = [30,20.80,40,50,10,60,70,90] 数据存在列表中，打印成下面的样子</span></span><br><span class="line"><span class="comment">#          30</span></span><br><span class="line"><span class="comment">#    20          80</span></span><br><span class="line"><span class="comment">#  40   50    10     60</span></span><br><span class="line"><span class="comment">#70  90</span></span><br><span class="line"><span class="comment"># 打印要求，严格对齐，就像一棵二叉树一样</span></span><br><span class="line"><span class="comment"># 思路</span></span><br><span class="line"><span class="comment"># 第一行取1个打印，第二行取2个，第三行取3个，以此类推。如何对齐且不重叠？</span></span><br><span class="line"><span class="comment"># 两种方法，第一种为同学实现，第二个是老师实现</span></span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="comment"># 居中对齐方案</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_tree</span><span class="params">(array,unit_width=<span class="number">2</span>)</span>:</span></span><br><span class="line">    length = len(array)  <span class="comment"># 9</span></span><br><span class="line">    depth = math.ceil(math.log2(length + <span class="number">1</span>))   <span class="comment"># 4</span></span><br><span class="line">    </span><br><span class="line">    index = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    width = <span class="number">2</span> ** depth - <span class="number">1</span>   <span class="comment"># 行宽，最深的行 15</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(depth):   <span class="comment"># 0 1 2 3</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">2</span> ** i):   <span class="comment"># 0:0 1:0,1 2:0,1,2,3 3:0~7</span></span><br><span class="line">            <span class="comment"># 居中打印，后面追加一个空格</span></span><br><span class="line">            print(<span class="string">'&#123;:^&#123;&#125;&#125;'</span>.format(array[index],width * unit_width),end=<span class="string">' '</span> * unit_width)</span><br><span class="line">            index += <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> index &gt;= length:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        width = width // <span class="number">2</span>   <span class="comment"># 居中打印宽度减半</span></span><br><span class="line">        print()   <span class="comment"># 控制换行</span></span><br><span class="line"><span class="comment"># 测试</span></span><br><span class="line">print_tree([x + <span class="number">1</span> <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">29</span>)])</span><br><span class="line"></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="comment"># 投影栅格实现</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_tree</span><span class="params">(array)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    		前空格			元素间</span></span><br><span class="line"><span class="string">    1		  7				0</span></span><br><span class="line"><span class="string">    2		  3				7</span></span><br><span class="line"><span class="string">    3		  1				3</span></span><br><span class="line"><span class="string">    4		  0				1</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    index = <span class="number">1</span></span><br><span class="line">    depth = math.ceil(math.log2(len(array)))  </span><br><span class="line"><span class="comment"># 因为使用时前面补0 了，不然应该是math.ceil(math.log2(len(array)+1))</span></span><br><span class="line">	sep = <span class="string">'  '</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(depth):</span><br><span class="line">        offset = <span class="number">2</span> ** i</span><br><span class="line">        print(sep * (<span class="number">2</span> ** (depth - i - <span class="number">1</span>) - <span class="number">1</span>),end=<span class="string">''</span>)</span><br><span class="line">        line = array[index:index + offset]</span><br><span class="line">        <span class="keyword">for</span> j,x <span class="keyword">in</span> enumerate(line):</span><br><span class="line">            print(<span class="string">"&#123;:&gt;&#123;&#125;&#125;"</span>.format(x,len(sep)),end=<span class="string">''</span>)</span><br><span class="line">            interval = <span class="number">0</span> <span class="keyword">if</span> i == <span class="number">0</span> <span class="keyword">else</span> <span class="number">2</span> ** (depth - i) - <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> j &lt; len(line) - <span class="number">1</span>:</span><br><span class="line">                print(sep * interval,end=<span class="string">''</span>)</span><br><span class="line">                </span><br><span class="line">        index += offset</span><br><span class="line">        print()</span><br><span class="line">        </span><br><span class="line">print_tree([<span class="number">0</span>,<span class="number">30</span>,<span class="number">20</span>,<span class="number">80</span>,<span class="number">40</span>,<span class="number">50</span>,<span class="number">10</span>,<span class="number">60</span>,<span class="number">70</span>,<span class="number">90</span>,<span class="number">22</span>])</span><br><span class="line">print_tree([<span class="number">0</span>,<span class="number">30</span>,<span class="number">20</span>,<span class="number">80</span>,<span class="number">40</span>,<span class="number">50</span>,<span class="number">10</span>,<span class="number">60</span>,<span class="number">70</span>,<span class="number">90</span>,<span class="number">22</span>,<span class="number">33</span>,<span class="number">44</span>,<span class="number">55</span>,<span class="number">66</span>,<span class="number">77</span>])</span><br><span class="line">print_tree([<span class="number">0</span>,<span class="number">30</span>,<span class="number">20</span>,<span class="number">80</span>,<span class="number">40</span>,<span class="number">50</span>,<span class="number">10</span>,<span class="number">60</span>,<span class="number">70</span>,<span class="number">90</span>,<span class="number">22</span>,<span class="number">33</span>,<span class="number">44</span>,<span class="number">55</span>,<span class="number">66</span>,<span class="number">77</span>,<span class="number">88</span>,<span class="number">99</span>,<span class="number">11</span>])</span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="comment"># 堆调整</span></span><br><span class="line"><span class="comment"># 核心算法</span></span><br><span class="line"><span class="comment"># 对于堆排序的核心算法就是堆结点的调整</span></span><br><span class="line"><span class="comment"># 1. 度数为2的结点A，如果它的左右孩子结点的最大值比它大的，将这个最大值和该结点交换</span></span><br><span class="line"><span class="comment"># 2. 度数为1的结点A，如果它的左孩子的值大于它，则交换</span></span><br><span class="line"><span class="comment"># 3. 如果结点A被交换到新的位置，还需要和其孩子结点重复上面的过程</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Heap Sort</span></span><br><span class="line"><span class="comment"># 为了和编码对应，增加一个无用的0在首位</span></span><br><span class="line"><span class="comment"># origin = [0,50,10,90,30,70,40,80,60,20]</span></span><br><span class="line">origin = [<span class="number">0</span>,<span class="number">30</span>,<span class="number">20</span>,<span class="number">80</span>,<span class="number">40</span>,<span class="number">50</span>,<span class="number">10</span>,<span class="number">60</span>,<span class="number">70</span>,<span class="number">90</span>]</span><br><span class="line"></span><br><span class="line">total = len(origin) - <span class="number">1</span>   <span class="comment"># 初始待排序元素个数，即n</span></span><br><span class="line">print(origin)</span><br><span class="line">print_tree(origin)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_adjust</span><span class="params">(n,i,array:list)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    调整当前结点（核心算法）</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    调整的结点的起点在n//2，保证所有调整的结点都有孩子结点</span></span><br><span class="line"><span class="string">    :param n: 待比较数个数</span></span><br><span class="line"><span class="string">    :param i: 当前结点的下标</span></span><br><span class="line"><span class="string">    :param array: 待排序数据</span></span><br><span class="line"><span class="string">    :return: None</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">while</span> <span class="number">2</span> * i &lt;= n:</span><br><span class="line">        <span class="comment"># 孩子结点判断 2i为左孩子，2i+1为右孩子</span></span><br><span class="line">        lchile_index = <span class="number">2</span> * i</span><br><span class="line">        <span class="comment"># 先假定左孩子大，如果存在右孩子且大则最大孩子索引就是右孩子</span></span><br><span class="line">        max_child_index = lchile_index   <span class="comment"># n=2i</span></span><br><span class="line">        <span class="keyword">if</span> n &gt; lchile_index <span class="keyword">and</span> array[lchile_index + <span class="number">1</span>] &gt; array[lchile_index]:   </span><br><span class="line">        <span class="comment"># n&gt;2i说明还有右孩子</span></span><br><span class="line">        	max_child_index = lchile_index + <span class="number">1</span>   <span class="comment"># n=2i+1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 和子树的根结点比较</span></span><br><span class="line">        <span class="keyword">if</span> array[max_child_index] &gt; array[i]:</span><br><span class="line">            array[i],array[max_child_index] = array[max_child_index],array[i]</span><br><span class="line">            i = max_child_index   <span class="comment"># 被交换后，需要判断是否还需要调整</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="comment"># print_tree(array)</span></span><br><span class="line">        </span><br><span class="line">heap_adjust(total,total//<span class="number">2</span>, origin)</span><br><span class="line">print(origin)</span><br><span class="line">print_tree(origin)</span><br><span class="line"><span class="comment"># 到目前为止也只是解决了单个结点的调整，下面要使用循环来依次解决比起始结点编号小的结点。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建大顶堆</span></span><br><span class="line"><span class="comment"># 起始的选择</span></span><br><span class="line"><span class="comment"># 从最下层最右边叶子结点的父结点开始，由于构造了一个前置的0，所以编号和列表的索引正好重合。但是，元素个数等于长度减1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下一个结点</span></span><br><span class="line"><span class="comment"># 按照二叉树性质5编号的结点，从起点开始找编号逐个递减的结点，直到编号1</span></span><br><span class="line"><span class="comment"># 构建大顶堆、大根堆</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_heap</span><span class="params">(total,array:list)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(tatal//<span class="number">2</span>,<span class="number">0</span>,<span class="number">-1</span>):</span><br><span class="line">        heap_adjust(total,i,array)</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line">print_tree(max_heap(total,origin))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 思考：</span></span><br><span class="line"><span class="comment">#          90</span></span><br><span class="line"><span class="comment">#    70          80</span></span><br><span class="line"><span class="comment">#  40   50    10     60</span></span><br><span class="line"><span class="comment">#20  30</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 大顶堆有没有可能是这样</span></span><br><span class="line"><span class="comment">#          90</span></span><br><span class="line"><span class="comment">#    60          80</span></span><br><span class="line"><span class="comment">#  40   50    10     70</span></span><br><span class="line"><span class="comment">#20  30</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 有没有可能这样</span></span><br><span class="line"><span class="comment">#          90</span></span><br><span class="line"><span class="comment">#    50          80</span></span><br><span class="line"><span class="comment">#  40   10    60     70</span></span><br><span class="line"><span class="comment">#20  30</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 有没有可能这样</span></span><br><span class="line"><span class="comment">#          90</span></span><br><span class="line"><span class="comment">#    50          70</span></span><br><span class="line"><span class="comment">#  40   10    60     80</span></span><br><span class="line"><span class="comment">#20  30</span></span><br><span class="line"><span class="comment"># 不可以是这样，70下有80，比70大，上面几种是有可能的，所以是不稳定的</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 结论</span></span><br><span class="line"><span class="comment"># 最大的一定在第一层，第二层一定有一个次大的，也就是80</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 排序</span></span><br><span class="line"><span class="comment"># 思路：</span></span><br><span class="line"><span class="comment"># 1. 每次都要让堆顶的元素和最后一个结点交换，然后排除最后一个元素，形成一个新的被破坏的堆</span></span><br><span class="line"><span class="comment"># 2. 让它重新调整，调整后，堆顶一定是最大的元素</span></span><br><span class="line"><span class="comment"># 3. 再次重复第1、2步直至剩余一个元素</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(total,array:list)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> total &gt; <span class="number">1</span>:</span><br><span class="line">        array[<span class="number">1</span>],array[total] = array[total],array[<span class="number">1</span>]   <span class="comment"># 堆顶和最后一个结点交换</span></span><br><span class="line">        total -= <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        heap_adjust(total,<span class="number">1</span>,array)</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line">print_tree(sort(total,origin))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 改进</span></span><br><span class="line"><span class="comment"># 如果最后剩余2个元素的时候，如果后一个结点比堆顶大，就不用调整了</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(total,array:list)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> total &gt; <span class="number">1</span>:</span><br><span class="line">        array[<span class="number">1</span>],array[total] = array[total],array[<span class="number">1</span>]   <span class="comment"># 堆顶和最后一个结点交换</span></span><br><span class="line">        total -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> total == <span class="number">2</span> <span class="keyword">and</span> array[total] &gt;= array[total<span class="number">-1</span>]:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        heap_adjust(total,<span class="number">1</span>,array)</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line">print_tree(sort(total,origin))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 思考</span></span><br><span class="line"><span class="comment"># 如果有n个结点全部是90,能在哪些地方优化？是否可以假设，如果在某一个趟排序中，如果最后一个叶子结点正好</span></span><br><span class="line"><span class="comment"># 是堆顶，就代表树中元素都相等？</span></span><br><span class="line"><span class="comment"># 反例</span></span><br><span class="line"><span class="comment">#     90</span></span><br><span class="line"><span class="comment">#   80  90</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 完整代码</span></span><br><span class="line"><span class="comment"># 如果有需要，请自行将算法函数封装成类</span></span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_tree</span><span class="params">(array)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">        		前空格			元素间</span></span><br><span class="line"><span class="string">    1		  7				0</span></span><br><span class="line"><span class="string">    2		  3				7</span></span><br><span class="line"><span class="string">    3		  1				3</span></span><br><span class="line"><span class="string">    4		  0				1</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    index = <span class="number">1</span></span><br><span class="line">    depth = math.ceil(math.log2(len(array)))   </span><br><span class="line">    <span class="comment"># 因为补0了，不然应该是math.ceil(math.log2(len(array)+1))</span></span><br><span class="line">    sep = <span class="string">'  '</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(depth):</span><br><span class="line">        offset = <span class="number">2</span> ** i</span><br><span class="line">        print(sep * (<span class="number">2</span> ** (depth - i <span class="number">-1</span>) - <span class="number">1</span>),end=<span class="string">''</span>)</span><br><span class="line">        line = array[index:index + offset]</span><br><span class="line">        <span class="keyword">for</span> j,x <span class="keyword">in</span> enumerate(line):</span><br><span class="line">            print(<span class="string">"&#123;:&#123;&#125;&#125;"</span>.format(x,len(sep)),end=<span class="string">''</span>)</span><br><span class="line">            interval = <span class="number">0</span> <span class="keyword">if</span> i == <span class="number">0</span> <span class="keyword">else</span> <span class="number">2</span> ** (depth - i) - <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> j &lt; len(line) - <span class="number">1</span>:</span><br><span class="line">                print(sep * interval,end=<span class="string">''</span>)</span><br><span class="line">                </span><br><span class="line">        index += offset</span><br><span class="line">        print()</span><br><span class="line">        </span><br><span class="line"><span class="comment"># Heap Sort</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了和编码对应，增加一个无用的0在首位</span></span><br><span class="line"><span class="comment"># origin = [0,50,10,90,30,70,40,80,60,20]</span></span><br><span class="line">origin = [<span class="number">0</span>,<span class="number">50</span>,<span class="number">10</span>,<span class="number">90</span>,<span class="number">30</span>,<span class="number">70</span>,<span class="number">40</span>,<span class="number">80</span>,<span class="number">60</span>,<span class="number">20</span>]</span><br><span class="line"></span><br><span class="line">total = len(origin) - <span class="number">1</span>   <span class="comment"># 初始待排序元素个数，即n</span></span><br><span class="line">print(origin)</span><br><span class="line">print_tree(origin)</span><br><span class="line">print(<span class="string">"="</span>*<span class="number">50</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_adjust</span><span class="params">(n,i,array:list)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    调整当前结点（核心算法）</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    调整的结点的起点在n//2，保证所有调整的结点都有孩子结点</span></span><br><span class="line"><span class="string">    :param n:待比较数个数</span></span><br><span class="line"><span class="string">    :param i: 当前结点的下标</span></span><br><span class="line"><span class="string">    :param array: 待排序数据</span></span><br><span class="line"><span class="string">    :return: None</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">while</span> <span class="number">2</span> * i &lt;= n:</span><br><span class="line">        <span class="comment"># 孩子结点判断2i为左孩子，2i+1为右孩子</span></span><br><span class="line">        lchile_index = <span class="number">2</span> * i</span><br><span class="line">        max_chile_index = lchile_index   <span class="comment"># n=2i</span></span><br><span class="line">        <span class="keyword">if</span> n &gt; lchile_index <span class="keyword">and</span> array[lchile_index + <span class="number">1</span>] &gt; array[lchile_index]:</span><br><span class="line">            <span class="comment"># n &gt; 2i说明还有右孩子</span></span><br><span class="line">            max_child_index = lchile_index + <span class="number">1</span>   <span class="comment"># n=2i+1</span></span><br><span class="line">            </span><br><span class="line">        <span class="comment"># 和子树的根结点比较</span></span><br><span class="line">        <span class="keyword">if</span> array[max_child_index] &gt; array[i]:</span><br><span class="line">            array[i],array[max_child_index] = array[max_child_index],array[i]</span><br><span class="line">            i = max_child_index   <span class="comment"># 被交换后，需要判断是否还需要调整</span></span><br><span class="line">            </span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">     <span class="comment"># print_tree(array)</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 构建大顶椎、大根堆</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">max_heap</span><span class="params">(total,array:list)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(total//<span class="number">2</span>,<span class="number">0</span>,<span class="number">-1</span>):</span><br><span class="line">        heap_adjust(total,i,array)</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line">print_tree(max_heap(total,origin))</span><br><span class="line">print(<span class="string">"="</span>*<span class="number">50</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 排序</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(total,array:list)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> total &gt; <span class="number">1</span>:</span><br><span class="line">        array[<span class="number">1</span>],array[total] = array[total],array[<span class="number">1</span>]   <span class="comment"># 堆顶和最后一个结点交换</span></span><br><span class="line">        total -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> total == <span class="number">2</span> <span class="keyword">and</span> array[total] &gt;= array[total<span class="number">-1</span>]:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        heap_adjust(total,<span class="number">1</span>,array)</span><br><span class="line">    <span class="keyword">return</span> array</span><br><span class="line"></span><br><span class="line">print_tree(sort(total,origin))</span><br><span class="line">print(origin)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>总结<ul>
+<li>是利用堆性质的一种选择排序，在堆顶选出最大值或最小值</li>
+<li>时间复杂度<ul>
+<li>堆排序的时间复杂度为O(nlogn)</li>
+<li>由于堆排序对原始记录的排序状态并不敏感，因此它无论是最好、最坏和平均时间复杂度均为O(nlogn)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python二叉树遍历和堆排序/总结1.png" alt=""></p>
+<ul>
+<li>总结<ul>
+<li>空间复杂度<ul>
+<li>只是使用了一个交换用的空间，空间复杂度为O(1)</li>
+</ul>
+</li>
+<li>稳定性<ul>
+<li>不稳定的排序算法</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/21/一篇文章彻底弄懂Base64编码原理-转/" rel="next" title="一篇文章彻底弄懂Base64编码原理(转)">
+                <i class="fa fa-chevron-left"></i> 一篇文章彻底弄懂Base64编码原理(转)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">176</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">135</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#二叉树的遍历"><span class="nav-number">1.</span> <span class="nav-text">二叉树的遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆排序-Heap-Sort"><span class="nav-number">2.</span> <span class="nav-text">堆排序 Heap Sort</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

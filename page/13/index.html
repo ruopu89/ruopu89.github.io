@@ -350,6 +350,202 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/27/docker部署-Nexus3-x使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/27/docker部署-Nexus3-x使用/" itemprop="url">
+                  docker部署-Nexus3.x使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-11-27 08:48:11" itemprop="dateCreated datePublished" datetime="2018-11-27T08:48:11+08:00">2018-11-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2018-11-28 14:37:42" itemprop="dateModified" datetime="2018-11-28T14:37:42+08:00">2018-11-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ccjd:~# docker run -d --name nexus3 --restart=always -p 8081:8081 -p 8082:8082 --mount src=nexus-data,target=/nexus-data sonatype/nexus3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在后台运行容器，名字叫nexus3，运行了一个restart策略为always的nexus3容器，暴露docker的8081端口为服务器的8081端口，挂载本地的nexus-data目录到容器的/nexus-data目录（这会在本地的/var/lib/docker/volumes中自动创建一个nexus-data目录，在容器中自动创建/nexus-data目录），镜像使用sonatype/nexus3。</span></span><br><span class="line">root@ccjd:~# docker inspect --format '&#123;&#123; .NetworkSettings.IPAddress &#125;&#125;' 48b7fb09c1f8</span><br><span class="line">172.17.0.2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用此命令获取docker的IP地址</span></span><br></pre></td></tr></table></figure>
+<h3 id="docker命令的–restart选项"><a href="#docker命令的–restart选项" class="headerlink" title="docker命令的–restart选项"></a>docker命令的–restart选项</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 运行容器时使用--restart参数可以指定一个restart策略，来指示在退出时容器应该如何重启或不应该重启。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当容器启用restart策略时，将会在docker ps显示Up或者Restarting状态。也可以使用docker events命令来生效restart策略。</span></span><br><span class="line">docker支持如下restart策略：</span><br><span class="line"></span><br><span class="line">* no – 容器退出时不要自动重启。这个是默认值。</span><br><span class="line">* on-failure[:max-retries] – 只在容器以非0状态码退出时重启。可选的，可以退出docker daemon尝试重启容器的次数。</span><br><span class="line">* always – 不管退出状态码是什么始终重启容器。当指定always时，docker daemon将无限次数地重启容器。容器也会在daemon启动时尝试重启，不管容器当时的状态如何。</span><br><span class="line">* unless-stopped – 不管退出状态码是什么始终重启容器，不过当daemon启动时，如果容器之前已经为停止状态，不要尝试启动它。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在每次重启容器之前，不断地增加重启延迟[上一次重启的双倍延迟，从100毫秒开始]来防止影响服务器。这意味着daemon将等待100ms,然后200 ms, 400, 800, 1600等等，直到超过on-failure限制，或执行docker stop或docker rm -f。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果容器重启成功[容器启动后并运行至少10秒]，然后delay重置为默认的100ms。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 你可以使用on-failure策略指定docker尝试重启容器的最大次数。默认下docker将无限次数重启容器。可以通过docker inspect来查看已经尝试重启容器了多少次。例如，获取容器“my-container”的重启次数:</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">"&#123;&#123; .RestartCount &#125;&#125;"</span> my-container</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2</span></span><br><span class="line"></span><br><span class="line">或者获取上一次容器重启时间：</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker inspect -f <span class="string">"&#123;&#123; .State.StartedAt &#125;&#125;"</span> my-container</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2015-03-04T23:47:07.691840179Z</span></span><br><span class="line"></span><br><span class="line">* 示例</span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --restart=always redis</span></span><br><span class="line">这运行了一个restart策略为always的redis容器，以使得容器退出时,docker将重启它。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker run --restart=on-failure:10 redis</span></span><br><span class="line">这个运行了一个restart策略为on-failure,最大重启次数为10的redis容器。如果redis以非0状态退出连续退出超过10次，那么docker将中断尝试重启这个容器。只有on-failure策略支持设置最大重启次数限制。</span><br></pre></td></tr></table></figure>
+<h3 id="配置docker仓库"><a href="#配置docker仓库" class="headerlink" title="配置docker仓库"></a>配置docker仓库</h3><blockquote>
+<p>Nexus3 提供了的3种类型的Docker仓库，前两者都可以创建多个仓库，最后一个则可以将他们全部聚合到一个URL来访问。</p>
+<ul>
+<li>docker (hosted): 自托管</li>
+<li>docker (proxy): 代理</li>
+<li>docker (group): 聚合</li>
+</ul>
+</blockquote>
+<h4 id="hosted类型"><a href="#hosted类型" class="headerlink" title="hosted类型"></a>hosted类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 用浏览器打开192.168.0.198:8081--&gt;点击右上角登录--&gt;点击页面上方的齿轮标志--&gt;点击左侧的Repository中的Bolb Stores创建一个存储块--&gt;点击左侧Repositories--&gt;Create repository--&gt;docker(hosted)--&gt;输入名称；勾选Online，这个开关可以设置这个Docker repo是在线还是离线；选择HTTP并设置创建时用到的8082端口，这是在命令行连接时要用到的端口；勾选Force basic authentication，这样的话就不允许匿名访问了，执行docker pull或 docker push之前，都要先登录：docker login；勾选Docker Registry API Support，Docker registry默认使用的是API v2, 但是为了兼容性，我们可以勾选启用API v1。Storage选择之前创建的存储块设备；Hosted使用默认的Allow redeploy；选择左侧的Security中的Realms，将Docker Bearer Token Realm加入到右侧的Active框中</span><br><span class="line">2. 使用本机的ubuntu16.04测试</span><br><span class="line">root@ccjd:~# vim /lib/systemd/system/docker.service</span><br><span class="line">	[Service]</span><br><span class="line">	...</span><br><span class="line">	ExecStart=/usr/bin/dockerd --insecure-registry 192.168.0.198:8082 -H unix://</span><br><span class="line">	...</span><br><span class="line"><span class="meta">	#</span><span class="bash"> 加入--insecure-registry 192.168.0.198:8082，这里加入的地址必须是宿主机的地址，测试发现如果添加的是docker容器的172地址，在认证时还是会提示<span class="string">"Error response from daemon: Get https://172.17.0.2:8082/v2/: http: server gave HTTP response to HTTPS client"</span></span></span><br><span class="line">root@ccjd:~# systemctl daemon-reload </span><br><span class="line">root@ccjd:~# systemctl restart docker</span><br><span class="line">root@ccjd:~# docker login 192.168.0.198:8082 -u admin -p admin123</span><br><span class="line">WARNING! Using --password via the CLI is insecure. Use --password-stdin.</span><br><span class="line">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.</span><br><span class="line">Configure a credential helper to remove this warning. See</span><br><span class="line">https://docs.docker.com/engine/reference/commandline/login/#credentials-store</span><br><span class="line"></span><br><span class="line">Login Succeeded</span><br><span class="line"><span class="meta">#</span><span class="bash"> 出现Login Succeeded就表示成功了</span></span><br><span class="line">root@ccjd:~# docker tag centos 192.168.0.198:8082/centos</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给现有的centos镜像打一个标签叫192.168.0.198:8082/centos</span></span><br><span class="line">root@ccjd:~# docker image ls</span><br><span class="line">REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.0.198:8082/centos   latest              75835a67d134        6 weeks ago         200MB</span><br><span class="line">centos                      latest              75835a67d134        6 weeks ago         200MB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看已有了新的镜像</span></span><br><span class="line">root@ccjd:~# docker push 192.168.0.198:8082/centos</span><br><span class="line">The push refers to repository [192.168.0.198:8082/centos]</span><br><span class="line">f972d139738d: Pushed </span><br><span class="line">latest: digest: sha256:dc29e2bcceac52af0f01300402f5e756cc8c44a310867f6b94f5f7271d4f3fec size: 529</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将镜像推送到本地仓库</span></span><br></pre></td></tr></table></figure>
+<h4 id="proxy类型"><a href="#proxy类型" class="headerlink" title="proxy类型"></a>proxy类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. 用浏览器打开192.168.0.198:8081--&gt;点击右上角登录--&gt;点击页面上方的齿轮标志--&gt;点击左侧的Repository中的Bolb Stores创建一个存储块。</span><br><span class="line">2. 打开左侧的Repositories--&gt;Create replsitory--&gt;docker(proxy)--&gt;自定义Name；勾选Online；设置http端口；不勾选Force basic authentication；勾选Docker Registry API Support；Remote Storage使用阿里云的加速器地址；Docker Index使用Use proxy registry(specified above)；Storage使用创建的存储块</span><br><span class="line"><span class="meta">#</span><span class="bash"> 勾选Force basic authentication后，proxy仓库的状态会显示在线-正在连接。但下载镜像后状态也不会改变。如果不勾选，下载镜像后会显示在线-远程可用</span></span><br><span class="line">3. 配置</span><br><span class="line">root@ccjd:~# vim /etc/docker/daemon.json</span><br><span class="line">    &#123;</span><br><span class="line">            "registry-mirrors":[</span><br><span class="line">                    "http://192.168.0.198:8083"</span><br><span class="line">            ]</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 改为内部仓库的地址</span></span><br><span class="line">4. 测试</span><br><span class="line">root@ccjd:~# docker pull debian</span><br><span class="line">5. 用浏览器打开192.168.0.198:8081后，点击上面的盒子图标，在左侧的Browse中选择创建的proxy存储块，可以看到我们下载的镜像，这是将镜像持久化存储在块中了。之后如果下载相同的镜像，可以从私有仓库中直接下载。</span><br></pre></td></tr></table></figure>
+<h4 id="group类型"><a href="#group类型" class="headerlink" title="group类型"></a>group类型</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1. 创建存储块--&gt;创建group类型库</span><br><span class="line">2. 这里需要注意，在三种类型中都不再选择"Docker Registry API支持"，并修改配置文件，如下：</span><br><span class="line">root@ccjd:~# vim /etc/docker/daemon.json </span><br><span class="line">    &#123;</span><br><span class="line">            "registry-mirrors":["http://192.168.0.130:8083"],</span><br><span class="line">            "insecure-registries":["192.168.0.130:8083","192.168.0.130:8082"],</span><br><span class="line">            "disable-legacy-registry":true</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里第一行定义了group类型的仓库，第二行定义了两个地址为安全地址，可以不用https连接，最后一行定义了关闭<span class="string">"Docker v1 API"</span>，这样就不用在定义三种类型时选择启用Docker v1 API了。</span></span><br><span class="line">3. 测试发现，如果在group类型中一次性加入hosted和proxy类型的两个存储库，那么pull镜像时，proxy类型的库中就不会有反应，去除了hosted类型的库后就可以了。之后再将hosted类型的库加上也没有问题。</span><br><span class="line">4. 官方推荐配置两个Connectors端口，一个配置在docker(group)用来访问所有库，搜索和下载images(group下包含proxy，所以创建proxy仓库的时候可以不设置Connectors-https端口)，另一个配置在docker(hosted)用来push自己的images，使用docker(group)实现搜索和下载images。</span><br><span class="line">The recommended minimal configuration requires one port for a Docker repository group used for read access to all repositories and one port for each hosted Docker repository that will receive push events from your users.</span><br><span class="line">5. 测试</span><br><span class="line">docker login 192.168.0.130:8083 -u admin -p admin123</span><br><span class="line">docker pull centos</span><br><span class="line">再次查看nexus3页面时，在proxy存储块中应该有centos镜像，之后再下载时就可以从私有库中下载了。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面为三种类型库的配置截图</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/nexus3/dockerblock.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerhosted1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerhosted2.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy2.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockerproxy3.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockergroup1.jpg" alt=""></p>
+<p><img src="/images/nexus3/dockergroup2.jpg" alt=""></p>
+<h3 id="配置yum仓库"><a href="#配置yum仓库" class="headerlink" title="配置yum仓库"></a>配置yum仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">使用nexus3来管理yum仓库相对简单，首先创建存储块，这里共创建了6个，有5个是给每个不同的库使用的，1个是给组用的。之后创建5个不同的proxy类型库，每个库都指向不同的yum源，最后创建一个组来管理这5个库。yum源地址如下：</span><br><span class="line">http://mirrors.aliyun.com/centos/7/os/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/updates/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/extras/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/centosplus/x86_64</span><br><span class="line">http://mirrors.aliyun.com/centos/7/contrib/x86_64</span><br></pre></td></tr></table></figure>
+<p><img src="/images/nexus3/yumblock.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumRepositories.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumproxy1.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumproxy2.jpg" alt=""></p>
+<p><img src="/images/nexus3/yumgroup.jpg" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/26/ubuntu16-04配置IP地址/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2195,178 +2391,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/nc命令使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/19/nc命令使用/" itemprop="url">
-                  nc命令使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-11-19 10:02:36" itemprop="dateCreated datePublished" datetime="2018-11-19T10:02:36+08:00">2018-11-19</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2018-12-25 10:22:37" itemprop="dateModified" datetime="2018-12-25T10:22:37+08:00">2018-12-25</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络/" itemprop="url" rel="index"><span itemprop="name">网络</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="nc命令使用方法"><a href="#nc命令使用方法" class="headerlink" title="nc命令使用方法"></a>nc命令使用方法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line">* 将nc命令当telnet使用</span><br><span class="line">语法：</span><br><span class="line">nc -nv IP PORT</span><br><span class="line">例：</span><br><span class="line">mtr 202.106.0.20</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用mtr命令追踪一下路由</span></span><br><span class="line">nc -nv 123.125.50.29 110</span><br><span class="line"><span class="meta">#</span><span class="bash"> -n表示不使用DNS解析(不建议在nc后使用域名)；-v表示显示详细信息。连接163邮箱服务器。进入后可以使用一些命令，但识别的都是base64加密后的数据</span></span><br><span class="line">base64</span><br><span class="line">	zheng.yao@ccgoldenet.com</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输入base64命令后按回车，之后等待输入数据，输入完成后按回车再按Ctrl+d结束，就会产生一个base64编码后的数据</span></span><br><span class="line">nc -vn 123.125.50.138 25</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接163的smtp服务器。</span></span><br><span class="line">nc -vn 1.1.1.1 80</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接后都会提示端口的状态，如open表示打开状态</span></span><br><span class="line">	head /</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入后，可以用head请求头信息</span></span><br><span class="line"></span><br><span class="line">* 使用NC传输文本信息</span><br><span class="line">A：nc -l -p 333</span><br><span class="line"><span class="meta">#</span><span class="bash"> -l(listen)表示要监听端口，-p指定端口号。这可以起到一个服务端的功能</span></span><br><span class="line">B：nc -nv 1.1.1.1 333</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接后，这两台主机就可以聊天了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个功能不为聊天，实际是为电子取证所用</span></span><br><span class="line"></span><br><span class="line">A：nc -l -p 333</span><br><span class="line">B：ls -l | nc -nv 1.1.1.1 333</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将本机ls -l显示的信息传到nc服务器上。这是远程电子审计的标准方法</span></span><br><span class="line"></span><br><span class="line">A：nc -l -p 333 &gt; ps.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将结果重定向到一个文件中</span></span><br><span class="line">B：ps aux|nc -nv 1.1.1.1 333 -q 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 收集进程信息。-q表示标准结果输出后，delay（延迟）一定时间就退出。1就是延迟的时间，表示1秒</span></span><br><span class="line">A： cat ps.txt</span><br><span class="line"></span><br><span class="line">A：nc -l -p 333 &gt; lsof.txt</span><br><span class="line">B：lsof | nc -nv 1.1.1.1 333 -q 1</span><br><span class="line">A： cat lsof.txt</span><br><span class="line"></span><br><span class="line">* 使用NC传输文件/目录</span><br><span class="line">** 传输文件</span><br><span class="line">A：nc -lp 333 &gt; 1.mp4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 接收端打开333端口，接收到的内容输入到一个文件名</span></span><br><span class="line">B：nc -nv 1.1.1.1 333 &lt; 1.mp4 -q 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 发送文件到接收端。在windows上使用上面的命令会报错，可能是安装的是netcat软件。需要使用下面命令</span></span><br><span class="line">nc -w 1 1.1.1.1 333 &lt; 1.mp4</span><br><span class="line">或</span><br><span class="line">A：nc -q 1 -lp 333 &lt; a.mp4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从服务器向客户端收送文件，这就成了发送端。这像是一个下载的过程。连接完成后1秒断开</span></span><br><span class="line">B：nc -nv 1.1.1.1 333 &gt; 2.mp4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 客户端成了接收端。</span></span><br><span class="line"></span><br><span class="line">** 传输目录</span><br><span class="line">A：tar -cvf - music/ | nc -lp 333 -q 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 打包目录，通过管道入到nc中。视频中强调，cvf后面的横线不能少，少了就不能打包成tar文件了。在 GNU 指令中，如果单独使用 - 符号，不加任何该加的文件名称时，代表<span class="string">"标准输入"</span>的意思。这是 GNU指令的共通选项。如：tar xpvf -，这里的 - 符号，既代表从标准输入读取资料。不过，在 <span class="built_in">cd</span> 指令中则比较特别，<span class="built_in">cd</span> -，这代表变更工作目录到<span class="string">"上一次"</span>工作目录。</span></span><br><span class="line">B：nc -nv 1.1.1.1 333 |tar -xvf -</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接到nc，将打包的目录解压到本地</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 也可以反方向传输。</span></span><br><span class="line"></span><br><span class="line">** 加密传文件</span><br><span class="line">A：nc -lp 333 | mcrypt --flush -Fbqd -a rijindael-256 -m ecb &gt; 1.mp4</span><br><span class="line"><span class="meta">#</span><span class="bash"> A端先监听端口，等待别人给其传文件。收到文件后给后面的解密命令解密，之后重新输出一个文件。接收到文件后会提示输入密码</span></span><br><span class="line">B：mcrypt --flush -Fbq -a rijindael-256 -m ecb &lt; a.mp4 | nc -nv 1.1.1.1 333 -q 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将加密文件转给A主机。两边的加密方式应该一致。加密时需要输入两次密码</span></span><br><span class="line"></span><br><span class="line">* 使用NC做流媒体服务</span><br><span class="line">A： cat 1.mp4 | nc -lp 333</span><br><span class="line"><span class="meta">#</span><span class="bash"> mp4文件也可以用cat打开</span></span><br><span class="line">B：nc -nv 1.1.1.1 333 | mplayer -vo x11 -cache 3000 -</span><br><span class="line"><span class="meta">#</span><span class="bash"> mplayer是一个播放器，其他支持命令行的播放器也可以</span></span><br><span class="line"></span><br><span class="line">* 使用NC做端口扫描</span><br><span class="line">nc -nvz 1.1.1.1 1-65535</span><br><span class="line">nc -nvzu 1.1.1.1 1-1024</span><br><span class="line"><span class="meta">#</span><span class="bash"> -z表示使用0输入/输出模式，只在扫描通信端口时使用。默认使用tcp端口，-u表示扫描udp的端口。每一个扫描器扫描的结果都不是完全准确的，可能被防火墙拦截。建议使用多个工具进行扫描</span></span><br><span class="line"></span><br><span class="line">* 使用NC做远程克隆硬盘</span><br><span class="line">A：nc -lp 333 | dd of=/dev/sda</span><br><span class="line">B：dd if=/dev/sda | nc -nv 1.1.1.1 333 -q 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 远程电子取证，可以将目标服务器硬盘远程复制，或者内存。这是块级别的备份。不会只拷贝文件，它会将磁盘扇区上的所有数据都拷贝过来。dd命令就是块级别的复制。<span class="keyword">if</span>表示input file</span></span><br><span class="line"></span><br><span class="line">* 使用NC做远程控制</span><br><span class="line">** 正向</span><br><span class="line">A： nc -lp 333 -c bash</span><br><span class="line">B： nc -nv 1.1.1.1 333</span><br><span class="line"><span class="meta">#</span><span class="bash"> 客户端控制服务器。连接后可以使用bash命令</span></span><br><span class="line"></span><br><span class="line">** 反向</span><br><span class="line">A：nc -lp 333</span><br><span class="line">B：nc -nv 1.1.1.1 333 -c bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 服务器控制客户端</span></span><br><span class="line"></span><br><span class="line">注：windows用户把bash改成cmd</span><br><span class="line"></span><br><span class="line">* NC-NCAT</span><br><span class="line">NC缺乏加密和身份验证的能力</span><br><span class="line">NCAT包含于nmap工具包中。NCAT与NC是不一样的</span><br><span class="line">A：ncat -c bash --allow 1.1.1.1 -vnl 333 --ssl</span><br><span class="line"><span class="meta">#</span><span class="bash"> --allow表示允许哪个IP地址来连接本服务器</span></span><br><span class="line">B：ncat -nv 1.1.1.1 333 --ssl；监听的是333端口，--ssl表示ssl加密</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不同系统/平台的NC参数功能不尽相同</span></span><br></pre></td></tr></table></figure>
-<h3 id="mtr命令"><a href="#mtr命令" class="headerlink" title="mtr命令"></a>mtr命令</h3><p>mtr命令可以结合ping nslookup tracert 来判断网络的相关特性</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">* 参数</span><br><span class="line">mtr -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以报告模式显示</span></span><br><span class="line"></span><br><span class="line">mtr -s </span><br><span class="line"><span class="meta">#</span><span class="bash"> 用来指定ping数据包的大小</span></span><br><span class="line"></span><br><span class="line">mtr -c </span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置每秒发送数据包的数量</span></span><br><span class="line"></span><br><span class="line">mtr -n </span><br><span class="line"><span class="meta">#</span><span class="bash"> no-dns不对IP地址做域名解析</span></span><br><span class="line"></span><br><span class="line">mtr -a </span><br><span class="line"><span class="meta">#</span><span class="bash"> 来设置发送数据包的IP地址 这个对一个主机由多个IP地址是有用的</span></span><br><span class="line"></span><br><span class="line">mtr -i </span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用这个参数来设置ICMP返回之间的要求默认是1秒</span></span><br><span class="line"></span><br><span class="line">mtr -4 </span><br><span class="line"><span class="meta">#</span><span class="bash"> IPv4</span></span><br><span class="line"></span><br><span class="line">mtr -6 </span><br><span class="line"><span class="meta">#</span><span class="bash"> IPv6</span></span><br><span class="line"></span><br><span class="line">ruopu@ruopu-PC:~$ mtr -r 202.108.33.94</span><br><span class="line">Start: 2018-11-19T11:09:25+0800</span><br><span class="line">HOST: ruopu-PC                    Loss%   Snt   Last   Avg  Best  Wrst StDev</span><br><span class="line">  1.|-- _gateway                   0.0%    10    0.3   0.4   0.3   0.5   0.1</span><br><span class="line">  2.|-- 106.38.38.81               0.0%    10    3.2   8.7   3.1  54.0  15.9</span><br><span class="line">  3.|-- 237.235.120.106.static.bj 10.0%    10    2.8   3.0   2.8   4.4   0.5</span><br><span class="line">  4.|-- 202.97.57.201              0.0%    10    3.3   3.4   3.2   3.8   0.2</span><br><span class="line">  5.|-- 202.97.88.246             60.0%    10    3.2   3.2   3.1   3.3   0.1</span><br><span class="line">  6.|-- 219.158.44.133             0.0%    10   10.7   8.2   3.5  12.7   2.7</span><br><span class="line">  7.|-- 219.158.3.77               0.0%    10    9.3   7.7   4.8  10.3   2.2</span><br><span class="line">  8.|-- 124.65.194.174            40.0%    10    3.5   3.6   3.4   3.7   0.1</span><br><span class="line">  9.|-- 61.148.143.30              0.0%    10    3.2   3.9   3.2   5.9   0.8</span><br><span class="line"> 10.|-- 210.74.176.138             0.0%    10    3.5   4.1   3.1   8.6   1.6</span><br><span class="line"> 11.|-- ???                       100.0    10    0.0   0.0   0.0   0.0   0.0</span><br><span class="line"><span class="meta">#</span><span class="bash"> ruopu-PC一列显示的是IP地址或本机域名；Snt一列显示的是设置每秒发送数据包的数量，默认值是10，可以通过参数-c来指定。</span></span><br><span class="line"></span><br><span class="line">ruopu@ruopu-PC:~$ mtr -r -c 15 202.108.33.94</span><br><span class="line">Start: 2018-11-19T11:12:54+0800</span><br><span class="line">HOST: ruopu-PC                    Loss%   Snt   Last   Avg  Best  Wrst StDev</span><br><span class="line">  1.|-- _gateway                   0.0%    15    0.4   0.4   0.3   0.5   0.1</span><br><span class="line">  2.|-- 106.38.38.81               0.0%    15  187.6  65.7   3.7 187.6  59.1</span><br><span class="line">  3.|-- 237.235.120.106.static.bj  0.0%    15    3.0   3.9   2.6  12.4   2.8</span><br><span class="line">  4.|-- 202.97.57.237              0.0%    15    4.4   6.5   4.0  14.6   3.0</span><br><span class="line">  5.|-- 202.97.57.114              0.0%    15   35.1  17.8   2.9  50.9  17.5</span><br><span class="line">  6.|-- 219.158.44.129             0.0%    15   12.5   7.9   3.3  20.7   4.4</span><br><span class="line">  7.|-- 219.158.3.77               0.0%    15    4.4   6.6   3.1   9.9   2.3</span><br><span class="line">  8.|-- 124.65.194.118            66.7%    15    3.9  12.1   3.7  43.0  17.3</span><br><span class="line">  9.|-- 61.148.143.22              0.0%    15    3.2   7.3   3.2  35.8   9.1</span><br><span class="line"> 10.|-- 210.74.178.198             0.0%    15    3.9   4.2   3.5  10.8   1.8</span><br><span class="line"> 11.|-- ???                       100.0    15    0.0   0.0   0.0   0.0   0.0</span><br><span class="line"><span class="meta">#</span><span class="bash"> HOST:ruopu-PC一列显示的是途经的IP地址或本机域名；Loss%列显示的是每个对应IP的丢包率，只有最后的目标丢包才算是真正的丢包；Snt一列显示的是设置每秒发送数据包的数量，默认值是10，可以通过参数-c来指定；Last列显示的是最近一次的返回时延，按毫秒计算；Avg列显示的是发送ping包的平均时延；Best烈显示的是最好或时延最短的；Wrst列显示的是最差或时延最长的；StDev列显示的是标准偏差。</span></span><br><span class="line"></span><br><span class="line">ruopu@ruopu-PC:~$ sudo mtr -i 0.1 -n -c 100 202.108.33.94</span><br><span class="line"><span class="meta">#</span><span class="bash"> 对不标IP不做解析，ping100次，每0.1秒返回一次结果</span></span><br><span class="line"></span><br><span class="line">ruopu@ruopu-PC:~$ mtr -r -n -c 30 -s 1024 www.baidu.com</span><br><span class="line">Start: 2018-11-19T11:28:06+0800</span><br><span class="line">HOST: ruopu-PC                    Loss%   Snt   Last   Avg  Best  Wrst StDev</span><br><span class="line">  1.|-- 192.168.0.1                0.0%    30    0.6   0.6   0.5   0.7   0.1</span><br><span class="line">  2.|-- 106.38.38.81               0.0%    30   16.8  56.8  11.6 160.8  36.0</span><br><span class="line">  3.|-- ???                       100.0    30    0.0   0.0   0.0   0.0   0.0</span><br><span class="line">  4.|-- 220.181.0.234             83.3%    30    6.1   5.6   4.6   6.1   0.6</span><br><span class="line">  5.|-- 218.30.112.130            60.0%    30    5.0   5.7   4.9  10.3   1.6</span><br><span class="line">  6.|-- 180.149.128.138           26.7%    30   10.6 270.4   6.8 1008. 355.7</span><br><span class="line">  7.|-- 180.149.129.6              0.0%    30    5.3   5.8   4.7  16.9   2.8</span><br><span class="line">  8.|-- ???                       100.0    30    0.0   0.0   0.0   0.0   0.0</span><br><span class="line">  9.|-- ???                       100.0    30    0.0   0.0   0.0   0.0   0.0</span><br><span class="line"> 10.|-- 180.149.132.151            0.0%    30    5.8   6.8   5.7  16.6   2.8</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2414,7 +2438,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">175</span>
+                    <span class="site-state-item-count">176</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>

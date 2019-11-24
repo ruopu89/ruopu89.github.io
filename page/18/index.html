@@ -350,6 +350,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/修改tomcat默认页面/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/12/修改tomcat默认页面/" itemprop="url">
+                  修改tomcat默认页面
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-09-12 12:50:03 / 修改時間：13:09:51" itemprop="dateCreated datePublished" datetime="2018-09-12T12:50:03+08:00">2018-09-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tomcat/" itemprop="url" rel="index"><span itemprop="name">tomcat</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>修改tomcat的默认页面为自己的主页，再使用nginx反代到tomcat。实现访问域名即可打开主页。</p>
+</blockquote>
+<ul>
+<li>tomcat</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">	&lt;Host name="localhost"  appBase="webapps"</span><br><span class="line">            unpackWARs="true" autoDeploy="true"&gt;</span><br><span class="line">        &lt;Context path="" docBase="echarge" reloadable="true" /&gt;</span><br><span class="line">//在Host下面加入Context一行，设置path为空，这样就不会访问到默认页了。之后用docBase指定主页的路径，这里写echarge表示是在webapps下的echarge目录。reloadable表示是否自动装载。</span><br><span class="line">/usr/local/tomcat/bin/shutdown.sh</span><br><span class="line">/usr/local/tomcat/bin/startup.sh</span><br><span class="line">//此例中已将主机的IP地址解析为域名了，另外tomcat监听在8081端口。这时可以通过"域名:8081"访问到主页了。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>nginx</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/conf.d/web.conf</span><br><span class="line">	proxy_cache_path /etc/nginx/cache levels=1:2:2 keys_zone=web_cache:10m max_size=2g;</span><br><span class="line">    server&#123;</span><br><span class="line">       server_name web.jdyichong.com;</span><br><span class="line">       index index.html index.htm;</span><br><span class="line">       charset utf-8;</span><br><span class="line">       proxy_cache web_cache;</span><br><span class="line">       proxy_cache_key $request_uri;</span><br><span class="line">       proxy_cache_methods GET HEAD;</span><br><span class="line">       proxy_cache_min_uses 1;</span><br><span class="line">       proxy_cache_valid 200 302 10m;</span><br><span class="line">       proxy_cache_valid 400 1m;</span><br><span class="line">       proxy_cache_use_stale http_502;</span><br><span class="line"></span><br><span class="line">       location / &#123;</span><br><span class="line">            proxy_pass http://web.jdyichong.com:8081;</span><br><span class="line">            //这里只要将所有访问都反代到本机的tomcat上即可。</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">//用nginx加入缓存设置，之后反向代理到本机的tomcat上，这样使用域名即可访问到主页了。</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/12/IO基础知识/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2144,7 +2312,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">175</span>
+                    <span class="site-state-item-count">176</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
