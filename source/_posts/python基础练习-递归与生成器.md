@@ -1,0 +1,346 @@
+---
+title: python基础练习-递归与生成器
+date: 2019-11-20 17:27:02
+tags: 递归与生成器
+categories: python
+---
+
+### 把一个字典扁平化
+
+![](/images/python递归函数/作业1.png)
+
+```python
+# 源字典{'a':{'b':1,'c':2},'d':{'e':3,'f':{'g':4}}}
+# 目标字典 {'a.c':2,'d.e':3,'d.f'g':4,'a.b':1}
+
+source = {'a':{'b':1,'c':2},'d':{'e':3,'f':{'g':4}}}
+target = {}
+# recursion
+def flatmap(src,prefix=''):  # 给prefix设置一个默认值为空
+    for k,v in src.items():
+        if isinstance(v,(list,tuple,set,dict)):
+            flatmap(v,prefix=prefix+k+'.')  # 递归调用
+        else:
+            target[prefix+k] = v
+            
+flatmap(source)
+print(target)
+# 代码执行时，进入函数，将传入的src拆分成kv对，分别给k和v变量，之后判断值是不是列表、元组、集合或字典中
+# 的一个，如果是，就使用递归将v的值当src再传入flatmap，prefix也重新赋值为键值加点，再次判断时，如果v
+# 是一个单值，那么就将target字典中重新拼好的键值如a.c赋值一个v，这样就能得到目标字典了。
+输出：
+{'a.b': 1, 'a.c': 2, 'd.e': 3, 'd.f.g': 4}
+
+- 一般这种函数都会生成一个新的字典，因此改造一下dest字典可以由内部创建，也可以由外部提供 
+source = {'a':{'b':1,'c':2},'d':{'e':3,'f':{'g':4}}}
+
+# recursion
+def flatmap(src,dest=None,prefix=''):
+    if dest == None:
+        dest = {}   # 将新字典在内部创建并返回
+    for k,v in src.items():
+        if isinstance(v,(list,tuple,set,dict)):
+            flatmap(v,dest,prefix=prefix+k+'.')   # 递归调用
+        else:
+            dest[prefix+k] = v
+    return dest
+
+print(flatmap(source))
+输出：
+{'a.b': 1, 'a.c': 2, 'd.e': 3, 'd.f.g': 4}
+
+- 不暴露给外界内部的字典呢？能否函数就提供一个参数源字典，返回一个新的扁平化字典呢？递归的时候要把目标字
+- 典的引用传递多层，怎么处理？
+
+source = {'a':{'b':1,'c':2},'d':{'e':3,'f':{'g':4}}}
+
+# recursion递归
+def flatmap(src): # 最外层函数只需要一个参数，就是外部的源字典，符合题意
+    def _flatmap(src,dest=None,prefix=''):
+        for k,v in src.items():
+            key = prefix + k   # 这里做加法处理后，key的值就是k值，如a或d
+            if isinstance(v,(list,tuple,set,dict)):
+                _flatmap(v,dest,key + '.')   # 递归调用
+            else:
+                dest[key] = v   # 只有在v是单个值的时候，再给dest中的key赋值
+                
+    dest = {}
+    _flatmap(src,dest)   
+    # 在flatmap函数中调用_flatmap函数，不然_flatmap函数无法执行，会返回一个空字典。调用_flatmap是
+    # 为了让内部函数执行，不然内层函数无法执行
+    # 这里与装饰器并不一样，一定要在flatmap函数中调用_flatmap函数
+    return dest
+
+print(flatmap(source))
+输出：
+{'a.b': 1, 'a.c': 2, 'd.e': 3, 'd.f.g': 4}
+```
+
+
+
+### 实现Base64编码
+
+![](/images/python递归函数/作业2.png)
+
+```python
+# 要求自己实现算法，不用库
+# 原理：https://blog.csdn.net/wo541075754/article/details/81734770
+- 大多数编码都是由字符串转化成二进制的过程，而Base64的编码则是从二进制转换为字符串。与常规恰恰相反
+- 将输入每3个字节断开，拿出一个3个字节，按8位一个字节，一共是24位，之后每6个bit(二进制位)断开成4段
+- 2**6 = 64，因此有了base64的编码表，表中的编号从0-63
+- 之后把6个bit段当做一个8bit看它的值，在每段前补0，凑成8bit。这个值就是Base64编码表的索引值，找到对应
+- 字符。再取3个字节，同样处理，直到最后
+
+- 举例：
+abc对应的ASCII码为：0x61 0x62 0x63
+01100001 01100010 01100011   # ASCII码对应的2进制abc，对应的是97,98,99
+011000 010110 001001 100011
+00011000 00010110 00001001 00100011   # 每6位补齐为8位
+24 22 9 35
+
+- 末尾的处理
+- 1. 正好3个字节，处理方式同上
+- 2. 剩1个字节或2个字节，切分成6bit一组，不足6bit的用0补满
+- 3. 完全没有数据的用=表示
+
+# 用自己实现对一段字符串进行Base64编码
+alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+teststr = "abcd"
+teststr1 = "ManMa"
+
+def base64(src):
+    ret = bytearray()   # 返回一个新字节数组。这个数组里的元素是可变的，并且每个元素的值范围: 0 <= x < 256。
+    length = len(src)   # 计算传入的字符的长度
+    # r记录补0的个数
+    r = 0
+    for offset in range(0,length,3):   # 从0开始，每3个截取一段
+        if offset + 3 <= length:   # 判断是否为最后三个字节，如果超出总长度，就说明是最后三个字节
+            triple = src[offset:offset + 3]   
+   # 把从offset开始到offset+3个结束的三个字符，也就是一段赋值给triple。这里的判断语句就是为了分段的
+        else:
+            triple = src[offset:]   # 如果不足3个字符，就把从offset到结束的值都赋给triple
+            r = 3 - len(triple)   # 用3减去目前triple的长度，就得出了要补几个0
+            triple = triple + '\x00'*r   # 补几个0，这里补的是ASCII码的0，也就是0x00
+        # triple中只有一个三字节的值，因为triple每一次都是重新赋值的，赋值之后就向下执行查找
+        # print(triple,r)
+        # 将3个字节看成一个整体围成字节bytes，大端模式
+        # 十六进制当数值时有大端和小端两种模式，大端意思是开头（低地址）权重大，小端为开头（低地址）权
+        # 重小。文件系统一般用小端模式，网络传输一般用大端模式。
+        # abc => 0x616263
+        b = int.from_bytes(triple.encode(),'big')   # 小端模式为'little'
+# encode()表示以 encoding 指定的编码格式编码字符串，默认编码为 'utf-8'
+# int.from_bytes()将byte转换为int类型
+# 函数格式：int.from_bytes(bytes, byteorder, *, signed=False)
+# bytes是要转换的十六进制；byteorder：选'big'和'little'，big代表正常顺序，little反之；signed：选
+# True、Flase表示是否要区分二进制的正负数含义。即是否要对原二进制数进行原码反码补码操作。
+        print(hex(b))
+    # hex()将10进制整数转换成16进制，以字符串形式表示。
+    # 这里先用encode将字符转换为bytes类型，再用int.from_bytes的大端模式转换为int类型，再将int类型转换为十六进制
+        
+        # 01100001 01100010 01100011   # abc
+        # 011000 010110 001001 100011   # 每6位断开
+        for i in range(18,-1,-6):   
+# 因为这时的triple已经处理完毕并赋值给了b，其中是分好的三个字节，并且要将三个字节分为四段，每段6bit，
+# 所以这里最多为18。这里i得到的数字是18,12,6,0。这四个数字是6的倍数，看一下上面列出的两行二进制数字
+            if i == 18:
+                index = b >> i 
+# 看上面第二排6bit的数字，第一次向右移18位，这里移掉一位就少一位。也就是后三段去掉，就可以得到第一段的
+# 6bit数字了，第一段6bit的十进制数字是24
+            else:
+# 第二次开始就进入这里，下面先右移12位，也就是得到了前两段，之后和0x3F相与，0x3F的二进制数字是
+# 111111，前面的全是0，也就是上面的前两段与这个0x3F相与，就得到 011000 010110 & 000000 111111，
+# 与运算执行完就只剩第二段地址了，这也就是我们需要的。第二段地址的十进制数是22。第三次进入时i是6，前三
+# 段和0x3F相与，0x3F就是111111，不足位的地方补0，所以可以得到第三段二进制数。第四段也一样
+                index = b >> i & 0x3F   # 0x3F就是0b0011 1111
+# 上面的判断可以就写一行index = b >> i & 0x3F
+            ret.append(alphabet[index])   # 得到base64编码的列表
+# 当上面得到index时，就用这个index索引到alphabet这个自定义的base64编码表中查询对应的值，这就是abc的 
+# 由来。
+            # 策略是不管是不是补零，都填满，只有最后一次可能出现补零的
+            # 在最后替换掉就是了，代码清晰，而且替换至多2次
+            # 在上一个循环中判断 r!=0，效率可能会高些
+        for i in range(1,r+1):   # 1到r，补几个0替换几个=，r记录补了几个0，再加1是因为前包后不包
+            ret[-i] = 0x3D   # ox3D是等号的ASCII码，把ret中从后向前，有几个是全0的就替换为等号
+# 上面这个循环在计算在6bit的情况下应该如何把全是0的位置替换成等号，如最后一段是三个字符，如abc，这是不
+# 需要补0的，如果是两个字符，如ab，要补一个0并替换为等号，如果是一个字符，要被两个0并替换为等号
+	return ret
+
+print(base64(teststr))
+print('*'*40)
+print(base64(teststr1))
+输出：
+0x616263   # triple的十六进制
+0x640000
+bytearray(b'YWJjZA==')
+****************************************
+0x4d616e
+0x4d6100
+bytearray(b'TWFuTWE=')
+
+# 下面是base64实现
+import base64
+print(base64.b64encode(teststr.encode()))
+输出：
+b'YWJjZA=='
+```
+
+
+
+### 求2个字符串的最长公共子串
+
+```python
+思考：
+s1 = 'abcdefg'
+s2 = 'defabcd'
+
+- 方法一：矩阵算法
+让s2的每一个元素，去分别和s1的每一个元素比较，相同就是1，不同就是0，有下面的矩阵。比如s2中第一个a和s2中
+的所有元素比较，如果相同就是1，不同就是0。得到0001000，也就是在s2中索引为3的位置是a
+	 s1
+s1 0001000
+s1 0000100
+s1 0000010
+s1 1000000
+s1 0100000
+s1 0010000
+s1 0001000
+
+上面都是s1的索引。看与斜对角线平行的线，这个线是穿过1的，那么最长的就是最长子串。也就是通过查找出值为1的
+最长对角线就能找到最长公共子串。上面第四行到第七行是就是最长子串，也就是abcd
+print(s1[3:3+3])   
+# s1的[3:6]是def，3+3表示从索引3开始，后面的3表示向后偏移几个，也就是结束位置。也就是子串的长度
+print(s1[0:0+4])   # s1的[0:4]是abcd，这里表示计算上面的索引范围，从0到4是最长子串
+
+矩阵求法还需要一个字符扫描最长子串的过程，扫描的过程就是len(s1)*len(s2)次，O(n*m)。
+有办法一遍循环就找出最长的子串吗？
+0001000第一行，索引为3,0
+第二行的时候如果4,1是1，就判断3,0是否为1，为1就把3,0加1。如果5,2是1，就判断4,1是否为1，是1就加1，再
+就判断3,0是否为1，为1就把3,0加1。
+
+	 s1
+s1 0003000
+s1 0000200
+s1 0000010
+s1 4000000
+s1 0300000
+s1 0020000
+s1 0001000
+# 这里表示，第一行是不用管的，因为如果再减1就是负值了，从第二行开始，扫描的同时，看一下有数字的索引位置
+# 是否比前一个索引小1，也就是说在矩阵扫描时当前索引位置如果是i,j，那么前一个索引位置就是i-1,j-1，我们
+# 要比较i-1,j-1是不是比i,j小1，如果发现第一行索引位置有一个1，这时，就把第一行索引位置的值加1，也就是
+# 变成2，而第二行的索引位置写1，扫描第三行的时候还是这样看，前一行小1的索引位置是不是有不为0的数字，如果
+# 有，就把第三行的索引位置写1，上面两行相应的索引位置都要加1
+
+上面的方法是个递归问题，不好。
+最后在矩阵中找到最大的元素，从它开始就能写出最长的子串了。但是这个不好算，因为是逆推的，改为顺推。
+
+顺推的意思，就是判断s2中每个元素与s1中的所有元素比较，如果相同就记录索引数字，如s2中第一个a与s1中索引为
+3的值机同，那么就记录索引3为1，之后再判断s2中第二个元素与s1中索引为4的元素是否一致，如果一致就标记索引 
+4为2，依此类推，如果找到一个就看前一个的数字是几，然后在它的上面加1。也就是某个二维矩阵元素的值由
+record[i][j]=1演变为record[i][j]=1 +record[i-1][j-1]，这样就避免了后续查找对角线长度的操作了。
+这里的[i]和[j]就是s1和s2的索引，如果两个索引的值相同就为1，优化后就是用之前的索引的值加1
+	 s1
+s1 0001000
+s1 0000200
+s1 0000030
+s1 1000000
+s1 0200000
+s1 0030000
+s1 0004000
+# 这里索引位置为1的是在边上的，如第一行和第四行，横着的是x轴，竖着是y轴，所以第1行是x轴为0，第一个索引
+# 位置的值为1的行是y轴为0。
+
+
+# www.magedu.com
+
+s1 = 'abcdefg'
+s2 = 'defabcd'
+s2 = 'defabcdoabcdeftw'
+s3 = '1234a'
+s4 = "5678"
+s5 = 'abcdd'
+
+def findit(str1, str2):   # 传入两个参数，都是字符串
+# 因为s1里没有重复的字符，所以用s2来和s1比较，所以矩阵中只有1而没有2。实际谁与谁相比都可以
+    matrix = []   # 创建空列表，记录最长字串
+    # 从x轴或者y轴取都可以，选择x轴，xmax和xindex
+    xmax = 0   # 这里保存的就是索引的值里最大的
+    xindex = 0   # 这里保存的是最大值的索引
+    for i,x in enumerate(str2):
+        matrix.append([])   # 这时的matrix就是[[]]，每次比较前都追加一个空列表
+        for j,y in enumerate(str1):
+            if x != y:   
+            # 若两个字符不相等，这里开始比较str2中第一个元素与str1中每一个元素是否相同 
+                matrix[i].append(0)   # 如果不相等，就把matrix中的索引为i的元素标记为0
+            else:
+                if i == 0 or j == 0:   # 两个字符相等，有字符在边上的
+                    matrix[i].append(1)
+# 本来都是在索引上加1的，但为了区分是不是在边上，所以这里这样做。如果以s1与s2来看，x轴为0时，s2为d，
+# s1为abcdefg，这是在用s2中的每个元素与s1中的全部元素比较。当y邮为0时，s2是defabcd，s1是a，这是在
+# s2中的每个元素与s1的全部元素比较时，只有比较到s1的第一个元素时的情况，s1与s2比较时，只有这两种情况
+# 是在边上的
+                else:   # 不在边上
+                    matrix[i].append(matrix[i-1][j-1]+1)
+                    
+                if matrix[i][j] > xmax:   # 判断当前加入的值和记录的最大值比较
+                    xmax = matrix[i][j]   # 记录最大值，用于下次比较
+                    xindex = j   # 记录当前值的x轴偏移量，和str1[xindex+1-xmax:xindex+1]匹配
+                    xindex += 1   # 只是为了计算的需要才+1，和str1[xindex - max: xindex]匹配
+   # return str1[xindex+1-xmax:xindex+1]
+	return str1[xindex - xmax: xindex]
+
+print(findit(s1,s2))
+print(findit(s1,s3))   # a
+print(findit(s1,s4))   # 空串
+print(findit(s1,s5))   # abcd
+s1 = 'abcdefg'
+s5 = '304abcdd'
+print(findit(s1,s5))   # abcd
+输出：
+abcdef
+a
+
+abcd
+abcd
+
+- 方法二
+可不可以这样思考，字符串都是连续的字符，所以才有了下面的思路。
+思路一：
+第一轮：从s1中依次取1个字符，在s2查找，看是否能够找到子串。如果没有一个字符在s2中找到，说明就没有公共子
+串，直接退出。如果找到了至少一个公共子串，则很有可能还有更长的公共子串，可以进入下一轮。
+第二轮：然后从s1中取连续的2个字符，在s2中查找，看看能否找到公共的子串。如果没找到，说明最大公共子串就是
+上一轮的随便的哪一个就行了。如果找到至少一个，则说明公共子串可能还可以再长一些。可以进入下一轮。
+改进，只要找到第一轮的公共子串的索引，最长公共子串也是从它开始的，所以以后的轮次都从这些索引位置开始，可
+以减少比较的次数。
+
+思路二：
+既然是求最大子串，我先看s1全长作为子串。在s2中搜索，是否返回正常的index，正常就找到了最长子串。没有找
+到，把s1按照length-1取多个子串。在s2中搜索，是否能返回正常的index。
+注意：不要一次把s1的所有子串生成，用不了，也不要从最短开始，因为题目要最长的。但是也要注意，万一他们的公
+共子串就只有一个字符，或者很少字符的，思路一就会占优势。
+
+s1 = 'abcdefg'
+s2 = 'defabcdoabcdeftw'
+s3 = '1234a'
+
+def findit(str1,str2):
+    count = 0   # 看看效率，计数
+    length = len(str1)
+    
+    for sublen in range(length,0,-1):
+        for start in range(0,length-sublen+1):
+            substr = str1[start:start+sublen]
+            count += 1
+            if str2.find(substr) > -1:   # found
+                print("count={},substrlen={}".format(count,sublen))
+                return substr
+            
+print(findit(s1,s2))
+print(findit(s1,s3))
+输出：
+count=2,substrlen=6
+abcdef
+count=22,substrlen=1
+a
+```
+

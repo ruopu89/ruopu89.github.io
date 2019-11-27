@@ -1,7 +1,7 @@
 ---
 title: python基础练习
 date: 2019-06-20 09:15:56
-tags: python
+tags: python练习
 categories: python
 ---
 

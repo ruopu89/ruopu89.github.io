@@ -34,7 +34,7 @@ def 函数名(参数列表):
     [return 返回值]
 # 函数名就是标识符，命名要求一样
 # 语句块必须缩进，约定4个空格
-# Python的函数没有return语句，隐式会返回一个None值
+# Python的函数如果没有return语句，隐式会返回一个None值
 # 定义中的参数列表称为形式参数，只是一种符号表达，简称形参
 ```
 - 调用
@@ -51,7 +51,7 @@ def add(x,y):
 out = add(4,5)
 print(out)
 # 上面只是一个函数的定义，有一个函数叫做add，接收2个参数
-# 计算的结果，通过返回值返回
+# 计算的结果，通过return返回值返回
 # 调用通过函数名add加2个参数，返回值可使用变量接收
 # 定义需要在调用前，也就是说调用时，已经被定义过了，否则抛NameError异常
 # 函数是可调用的对象，callable()
@@ -73,6 +73,7 @@ print(out)
   - `f((1,),z=6,y=4.1)`
   - `f(y=5,z=6,2)` # 这会报错
   - 要求位置参数在关键字参数之前传入，位置参数是按位置对应的
+  - 位置参数与关键字参数只是传参的方法不一样而已，定义函数时的方法是一样的
 
 
 
@@ -100,9 +101,13 @@ def login(host='127.0.0.1',port='8080',username='wayne',password='magedu'):
 login()  # 可以这样调用，使用默认值。在测试时很有用，但在实际使用中作用不大
 输出：127.0.0.1:8080@wayne/magedu
 login('127.0.0.1',80,'tom','tom')
+输出：127.0.0.1:80@tom/tom
 login('127.0.0.1',username='root')
+输出：127.0.0.1:8080@root/magedu
 login('localhost',port=80,password='com')
+输出：localhost:80@wayne/com
 login(port=90,password='magedu',host='www')
+输出：www:90@wayne/magedu
 ```
 
 
@@ -119,7 +124,9 @@ def add(nums):
         sum += x
     return sum
 add([1,3,5])
+标准输出：Out: 9
 add((2,4,6))
+标准输出：Out: 12
 # 可以只传入一个参数，这个参数是一个可迭代对象。定义时只有一个形参，调用时的实参是一个可迭代对象
 ```
 
@@ -139,7 +146,6 @@ def add(*nums):
 add(3,6,9)
 # 在形参前使用*表示该形参是可变参数，可以接收多个实参
 # 收集多个实参为一个tuple
-# 思考:关键字参数能否也能传递任意多个吗？
 
 例：
 def add(*nums):  
@@ -174,6 +180,11 @@ def showconfig(**kwargs):
         print('{} = {}'.format(k,v))
         
 showconfig(host='127.0.0.1',port='8080',username='wayne',password='magedu')
+输出：
+host = 127.0.0.1
+port = 8080
+username = wayne
+password = magedu
 # 形参前使用**符号，表示可以接收多个关键字参数
 # 收集的实参名称和值组成一个字典
 ```
@@ -203,11 +214,11 @@ add(4,3,x=0)
 
 def(**kwargs,x):
     print(x)
-    print(kvargs)
-# 这里报错的原因是**kvargs和x都是关键字参数，都是keyword。所以会报错
+    print(kwargs)
+# 这里报错的原因是**kwargs和x都是关键字参数，都是keyword。所以会报错
 输出：
   File "<ipython-input-14-7e57b033edae>", line 1
-    def(**kvargs,x):
+    def(**kwargs,x):
        ^
 SyntaxError: invalid syntax
 ```
@@ -229,10 +240,43 @@ def fn(x,y,*args,**kwargs):
     print(kwargs)
     
 fn(3,5,7,9,10,a=1,b='python')
+输出：
+3
+5
+(7, 9, 10)
+{'a': 1, 'b': 'python'}
+
 fn(3,5)
+输出：
+3
+5
+()
+{}
+
 fn(3,5,7)
+输出：
+3
+5
+(7,)
+{}
+
 fn(3,5,a=1,b='python')
+输出：
+3
+5
+()
+{'a': 1, 'b': 'python'}
+
 fn(7,9,y=5,x=3,a=1,b='python')
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-51-ff279493d0b6> in <module>
+      9 # fn(3,5,7)
+     10 # fn(3,5,a=1,b='python')
+---> 11 fn(7,9,y=5,x=3,a=1,b='python')
+
+TypeError: fn() got multiple values for argument 'y'
 # 错误，7和9分别赋给了x，y，之后又给了y=5，x=3，重复了
 
 def fn(*args,x,y,**kwargs):
@@ -244,7 +288,24 @@ def fn(*args,x,y,**kwargs):
 fn(3,5)
 fn(3,5,7)
 fn(3,5,a=1,b='python')
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-56-2097f13d817a> in <module>
+      5     print(kwargs)
+      6 
+----> 7 fn(7,9)
+
+TypeError: fn() missing 2 required keyword-only arguments: 'x' and 'y'
+# 按上面定义的方法，这三种调用的方法都会报错，要求将x和y这两个关键字参数的值明确给出
+
 fn(7,9,y=5,x=3,a=1,b='python')
+输出：
+3
+5
+(7, 9)
+{'a': 1, 'b': 'python'}
+# 按上面方法定义时，只要这样调用才可以。
 ```
 
 
@@ -259,15 +320,33 @@ def fn(*args,x):
     print(x)
     print(args)
     
-fn(3,5)
+fn(3,5)      
 fn(3,5,7)
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-58-a561a8c35f3d> in <module>
+      3     print(args)
+      4 
+----> 5 fn(3,5)
+
+TypeError: fn() missing 1 required keyword-only argument: 'x'
+        
 fn(3,5,x=7)
+输出：
+7
+(3, 5)
 # args可以看做已经截获了所有的位置参数，x不使用关键字参数就不可能拿到实参
 # 思考:def fn(**kwargs, x) 可以吗？
 
 def fn(**kwargs,x):
     print(x)
     print(kwargs)
+输出：
+ File "<ipython-input-62-33c9a294d8b7>", line 1
+    def fn(**kwargs,x):
+                    ^
+SyntaxError: invalid syntax
 # 直接报语法错误
 # 可以理解为kwargs会截获所有的关键字参数，就算你写了x=5，x也永远得不到这个值，所以语法错误
 
@@ -288,22 +367,79 @@ def fn(*args,x=5):
     print(x)
     print(args)
 fn()
+输出：
+5
+()
 # 等价于fn(x=5)
-fn(5)
-fn(x=6)
-fn(1,2,3,x=10)
 
+fn(5)
+输出：
+5
+(5,)
+
+fn(x=6)
+输出：
+6
+()
+
+fn(1,2,3,x=10)
+输出：
+10
+(1, 2, 3)
 
 def fn(y,*args,x=5):
     print('x={},y={}'.format(x,y))
     print(args)
 
 fn()
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-67-d1577c4645e1> in <module>
+      3     print(args)
+      4 
+----> 5 fn()
+
+TypeError: fn() missing 1 required positional argument: 'y'
+        
 fn(5)
+输出：
+x=5,y=5
+()
+
 fn(x=6)
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-69-0a11163cdc28> in <module>
+      3     print(args)
+      4 
+----> 5 fn(x=6)
+
+TypeError: fn() missing 1 required positional argument: 'y'
+        
 fn(1,2,3,x=10)
+输出：
+x=10,y=1
+(2, 3)
+
 fn(y=17,2,3,x=10)
+输出：
+  File "<ipython-input-71-f33d57e490fb>", line 5
+    fn(y=17,2,3,x=10)
+           ^
+SyntaxError: positional argument follows keyword argument
+    
 fn(1,2,y=3,x=10)
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-72-526c5ac03606> in <module>
+      3     print(args)
+      4 
+----> 5 fn(1,2,y=3,x=10)
+
+TypeError: fn() got multiple values for argument 'y'
 # x是keyword-only参数
     
     
@@ -312,17 +448,36 @@ def fn(x=5,**kwargs):
     print(kwargs)
     
 fn()
+输出：
+x=5
+{}
+
 fn(5)
+输出：
+x=5
+{}
+
 fn(x=6)
+输出：
+x=6
+{}
+
 fn(y=3,x=10)
+输出：
+x=10
+{'y': 3}
+
 fn(3,y=10)
+输出：
+x=3
+{'y': 10}
 ```
 
 
 
 ### 函数参数规则
 
-- 参数列表参数一般顺序是，普通参数、缺省参数、可变位置参数、keyword-only参数(可带缺省值)、可变关键字参数
+- ***参数列表参数一般顺序是，普通参数、缺省参数、可变位置参数、keyword-only参数(可带缺省值)、可变关键字参数***
 
 ```python
 def fn(x,y,z=3,*arg,m=4,n,**kwargs):
@@ -344,8 +499,22 @@ def connect(host='localhost', port='3306', user='admin', password='admin', **kwa
 	print(kwargs)
     
 connect(db='cmdb')
+输出：
+localhost 3306
+admin admin
+{'db': 'cmdb'}
+
 connect(host='192.168.1.123', db='cmdb')
+输出：
+192.168.1.123 3306
+admin admin
+{'db': 'cmdb'}
+
 connect(host='192.168.1.123', db='cmdb', password='mysql')
+输出：
+192.168.1.123 3306
+admin mysql
+{'db': 'cmdb'}
 ```
 
 
@@ -360,14 +529,38 @@ def add(x, y):
 	return x+y
 
 add(4, 5)
+输出： Out:9
+    
 add((4,5))
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-82-aca89f37f922> in <module>
+      2         return x+y
+      3 
+----> 4 add((4, 5))
+
+TypeError: add() missing 1 required positional argument: 'y'
+        
 t = (4, 5)
 add(t[0], t[1])
-add(*t) 
+输出：Out:9
+    
+add(*t)
+输出：Out:9
+    
 add(*(4,5))
+输出：Out:9
+    
 add(*range(1,3))
+输出：Out:3
+# range(1,3)的结果是1和2，所以相加是3
+
 add(*[4,5])
+输出：Out:9
+    
 add(*{4,6})
+输出：Out:10
 ```
 
 - 参数解构
@@ -382,12 +575,31 @@ def add(x, y):
 	return x+y
 
 add(*(4,5))
+输出：Out:9
+
 add(*[4,5])
+输出：Out:9
+
 add(*{4,6})
+输出：Out:10
+
 d = {'x': 5, 'y': 6}
 add(**d)
+输出：Out:11
+
 add(**{'a': 5, 'b': 6})
+输出：
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-95-407fdeb69ace> in <module>
+      2         return x+y
+      3 
+----> 4 add(**{'a':5,'b':6})
+
+TypeError: add() got an unexpected keyword argument 'a'
+    
 add(*{'a': 5, 'b': 6})
+输出：Out:'ab'
 ```
 
 - 参数解构和可变参数
@@ -401,8 +613,14 @@ def add(*iterable):
 	return result
 
 add(1,2,3)
+输出：Out:6
+    
 add(*[1,2,3])
+输出：Out:6
+
 add(*range(10))
+输出：Out:45
+
 - 可见范围，函数内定义的变量，在函数外是不可见的，不能调用。
 - 但在函数外定义一个变量，在函数内可以调用
 - 函数内的变量叫本地变量
@@ -418,6 +636,9 @@ def showplus(x):
     return x + 1
 
 showplus(5)
+输出：
+5
+Out:6
 ```
 
 - 多条return语句
@@ -429,6 +650,8 @@ def guess(x):
     else:
         return "<=3"
 print(guess(10))
+输出：
+>3
 # return可以执行多次吗？
 ```
 
@@ -440,10 +663,20 @@ def fn(x):
         if i > 3:
             return i
         else:
-            print("{} is not greater than 3".format(x))
+            print("{} is not greater than 3".format(i))
             
 # print(fn(5)) 打印什么？
+0 is not greater than 3
+1 is not greater than 3
+2 is not greater than 3
+3 is not greater than 3
+4
+
 # print(fn(3)) 打印什么？
+0 is not greater than 3
+1 is not greater than 3
+2 is not greater than 3
+None
 ```
 
 - 总结
@@ -461,11 +694,13 @@ def fn(x):
 def showlist():
     return [1,3,5]
 # showlist函数是返回了多个值吗？
-
+输出： Out:[1, 3, 5]
+    
 def showlist():
     return 1,3,5
 # 这次showlist函数是否返回了多个值？
-
+输出：Out:(1, 3, 5)
+    
 - 函数不能同时返回多个值
 - return [1,3,5]是指明返回一个列表，是一个列表对象
 - return 1,3,5 看似返回多个值，隐式的被python封装成了一个元组
@@ -532,7 +767,7 @@ def fn1():
 def fn2():
     print(x)
 # x 可见吗
-print(X)
+print(x)
 # x 可见吗
 
 * 嵌套结构
@@ -559,7 +794,7 @@ outer2()
 - 从嵌套结构例子看出
 	- 外层变量作用域在内层作用域可见
     - 内层作用域inner中，如果定义了o=97，相当于当前作用域中重新定义了一个新的变量o，但是这个o并没有覆
-    盖外层作用域outer中的o
+    盖外层作用域outer2中的o
     
 x = 5
 def foo():
@@ -634,7 +869,7 @@ print(z)
 ### 闭包*
 
 - 自由变量：未在本地作用域中定义的变量。例如定义在内存函数外的外层函数的作用域中的变量
-- 闭包：就是一个概念，出现在嵌套函数中，指的是内层函数引用到了外层函数的自由变量，就形成了闭包。这实际是一个函数嵌套，内层的函数引用到了上一层函数的问题。在全局作用域中的就不是闭包。
+- 闭包：就是一个概念，出现在嵌套函数中，指的是内层函数引用到了外层函数的自由变量，就形成了闭包。这实际是一个函数嵌套，内层的函数引用到了上一层函数的问题。如果引用的是全局作用域中的函数就不是闭包。
 
 ```python
 - c[0] += 1这行会报错吗？
@@ -649,23 +884,23 @@ def counter():
 # 里没有用global，而用一个引用类型来实现，这样就避开了c += 1会报错的情况。所以这行不会报错
         return c[0]   # 这里返回c[0]的值，也就是返回了c第一个元素的值
     return inner
-# 这里不是函数调用，因为没有括号。这里返回的是一个标识符，这个标识符对应一个对象。标识符用来定义一个对
-# 象，这个对象叫函数，所以返回的是函数对象。它返回的不是函数调用的返回值。加括号表示调用函数。这行返回的
-# 不是函数调用的结果，这里的返回值就是inner，inner是一个可调用对象callable，也是一个function对象
+# 这里不是函数调用，因为没有括号。这里返回的是一个标识符/函数名，这个标识符对应一个对象。标识符用来定义
+# 一个对象，这个对象叫函数，所以返回的是函数对象。它返回的不是函数调用的返回值。加括号表示调用函数。这行
+# 返回的不是函数调用的结果，这里的返回值就是inner，inner是一个可调用对象callable，也是一个function对象
 
 foo = counter()  
 # 这里的counter()函数调用返回的是return inner，也就是函数对象的引用。这里的foo的类型也变成了一个
-# callable，可调用对象。这时foo就等于inner了，foo()与inner()是一样的，像是一个别名。但这里不能使用
-# inner() 这种方法，因为它是函数中的函数，所以在外面是不可见的。从里面可以使用外面的变量，用global。但
-# 从外面不能引用函数中的定义
+# callable，可调用对象。这时foo就等于inner了，foo()与inner()是一样的，像是一个别名。但在外面不能使
+# 用inner() 这种方法，因为它是函数中的函数，所以在外面是不可见的。从里面可以使用外面的变量，用global。
+# 但从外面不能引用函数中的定义
 print(type(foo))   # 这就可以看出foo是一个function了
 print(callable(foo))   # 这里返回True
 print(type(foo()))
 print(foo(),foo())
 # 这里要调用两次foo函数，调用第一个foo()的时候就会进到函数中的def inner():里面，执行c[0] += 1和
 # return c[0]，因为c的索引0的值在def counter():中定义了是0，再加1后，c就是1了，之后用return返回。
-# 第二次调用foo()时，c已经是1了，这时c就变成2了，之后返回。这说明c的值被保留下来了。一般按道理执行过
-# foo()之后，它的局部变量就没了，也就是c = [0]这个值就应该随counter函数消亡了，每次调用foo()时，
+# 第二次调用foo()时，c已经是1了，这时c再加1就变成2了，之后返回。这说明c的值被保留下来了。一般按道理执
+# 行过foo()之后，它的局部变量就没了，也就是c = [0]这个值就应该随counter函数消亡了，每次调用foo()时，
 # c = [0]这个值应该不存在或重新赋值。但这里foo = counter()一步拿到了一个内部函数的引用，然后赋值给了
 # 一个变量，之后加1，这时c[0]的值一定不是0。对象计数引用加1。被引用后inner()这个对象不应该被消亡，所以
 # 打印时，foo是function对象，而且一定是callable的，也可以把一个callable对象用callable()检查，如果
@@ -687,8 +922,8 @@ True
 def counter1():
     c = 5
     def inner1():
-        c += 1
-#         return c     
+#        c += 1
+         return c     
 # 这也是一个闭包，因为这也是对外部变量的引用。引用时只要改变外部变量就不是闭包了。如在这里加上c = 4，这
 # 里的c与外部的c就是两个变量了。闭包就是为了使用外层函数的变量，如果加入c += 1，就会出问题了。因为这时
 # 没有定义c，就要改变c的值。上面只是改变c的元素的值。所以在定义时c就不能被定义成一个数字，应该定义为列
@@ -719,8 +954,8 @@ UnboundLocalError                         Traceback (most recent call last)
       6 # 这也是一个闭包，因为这也是对外部变量的引用。引用时只要改变外部变量就不是闭包了。如在这里加上c = 4，这里的c与外部的c就是两个变量了
 
 UnboundLocalError: local variable 'c' referenced before assignment
-# 使用global可以解决上面的报错，但这使用的是全局变量，而不是闭包
-# 如果要对普通变量的闭包，python3中可以使用nonlocal
+# 使用global可以解决上面的报错，但这样使用的是全局变量，而不是闭包
+# 如果要用对普通变量的闭包，python3中可以使用nonlocal
 =======================================================================================
 def counter1():
     c = [4]
@@ -745,7 +980,8 @@ def count():
     c = 1
     a = 10
     def inner():
-        global c   # 报错的原因是在函数的外部没有定义过c，函数中定义的都算本地环境。解析器才是global环境
+        global c   
+  # 报错的原因是在函数的外部没有定义过c，函数中定义的都算本地环境。解析器才是global环境
 # global的作用域在全局和使用global声明的函数中有效。以这个函数来说，只在全局和inner()函数中有效。
         c += 1
         return c
@@ -783,7 +1019,7 @@ foo()
 2
 - count是外层函数的局部变量，被内部函数引用
 - 内部函数使用nonlocal关键字声明count变量在上级作用域而非本地作用域中定义
-- 左边代码可以正常使用，且形成闭包
+- 上面代码可以正常使用，且形成闭包
 =======================================================================================
 a = 50
 def counter():
@@ -801,7 +1037,6 @@ foo = counter()
 foo()
 foo()
 - 这段代码不能正常运行，变量a不能在全局作用域中
-
 ```
 
 
@@ -877,7 +1112,7 @@ None 140460738254232
 [100, 100]
 None 140460738254232
 3 ([100, 100], 5, 6)
-- 函数地址并没有变，就是说函数这个对象的没有变，调用它，它的属性__defaults__中使用元组保存默认值
+- 函数地址并没有变，调用它，它的属性__defaults__中使用元组保存默认值
 - xyz默认值是引用类型，引用类型的元素变动，并不是元组的变化
 =======================================================================================
 def foo(w,u='abc',*,z=123,zz=[456]):
@@ -888,8 +1123,21 @@ def foo(w,u='abc',*,z=123,zz=[456]):
 print(foo.__defaults__)
 foo('magedu')
 print(foo.__kwdefaults__)
-- 属性__defaults__中使用元组保存所有位置参数默认值
+输出：
+('abc',)
+magedu xyz 789 [456, 1]
+{'z': 123, 'zz': [456, 1]}
+
+- 属性__defaults__中使用元组保存所有位置参数默认值，这里说的位置参数包括关键字参数或默认参数
 - 属性__kwdefaults__中使用字典保存所有keyword-only参数的默认值
+- 这里涉及之前的概念不可混淆。位置参数与关键字参数是传参的方法不一样，但定义函数时是一样的，都是
+- def f(a,b,c)，位置参数传参时可以直接使用f(1,2,3)，只要参数个数与定义时一样就可以，它会按定义时的顺
+- 序给参数赋值。而关键字参数传参时用，f(b=2,c=0,a=3)，这样传参更灵活，不用计较定义时的顺序。默认参数是
+- 在定义时就给了参数一个默认值，f(a=8)，调用时如果不给参数，就用默认值；keyword-only是在定义时在星号
+- 或可变参数后定义的普通参数，如f(a,*,r)、f(*args,e)，这里的r和e都是keyword-only，调用函数时必须给
+- keyword-only类型的参数指定明确的值，如f(1,r=8)；可变参数可以用一个参数匹配多个参数，如
+- f(*args,a)，调用时可以用f(1,2,3,a=0)；可变关键字参数在定义时要放在最后，它可以截取所有关键字参数，
+- 以字典方式保存，定义如f(**kwargs)，调用时用f(a=8,b=9)
 ```
 
 
@@ -909,7 +1157,7 @@ print(1,foo.__defaults__)
 foo()
 print(2,foo.__defaults__)
 foo([10])
-# 这里给了foo()函数一个值，那就不使用默认值了，所以下面浅拷贝后再打印出来的是[10,1]
+# 这里给了foo()函数一个值，那就不使用默认值了，之后再向xyz中追加1，所以下面浅拷贝后再打印出来的是[10,1]
 print(3,foo.__defaults__)
 foo([10,5])
 # 因为上面没有修改默认值，所以打印出来的是[10,5,1]
@@ -965,7 +1213,7 @@ print(a)
 - Build-in，内置模块的命名空间，生命周期从python解释器启动时创建到解释器退出时消亡。例如print(open)，print和open都是内置的变量
 - 所以一个名词的查找顺序就是LEGB
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python函数/变量名解析原则1.png)
+![](/images/python函数/变量名解析原则1.png)
 
 
 
@@ -978,6 +1226,8 @@ def foo(xyz=[],u='abc',z=123):
     xyz.append(1)
     return xyz
 print(foo(),id(foo),foo.__defaults__)
+输出：
+[1] 139660910996064 ([1], 'abc', 123)
 
 def foo(xyz=[],u='abc',z=123):
     xyz.append(1)
@@ -985,6 +1235,16 @@ def foo(xyz=[],u='abc',z=123):
 print(foo(),id(foo),foo.__defaults__)
 del foo
 print(foo(),id(foo),foo.__defaults__)
+输出：
+[1] 139660910996608 ([1], 'abc', 123)
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-152-21d255639bdf> in <module>
+      4 print(foo(),id(foo),foo.__defaults__)
+      5 del foo
+----> 6 print(foo(),id(foo),foo.__defaults__)
+
+NameError: name 'foo' is not defined
 ```
 
 - 全局函数销毁
@@ -1008,8 +1268,21 @@ def foo(xyz=[],u='abc',z=123):
     return inner
 bar = foo()
 print(id(foo),id(bar),foo.__defaults__,bar.__defaults__)
+输出：
+<function foo.<locals>.inner at 0x7f0556fd2730>
+<function foo.<locals>.inner at 0x7f0556fd2b70>
+139660910996200 139660910996336 ([1], 'abc', 123) (100,)
+
 del bar
 print(id(foo),id(bar),foo.__defaults__,bar.__defaults__)
+输出：
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-154-da23e1c7a787> in <module>
+      1 del bar
+----> 2 print(id(foo),id(bar),foo.__defaults__,bar.__defaults__)
+
+NameError: name 'bar' is not defined
 ```
 
 - 局部函数销毁

@@ -11,7 +11,7 @@ categories: python
 - 树是n(n>0)个元素的集合
   - n = 0时，称为空树
   - 树只有一个特殊的没有前驱的元素，称为树的根root
-  - 树中除了根结点外，其余元素只能有一个前驱，可以有零个或多个多继
+  - 树中除了根结点外，其余元素只能有一个前驱，可以有零个或多个后继
 - 递归定义
   - 树T是n(n>=0)个元素的集合。n=0时，称为空树
   - 有且只有一个特殊元素根，剩余元素都可以被划分为m个互不相交的集合T1、T2、T3、...、Tm，而每一个集合都是树，称为T的子树Subtree
@@ -23,7 +23,7 @@ categories: python
 - 内部结点：除根结点外的分支结点，当然也不包括叶子结点
 - 树的度是树内各结点的度的最大值。D结点度最大为3，树的度数就是3
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/树的概念1.png)
+![](/images/python树/树的概念1.png)
 
 - 孩子(儿子Child)结点：结点的子树的根结点称为该结点的孩子
 - 双亲(父Parent)结点：一个结点是它各子树的根结点的双亲
@@ -42,7 +42,7 @@ categories: python
 - 树的特点
   - 唯一的根
   - 子树不相交
-  - 除了根以外，每个元素只能有一个前驱，可以有零个或多个多继
+  - 除了根以外，每个元素只能有一个前驱，可以有零个或多个后继
   - 根结点没有双亲结点(前驱)，叶子结点没有孩子结点(后继)
   - vi是vj的双亲，则L(vi) = L(vj) - 1，也就是说双亲比孩子结点的层次小1
 - 堂兄弟的双亲是兄弟关系吗？
@@ -69,7 +69,7 @@ categories: python
 - 左斜树，所有结点都只有左子树
 - 右斜树，所有结点都只有右子树
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/斜树1.png)
+![](/images/python树/斜树1.png)
 
 
 
@@ -80,7 +80,7 @@ categories: python
 - k为深度(1<=k<=n)，则结点总数为2^k-1
 - 如下图，一个深度为4的15个结点的满二叉树
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/满二叉树1.png)
+![](/images/python树/满二叉树1.png)
 
 
 
@@ -92,19 +92,19 @@ categories: python
 - k为深度(1<=k<=n)，则结点总数最大值为2^k-1，当达到最大值的时候就是满二叉树
 - 举例，完全二叉树，最下一层的叶子结点都连续的集中在左边
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/完全二叉树1.png)
+![](/images/python树/完全二叉树1.png)
 
 - 举例，完全二叉树，最下一层的叶子结点都连续的集中在左边
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/完全二叉树2.png)
+![](/images/python树/完全二叉树2.png)
 
 - 举例，完全二叉树，最下一层的叶子结点都连续的集中在左边
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/完全二叉树3.png)
+![](/images/python树/完全二叉树3.png)
 
 - 举例，***不是完全二叉树***
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/完全二叉树4.png)
+![](/images/python树/完全二叉树4.png)
 
 
 
@@ -126,7 +126,7 @@ categories: python
     - 分支数还等于n0*0+n1*1+n2*2，n2是2分支结点所以乘以2,2*n2+n1
     - 可行2*n2+n1=n0+n1+n2-1 => n2 = n0-1
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/二叉树性质1.png)
+![](/images/python树/二叉树性质1.png)
 
 - 其他性质
   - 高度为k的二叉树，至少有k个结点
@@ -137,11 +137,10 @@ categories: python
 - 性质4
   - 具有n个结点的完全二叉树的深度为int(log2n)+1或者math.ceil(log2(n+1))
 
-![](/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/python树/二叉树性质2.png)
+![](/images/python树/二叉树性质2.png)
 
 - 性质5
   - 如果有一棵n个结点的完全二叉树(深度为性质4)，结点按照层序编号，如下图
   - 如果i=1，则结点i是二叉树的根，无双新；如果i>1，则其双亲是int(i/2)，向下取整。就是子结点的编号整除2得到的就是父结点的编号。父结点如果是i，那么左孩子结点就是2i，右孩子结点就是2i+1
   - 如果2i>n，则结点i无左孩子，即结点i为叶子结点；否则其左孩子结点存在编号为2i
   - 如果2i+1>n，则结点i无右孩子，注意这里并不能说明结点i没有左孩子；否则右孩子结点存在编号为2i+1
-

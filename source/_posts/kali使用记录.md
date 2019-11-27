@@ -10,7 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity ark cherrytree catfish
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -37,6 +37,9 @@ sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfet
 # 机使用了NAT联网的方式
 # fish是一个命令行提示工具，安装后，要运行fish到一个新的shell中才能使用其功能。源：apt-add-repository ppa:fish-shell/release-2
 # audacity为录音软件
+# ark为解压缩软件
+# cherrytree为树状记录软件
+# catfish为搜索软件
 ```
 
 
@@ -390,6 +393,15 @@ sudo apt-fast upgrade
 
 ```shell
 号称是一款全能的下载工具，使用上的确比以往的下载工具好用。下载地址：https://motrix.app/zh-CN/
+```
+
+
+
+#### linux下载工具XDM
+
+```python
+据称是可以大幅度提高下载速度的免费下载工具，可以在设置中打开并添加浏览器插件，下载后执行shell脚本即可。
+地址：http://xdman.sourceforge.net/
 ```
 
 
@@ -1731,6 +1743,51 @@ Control+Shift+W
 
 20. 取消PPA库的方法
 sudo add-apt-repository --remove ppa:nilarimogard/webupd8
+```
+
+
+
+#### 无法登录GUI环境
+
+```python
+更新后，无法使用用户登录到桌面环境，在网上找到的解决办法无非重新安装lightdm或sdm3，但并无法解决问题。发
+现重新创建用户或使用root用户是可以登录到桌面环境的。
+# root用户登录桌面环境
+vim /root/.profile
+将最后一行的mesg n改为tty -s && mesg n。重启后生效
+
+# 创建用户
+useradd -m -G adm,cdrom,sudo,dip,plugdev,lpadmin,sambashare,vboxusers,usbfs -s /bin/zsh ruopu
+### -m表示创建家目录；-G表示指定附属组；-s表示指定默认shell
+cp -r /home/shouyu/* /home/ruopu
+cp -r /home/shouyu/.* /home/ruopu
+### 将之前有问题的用户家目录中的所有文件，包括点开头的配置文件都复制到新用户目录下
+vim /home/ruopu/.zshrc
+export ZSH="/home/ruopu/.oh-my-zsh"
+### 将.zshrc配置文件中的目录改为新用户的家目录
+chown -r ruopu.ruopu /home/ruopu
+### 修改所有复制过来的文件的属主属组
+passwd ruopu
+### 如果不设置用户密码，会在登录界面显示用户被禁用
+userdel -r shouyu
+### 删除旧用户
+```
+
+
+
+### 屏幕变成竖屏的
+
+```shell
+使用当中，笔记本屏幕自动旋转了90度，头也要向右低90度才能正常看，原因不明
+xrandr -o normal
+# 恢复正常角度
+xrandr -o left
+# 竖屏显示
+xrandr -o right
+# 向右旋转90度
+xrandr -o inverted
+# 上下翻转
+# 参考：blog.csdn.net/ITBigGod/article/details/85775257
 ```
 
 
