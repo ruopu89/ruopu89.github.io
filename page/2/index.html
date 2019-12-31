@@ -350,6 +350,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/15/ngrok简单配置与使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/15/ngrok简单配置与使用/" itemprop="url">
+                  ngrok简单配置与使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-15 17:08:50 / 修改時間：17:41:28" itemprop="dateCreated datePublished" datetime="2019-11-15T17:08:50+08:00">2019-11-15</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络/" itemprop="url" rel="index"><span itemprop="name">网络</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    ngrok是一个内网穿透的解决方案，它可以使你通过公网服务器连接到你本地的服务器</p>
+<h3 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">   公网服务器</span><br><span class="line">--------------</span><br><span class="line">yum install -y gcc git mercurial bzr subversion golang golang-pkg-windows-amd64 golang-pkg-windows-386</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装所需包</span></span><br><span class="line">git clone https://github.com/inconshreveable/ngrok.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 克隆到本地</span></span><br></pre></td></tr></table></figure>
+<h3 id="生成证书"><a href="#生成证书" class="headerlink" title="生成证书"></a>生成证书</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">cd ngrok</span><br><span class="line">mkdir cert</span><br><span class="line">cd cert</span><br><span class="line">export NGROK_DOMAIN="abc.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里的域名就是你要访问的域名，需要在互联网可以解析到</span></span><br><span class="line">openssl genrsa -out rootCA.key 2048</span><br><span class="line">openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=$NGROK_DOMAIN" -days 5000 -out rootCA.pem</span><br><span class="line">openssl genrsa -out device.key 2048</span><br><span class="line">openssl req -new -key device.key -subj "/CN=$NGROK_DOMAIN" -out device.csr</span><br><span class="line">openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成密钥</span></span><br><span class="line">cp rootCA.pem ../assets/client/tls/ngrokroot.crt </span><br><span class="line">cp device.crt ../assets/server/tls/snakeoil.crt </span><br><span class="line">cp device.key ../assets/server/tls/snakeoil.key </span><br><span class="line"><span class="meta">#</span><span class="bash"> 将密钥复制到指定位置</span></span><br><span class="line">cd ..</span><br><span class="line">GOOS=linux GOARCH=amd64 make release-server</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成服务端包</span></span><br><span class="line">GOOS=linux GOARCH=amd64 make release-client</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成linux客户端名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> windows客户端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=windows GOARCH=amd64 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=windows GOARCH=386 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MacOS客户端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=darwin GOARCH=amd64 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=darwin GOARCH=386 make release-client</span></span><br><span class="line">./bin/ngrokd -domain="$NGROK_DOMAIN" -httpAddr=":28080" -httpsAddr=":28443" -tunnelAddr=":24443"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定端口并启动ngrok服务，如果不指定端口，http默认端口80，https默认端口443，tunnel默认端口4443，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> tunnel端口是服务端与客户端联系的端口</span></span><br></pre></td></tr></table></figure>
+<h3 id="客户端配置"><a href="#客户端配置" class="headerlink" title="客户端配置"></a>客户端配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">登录服务器下载上面生成的客户端包，因为使用的是ubuntu客户端，所以下载ngrok包就可以了</span><br><span class="line">vim ngrok.cfg                                                                   </span><br><span class="line">server_addr: "abc.com:24443"</span><br><span class="line">trust_host_root_certs: false</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一个ngrok的配置文件，注意这个文件是yaml文件，所以对格式要求很严格。冒号与后面引号之间是有空格的。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置的配置文件可以放在家目录，叫.ngrok</span></span><br><span class="line">./ngrok -config ngrok.cfg -proto=tcp 22</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样可以启动客户端，这里用-config指定了配置文件，本地与服务器都使用tcp协议，本地监听22端口，服务器会</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听一个随机端口，本地要监听哪个端口，要取决于要连接的服务监听的端口，如这里要使用ssh服务，输出如下：</span></span><br><span class="line">ngrok                                                                                    </span><br><span class="line">Tunnel Status                 online   # 这里要变成online才是正常，开始是connecting</span><br><span class="line">Version                       1.7/1.7</span><br><span class="line">Forwarding                    tcp://abc.com:38139 -&gt; 127.0.0.1:22</span><br><span class="line">Web Interface                 127.0.0.1:4040</span><br><span class="line"><span class="meta">#</span><span class="bash"> Conn                        1</span></span><br><span class="line">Avg Conn Time                 24193.12ms                                               </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有一个问题，当连接成功后，域名是没有前缀的。所有添加域名解析时，就直接解析域名即可。使用这种方法可</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 以添加不同的端口映射到本地，如3389端口。但这里的问题是，服务器一端打开的随机端口，所以每次都需要手动修</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 改安全组的配置，放开指定端口</span></span><br><span class="line"></span><br><span class="line">./ngrok -subdomain ngrok -config=./ngrok.cfg</span><br><span class="line"><span class="meta">#</span><span class="bash"> -subdomain指定域名的前缀，如域名是abc.com，那么连接后就是ngrok.abc.com，这样启动客户端后要监听80</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 端口。这里如果加了域名前缀，那么在添加域名解析时，就要在添加A记录时，添加一个泛域名解析，如*.ngrok</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/14/python基础学习-生成器/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2455,193 +2616,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/31/python基础学习-random模块/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/10/31/python基础学习-random模块/" itemprop="url">
-                  python基础学习-random模块
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-10-31 08:28:39 / 修改時間：09:09:17" itemprop="dateCreated datePublished" datetime="2019-10-31T08:28:39+08:00">2019-10-31</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p><code>random.choice(seq)</code></p>
-<p>从非空序列 <em>seq</em> 返回一个随机元素。 如果 <em>seq</em> 为空，则引发 <a href="https://docs.python.org/zh-cn/3/library/exceptions.html#IndexError" target="_blank" rel="noopener"><code>IndexError</code></a>。</p>
-</li>
-<li><p><code>random.shuffle(x[, random])</code></p>
-<p>将序列 <em>x</em> 随机打乱位置。可选参数 <em>random</em> 是一个0参数函数，在 [0.0, 1.0) 中返回随机浮点数；默认情况下，这是函数 <a href="https://docs.python.org/zh-cn/3/library/random.html#random.random" target="_blank" rel="noopener"><code>random()</code></a> 。要改变一个不可变的序列并返回一个新的打乱列表，请使用<code>sample(x, k=len(x))</code>。请注意，即使对于小的 <code>len(x)</code>，<em>x</em> 的排列总数也可以快速增长，大于大多数随机数生成器的周期。 这意味着长序列的大多数排列永远不会产生。 例如，长度为2080的序列是可以在 Mersenne Twister 随机数生成器的周期内拟合的最大序列。</p>
-</li>
-<li><p><code>random.random()</code></p>
-<p>返回 [0.0, 1.0) 范围内的下一个随机浮点数。</p>
-</li>
-<li><p><code>random.sample(population, k)</code></p>
-<p>返回从总体序列或集合中选择的唯一元素的 <em>k</em> 长度列表。 用于无重复的随机抽样。返回包含来自总体的元素的新列表，同时保持原始总体不变。 结果列表按选择顺序排列，因此所有子切片也将是有效的随机样本。 这允许抽奖获奖者（样本）被划分为大奖和第二名获胜者（子切片）。总体成员不必是 <a href="https://docs.python.org/zh-cn/3/glossary.html#term-hashable" target="_blank" rel="noopener">hashable</a> 或 unique 。 如果总体包含重复，则每次出现都是样本中可能的选择。要从一系列整数中选择样本，请使用 <a href="https://docs.python.org/zh-cn/3/library/stdtypes.html#range" target="_blank" rel="noopener"><code>range()</code></a> 对象作为参数。 对于从大量人群中采样，这种方法特别快速且节省空间：<code>sample(range(10000000), k=60)</code> 。如果样本大小大于总体大小，则引发 <a href="https://docs.python.org/zh-cn/3/library/exceptions.html#ValueError" target="_blank" rel="noopener"><code>ValueError</code></a> 。</p>
-</li>
-<li><p><code>random.uniform(a, b)</code></p>
-<p>返回一个随机浮点数 <em>N</em> ，当 <code>a &lt;= b</code> 时 <code>a &lt;= N &lt;= b</code> ，当 <code>b &lt; a</code> 时 <code>b &lt;= N &lt;= a</code> 。取决于等式 <code>a + (b-a) * random()</code> 中的浮点舍入，终点 <code>b</code> 可以包括或不包括在该范围内。</p>
-</li>
-<li><p><code>random.randrange(stop)</code></p>
-</li>
-<li><p><code>random.randrange(start, stop[, step])</code></p>
-<p>从 <code>range(start, stop, step)</code> 返回一个随机选择的元素。 这相当于 <code>choice(range(start, stop, step))</code> ，但实际上并没有构建一个 range 对象。位置参数模式匹配 <a href="https://docs.python.org/zh-cn/3/library/stdtypes.html#range" target="_blank" rel="noopener"><code>range()</code></a> 。不应使用关键字参数，因为该函数可能以意外的方式使用它们。在 3.2 版更改: <a href="https://docs.python.org/zh-cn/3/library/random.html#random.randrange" target="_blank" rel="noopener"><code>randrange()</code></a> 在生成均匀分布的值方面更为复杂。 以前它使用了像<code>int(random()*n)</code>这样的形式，它可以产生稍微不均匀的分布。</p>
-</li>
-<li><p><code>random.randint(a, b)</code></p>
-<p>返回随机整数 <em>N</em> 满足 <code>a &lt;= N &lt;= b</code>。相当于 <code>randrange(a, b+1)</code>。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -2684,7 +2663,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">180</span>
+                    <span class="site-state-item-count">181</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3048,7 +3027,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">139</span>
+                      
+                    
+                    <span class="site-state-item-count">140</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
