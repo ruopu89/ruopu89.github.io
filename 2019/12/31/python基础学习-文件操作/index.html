@@ -143,7 +143,7 @@
 <meta property="og:description" content="文件操作冯诺依曼体系架构  CPU由运算器和控制器组成 运算器，完成各种算数运算、逻辑运算、数据传输等数据加工处理 控制器，控制程序的执行 存储器，用于记忆程序和数据，例如内存 输入设备，将数据或者程序输入到计算机中，例如键盘、鼠标 输出设备，将数据或程序的处理结果展示给用户，例如显示器、打印机等    一般说IO操作，指的是文件IO，如果指的是网络IO，都会直接说网络IO 文件IO常用操作">
 <meta property="og:locale" content="zh-TW">
 <meta property="og:image" content="http://yoursite.com/images/python文件操作/冯诺依曼体系架构.png">
-<meta property="og:updated_time" content="2019-12-31T09:37:30.128Z">
+<meta property="og:updated_time" content="2020-01-02T01:26:23.652Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python基础学习-文件操作">
 <meta name="twitter:description" content="文件操作冯诺依曼体系架构  CPU由运算器和控制器组成 运算器，完成各种算数运算、逻辑运算、数据传输等数据加工处理 控制器，控制程序的执行 存储器，用于记忆程序和数据，例如内存 输入设备，将数据或者程序输入到计算机中，例如键盘、鼠标 输出设备，将数据或程序的处理结果展示给用户，例如显示器、打印机等    一般说IO操作，指的是文件IO，如果指的是网络IO，都会直接说网络IO 文件IO常用操作">
@@ -398,12 +398,24 @@
                 
               
 
-              <time title="創建時間：2019-12-31 15:42:08 / 修改時間：17:37:30" itemprop="dateCreated datePublished" datetime="2019-12-31T15:42:08+08:00">2019-12-31</time>
+              <time title="創建時間：2019-12-31 15:42:08" itemprop="dateCreated datePublished" datetime="2019-12-31T15:42:08+08:00">2019-12-31</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-01-02 09:26:23" itemprop="dateModified" datetime="2020-01-02T09:26:23+08:00">2020-01-02</time>
               
             
           </span>
@@ -687,18 +699,26 @@
 <p><code>closed</code>是否已经关闭</p>
 <h3 id="上下文管理"><a href="#上下文管理" class="headerlink" title="上下文管理"></a>上下文管理</h3><h4 id="问题的引出"><a href="#问题的引出" class="headerlink" title="问题的引出"></a>问题的引出</h4><p>在linux中，执行</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下面必须这么写</span></span><br><span class="line">lst = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2000</span>):</span><br><span class="line">    lst.append(open(<span class="string">'test'</span>))</span><br><span class="line"><span class="comment"># OSError: [Errno 24] Too many open files: 'test'</span></span><br><span class="line"></span><br><span class="line">print(len(lst))</span><br><span class="line"></span><br><span class="line">lsof 列出打开的文件。没有就用yum install lsof</span><br><span class="line">lsof -p <span class="number">1427</span> | grep test | wc -l</span><br><span class="line">lsof -p 进程号</span><br><span class="line">ulimit -a 查看所有限制。其中open files就是打开文件数的限制，默认<span class="number">1024</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> lst:</span><br><span class="line">    x.close()</span><br><span class="line"><span class="comment"># 将文件一次关闭，然后就可以继续打开了。再看一次lsof</span></span><br></pre></td></tr></table></figure>
+<p><strong><em>有一些任务，可能事先需要设置，事后做清理工作。对于这种场景，Python的with语句提供了一种非常方便的处理方式。一个很好的例子是文件处理，你需要获取一个文件句柄，从文件中读取数据，然后关闭文件句柄。</em></strong></p>
 <p>如何解决？</p>
 <ol>
 <li>异常处理</li>
 </ol>
-<p>当出现异常的时候，拦截异常。但是，因为很多代码都可能出现OSError异常，还不好判断异常就是国为资源限制产生的</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">f = open(<span class="string">'test'</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    f.write(<span class="string">"abc"</span>)   <span class="comment"># 文件只读，写入失败</span></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    f.close()    <span class="comment"># 这样才行</span></span><br></pre></td></tr></table></figure>
-<p>使用finally可以保证打开的文件可以被关闭</p>
+<p>当出现异常的时候，拦截异常。但是，因为很多代码都可能出现OSError异常，还不好判断异常就是因为资源限制产生的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">f = open(<span class="string">'test'</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    f.write(<span class="string">"abc"</span>)   <span class="comment"># 文件只读，写入失败</span></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    f.close()    <span class="comment"># 这样才行</span></span><br><span class="line"><span class="comment"># 使用finally可以保证打开的文件可以被关闭</span></span><br><span class="line"><span class="comment"># 虽然这段代码运行良好，但是太冗长了。这时候就是with一展身手的时候了。除了有更优雅的语法，with还可以很</span></span><br><span class="line"><span class="comment"># 好的处理上下文环境产生的异常。</span></span><br></pre></td></tr></table></figure>
 <ol start="2">
 <li>上下文管理</li>
 </ol>
-<p>一种特殊的语法，交给解释器云释放文件对象</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">del</span> f</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'test'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">"abc"</span>)   <span class="comment">#  文件只读，写入失败</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 测试f是否关闭</span></span><br><span class="line">f.closed   <span class="comment"># f的作用域</span></span><br></pre></td></tr></table></figure>
+<p>一种特殊的语法，交给解释器去释放文件对象</p>
+<p>with工作原理</p>
+<ul>
+<li><p>基本思想是with所求值的对象必须有一个<code>__enter__()</code>方法，一个<code>__exit__()</code>方法。</p>
+</li>
+<li><p>紧跟with后面的语句被求值后，返回对象的<code>__enter__()</code>方法被调用，这个方法的返回值将被赋值给as后面的变量；</p>
+</li>
+<li>当with后面的代码块全部被执行完之后，将调用前面返回对象的<code>__exit__()</code>方法。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">del</span> f</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'test'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">"abc"</span>)   <span class="comment">#  文件只读，写入失败</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 测试f是否关闭</span></span><br><span class="line">f.closed   <span class="comment"># f的作用域</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果有多项，可以写成</span></span><br><span class="line">With open(<span class="string">'1.txt'</span>) <span class="keyword">as</span> f1, open(<span class="string">'2.txt'</span>) <span class="keyword">as</span>  f2:</span><br><span class="line">    do something</span><br></pre></td></tr></table></figure>
 <p>上下文管理</p>
 <ol>
 <li>使用with … as 关键字</li>
@@ -709,7 +729,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f1 = open(<span class="string">'test'</span>)</span><br><span class="line"><span class="keyword">with</span> f1:</span><br><span class="line">    f1.write(<span class="string">"abc"</span>)   <span class="comment"># 文件只读，写入失败</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 测试f是否关闭</span></span><br><span class="line">f1.closed   <span class="comment"># f1的作用域</span></span><br></pre></td></tr></table></figure>
 <p>对于类似于文件对象的IO对象，一般来说都需要在不使用的时候关闭、注销、以释放资源。IO被打开的时候，会获得一个文件描述符。计算机资源是有限的，所以操作系统都会做限制。就是为了保护计算机的资源不要被完全耗尽，计算资源是共享的，不是独占的。一般情况下，除非特别明确的知道资源情况，否则不要提高资源的限制值来解决问题。</p>
 <h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><h4 id="指定一个源文件，实现copy到目标目录"><a href="#指定一个源文件，实现copy到目标目录" class="headerlink" title="指定一个源文件，实现copy到目标目录"></a>指定一个源文件，实现copy到目标目录</h4><p>例如把/tmp/test.txt拷贝到/tmp/test1.txt</p>
-<h4 id="有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词"><a href="#有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词" class="headerlink" title="有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词"></a>有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">简单处理后，大概的得数如下：</span><br><span class="line">the, <span class="number">136</span></span><br><span class="line"><span class="keyword">is</span>, <span class="number">60</span></span><br><span class="line">a, <span class="number">54</span></span><br><span class="line">path, <span class="number">52</span></span><br><span class="line"><span class="keyword">if</span>, <span class="number">42</span></span><br><span class="line"><span class="keyword">and</span>, <span class="number">39</span></span><br><span class="line">to, <span class="number">34</span></span><br><span class="line">of, <span class="number">33</span></span><br><span class="line">on, <span class="number">32</span></span><br><span class="line"><span class="keyword">return</span>, <span class="number">30</span></span><br><span class="line"></span><br><span class="line">实际上有效的path很多，作为合法的单词path统计应该有<span class="number">100</span>多个。对单词做进一步处理后，统计如下：</span><br><span class="line">path, <span class="number">137</span></span><br><span class="line">the, <span class="number">136</span></span><br><span class="line"><span class="keyword">is</span>, <span class="number">60</span></span><br><span class="line">a, <span class="number">59</span></span><br><span class="line">os, <span class="number">50</span></span><br><span class="line"><span class="keyword">if</span>, <span class="number">43</span></span><br><span class="line"><span class="keyword">and</span>, <span class="number">40</span></span><br><span class="line">to, <span class="number">34</span></span><br><span class="line">of, <span class="number">33</span></span><br><span class="line">on, <span class="number">33</span></span><br></pre></td></tr></table></figure>
+<h4 id="有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词"><a href="#有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词" class="headerlink" title="有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词"></a>有一个文件，对其进行单词统计，不区分大小写，并显示单词重复最多的10个单词</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">简单处理后，大概的得数如下：</span><br><span class="line">the, <span class="number">136</span></span><br><span class="line"><span class="keyword">is</span>, <span class="number">60</span></span><br><span class="line">a, <span class="number">54</span></span><br><span class="line">path, <span class="number">52</span></span><br><span class="line"><span class="keyword">if</span>, <span class="number">42</span></span><br><span class="line"><span class="keyword">and</span>, <span class="number">39</span></span><br><span class="line">to, <span class="number">34</span></span><br><span class="line">of, <span class="number">33</span></span><br><span class="line">on, <span class="number">32</span></span><br><span class="line"><span class="keyword">return</span>, <span class="number">30</span></span><br><span class="line"><span class="comment"># 上面是以空格为分隔的结果，这里的path与下面统计的数量不一样，因为分隔符不一样</span></span><br><span class="line">实际上有效的path很多，作为合法的单词path统计应该有<span class="number">100</span>多个。对单词做进一步处理后，统计如下：</span><br><span class="line">path, <span class="number">137</span></span><br><span class="line">the, <span class="number">136</span></span><br><span class="line"><span class="keyword">is</span>, <span class="number">60</span></span><br><span class="line">a, <span class="number">59</span></span><br><span class="line">os, <span class="number">50</span></span><br><span class="line"><span class="keyword">if</span>, <span class="number">43</span></span><br><span class="line"><span class="keyword">and</span>, <span class="number">40</span></span><br><span class="line">to, <span class="number">34</span></span><br><span class="line">of, <span class="number">33</span></span><br><span class="line">on, <span class="number">33</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 最好使用字典来实现此题，到目前为止学过的时间复杂度为O(1)的数据结构只有set和dict</span></span><br><span class="line"><span class="comment"># 大的数据统计都用字典这种数据结构，关键是如何分词，如果断开，英文一般用空格。中文要用分词库，比较麻烦。</span></span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -752,6 +772,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/02/python基础学习-转：-翻译-理解Python的with语句/" rel="prev" title="python基础学习-转：[翻译]理解Python的with语句">
+                python基础学习-转：[翻译]理解Python的with语句 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -820,7 +844,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">181</span>
+                    <span class="site-state-item-count">188</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -1186,7 +1210,21 @@
                     
                       
                     
-                    <span class="site-state-item-count">140</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">147</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
@@ -1242,7 +1280,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>
