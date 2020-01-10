@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="argparse模块一个可执行文件或者脚本都可以接收参数 123ls -l /etc# /etc 是位置参数# -l 是短选项 如果把这些参数传递给程序呢？ 从3.2 开始Python提供了参数分析的模块 argparse 参数分类参数分为： 位置参数，参数放在那里，就要对应一个参数位置。例如/etc就是对应一个参数位置。 选项参数，必须通过前面是 - 的短选项或者 – 的长选项，然后后面的才算它">
+<meta name="keywords" content="模块">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-argparse模块">
+<meta property="og:url" content="http://yoursite.com/2020/01/10/python基础学习-argparse模块/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="argparse模块一个可执行文件或者脚本都可以接收参数 123ls -l /etc# /etc 是位置参数# -l 是短选项 如果把这些参数传递给程序呢？ 从3.2 开始Python提供了参数分析的模块 argparse 参数分类参数分为： 位置参数，参数放在那里，就要对应一个参数位置。例如/etc就是对应一个参数位置。 选项参数，必须通过前面是 - 的短选项或者 – 的长选项，然后后面的才算它">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/python-argparse模块/异常1.png">
+<meta property="og:updated_time" content="2020-01-10T04:34:14.432Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-argparse模块">
+<meta name="twitter:description" content="argparse模块一个可执行文件或者脚本都可以接收参数 123ls -l /etc# /etc 是位置参数# -l 是短选项 如果把这些参数传递给程序呢？ 从3.2 开始Python提供了参数分析的模块 argparse 参数分类参数分为： 位置参数，参数放在那里，就要对应一个参数位置。例如/etc就是对应一个参数位置。 选项参数，必须通过前面是 - 的短选项或者 – 的长选项，然后后面的才算它">
+<meta name="twitter:image" content="http://yoursite.com/images/python-argparse模块/异常1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/01/10/python基础学习-argparse模块/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-argparse模块 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/10/python基础学习-argparse模块/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-argparse模块
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-01-10 10:19:41 / 修改時間：12:34:14" itemprop="dateCreated datePublished" datetime="2020-01-10T10:19:41+08:00">2020-01-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="argparse模块"><a href="#argparse模块" class="headerlink" title="argparse模块"></a>argparse模块</h3><p>一个可执行文件或者脚本都可以接收参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -l /etc</span><br><span class="line"><span class="comment"># /etc 是位置参数</span></span><br><span class="line"><span class="comment"># -l 是短选项</span></span><br></pre></td></tr></table></figure>
+<p>如果把这些参数传递给程序呢？</p>
+<p>从3.2 开始Python提供了参数分析的模块 argparse</p>
+<h3 id="参数分类"><a href="#参数分类" class="headerlink" title="参数分类"></a>参数分类</h3><p>参数分为：</p>
+<p>位置参数，参数放在那里，就要对应一个参数位置。例如/etc就是对应一个参数位置。</p>
+<p>选项参数，必须通过前面是 - 的短选项或者 – 的长选项，然后后面的才算它的参数，当然短选项后面也可以没有参数。</p>
+<p>上例中，/etc对应的是位置参数，-l是选项参数。</p>
+<p><code>ls -alh src</code></p>
+<h3 id="基本解析"><a href="#基本解析" class="headerlink" title="基本解析"></a>基本解析</h3><p>先来一段最简单的程序</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser()   <span class="comment"># 一个参数解析器</span></span><br><span class="line">args = parser.parse_args()   <span class="comment"># 分析参数</span></span><br><span class="line">parser.print_help()   <span class="comment"># 打印帮助</span></span><br></pre></td></tr></table></figure>
+<p>运行结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python test.py -h</span><br><span class="line">usage: test1.py [-h]</span><br><span class="line">optional arguments:</span><br><span class="line">  -h, --help  show this help message <span class="keyword">and</span> exit</span><br></pre></td></tr></table></figure>
+<p>argparse不仅仅做了参数的定义和解析，还自动帮助生成了帮助信息。尤其是usage，可以看到现在定义的参数是否是自己想要的。</p>
+<h3 id="解析器的参数"><a href="#解析器的参数" class="headerlink" title="解析器的参数"></a>解析器的参数</h3><table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prog</td>
+<td>程序的名字，缺省使用sys.argv[0]</td>
+</tr>
+<tr>
+<td>add_help</td>
+<td>自动为解析器增加 -h 和 –help 选项，默认为True</td>
+</tr>
+<tr>
+<td>description</td>
+<td>为程序功能添加描述</td>
+</tr>
+</tbody>
+</table>
+<p><code>parser = argparse.ArgumentParser(prog=&#39;1s&#39;,add_help=True,description=&#39;list directory contents&#39;)</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py --help</span><br><span class="line">usage: ls[-h]</span><br><span class="line"></span><br><span class="line">list directory contents</span><br><span class="line"></span><br><span class="line">optional arguments:</span><br><span class="line">  -h, --help show this help message <span class="keyword">and</span> exit</span><br></pre></td></tr></table></figure>
+<h3 id="位置参数解析"><a href="#位置参数解析" class="headerlink" title="位置参数解析"></a>位置参数解析</h3><p>ls 基本功能应该解决目录内容的打印。</p>
+<p>打印的时候应该指定目录路径，需要位置参数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'1s'</span>,add_help=<span class="keyword">True</span>,descriptio=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>)</span><br><span class="line">args = parser.parse_args()   <span class="comment"># 分析参数</span></span><br><span class="line">parser.print_help()   <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">usage: ls [-h] path</span><br><span class="line">ls: error: the following arguments are required: path</span><br></pre></td></tr></table></figure>
+<p>程序等定义为：</p>
+<p><code>ls [-h] path</code></p>
+<p>-h 为帮助，可有可无</p>
+<p>path为位置参数，必须提供</p>
+<h3 id="传参"><a href="#传参" class="headerlink" title="传参"></a>传参</h3><p><code>parse_args(args=None,namespace=None)</code></p>
+<p>args 参数列表，一个可迭代对象。内部会把可迭代对象转换成list。如果为None则使用命令行传入参数，非None则使用args参数的可迭代对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>)   <span class="comment"># 位置参数</span></span><br><span class="line"></span><br><span class="line">args = parser.parse_args((<span class="string">'/etc'</span>,))   <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args)   <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help()   <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line">运行结果</span><br><span class="line">Namespace(path=<span class="string">'/etc'</span>)</span><br><span class="line">usage: ls [-h] path</span><br><span class="line">    </span><br><span class="line">list directory contents</span><br><span class="line"></span><br><span class="line">positional arguments:</span><br><span class="line">    path</span><br><span class="line"></span><br><span class="line">optional arguments:</span><br><span class="line">  -h, --help show this help message <span class="keyword">and</span> exit</span><br></pre></td></tr></table></figure>
+<p>Namespace(path=’/etc’)里面的path参数存储在了一个Namespace对象内的属性上，可以通过Namespace对象属性来访问，例如args.path</p>
+<h3 id="非必须位置参数"><a href="#非必须位置参数" class="headerlink" title="非必须位置参数"></a>非必须位置参数</h3><p>上面的代码必须输入位置参数，否则会报错。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">usage: ls [-h] path</span><br><span class="line">ls: error: the following arguments are required: path</span><br></pre></td></tr></table></figure>
+<p>但有时候，ls 命令不输入任何路径的话就表示列出当前目录的文件列表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"path help"</span>)   </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助</span></span><br><span class="line"></span><br><span class="line">args = parser.parse_args()   <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args)   <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help()   <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">Namespace(path=<span class="string">'.'</span>)</span><br><span class="line">usage: ls [-h] [path]</span><br><span class="line">    </span><br><span class="line">list directory contents</span><br><span class="line"></span><br><span class="line">positional arguments:</span><br><span class="line">  path    path help</span><br><span class="line"></span><br><span class="line">optional arguments:</span><br><span class="line">  -h, --help show this help message <span class="keyword">and</span> exit</span><br></pre></td></tr></table></figure>
+<p>可以看出path也变成可选的位置参数，没有提供就使用默认值 <code>.</code>点号表示当前路径。</p>
+<ul>
+<li>help 表示帮助文档中这个参数的描述</li>
+<li>nargs 表示这个参数接收结果参数，?表示可有可无，+表示至少一个，*可以任意个，数字表示必须是指定数目 个</li>
+<li>default 表示如果不提供该参数，就使用这个值。一般和?、*配合，因为它们都可以不提供位置参数，不提供就是用缺省值</li>
+</ul>
+<h3 id="选项参数"><a href="#选项参数" class="headerlink" title="选项参数"></a>选项参数</h3><h4 id="l-的实现"><a href="#l-的实现" class="headerlink" title="-l 的实现"></a>-l 的实现</h4><p><code>parser.add_argument(&#39;-l&#39;)</code>就增加了选项参数，参数定义为<code>ls [-h] [-l L] [path]</code>和我们要的形式有一点出入，我们期望的是[-h]，怎么解决？</p>
+<p>nargs能够解决吗？</p>
+<p><code>parser.add_argument(&#39;-l&#39;,nargs=&#39;?&#39;)</code></p>
+<p><code>ls [-h] [-l [L]] [path]</code></p>
+<p>L就了可选，而不是-l</p>
+<p>那么，直接把nargs=0，意思就是让这个选项接收0个参数，如下：</p>
+<p><code>parser.add_argument(&#39;-l&#39;,nargs=0)</code></p>
+<p>结果，抛出异常</p>
+<p><img src="/images/python-argparse模块/异常1.png" alt=""></p>
+<p>为了这个问题，使用action参数</p>
+<p><code>parser.add_argument(&#39;-l&#39;,action=&#39;store_true&#39;)</code></p>
+<p>看到命令定义变成了 <code>ls [-h] [-l] [path]</code></p>
+<p>提供-l选项，例如：</p>
+<p><code>ls -l</code> 得到 <code>Namespace(l=True,path=&#39;.&#39;)</code></p>
+<p><code>ls</code> 得到 <code>Namespace(l=False,path=&#39;.&#39;)</code></p>
+<p>这样用True、False来判断用户是否提供了该选项</p>
+<h4 id="a-的实现"><a href="#a-的实现" class="headerlink" title="-a 的实现"></a>-a 的实现</h4><p><code>parser.add_argument(&#39;-a&#39;,&#39;--all&#39;,action=&#39;store_true&#39;)</code></p>
+<p>长短选项可以同时给出。</p>
+<h5 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()  <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">Namespace(all=<span class="keyword">False</span>, l=<span class="keyword">False</span>, path=<span class="string">'.'</span>)</span><br><span class="line">usage: ls [-h] [-l] [-a] [path]</span><br><span class="line">    </span><br><span class="line">list directory contents</span><br><span class="line"></span><br><span class="line">positional arguments:</span><br><span class="line">  path        directory</span><br><span class="line"></span><br><span class="line">optional arguments:</span><br><span class="line">  -h, --help show this help message <span class="keyword">and</span> exit</span><br><span class="line">  -l         use a long listing format</span><br><span class="line">  -a,--all   show all files, do <span class="keyword">not</span> ignore entries starting <span class="keyword">with</span>.</span><br><span class="line"></span><br><span class="line"><span class="comment"># parser.parse_args('-l -a /tmp'.split())</span></span><br><span class="line">Namespace(all=<span class="keyword">True</span>, l=<span class="keyword">True</span>, path=<span class="string">'/tmp'</span>)</span><br></pre></td></tr></table></figure>
+<h5 id="ls-业务功能的实现"><a href="#ls-业务功能的实现" class="headerlink" title="ls 业务功能的实现"></a>ls 业务功能的实现</h5><p>到目前为止，已经解决了参数的定义和传参的问题，下面就要解决业务问题：</p>
+<ol>
+<li>列出所有指定路径的文件，默认是不递归的</li>
+<li>-a 显示所有文件，包括隐藏文件</li>
+<li>-l 详细列表模式显示</li>
+</ol>
+<h5 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()  <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path, all=False)</span>:</span></span><br><span class="line">    <span class="string">"""列出本目录文件"""</span></span><br><span class="line">    p = Path(path)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>): <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">yield</span> i.name</span><br><span class="line">        </span><br><span class="line">print(list(listdir(args.path)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取文件类型</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_getfiletype</span><span class="params">(f:Path)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> f.is_dir():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'d'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_block_device():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'b'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_char_device():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'c'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_socket():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'s'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_symlink():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'l'</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'-'</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># -rw-rw-r-- python python                5 Oct  25  00:07  test4</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdirdetail</span><span class="params">(path, all=False)</span>:</span></span><br><span class="line">    <span class="string">"""详细列出本目录"""</span></span><br><span class="line">    p = Path(path)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>): <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># mode 硬链接  属主  属组  字节  时间  name</span></span><br><span class="line">        stat = i.stat()</span><br><span class="line">        t = _getfiletype(i)</span><br><span class="line">        mode = oct(stat.st_mode)[<span class="number">-3</span>:]</span><br><span class="line">        atime = datetime.fromtimestamp(stat.st_atime).strftime(<span class="string">'%Y %m %d %H:%M:%S'</span>)</span><br><span class="line">        <span class="keyword">yield</span> (t, mode, stat.st_uid, stat.st_gid, stat.st_size, atime, i.name)</span><br><span class="line">        </span><br><span class="line">print(list(listdirdetail(args.path)))</span><br></pre></td></tr></table></figure>
+<p>mode 是整数，八进制描述的权限，最终显示未rwx的格式。</p>
+<p>方法1</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">modelist = [<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_getmodestr</span><span class="params">(mode:int)</span>:</span></span><br><span class="line">    m = mode &amp; <span class="number">0o777</span></span><br><span class="line">    <span class="comment"># print(mode)</span></span><br><span class="line">    <span class="comment"># print(m, bin(m))</span></span><br><span class="line">    mstr = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> i,v <span class="keyword">in</span> enumerate(bin(m)[<span class="number">-9</span>:]):</span><br><span class="line">        <span class="keyword">if</span> v == <span class="string">'1'</span>:</span><br><span class="line">            mstr += modelist[i]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            mstr += <span class="string">'-'</span></span><br><span class="line">    <span class="keyword">return</span> mstr</span><br></pre></td></tr></table></figure>
+<p>方法2：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">modelist = dict(zip(range(<span class="number">9</span>),[<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>]))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_getmodestr</span><span class="params">(mode:int)</span>:</span></span><br><span class="line">    m = mode &amp; <span class="number">0o777</span></span><br><span class="line">    mstr = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">8</span>,<span class="number">-1</span>,<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> m &gt;&gt; i &amp; <span class="number">1</span>:</span><br><span class="line">            mstr += modelist[<span class="number">8</span>-i]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            mstr += <span class="string">'-'</span></span><br><span class="line">    <span class="keyword">return</span> mstr</span><br></pre></td></tr></table></figure>
+<h5 id="合并开出文件函数"><a href="#合并开出文件函数" class="headerlink" title="合并开出文件函数"></a>合并开出文件函数</h5><p>listdirdetail 和listdir几乎一样，重复太多，合并</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()  <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_getfiletype</span><span class="params">(f:Path)</span>:</span></span><br><span class="line">    <span class="string">"""获取文件类型"""</span></span><br><span class="line">    <span class="keyword">if</span> f.is_dir():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'d'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_block_device():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'b'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_char_device():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'c'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_socket():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'s'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_symlink():</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'l'</span></span><br><span class="line">    <span class="keyword">elif</span> f.is_fifo():  <span class="comment"># pipe</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'p'</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'-'</span></span><br><span class="line">    </span><br><span class="line">modelist = dict(zip(range(<span class="number">9</span>),[<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>]))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_getmodestr</span><span class="params">(mode:int)</span>:</span></span><br><span class="line">    m = mode &amp; <span class="number">0o777</span></span><br><span class="line">    mstr = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">8</span>,<span class="number">-1</span>,<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> m &gt;&gt; i &amp; <span class="number">1</span>:</span><br><span class="line">            mstr += modelist[<span class="number">8</span>-i]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            mstr += <span class="string">'-'</span></span><br><span class="line">    <span class="keyword">return</span> mstr</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path, all=False, detail=False)</span>:</span></span><br><span class="line">    <span class="string">"""详细列出本目录"""</span></span><br><span class="line">    p = Path(path)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>):   <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> detail:</span><br><span class="line">            <span class="keyword">yield</span> (i.name,)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># -rw-rw-r--   1    python    python    5  Oct  25  00:07  test4</span></span><br><span class="line">            <span class="comment"># mode       硬链接  属主        属组     字节 时间             name</span></span><br><span class="line">            stat = i.stat()</span><br><span class="line">            mode = _getfiletype(i) + _getmodestr(stat.st_mode)</span><br><span class="line">            atime = datetime.fromtimestamp(stat.st_atime).strftime(<span class="string">'%Y %m %d %H:%M:%S'</span>)</span><br><span class="line">            <span class="keyword">yield</span> (mod, stat.st_nlink, stat.st_uid, stat.st_gid, stat.st_size, atime, i.name)</span><br><span class="line">            </span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> listdir(args.path):</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure>
+<h5 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h5><p>ls 的显示是把文件名按照升序排序输出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 排序</span></span><br><span class="line">sorted(listdir(args.path, detail=<span class="keyword">True</span>), key=<span class="keyword">lambda</span> x: x[len(x) - <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<h5 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h5><p>再次重构代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,add_help=<span class="keyword">True</span>,description=<span class="string">'list directory contents'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()  <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path, all=False, detail=False)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_getfiletype</span><span class="params">(f:Path)</span>:</span></span><br><span class="line">        <span class="string">"""获取文件类型"""</span></span><br><span class="line">        <span class="keyword">if</span> f.is_dir():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'d'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_block_device():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'b'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_char_device():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'c'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_socket():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'s'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_symlink():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'l'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_fifo(): <span class="comment"># pipe</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">'p'</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'-'</span></span><br><span class="line">        </span><br><span class="line">    modelist = dict(zip(range(<span class="number">9</span>),[<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_getmodestr</span><span class="params">(mode: int)</span>:</span></span><br><span class="line">        m = mode &amp; <span class="number">0o777</span></span><br><span class="line">        mstr = <span class="string">''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">8</span>, <span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            <span class="keyword">if</span> m &gt;&gt; i &amp; <span class="number">1</span>:</span><br><span class="line">                mstr += modelist[<span class="number">8</span> - i]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                mstr += <span class="string">'-'</span></span><br><span class="line">        <span class="keyword">return</span> mstr</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_listdir</span><span class="params">(path, all=False, detail=False)</span>:</span></span><br><span class="line">        <span class="string">"""详细列出本目录"""</span></span><br><span class="line">        p = Path(path)</span><br><span class="line">    	<span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>):   <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            	<span class="keyword">continue</span></span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> detail:</span><br><span class="line">            	<span class="keyword">yield</span> (i.name,)</span><br><span class="line">        	<span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># -rw-rw-r--   1    python    python    5  Oct  25  00:07  test4</span></span><br><span class="line">                <span class="comment"># mode       硬链接  属主        属组     字节 时间             name</span></span><br><span class="line">                stat = i.stat()</span><br><span class="line">                mode = _getfiletype(i) + _getmodestr(stat.st_mode)</span><br><span class="line">                atime = datetime.fromtimestamp(stat.st_atime).strftime(<span class="string">'%Y %m %d %H:%M:%S'</span>)</span><br><span class="line">                <span class="keyword">yield</span> (mod, stat.st_nlink, stat.st_uid, stat.st_gid, stat.st_size, atime, i.name)</span><br><span class="line">                </span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">from</span> sorted(_listdir(path, all, detail), key=<span class="keyword">lambda</span> x: x[len(x) - <span class="number">1</span>])</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	args = parser.parse_args() <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">	print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">	parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line">	files = listdir(args.path, args.all, args.l)</span><br><span class="line">	print(list(files))</span><br></pre></td></tr></table></figure>
+<h4 id="h-的实现"><a href="#h-的实现" class="headerlink" title="-h 的实现"></a>-h 的实现</h4><p>-h, –human-readable，如果-l 存在，-h 有效</p>
+<ol>
+<li>增加选项参数</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,description=<span class="string">'list directory contents'</span>,add_help=<span class="keyword">False</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-h'</span>, <span class="string">'--human-readable'</span>, action=<span class="string">'store_true'</span>, help=<span class="string">'with -l, print sizes in human readable format'</span>)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>增加一个函数，能够解决单位转换的</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_gethuman</span><span class="params">(size: int)</span>:</span></span><br><span class="line">    units = <span class="string">' KMGTP'</span></span><br><span class="line">    depth = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> size&gt;=<span class="number">1000</span>:</span><br><span class="line">        size = size // <span class="number">1000</span></span><br><span class="line">        depth += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&#123;&#125;&#123;&#125;'</span>.format(size, units[depth])</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>在-l逻辑部分增加处理</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">size = stat.st_size <span class="keyword">if</span> <span class="keyword">not</span> human <span class="keyword">else</span> _gethuman(stat.st_size)</span><br></pre></td></tr></table></figure>
+<h5 id="其他的完善"><a href="#其他的完善" class="headerlink" title="其他的完善"></a>其他的完善</h5><p>uid、gid的转换</p>
+<p>pwd模块，The password database ，提供访问Linux、Unix的password文件的方式。windows没有。</p>
+<p><code>pwd.getpwuid(Path().stat().st_uid).pw_name</code></p>
+<p>grp模块，Linux、Unix获取组信息的模块。windows没有</p>
+<p><code>grp.getgrgid(Path().stat().st_gid).gr_name</code></p>
+<p>pathlib模块，Path().group()或者Path().owner()也可以，本质上它们就是调用pwd模块和grp模块</p>
+<p>由于windows不支持，这次可以不加这个uid、gid的转换</p>
+<h5 id="代码改进"><a href="#代码改进" class="headerlink" title="代码改进"></a>代码改进</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,description=<span class="string">'list directory contents'</span>,add_help=<span class="keyword">False</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-h'</span>, <span class="string">'--human-readable'</span>, action=<span class="string">'store_true'</span>, help=<span class="string">'with -l, print sizes in human readable format'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path, all=False, detail=False, human=False)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_getfiletype</span><span class="params">(f:Path)</span>:</span></span><br><span class="line">        <span class="string">"""获取文件类型"""</span></span><br><span class="line">        <span class="keyword">if</span> f.is_dir():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'d'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_block_device():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'b'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_char_device():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'c'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_socket():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'s'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_symlink():</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'l'</span></span><br><span class="line">        <span class="keyword">elif</span> f.is_fifo(): <span class="comment"># pipe</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">'p'</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'-'</span></span><br><span class="line">        </span><br><span class="line">    modelist = dict(zip(range(<span class="number">9</span>),[<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>,<span class="string">'r'</span>,<span class="string">'w'</span>,<span class="string">'x'</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_getmodestr</span><span class="params">(mode: int)</span>:</span></span><br><span class="line">        m = mode &amp; <span class="number">0o777</span></span><br><span class="line">        mstr = <span class="string">''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">8</span>, <span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            <span class="keyword">if</span> m &gt;&gt; i &amp; <span class="number">1</span>:</span><br><span class="line">                mstr += modelist[<span class="number">8</span> - i]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                mstr += <span class="string">'-'</span></span><br><span class="line">        <span class="keyword">return</span> mstr</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_gethuman</span><span class="params">(size: int)</span>:</span></span><br><span class="line">        units = <span class="string">' KMGTP'</span></span><br><span class="line">        depth = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> size&gt;=<span class="number">1000</span>:</span><br><span class="line">            size = size // <span class="number">1000</span></span><br><span class="line">            depth += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&#123;&#125;&#123;&#125;'</span>.format(size,units[depth])</span><br><span class="line">            </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_listdir</span><span class="params">(path, all=False, detail=False)</span>:</span></span><br><span class="line">        <span class="string">"""详细列出本目录"""</span></span><br><span class="line">        p = Path(path)</span><br><span class="line">    	<span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>):   <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            	<span class="keyword">continue</span></span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> detail:</span><br><span class="line">            	<span class="keyword">yield</span> (i.name,)</span><br><span class="line">        	<span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># -rw-rw-r--   1    python    python    5  Oct  25  00:07  test4</span></span><br><span class="line">                <span class="comment"># mode       硬链接  属主        属组     字节 时间             name</span></span><br><span class="line">                stat = i.stat()</span><br><span class="line">                mode = _getfiletype(i) + _getmodestr(stat.st_mode)</span><br><span class="line">                atime = datetime.fromtimestamp(stat.st_atime).strftime(<span class="string">'%Y %m %d %H:%M:%S'</span>)</span><br><span class="line">                size = str(stat.st_size) <span class="keyword">if</span> <span class="keyword">not</span> human <span class="keyword">else</span> _gethuman(stat.st_size)</span><br><span class="line">                <span class="keyword">yield</span> (mod, stat.st_nlink, stat.st_uid, stat.st_gid, stat.st_size, atime, i.name)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 排序            </span></span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">from</span> sorted(_listdir(path, all, detail), key=<span class="keyword">lambda</span> x: x[len(x) - <span class="number">1</span>])</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	args = parser.parse_args() <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">	print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">	parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line">	files = listdir(args.path, args.all, args.l)</span><br><span class="line">	print(list(files))</span><br></pre></td></tr></table></figure>
+<h5 id="改进mode的方法"><a href="#改进mode的方法" class="headerlink" title="改进mode的方法"></a>改进mode的方法</h5><p>使用stat模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> stat</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line">stat.filemode(Path().stat().st_mode)</span><br></pre></td></tr></table></figure>
+<h5 id="最终代码"><a href="#最终代码" class="headerlink" title="最终代码"></a>最终代码</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">实现ls命令功能，实现-l、-a和--all、-h选项</span><br><span class="line">实现显示路径下的文件列表</span><br><span class="line">-a和--all显示包含开头的文件</span><br><span class="line">-l详细列表显示</span><br><span class="line">-h和-l配合，人性化显示文件大小，例如<span class="number">1</span>K、<span class="number">1</span>G、<span class="number">1</span>T等，可以认为<span class="number">1</span>G=<span class="number">1000</span>M</span><br><span class="line">c字符；d目录；-普通文件；l软链接；b块设备；s socket文件；p pipe文件，即FIFO</span><br><span class="line">-rw-rw-r--   <span class="number">1</span>    python    python    <span class="number">5</span>  Oct  <span class="number">25</span>  <span class="number">00</span>:<span class="number">07</span>  test4</span><br><span class="line">mode       硬链接  属主        属组     字节 时间             name</span><br><span class="line">按照文件名排序输出，可以和ls的顺序不一样，但要求文件名排序</span><br><span class="line">要求详细列表显示时，时间可以按照<span class="string">"年-月-日 时:分:秒"</span>  格式显示</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">import</span> stat</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获得一个参数解析器</span></span><br><span class="line">parser = argparse.ArgumentParser(prog=<span class="string">'ls'</span>,description=<span class="string">'list directory contents'</span>,add_help=<span class="keyword">False</span>)</span><br><span class="line">parser.add_argument(<span class="string">'path'</span>,nargs=<span class="string">'?'</span>,default=<span class="string">'.'</span>,help=<span class="string">"directory"</span>)  </span><br><span class="line"><span class="comment"># 位置参数，可有可无，缺省值，帮助 </span></span><br><span class="line">parser.add_argument(<span class="string">'-l'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'use a long listing format'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-a'</span>,<span class="string">'--all'</span>,action=<span class="string">'store_true'</span>,help=<span class="string">'show all files,do not ignore entries starting with .'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-h'</span>, <span class="string">'--human-readable'</span>, action=<span class="string">'store_true'</span>, help=<span class="string">'with -l, print sizes in human readable format'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path, all=False, detail=False, human=False)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_gethuman</span><span class="params">(size: int)</span>:</span></span><br><span class="line">        units = <span class="string">' KMGTP'</span></span><br><span class="line">        depth = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> size&gt;=<span class="number">1000</span>:</span><br><span class="line">            size = size // <span class="number">1000</span></span><br><span class="line">            depth += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&#123;&#125;&#123;&#125;'</span>.format(size,units[depth])</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_listdir</span><span class="params">(path, all=False, detail=False, human=False)</span>:</span></span><br><span class="line">        <span class="string">"""详细列出本目录"""</span></span><br><span class="line">        p = Path(path)</span><br><span class="line">    	<span class="keyword">for</span> i <span class="keyword">in</span> p.iterdir():</span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> all <span class="keyword">and</span> i.name.startswith(<span class="string">'.'</span>):   <span class="comment"># 不显示隐藏文件</span></span><br><span class="line">            	<span class="keyword">continue</span></span><br><span class="line">        	<span class="keyword">if</span> <span class="keyword">not</span> detail:</span><br><span class="line">            	<span class="keyword">yield</span> (i.name,)</span><br><span class="line">        	<span class="keyword">else</span>: <span class="comment"># -l</span></span><br><span class="line">                <span class="comment"># -rw-rw-r--   1    python    python    5  Oct  25  00:07  test4</span></span><br><span class="line">                <span class="comment"># mode       硬链接  属主        属组     字节 时间             name</span></span><br><span class="line">                stat = i.stat()</span><br><span class="line">                mode = _getfiletype(i) + _getmodestr(stat.st_mode)</span><br><span class="line">                atime = datetime.fromtimestamp(stat.st_atime).strftime(<span class="string">'%Y %m %d %H:%M:%S'</span>)</span><br><span class="line">                size = str(stat.st_size) <span class="keyword">if</span> <span class="keyword">not</span> human <span class="keyword">else</span> _gethuman(stat.st_size)</span><br><span class="line">                <span class="keyword">yield</span> (mod, stat.st_nlink, stat.st_uid, stat.st_gid, stat.st_size, atime, i.name)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 排序            </span></span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">from</span> sorted(_listdir(path, all, detail), key=<span class="keyword">lambda</span> x: x[len(x) - <span class="number">1</span>])</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	args = parser.parse_args() <span class="comment"># 分析参数，同时传入可迭代的参数</span></span><br><span class="line">	print(args) <span class="comment"># 打印名词空间中收集的参数</span></span><br><span class="line">	parser.print_help() <span class="comment"># 打印帮助</span></span><br><span class="line">	files = listdir(args.path, args.all, args.l)</span><br><span class="line">	print(list(files))</span><br></pre></td></tr></table></figure>
+<h5 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python xxx.py -lah</span><br><span class="line">$ python xxx.py /etc/ -lah</span><br></pre></td></tr></table></figure>
+<h5 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h5><p>如果要实现ls -lah /etc /tmp /home 怎么实现</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/模块/" rel="tag"># 模块</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/09/python基础学习-序列化和反序列化/" rel="next" title="python基础学习-序列化和反序列化">
+                <i class="fa fa-chevron-left"></i> python基础学习-序列化和反序列化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/10/python基础练习-文件操作/" rel="prev" title="python基础练习-文件操作">
+                python基础练习-文件操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">190</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">149</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#argparse模块"><span class="nav-number">1.</span> <span class="nav-text">argparse模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数分类"><span class="nav-number">2.</span> <span class="nav-text">参数分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本解析"><span class="nav-number">3.</span> <span class="nav-text">基本解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析器的参数"><span class="nav-number">4.</span> <span class="nav-text">解析器的参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位置参数解析"><span class="nav-number">5.</span> <span class="nav-text">位置参数解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#传参"><span class="nav-number">6.</span> <span class="nav-text">传参</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非必须位置参数"><span class="nav-number">7.</span> <span class="nav-text">非必须位置参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选项参数"><span class="nav-number">8.</span> <span class="nav-text">选项参数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#l-的实现"><span class="nav-number">8.1.</span> <span class="nav-text">-l 的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#a-的实现"><span class="nav-number">8.2.</span> <span class="nav-text">-a 的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#代码"><span class="nav-number">8.2.1.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ls-业务功能的实现"><span class="nav-number">8.2.2.</span> <span class="nav-text">ls 业务功能的实现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#代码实现"><span class="nav-number">8.2.3.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#合并开出文件函数"><span class="nav-number">8.2.4.</span> <span class="nav-text">合并开出文件函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#排序"><span class="nav-number">8.2.5.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#完整代码"><span class="nav-number">8.2.6.</span> <span class="nav-text">完整代码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#h-的实现"><span class="nav-number">8.3.</span> <span class="nav-text">-h 的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#其他的完善"><span class="nav-number">8.3.1.</span> <span class="nav-text">其他的完善</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#代码改进"><span class="nav-number">8.3.2.</span> <span class="nav-text">代码改进</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#改进mode的方法"><span class="nav-number">8.3.3.</span> <span class="nav-text">改进mode的方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#最终代码"><span class="nav-number">8.3.4.</span> <span class="nav-text">最终代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#测试"><span class="nav-number">8.3.5.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#思考"><span class="nav-number">8.3.6.</span> <span class="nav-text">思考</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

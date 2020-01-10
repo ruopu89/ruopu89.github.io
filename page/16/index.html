@@ -350,6 +350,913 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/22/Jenkins安装与部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/22/Jenkins安装与部署/" itemprop="url">
+                  Jenkins安装与部署
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-22 10:18:30" itemprop="dateCreated datePublished" datetime="2018-10-22T10:18:30+08:00">2018-10-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-02-01 18:08:34" itemprop="dateModified" datetime="2019-02-01T18:08:34+08:00">2019-02-01</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/持续集成与部署/" itemprop="url" rel="index"><span itemprop="name">持续集成与部署</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Jenkins简单部署"><a href="#Jenkins简单部署" class="headerlink" title="Jenkins简单部署"></a>Jenkins简单部署</h2><h3 id="rpm包安装启动"><a href="#rpm包安装启动" class="headerlink" title="rpm包安装启动"></a>rpm包安装启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">============================================================================================</span><br><span class="line">环境</span><br><span class="line">准备两台主机</span><br><span class="line">node1：地址：192.168.1.63</span><br><span class="line">node2：地址：192.168.1.64</span><br><span class="line">============================================================================================</span><br><span class="line">------------</span><br><span class="line">  jenkins</span><br><span class="line">------------  </span><br><span class="line">[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@jenkins ~]# yum install -y jenkins-2.60.3-1.1.noarch.rpm</span><br><span class="line">[root@jenkins ~]# systemctl start jenkins</span><br><span class="line">[root@jenkins ~]# ss -tln</span><br><span class="line">State       Recv-Q Send-Q            Local Address:Port                           Peer Address:Port              </span><br><span class="line">LISTEN      0      128                           *:111                                       *:*                  </span><br><span class="line">LISTEN      0      128                           *:22                                        *:*                  </span><br><span class="line">LISTEN      0      100                   127.0.0.1:25                                        *:*                  </span><br><span class="line">LISTEN      0      128                          :::111                                      :::*                  </span><br><span class="line">LISTEN      0      50                           :::8080</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到监控了8080端口</span></span><br><span class="line">[root@jenkins ~]# vim /etc/sysconfig/jenkins</span><br><span class="line">JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调整jenkins的使用内存，默认此项是-Djava.awt.headless=<span class="literal">true</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -Xms：初始堆内存Heap大小，使用的最小内存，cpu性能高时此值应设的大一些</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -Xmx：初始堆内存heap最大值，使用的最大内存</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -XX:MaxPermSize:设定最大内存的永久保存区域</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -Xms与-Xmx设置相同的值，需要根据实际情况设置，增大内存可以提高读写性能</span></span><br><span class="line">访问http://192.168.1.63:8080</span><br></pre></td></tr></table></figure>
+<h3 id="tomcat启动"><a href="#tomcat启动" class="headerlink" title="tomcat启动"></a>tomcat启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">  jenkins</span><br><span class="line">------------  </span><br><span class="line">[root@jenkins ~]# yum install -y tomcat</span><br><span class="line">[root@jenkins ~]# cp /usr/lib/jenkins/jenkins.war /usr/share/tomcat/webapps/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将上面安装的jenkins的war包复制到tomcat的部署目录下，也可以直接下载jenkins的war包</span></span><br><span class="line">[root@jenkins ~]# vim /etc/sysconfig/tomcat</span><br><span class="line">JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调整tomcat使用jvm内存</span></span><br><span class="line">[root@jenkins ~]# systemctl start tomcat</span><br><span class="line">[root@jenkins ~]# ps aux|grep tomcat</span><br><span class="line">tomcat     2242 17.4 40.8 3718460 763224 ?      Ssl  19:27   0:21 /usr/lib/jvm/jre/bin/java -Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m -classpath /usr/share/tomcat/bin/bootstrap.jar:/usr/share/tomcat/bin/tomcat-juli.jar:/usr/share/java/commons-daemon.jar -Dcatalina.base=/usr/share/tomcat -Dcatalina.home=/usr/share/tomcat -Djava.endorsed.dirs= -Djava.io.tmpdir=/var/cache/tomcat/temp -Djava.util.logging.config.file=/usr/share/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager org.apache.catalina.startup.Bootstrap start</span><br><span class="line"></span><br><span class="line">访问http://192.168.1.63:8080/jenkins</span><br><span class="line">[root@jenkins ~]# cat /usr/share/tomcat/.jenkins/secrets/initialAdminPassword </span><br><span class="line">cdc0bfcfa03e4d2da4f7232b213c50c1</span><br><span class="line"><span class="meta">#</span><span class="bash">  查看登录jenkins的默认密码</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装maven"><a href="#安装maven" class="headerlink" title="安装maven"></a>安装maven</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">  maven</span><br><span class="line">------------</span><br><span class="line">[root@maven ~]# yum install -y java-1.8.0-openjdk-devel  tomcat tomcat-admin-webapps</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在当前主机上安装一个tomcat，稍后测试maven构建的包是否可以正常运行</span></span><br><span class="line">[root@maven ~]# yum install -y maven git</span><br><span class="line">[root@maven ~]# git clone https://github.com/mageedu/spring-boot-web-jsp.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 克隆一个java代码测试。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 对maven来说最重要的是pom.xml文件，它描述了这个代码是如何构建的</span></span><br><span class="line">[root@maven ~]# cd spring-boot-web-jsp/</span><br><span class="line">[root@maven ~]# vim /etc/maven/settings.xml</span><br><span class="line">&lt;mirrors&gt;</span><br><span class="line">&lt;mirror&gt;</span><br><span class="line">       &lt;id&gt;nexus-osc&lt;/id&gt;</span><br><span class="line">       &lt;mirrorOf&gt;*&lt;/mirrorOf&gt;</span><br><span class="line">       &lt;name&gt;Nexus osc&lt;/name&gt;</span><br><span class="line">       &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">    &lt;/mirror&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> mirrors段添加国内源地址。</span></span><br><span class="line">&lt;profile&gt;</span><br><span class="line">    &lt;id&gt;jdk-1.4&lt;/id&gt;</span><br><span class="line">    &lt;activation&gt;</span><br><span class="line">    &lt;jdk&gt;1.4&lt;/jdk&gt;</span><br><span class="line">    &lt;/activation&gt;</span><br><span class="line">    &lt;repositories&gt;</span><br><span class="line">        &lt;repository&gt;</span><br><span class="line">            &lt;id&gt;nexus&lt;/id&gt;</span><br><span class="line">            &lt;name&gt;local private nexus&lt;/name&gt;</span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">            &lt;releases&gt;</span><br><span class="line">                &lt;enabled&gt;true&lt;/enabled&gt;</span><br><span class="line">            &lt;/releases&gt;</span><br><span class="line">            &lt;snapshots&gt;</span><br><span class="line">                &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">            &lt;/snapshots&gt;</span><br><span class="line">        &lt;/repository&gt;</span><br><span class="line">    &lt;/repositories&gt;</span><br><span class="line">    &lt;pluginRepositories&gt;</span><br><span class="line">        &lt;pluginRepository&gt;</span><br><span class="line">            &lt;id&gt;nexus&lt;/id&gt;</span><br><span class="line">            &lt;name&gt;local private nexus&lt;/name&gt;</span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">            &lt;releases&gt;</span><br><span class="line">                &lt;enabled&gt;true&lt;/enabled&gt;</span><br><span class="line">            &lt;/releases&gt;</span><br><span class="line">            &lt;snapshots&gt;</span><br><span class="line">                &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">            &lt;/snapshots&gt;</span><br><span class="line">        &lt;/pluginRepository&gt;</span><br><span class="line">    &lt;/pluginRepositories&gt;</span><br><span class="line">&lt;/profile&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> Maven 还需要安装一些插件包，这些插件包的下载地址也让其指向 oschina.net 的 Maven 地址。在&lt;profiles&gt;中插入</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要修改为国内源，不然构建速度将非常慢。尤其是在jenkins中</span></span><br><span class="line">[root@maven spring-boot-web-jsp]# mvn package</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开始构建。</span></span><br><span class="line">[root@maven ~]# vim /etc/tomcat/tomcat-users.xml</span><br><span class="line">&lt;role rolename="manager-gui"/&gt; </span><br><span class="line">&lt;role rolename="manager-script"/&gt;</span><br><span class="line">&lt;user name="tomcat" password="tomcat" roles="manager-gui,manager-script" /&gt;</span><br><span class="line">[root@maven ~]# vim /etc/sysconfig/tomcat</span><br><span class="line">JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"</span><br><span class="line">[root@maven ~]# systemctl start tomcat</span><br><span class="line">[root@maven spring-boot-web-jsp]# ls target/</span><br><span class="line">classes            maven-archiver  spring-boot-web-jsp-1.0      spring-boot-web-jsp-1.0.war.original</span><br><span class="line">generated-sources  maven-status    spring-boot-web-jsp-1.0.war</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到构建后有了war包</span></span><br><span class="line">[root@maven spring-boot-web-jsp]# cp target/spring-boot-web-jsp-1.0.war /usr/share/tomcat/webapps/</span><br><span class="line">访问http://192.168.1.64:8080/spring-boot-web-jsp-1.0/，可以看到部署的结果了</span><br></pre></td></tr></table></figure>
+<h3 id="测试jenkins"><a href="#测试jenkins" class="headerlink" title="测试jenkins"></a>测试jenkins</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">  jenkins</span><br><span class="line">------------  </span><br><span class="line">[root@jenkins ~]# scp jenkins.war 192.168.1.64:/usr/share/tomcat/webapps/</span><br><span class="line"><span class="meta">#</span><span class="bash"> jenkins.war包的属主属组应该是tomcat，权限是644</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  maven</span><br><span class="line">------------</span><br><span class="line">[root@maven webapps]# cat /usr/share/tomcat/.jenkins/secrets/initialAdminPassword </span><br><span class="line">083cbf58aefd411b89558aea505f3e94</span><br><span class="line">[root@maven webapps]# vim /etc/tomcat/server.xml</span><br><span class="line">&lt;Connector port="8080" protocol="HTTP/1.1"</span><br><span class="line">               connectionTimeout="20000"</span><br><span class="line">               redirectPort="8443" URIEncoding="UTF-8"/&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash">  让tomcat可以使用UTF-8编码。这是为了让jenkins不再报需要使用UTF-8编码的错误</span></span><br><span class="line">[root@maven webapps]# systemctl restart tomcat</span><br><span class="line">访问http://192.168.1.64:8080/jenkins/  --&gt;  输入密码  --&gt;  选择默认插件  --&gt;  创建新用户  --&gt; 在系统管理中配置jenkins的环境  --&gt;  到系统管理中的global tool configuration中配置JDK的别名和路径，取消自动安装，路径写/usr即可  --&gt;  git工具被默认配置了，因为git包已经安装了。Gradle是java的新的构建工具  --&gt;  配置Mave，使用mvn -v查看版本，将版本号输入到Name中，如maven-3.0.5，路径写/usr</span><br><span class="line"></span><br><span class="line">新建一个任务，叫spring-boot-web-jsp。一般构建选择两种，一是自由风格，一是pipeline（流水线），这里选自由风格。选择github project，输入https://github.com/mageedu/spring-boot-web-jsp.git，这是给定一个代码路径，点击高级可显示Display name输入spring-boot-web，这是自定义的。源码管理中的Git是指如果要推送到远程服务器上，在这里要输入地址，用户名和密码或密钥，在这里还是输入https://github.com/mageedu/spring-boot-web-jsp.git，源码管理不做配置也可以，但测试中发现一定要配置源码管理的地址，不然会提示找不到pom.xml文件。构建触发器是指如果代码更新了要怎么办或什么条件下进行构建。第一可以自定义脚本来触发，build after other projects are built指在其他项目构建完触发，build pericxfically是周期性构建，每隔一段时间就看一下源代码是否有变化，有变化就构建，GitHub hook trigger for GITScrn polling是如果GitHub上注册的hook有变化，就会发送通知，下载代码构建，Poll SCM是不断向github轮询，有符合条件的就构建，这里可以在日程表中写入H/5 * * * *，表示每5分钟轮询一次。在构建中可以选择Invoke top-level Maven targets，表示一个顶级的maven构建，在Maven Version中选择安装的maven版本，Goals中输入构建的路径，这种方式易出错。选择Execute shell表示脚本构建，在Command中写入/usr/bin/mvn package即可，它会自动切换到构建目录下构建。构建后操作就是要发布了。视频中这里没有选择。直接点击项目中的立即构建了，在构建中可以选择console一项，可以打开一个窗口查看构建的过程。</span><br><span class="line"></span><br><span class="line">[root@maven webapps]# cd /usr/share/tomcat/.jenkins/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 构建完成后进入此目录</span></span><br><span class="line">[root@maven .jenkins]# ls workspace/spring-boot-web-jsp/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在workspace目录中有构建完的程序</span></span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  jenkins</span><br><span class="line">------------ </span><br><span class="line">[root@jenkins ~]# rm -rf /usr/share/tomcat/webapps/jenkins*</span><br><span class="line">[root@jenkins ~]# cd /etc/tomcat/</span><br><span class="line">[root@jenkins tomcat]# vim tomcat-users.xml</span><br><span class="line">&lt;role rolename="manager-script"/&gt; </span><br><span class="line">&lt;user name="admin" password="admin" roles="manager-script" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash">  我们要将maven上构建的结果在 jenkins上的tomcat上运行，所以需要这里打开manager-script功能。</span></span><br><span class="line">[root@jenkins tomcat]# systemctl restart tomcat</span><br><span class="line">[root@jenkins tomcat]# ss -tln</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  maven</span><br><span class="line">------------</span><br><span class="line">选择系统管理中的管理插件，在可选插件中选择安装Deploy to container，选择安装完成后重启Jenkins。进入spring-boot-web-jsp项目中，点击配置，选择构建后操作中的Deploy war/ear to a container，这是刚安装的插件，WAR/EAR files输入**target/*.war，（**表示任意个路径下的target目录中的.war文件。也可以写为**/*.war或*.war）。Context path可以不改，使用默认，这里使用/test-spring（这是部署到node1的tomcat上的目录的名称）。Containers选择Tomcat7.*，用户名和密码就是上面配置的manager-script的用户名和密码，输入两次tomcat。Tomcat URL输入http://IP:8080/，这是tomcat的访问路径。如果要构建多个tomcat，可以再添加Add Container就可以了。最后保存。</span><br><span class="line">点击项目中的立即构建。构建中出了问题，一直提示没有权限部署。因为node1上没有安装tomcat-admin-webapps</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  jenkins</span><br><span class="line">------------ </span><br><span class="line">[root@jenkins tomcat]# yum install -y tomcat-admin-webapps</span><br><span class="line">[root@jenkins tomcat]# ls webapps/</span><br><span class="line">host-manager  manager  test-spring  test-spring.war</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在此目录下有刚部署的<span class="built_in">test</span>-spring.war文件</span></span><br><span class="line"></span><br><span class="line">访问http://192.168.1.63:8080/test-spring/</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">  maven</span><br><span class="line">------------</span><br><span class="line">[root@maven .jenkins]# rm -rf workspace/spring-boot-web-jsp/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除代码，测试重新构建</span></span><br><span class="line">[root@maven .jenkins]# cd</span><br><span class="line">[root@maven ~]# ls</span><br><span class="line">anaconda-ks.cfg  netty-new.jar  spring-boot-web-jsp</span><br><span class="line">[root@maven ~]# vim spring-boot-web-jsp/src/main/resources/application.properties</span><br><span class="line">spring.mvc.view.prefix: /WEB-INF/jsp/</span><br><span class="line">spring.mvc.view.suffix: .jsp</span><br><span class="line"></span><br><span class="line">welcome.message: Hi Jenkins, Test.com, iunx.io.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改这个文件中的显示内容，再保存，这里修改了Test.com, iunx.io.</span></span><br><span class="line">[root@maven ~]# vim spring-boot-web-jsp/src/main/resources/static/css/main.css</span><br><span class="line">h1&#123;</span><br><span class="line">        color:#FFFF00;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">h2&#123;</span><br><span class="line">        color:#0000FF;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改颜色</span></span><br><span class="line">cd spring-boot-web-jsp</span><br><span class="line">git add .</span><br><span class="line">git commit -m "version 4.2.0"</span><br><span class="line">git push </span><br><span class="line">点击自动构建</span><br><span class="line">如果是灰度发布，可以使用脚本，脚本可实现将指定文件发送到服务器并部署</span><br><span class="line">回滚到之前的版本，可以在构建时指定构建的版本就可以了，使用git克隆时就克隆指定的版本就可以了。</span><br><span class="line">在ganneral最上方的一栏中可以选择参数化构建过程。</span><br><span class="line">参考：blog.ramanshalupau.com/parameterized-jenkins-build-for-rollback-purposes，实现滚动发布与回滚</span><br></pre></td></tr></table></figure>
+<h2 id="Jenkins-amp-Gitlab"><a href="#Jenkins-amp-Gitlab" class="headerlink" title="Jenkins&amp;Gitlab"></a>Jenkins&amp;Gitlab</h2><h3 id="Jenkins依赖环境准备"><a href="#Jenkins依赖环境准备" class="headerlink" title="Jenkins依赖环境准备"></a>Jenkins依赖环境准备</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">* 安装java环境</span><br><span class="line">[root@jenkins ~]# ll</span><br><span class="line">total 83356</span><br><span class="line">-rw-------. 1 root root     1292 Oct 24 05:42 anaconda-ks.cfg</span><br><span class="line">-rwxr-xr-x  1 root root  9621331 Feb  1 12:51 apache-tomcat-8.5.33.tar.gz</span><br><span class="line">-rwxr-xr-x  1 root root 75728164 Feb  1 12:51 jenkins.war</span><br><span class="line">[root@jenkins ~]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@jenkins ~]# vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">[root@jenkins ~]# . /etc/profile.d/java.sh</span><br><span class="line">[root@jenkins ~]# java -version</span><br><span class="line">openjdk version "1.8.0_181"</span><br><span class="line">OpenJDK Runtime Environment (build 1.8.0_181-b13)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 25.181-b13, mixed mode)</span><br><span class="line"></span><br><span class="line">* tomcat环境</span><br><span class="line">[root@jenkins ~]# tar xf apache-tomcat-8.5.33.tar.gz -C /usr/local/</span><br><span class="line">[root@jenkins ~]# cd /usr/local/</span><br><span class="line">[root@jenkins local]# ln -sv apache-tomcat-8.5.33/ tomcat</span><br><span class="line">'tomcat' -&gt; 'apache-tomcat-8.5.33/'</span><br><span class="line">[root@jenkins local]# cp /root/jenkins.war tomcat/webapps/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上传Jenkins.war文件到tomcat服务器，放入webapps目录中</span></span><br><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@jenkins tomcat]# vim /usr/local/tomcat/conf/server.xml</span><br><span class="line">    &lt;Connector port="8080" protocol="HTTP/1.1"</span><br><span class="line">               connectionTimeout="20000"</span><br><span class="line">               redirectPort="8443" URIEncoding="UTF-8" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入URIEncoding=<span class="string">"UTF-8"</span>地址的编码解码字符集</span></span><br><span class="line">[root@jenkins local]# vim /usr/local/tomcat/bin/catalina.sh</span><br><span class="line">    JAVA_OPTS="-Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调整tomcat使用jvm内存</span></span><br><span class="line">[root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh</span><br><span class="line">[root@jenkins tomcat]# tail -f /usr/local/tomcat/logs/catalina.out</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看启动过程</span></span><br><span class="line">[root@jenkins local]# ps aux|grep tomcat</span><br><span class="line">root       3101 33.7 38.4 3704844 717556 pts/0  Sl   13:02   0:17 /usr/bin/java -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.awt.headless=true -Xms1024m -Xmx1024m -XX:MaxNewSize=512m -XX:MaxPermSize=512m -Djdk.tls.ephemeralDHKeySize=2048 -Djava.protocol.handler.pkgs=org.apache.catalina.webresources -Dorg.apache.catalina.security.SecurityListener.UMASK=0027 -Dignore.endorsed.dirs= -classpath /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar -Dcatalina.base=/usr/local/tomcat -Dcatalina.home=/usr/local/tomcat -Djava.io.tmpdir=/usr/local/tomcat/temp org.apache.catalina.startup.Bootstrap start</span><br><span class="line">[root@jenkins tomcat]# cat /root/.jenkins/secrets/initialAdminPassword </span><br><span class="line">2296380bbe5e4753bc970240aca8ae2d</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是打开jenkins页面时要输入的密码，这也是Jenkins的admin管理员的登录密码</span></span><br><span class="line"></span><br><span class="line">* 安装git</span><br><span class="line">[root@jenkins ~]# yum install -y git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下面访问10.5.5.250:8080/jenkins</li>
+</ul>
+<p><img src="/images/jenkins/jenkins1.jpg" alt=""></p>
+<ul>
+<li>选择安装推荐的插件。如果有软件安装失败，可在安装完后点Retry，再次安装。安装成功进入jenkins后，还要重启一次jenkins服务才能正常访问</li>
+</ul>
+<p><img src="/images/jenkins/jenkins2.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins3.jpg" alt=""></p>
+<ul>
+<li>创建用户，或使用admin用户登录</li>
+</ul>
+<p><img src="/images/jenkins/jenkins4.jpg" alt=""></p>
+<ul>
+<li>确认</li>
+</ul>
+<p><img src="/images/jenkins/jenkins5.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins6.jpg" alt=""></p>
+<ul>
+<li>完成上述步骤后可以正常登录，但测试发现chrome浏览器访问时显示空白页面，使用firefox浏览器没有问题</li>
+</ul>
+<p><img src="/images/jenkins/jenkins7.jpg" alt=""></p>
+<ul>
+<li>更换火狐浏览器后可以到登录页面，但输入用户名和密码后还是空白页面。解决方法如下：</li>
+</ul>
+<p><img src="/images/jenkins/jenkins8.jpg" alt=""></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins tomcat]# tail -f /var/log/messages </span><br><span class="line">Oct 21 22:30:35 jenkins systemd: Stopped IPv4 firewall with iptables.</span><br><span class="line">Oct 21 22:30:35 jenkins systemd: Unit iptables.service entered failed state.</span><br><span class="line">Oct 21 22:30:35 jenkins systemd: iptables.service failed.</span><br><span class="line">Oct 21 22:43:01 jenkins systemd: Started Session 4057 of user root.</span><br><span class="line">Oct 21 22:43:01 jenkins systemd: Starting Session 4057 of user root.</span><br><span class="line">Oct 21 22:57:11 jenkins systemd: Stopping The Apache HTTP Server...</span><br><span class="line">Oct 21 22:57:13 jenkins systemd: Stopped The Apache HTTP Server.</span><br><span class="line">Oct 21 22:57:18 jenkins systemd: Reloading.</span><br><span class="line">Oct 21 22:57:18 jenkins systemd: [/usr/lib/systemd/system/vzfifo.service:19] Support for option SysVStartPriority= has been removed and it is ignored</span><br><span class="line">Oct 21 23:15:06 jenkins systemd: Configuration file /usr/lib/systemd/system/ebtables.service is marked executable. Please remove executable permission bits. Proceeding anyway.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看系统日志发现，要求取消/usr/lib/systemd/system/ebtables.service的可执行权限。</span></span><br><span class="line">[root@jenkins tomcat]# chmod 744 /usr/lib/systemd/system/ebtables.service</span><br><span class="line"><span class="meta">#</span><span class="bash"> 取消属组和其他人的执行权限</span></span><br><span class="line">[root@jenkins tomcat]# lsof -i:8080</span><br><span class="line">[root@jenkins tomcat]# kill -9 1181</span><br><span class="line">[root@jenkins tomcat]# /usr/local/tomcat/bin/startup.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭tomcat并重新启动</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以正常访问了，使用chrome浏览器也没有问题了。但因为chrome浏览器的语言的繁体中文，所以Jenkins登录后也是繁体中文</li>
+</ul>
+<p><img src="/images/jenkins/jenkins9.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins10.jpg" alt=""></p>
+<h3 id="配置JDK和Maven并安装Deploy插件"><a href="#配置JDK和Maven并安装Deploy插件" class="headerlink" title="配置JDK和Maven并安装Deploy插件"></a>配置JDK和Maven并安装Deploy插件</h3><ul>
+<li>登录Jenkins</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置1.jpg" alt=""></p>
+<ul>
+<li>选择全局安全配置</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置2.jpg" alt=""></p>
+<ul>
+<li>选择允许用户注册。授权策略可以先任何用户可以做任何事，方便测试使用。也可以是默认的登录用户可以做任何事。最后保存</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置3.jpg" alt=""></p>
+<ul>
+<li>选全局工具配置</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置4.jpg" alt=""></p>
+<ul>
+<li>上面两项都选择文件系统中的settings文件，之后需要输入maven的settings文件路径。JDK也一样要输入JAVA_HOME的路径，同时自定义一个别名。取消自动安装。下面的Git因为还没有，所以可以删除。Maven同JDK，需要自定义名称并输入MAVEN_HOME</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置5.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins配置6.jpg" alt=""></p>
+<ul>
+<li>Maven的安装</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">到http://mirrors.shu.edu.cn/apache//maven/maven-3/3.5.4/binaries/下载Maven的二进制包，保存到/root目录下</span><br><span class="line">[root@jenkins ~]# tar xf apache-maven-3.5.4-bin.tar.gz -C /usr/local/</span><br><span class="line">[root@jenkins ~]# vim /etc/profile.d/maven.sh</span><br><span class="line">	export PATH=$PATH:/usr/local/apache-maven-3.5.4/bin</span><br><span class="line">	export MAVEN_HOME=/usr/local/apache-maven-3.5.4</span><br><span class="line">[root@jenkins ~]# . /etc/profile.d/maven.sh</span><br><span class="line">[root@jenkins ~]# mvn -version</span><br><span class="line">Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T18:33:14Z)</span><br><span class="line">Maven home: /usr/local/apache-maven-3.5.4</span><br><span class="line">Java version: 1.8.0_181, vendor: Oracle Corporation, runtime: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.181-3.b13.el7_5.x86_64/jre</span><br><span class="line">Default locale: en_US, platform encoding: ANSI_X3.4-1968</span><br><span class="line">OS name: "linux", version: "4.15.17-1-pve", arch: "amd64", family: "unix"</span><br><span class="line">[root@jenkins local]# vim /usr/local/apache-maven-3.5.4/conf/settings.xml</span><br><span class="line">&lt;mirrors&gt;</span><br><span class="line">&lt;mirror&gt;</span><br><span class="line">       &lt;id&gt;nexus-osc&lt;/id&gt;</span><br><span class="line">       &lt;mirrorOf&gt;*&lt;/mirrorOf&gt;</span><br><span class="line">       &lt;name&gt;Nexus osc&lt;/name&gt;</span><br><span class="line">       &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">    &lt;/mirror&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> mirrors段添加国内源地址。</span></span><br><span class="line">&lt;profile&gt;</span><br><span class="line">    &lt;id&gt;jdk-1.4&lt;/id&gt;</span><br><span class="line">    &lt;activation&gt;</span><br><span class="line">    &lt;jdk&gt;1.4&lt;/jdk&gt;</span><br><span class="line">    &lt;/activation&gt;</span><br><span class="line">    &lt;repositories&gt;</span><br><span class="line">        &lt;repository&gt;</span><br><span class="line">            &lt;id&gt;nexus&lt;/id&gt;</span><br><span class="line">            &lt;name&gt;local private nexus&lt;/name&gt;</span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">            &lt;releases&gt;</span><br><span class="line">                &lt;enabled&gt;true&lt;/enabled&gt;</span><br><span class="line">            &lt;/releases&gt;</span><br><span class="line">            &lt;snapshots&gt;</span><br><span class="line">                &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">            &lt;/snapshots&gt;</span><br><span class="line">        &lt;/repository&gt;</span><br><span class="line">    &lt;/repositories&gt;</span><br><span class="line">    &lt;pluginRepositories&gt;</span><br><span class="line">        &lt;pluginRepository&gt;</span><br><span class="line">            &lt;id&gt;nexus&lt;/id&gt;</span><br><span class="line">            &lt;name&gt;local private nexus&lt;/name&gt;</span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">            &lt;releases&gt;</span><br><span class="line">                &lt;enabled&gt;true&lt;/enabled&gt;</span><br><span class="line">            &lt;/releases&gt;</span><br><span class="line">            &lt;snapshots&gt;</span><br><span class="line">                &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">            &lt;/snapshots&gt;</span><br><span class="line">        &lt;/pluginRepository&gt;</span><br><span class="line">    &lt;/pluginRepositories&gt;</span><br><span class="line">&lt;/profile&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> Maven 还需要安装一些插件包，这些插件包的下载地址也让其指向 oschina.net 的 Maven 地址。在&lt;profiles&gt;中插入</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一定要修改为国内源，不然构建速度将非常慢。尤其是在jenkins中</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>选择插件管理</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置7.jpg" alt=""></p>
+<ul>
+<li>安装插件deploy to container，这个插件是让jenkins成功构建后可以部署war包到tomcat的</li>
+</ul>
+<p><img src="/images/jenkins/jenkins配置8.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkins配置9.jpg" alt=""></p>
+<h3 id="gitlab安装"><a href="#gitlab安装" class="headerlink" title="gitlab安装"></a>gitlab安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">下载gitlab-ce-10.6.1-ce.0.el7.x86_64.rpm到/root目录</span><br><span class="line">[root@localhost ~]# yum install -y gitlab-ce-10.6.1-ce.0.el7.x86_64.rpm</span><br><span class="line">[root@localhost ~]# vim /etc/gitlab/gitlab.rb</span><br><span class="line">	external_url 'http://10.5.5.199'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置服务地址</span></span><br><span class="line">[root@localhost ~]# gitlab-ctl reconfigure</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是一个初始化的过程</span></span><br><span class="line">访问IP，要求设置root密码，需要是一个复杂的密码，之后就可以正常登录了</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果访问出现502错误，可以查看是否之前安装并启动过web服务或tomcat服务，卸载服务并重启gitlab后就可以正常访问了。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [root@gitlab ~]<span class="comment"># gitlab-ctl restart		# 重启gitlab命令</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外也可以查看一下内存是否不足</span></span><br></pre></td></tr></table></figure>
+<h3 id="获取gitlab的token"><a href="#获取gitlab的token" class="headerlink" title="获取gitlab的token"></a>获取gitlab的token</h3><ul>
+<li>使用root用户登录</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken1.jpg" alt=""></p>
+<ul>
+<li>选择左下角的settings，并勾选最下方的“Allow requests to the local network from hooks and services”并保存。此项非常关键，如果不勾选此项，之后测试连接jenkins时会报500错误</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken2.jpg" alt=""></p>
+<ul>
+<li>登出root用户，重新注册一个新用户</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken3.jpg" alt=""></p>
+<ul>
+<li>选择用户的settings，并选择左侧的”Access Tokens”</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken4.jpg" alt=""></p>
+<ul>
+<li>创建Token</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken5.jpg" alt=""></p>
+<ul>
+<li>得到一个Token，这个很重要，需要记录，如果关闭此页面，之后就找不到这个Token了</li>
+</ul>
+<p><img src="/images/jenkins/gitlabgetToken6.jpg" alt=""></p>
+<h3 id="创建一个git项目"><a href="#创建一个git项目" class="headerlink" title="创建一个git项目"></a>创建一个git项目</h3><ul>
+<li>使用普通用户登录，到首页创建项目</li>
+</ul>
+<p><img src="/images/jenkins/gitlab项目1.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlab项目2.jpg" alt=""></p>
+<ul>
+<li>这两条命令在设置jenkins时有用</li>
+</ul>
+<p><img src="/images/jenkins/gitlab项目3.jpg" alt=""></p>
+<h3 id="生成访问Gitlab的ssh秘钥。"><a href="#生成访问Gitlab的ssh秘钥。" class="headerlink" title="生成访问Gitlab的ssh秘钥。"></a>生成访问Gitlab的ssh秘钥。</h3><blockquote>
+<p> <strong>从gitlab以SSH方式拉取或提交代码需要用到这个SSH 秘钥</strong>，哪台机器需要从gitlab上拉取代码，就在哪台机器上生成一次SSH Key，因此，在jenkins服务器上，以及你的开发PC上，都需要生成SSH密钥。</p>
+</blockquote>
+<p><img src="/images/jenkins/gitlabssh1.jpg" alt=""></p>
+<ul>
+<li>在jenkins与要部署代码的服务器上执行生成秘钥的命令</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@jenkins conf]# ssh-keygen -t rsa -P ''</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/root/.ssh/id_rsa): </span><br><span class="line">Created directory '/root/.ssh'.</span><br><span class="line">Your identification has been saved in /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">69:1e:73:2b:de:c8:e8:23:79:9a:0a:96:6f:e8:8a:b8 root@jenkins</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+--[ RSA 2048]----+</span><br><span class="line">|                 |</span><br><span class="line">|                 |</span><br><span class="line">|                 |</span><br><span class="line">|         .       |</span><br><span class="line">|        S .      |</span><br><span class="line">|  .    o + .     |</span><br><span class="line">|.o.  .  o .      |</span><br><span class="line">|+o..o.o+ +       |</span><br><span class="line">|Eoooo=o.+ .      |</span><br><span class="line">+-----------------+</span><br><span class="line">[root@jenkins conf]# cat /root/.ssh/id_rsa.pub </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZS8mV9dyi2kOCnhe3o5V/bc8EEln6cVpNXQ16P4lKvAYSdcmrRTYdWapsssJAzjWnA5Pa/u32n/OWKTZDq+qmV3IxlQwuOVI7AeB5TJTuawk90f/1fj7aN1963yOvlZthS8dRUvEcrq+HHpekmAH+mLDeQGYcZEoNsovl1Cvp3TVNDC/7sKds7yoYmHupknyn5d7tgGID8Up02DJlgUQK6V7ZvivjRxAaYAjsWSEktIZK0jv0uWqo6cSddC/rLERGL4spjdwqErFKDQ8SVhArD5zR7L5Lpf9McbxFLFpMMN0I2U+udCXa8n7vwbzHTyaFU+ZvUkX80ykDpMJIW5ot root@jenkins</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将此公钥放入gitlab中</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/jenkins/gitlabssh2.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlabssh3.jpg" alt=""></p>
+<h3 id="jenkins中安装gitlab插件"><a href="#jenkins中安装gitlab插件" class="headerlink" title="jenkins中安装gitlab插件"></a>jenkins中安装gitlab插件</h3><blockquote>
+<p>需要的插件：</p>
+<ul>
+<li>GitLab Hook：使 gitlab web 挂钩能够用于触发 gitlab 项目上的 smc 轮询</li>
+<li>GitLab：这个插件允许 gitlab 触发 jenkins 构建, 并在 gitlab ui 中显示它们的结果。</li>
+<li>Gitlab Authentication：这是使用 gitlab oauth 的身份验证插件。</li>
+<li>Git Parameter：增加了从项目中配置的 git 存储库中选择分支、标记或修订的功能。</li>
+<li>Build Authorization Token Root：即使匿名用户看不到 jenkins, 也可以访问生成和相关的 rest 生成触发器</li>
+<li>Publish Over SSH：通过 ssh 发送生成项目</li>
+</ul>
+</blockquote>
+<p><img src="/images/jenkins/gitlabPlugin1.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlabPlugin2.jpg" alt=""></p>
+<p><img src="/images/jenkins/gitlabPlugin3.jpg" alt=""></p>
+<h3 id="jenkins中设置token"><a href="#jenkins中设置token" class="headerlink" title="jenkins中设置token"></a>jenkins中设置token</h3><blockquote>
+<p>jenkins可以通过从gitlab上得到的token，与gitlab协同工作</p>
+</blockquote>
+<p><img src="/images/jenkins/jenkinsgitlabtoken1.jpg" alt=""></p>
+<p><img src="/images/jenkins/jenkinsgitlabtoken2.jpg" alt=""></p>
+<ul>
+<li><p>Connection name可以自定义；Gitlab host URL是gitlab的访问地址；最后设置Credentials</p>
+<p><img src="/images/jenkins/jenkinsgitlabtoken3.jpg" alt=""></p>
+</li>
+<li><p>在弹出的窗口中选择类型为GitLab API token，之后输入在gitlab中取得的项目的token，最后添加</p>
+</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsgitlabtoken4.jpg" alt=""></p>
+<ul>
+<li>选择刚创建的”GitLab API token”，然后点击”Test Connection”测试是否连接正常，如果没有问题就保存。这里的配置会在创建任务后的第一个General页面的”GitLab Connection”中自动引用</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsgitlabtoken5.jpg" alt=""></p>
+<h3 id="jenkins中设置Publish-over-SSH"><a href="#jenkins中设置Publish-over-SSH" class="headerlink" title="jenkins中设置Publish over SSH"></a>jenkins中设置Publish over SSH</h3><ul>
+<li>进入设置</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsSSH1.jpg" alt=""></p>
+<ul>
+<li>输入jenkins服务器的私钥，也就是用户家目录中.ssh中的id_rsa文件的内容（这是为了可以通过jenkins的公钥与私钥进行配对，使jenkins可以在远程主机上操作，当然也需要jenkins将公钥传到远程主机），SSH Servers中设置自定义Name，Hostname是要部署代码的服务器地址，Username是登录用的用户名，Remote Directory这里设置为了/usr/share/nginx/html，之后jenkins就可以向这个目录部署网页文件了</li>
+</ul>
+<p><img src="/images/jenkins/jenkinsSSH2.jpg" alt=""></p>
+<h3 id="配置git插件"><a href="#配置git插件" class="headerlink" title="配置git插件"></a>配置git插件</h3><ul>
+<li>打开系统管理中的系统设置</li>
+</ul>
+<p><img src="/images/jenkins/git插件1.jpg" alt=""></p>
+<ul>
+<li>选择Git plugin</li>
+</ul>
+<p><img src="/images/jenkins/git插件2.jpg" alt=""></p>
+<ul>
+<li>设置Git插件的全局配置，然后点击“apply”——“save”。全局配置就是上面“Gitlab创建项目”部分中的global setting ，也就是git的用户名和邮箱地址。在项目第一次commit前，这些信息都可以在GitLab的项目的首页里找到</li>
+</ul>
+<p><img src="/images/jenkins/git插件3.jpg" alt=""></p>
+<h3 id="创建一个Jenkins-Job"><a href="#创建一个Jenkins-Job" class="headerlink" title="创建一个Jenkins Job"></a>创建一个Jenkins Job</h3><blockquote>
+<p>在jenkins里，一个任务叫做一个job。一般我们的项目会有多个分支，比如开发分支和产品分支，我们可以对每一个分支都新建一个job，比如，我们对开发分支创建一个测试的job，每次有代码提交就自动运行一次测试，对产品分支创建一个打包的job，每次有代码提交就运行打包任务。</p>
+<p>在系统设置中设置的项就是为了可以在任务中得到引用。</p>
+</blockquote>
+<p><img src="/images/jenkins/创建jenkinsjob1.jpg" alt=""></p>
+<ul>
+<li>创建的job最好与gitlab中的项目名一致</li>
+</ul>
+<p><img src="/images/jenkins/创建jenkinsjob2.jpg" alt=""></p>
+<h3 id="配置Job"><a href="#配置Job" class="headerlink" title="配置Job"></a>配置Job</h3><ul>
+<li>在源码管理里，选择Git，并输入路径，路径可以在gitlab的项目首页上看到</li>
+</ul>
+<p><img src="/images/jenkins/配置job1.jpg" alt=""></p>
+<ul>
+<li>添加用户，类型选“SSH Username with private key”；Username填root；选择PrivateKey中的Enter directly，在下面的key中输入jenkins服务器的私钥，可以用命令<code>cat /root/.ssh/id_rsa</code>查看。也里是指使用jenkins服务器上root用户的私钥访问gitlab上的项目，与gitlab上的jenkins服务器的root用户的公钥进行验证。</li>
+</ul>
+<p><img src="/images/jenkins/配置job2.jpg" alt=""></p>
+<blockquote>
+<p>在Repository URL下面的红字提示“Failed to connect to repository : Error performing command: git ls-remote -h <a href="mailto:git@10.5.5.11" target="_blank" rel="noopener">git@10.5.5.11</a>:test/ccjdtest.git HEAD”是因为jenkins服务器上没有安装git，安装后解决。</p>
+</blockquote>
+<p><img src="/images/jenkins/配置job3.jpg" alt=""></p>
+<blockquote>
+<p>jenkins job默认对master分支进行构建，你也可以自定义分支。这要求你的Gitlab代码仓库中要存在这个分支，一般来说，就是要向代码仓库提交一次更改，请 <strong>自行完成</strong>（Gitlab项目刚创建时是空的，一个分支也没有，这样的话，自动构建时会出错）</p>
+</blockquote>
+<p><img src="/images/jenkins/配置job4.jpg" alt=""></p>
+<ul>
+<li>配置构建触发器，选择Build一行，后面的地址就是jenkins上放项目的路径，再选择下面的高级</li>
+</ul>
+<p><img src="/images/jenkins/配置job5.jpg" alt=""></p>
+<ul>
+<li>选择Filter branches by regex，表示要触发自动部署的分支，在下面的Target Branch Regex中输入”.*master”，这是正则表达式，表示分支名。最后点击Generate，生成gitlab webhook的安全令牌，在配置gitlab时有用。</li>
+</ul>
+<p><img src="/images/jenkins/配置job6.jpg" alt=""></p>
+<ul>
+<li>构建，选择新增中的send files or … over SSH</li>
+</ul>
+<p><img src="/images/jenkins/配置job7.jpg" alt=""></p>
+<ul>
+<li>这里的Name中会有在Jenkins的设置中设置的Publish over SSH的服务器名字，下面的Source files中输入“**/**”，Remote directory中要部署到远程服务器的路径，Exec command是在远程服务器部署完代码后要执行的命令</li>
+</ul>
+<h3 id="gitlab上设置webhook"><a href="#gitlab上设置webhook" class="headerlink" title="gitlab上设置webhook"></a>gitlab上设置webhook</h3><ul>
+<li>到gitlab的项目中设置集成</li>
+</ul>
+<p><img src="/images/jenkins/webhook1.jpg" alt=""></p>
+<ul>
+<li>URL与Secret Token都是在Jenkins中的项目配置中取得的，取消SSL的勾选，最后添加</li>
+</ul>
+<p><img src="/images/jenkins/webhook2.jpg" alt=""></p>
+<ul>
+<li>添加后在下面的Webhooks中就会有添加的项，点Test中的Push events测试。这里一定要在gitlab的项目中有一个文件，如果没有，测试时会提示“Hook execution failed: Ensure the project has at least one commit.”。可以在gitlab项目中创建一个README文件</li>
+</ul>
+<p><img src="/images/jenkins/webhook3.jpg" alt=""></p>
+<ul>
+<li>如果测试正常，在页面最上方会有HTTP 200的提示</li>
+</ul>
+<p><img src="/images/jenkins/webhook4.jpg" alt=""></p>
+<ul>
+<li>webhook就是为了在有人上传代码时，就会触发上面设置的地址，只要触发这个地址，jenkins就会自动部署</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><ul>
+<li>到要部署代码的服务器上，安装nginx。</li>
+<li>到jenkins服务器上安装git，准备拉取代码</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">  jenkins</span><br><span class="line">-------------</span><br><span class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub 10.5.5.22</span><br><span class="line"><span class="meta">#</span><span class="bash"> 要与部署代码的服务器实现密钥通讯</span></span><br><span class="line">git clone git@10.5.5.11:test/ccjdtest.git</span><br><span class="line">cd ccjdtest/</span><br><span class="line">echo "test Jenkins" &gt; index.html</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个文件</span></span><br><span class="line">git config --global user.email "test@ccjd.com"</span><br><span class="line">git config --global user.name "test"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这两项是在gitlab中创建项目时设置的</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'add index.html'</span><br><span class="line">git push</span><br><span class="line"><span class="meta">#</span><span class="bash"> 推送到gitlab服务器</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>到jenkins中查看项目情况，如果配置正确，推送代码到gitlab后，这里会有提示</li>
+</ul>
+<p><img src="/images/jenkins/测试1.jpg" alt=""></p>
+<ul>
+<li>到部署代码的服务器上查看，index.html文件已放入了/usr/share/nginx/html目录中，并且服务已重新启动。访问页面变成了我们设置的内容。</li>
+</ul>
+<h3 id="测试maven手动部署"><a href="#测试maven手动部署" class="headerlink" title="测试maven手动部署"></a>测试maven手动部署</h3><h4 id="部署流程"><a href="#部署流程" class="headerlink" title="部署流程"></a>部署流程</h4><ol>
+<li>注册gitlab帐号</li>
+<li>创建git项目</li>
+<li>将上传代码的主机、Jenkins服务器、与部署代码的服务器的公钥上传到gitlab</li>
+<li>将项目clone到本地</li>
+<li>将本地代码push到gitlab</li>
+<li>在Jenkins中创建Job</li>
+<li>设置Job中的git地址，Jenkins登录git的用户名与私钥。新建构建“调用顶层Maven目标”</li>
+<li>第一次构建，要到Job中点击“立即构建”</li>
+<li>构建后操作</li>
+</ol>
+<h4 id="设置Job"><a href="#设置Job" class="headerlink" title="设置Job"></a>设置Job</h4><ul>
+<li>设置Job，输入git地址，设置jenkins服务器登录gitlib时用的用户名与私钥，这样私钥与jenkins上传到gitlab上的公钥就可以配对了</li>
+</ul>
+<p><img src="/images/jenkins/设置job1.jpg" alt=""></p>
+<ul>
+<li>设置构建，选择调用顶层Maven目标</li>
+</ul>
+<p><img src="/images/jenkins/设置job2.jpg" alt=""></p>
+<ul>
+<li>Maven版本是在jenkins设置中设置好的，目标是一条Maven命令：“clean install -Dmaven.test.skip=true”</li>
+</ul>
+<p><img src="/images/jenkins/设置job3.jpg" alt=""></p>
+<ul>
+<li>设置构建后操作。WAR/EAR files是一个相对路径，相对/root/.jenkins/workspace/echarging/而言，echarging是项目的名称，项目下的target中有war文件，这里输入c-rest/target表示在项目目录下还有一层。Context path是访问的名称，之后就可以使用IP:8080/rest访问了。再选择下面的Containers为Tomcat8.x，这要根据实际情况选择，然后添加一个可以访问tomcat的manager_webapp页面的用户名和密码，这是在部署代码的tomcat中设置的。下面就是Tomcat的访问地址。都输入正确后保存即可。这样，在Maven处理完代码后，就会自动部署到部署代码的tomcat服务器上了。</li>
+</ul>
+<p><img src="/images/jenkins/设置job4.jpg" alt=""></p>
+<ul>
+<li>在部署代码的服务器上设置tomcat</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon local]# yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">[root@bogon ~]# vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">[root@bogon tomcat]# vim /usr/local/tomcat/conf/tomcat-users.xml</span><br><span class="line">      &lt;role rolename="manager-gui"/&gt;</span><br><span class="line">      &lt;role rolename="manager-script"/&gt;</span><br><span class="line">      &lt;role rolename="manager-jmx"/&gt;</span><br><span class="line">      &lt;role rolename="manager-status"/&gt;</span><br><span class="line">      &lt;user username="tomcat_user" password="tomcat" roles="manager-gui,manager-script,manager-jmx,manager-status"/&gt;</span><br><span class="line">[root@bogon tomcat]# vim webapps/manager/META-INF/context.xml</span><br><span class="line">	&lt;Context antiResourceLocking="false" privileged="true" &gt;</span><br><span class="line">  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"</span><br><span class="line">         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|10.5.5.90|10.5.5.9" /&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里加入两个地址，一个是本地的地址，为了测试页面是否可以打开。一个是jenkins的地址。如果不加jenkins的地址，jenkins的部署会报错。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>到Job中，点击立即构建</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">  jenkins</span><br><span class="line">-------------</span><br><span class="line">1. 全局安全设置，可以用户注册</span><br><span class="line">2. 系统设置中设置maven和java的家目录</span><br><span class="line">3. 安装deploy to container及gitlib相关插件</span><br><span class="line">4. jenkins中设置token，使jenkins与gitlab可以联合工作</span><br><span class="line">5. 配置publish over ssh，使jenkins可以使用ssh方法发送文件到远程服务器，或在远程服务器上执行命令。当然还需要将jenkins的公钥传输到远程主机</span><br><span class="line">6. 配置git，使用jenkins可以到远程的gitlab上进行验证</span><br><span class="line">7. 配置JOB</span><br><span class="line">7.1 源码管理中使用git，创建一个带有jenkins服务器上私钥的用户名，让jenkins可以使用私钥与github上的jenkins的公钥配对。让gitlab可以将代码推送到jenkins。</span><br><span class="line">7.2 构建触发器选择Build when a change is pushed to GitLab. (当更改推送到 gitlab 时生成。)，这是为了让gitlab可以向jenkins发送POST请求的。之后设置自动触发的分支，生成一个webhook安全令牌。</span><br><span class="line">7.3 构建，选择Send files or execute commands over SSH，也就是在构建期间通过ssh作为构建步骤发送文件或执行命令的方法，之后可以设置要部署的服务器，这个服务器是在publish over ssh中设置好的某台服务器，还可以设置代码的源路径，要部署的远程服务器的路径，要在远程服务器上执行的命令等。</span><br><span class="line"></span><br><span class="line">-----------</span><br><span class="line">  gitlab</span><br><span class="line">-----------</span><br><span class="line">1. 生成token，给jenkins使用</span><br><span class="line">2. 为某个项目设置webhook。设置jenkins的URL与jenkins中生成的webhook安全令牌，使gitlab知道如何通知jenkins</span><br><span class="line">3. 当项目中的代码发生变化时，gitlab会将代码推送到jenkins主机进行部署</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/19/RabbitMQ基本命令与配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/19/RabbitMQ基本命令与配置/" itemprop="url">
+                  RabbitMQ基本命令与配置
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-10-19 09:19:56 / 修改時間：13:46:31" itemprop="dateCreated datePublished" datetime="2018-10-19T09:19:56+08:00">2018-10-19</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/消息队列/" itemprop="url" rel="index"><span itemprop="name">消息队列</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><h5 id="rabbitmq-server命令"><a href="#rabbitmq-server命令" class="headerlink" title="rabbitmq server命令"></a>rabbitmq server命令</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">systemctl start rabbitmq-server</span><br><span class="line">systemctl stop rabbitmq-server</span><br><span class="line">systemctl status rabbitmq-server</span><br><span class="line">systemctl rotate-logs rabbitmq-server</span><br><span class="line">systemctl restart rabbitmq-server</span><br><span class="line">systemctl condrestart rabbitmq-server</span><br><span class="line">systemctl try-restart rabbitmq-server</span><br><span class="line">systemctl reload rabbitmq-server</span><br><span class="line">systemctl force-reload rabbitmq-server</span><br><span class="line"><span class="meta">#</span><span class="bash"> rabbitmq默认监听5672端口，网页管理页面监听15672端口</span></span><br></pre></td></tr></table></figure>
+<h5 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">* 语法</span><br><span class="line">** 开启插件</span><br><span class="line">rabbitmq-plugins enable 插件名</span><br><span class="line">** 关闭插件</span><br><span class="line">rabbitmq-plugins disable 插件名</span><br><span class="line">rabbitmq-plugins enable rabbitmq_management</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启rabbitmq web管理页面插件</span></span><br></pre></td></tr></table></figure>
+<h5 id="rabbitmqctl命令"><a href="#rabbitmqctl命令" class="headerlink" title="rabbitmqctl命令"></a>rabbitmqctl命令</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">* 创建用户，设置密码</span><br><span class="line">rabbitmqctl add_user username password</span><br><span class="line"></span><br><span class="line">* 分配用户标签-设置为管理用户。默认用户名密码为guest</span><br><span class="line">rabbitmqctl set_user_tags username tag</span><br><span class="line"><span class="meta">#</span><span class="bash"> Tag可以为：administrator,monitoring, management等</span></span><br><span class="line"></span><br><span class="line">* 查看现有用户信息</span><br><span class="line">rabbitmqctl list_users</span><br><span class="line"></span><br><span class="line">* 删除用户</span><br><span class="line">rabbitmqctl delete_user username</span><br><span class="line"></span><br><span class="line">* 修改用户密码</span><br><span class="line">rabbitmqctl change_password username password</span><br><span class="line"></span><br><span class="line">* 查看所有队列消息</span><br><span class="line">rabbitmqctl list_queues</span><br><span class="line"></span><br><span class="line">* 清除所有队列</span><br><span class="line">rabbitmqctl reset</span><br><span class="line"></span><br><span class="line">* 新建虚拟机</span><br><span class="line">rabbitmqctl add_vhost  虚拟机名</span><br><span class="line"></span><br><span class="line">* 撤销虚拟机</span><br><span class="line">rabbitmqctl delete_vhost 虚拟机名</span><br><span class="line"></span><br><span class="line">* 服务器状态</span><br><span class="line">rabbitmqctl status</span><br></pre></td></tr></table></figure>
+<h5 id="防火墙设置"><a href="#防火墙设置" class="headerlink" title="防火墙设置"></a>防火墙设置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 15672 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 25672 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 5672 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 4369 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 5671 -j ACCEPT</span><br></pre></td></tr></table></figure>
+<h4 id="rabbitmq配置"><a href="#rabbitmq配置" class="headerlink" title="rabbitmq配置"></a>rabbitmq配置</h4><h5 id="RabbitMQ支持三种配置方式："><a href="#RabbitMQ支持三种配置方式：" class="headerlink" title="RabbitMQ支持三种配置方式："></a><strong>RabbitMQ支持三种配置方式：</strong></h5><ul>
+<li>读取环境变量中配置， 这包括shell中环境变量和rabbitmq-env.conf/rabbitmq-env-conf.bat文件中配置的环境变量</li>
+</ul>
+<p>&emsp;&emsp;可配置如端口、配置文件指定自定义位置、节点名字等信息。</p>
+<ul>
+<li>读取配置文件rabbitmq.config</li>
+</ul>
+<p>&emsp;&emsp;可配置权限、集群、插件设置等高级信息， 当然也可配置端口等简单信息</p>
+<ul>
+<li>通过运行命令时指定参数</li>
+</ul>
+<p>&emsp;&emsp;通常用来配置集群范围信息， 用来运行时动态传入</p>
+<h5 id="环境变量读取优先级"><a href="#环境变量读取优先级" class="headerlink" title="环境变量读取优先级"></a><strong>环境变量读取优先级</strong></h5><ul>
+<li><p>读取shell中环境变量</p>
+</li>
+<li><p>读取rabbitmq-env.conf/rabbitmq-env-conf.bat中的</p>
+</li>
+<li><p>读取默认的</p>
+</li>
+</ul>
+<h5 id="rabbitmq-env-conf-rabbitmq-env-conf-bat-详解（颜色标注的为常用配置）"><a href="#rabbitmq-env-conf-rabbitmq-env-conf-bat-详解（颜色标注的为常用配置）" class="headerlink" title="rabbitmq-env.conf/rabbitmq-env-conf.bat 详解（颜色标注的为常用配置）"></a><strong>rabbitmq-env.conf/rabbitmq-env-conf.bat 详解（颜色标注的为常用配置）</strong></h5><table>
+<thead>
+<tr>
+<th style="text-align:left">变量名称</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">RABBITMQ_NODE_IP_ADDRESS</td>
+<td>默认为空字符串， 即绑定所有网络接口</td>
+<td>如果想绑定到一个固定的IP可以使用此变量. 如果要绑定到两个或两个以上只能通过rabbitmq.config中的tcp_listeners来设置。</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_NODE_PORT</td>
+<td>5672</td>
+<td>供客户端建立连接端口</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_DIST_PORT</td>
+<td>RABBITMQ_NODE_PORT + 20000</td>
+<td>用于节点和CLI工具连接的端口， 如果rabbitmq.config中配置了kernel.inet_dist_listen_min 或 kernel.inet_dist_listen_max该参数将被忽略</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_NODENAME</td>
+<td>Unix*: rabbit@$HOSTNAMEWindows: rabbit@%COMPUTERNAME%</td>
+<td>节点名字， 必须唯一</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_CONF_ENV_FILE</td>
+<td>Generic UNIX - $RABBITMQ_HOME/etc/rabbitmq/Debian - /etc/rabbitmq/RPM - /etc/rabbitmq/Mac OS X (Homebrew) - ${install_prefix}/etc/rabbitmq/, the Homebrew prefix is usually /usr/localWindows - %APPDATA%\RabbitMQ\</td>
+<td>rabbitmq-env.conf/rabbitmq-env-conf.bat 默认位置， 不同系统不同安装方式位置也不同， 如果默认位置没找到则需在该位置手动创建一个</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_CONFIG_FILE</td>
+<td>同上</td>
+<td>rabbitmq.config 默认位置。 如果默认位置没找到则需在该位置手动创建一个</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_USE_LONGNAME</td>
+<td>官网没说。。。。应该是false。。。</td>
+<td>取值： true 或 false。  如果配置为true， 这将导致RabbitMQ使用完全限定的名称来标识节点</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_SERVICENAME</td>
+<td>Windows Service: RabbitMQ</td>
+<td>服务名称</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_CONSOLE_LOG</td>
+<td>只在控制台输出日志， 日志不会持久化到文件</td>
+<td>取值： new 或 reuse。两种取值都是将控制台输出从服务器重定向到名为%rabbitmqservicename%（上面那个变量）的文件。　　1）默认： 不设置， 控制台的日志不会被持久化到文件　　2）new： 每次启动时都会创建一个新的文件　　3）reuse： 每次启动服务器都会重用该日志文件</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_CTL_ERL_ARGS</td>
+<td>None</td>
+<td>在调用rabbitmqctl时使用的erl命令的参数。应该仅用于调试目的。</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_SERVER_ERL_ARGS</td>
+<td>Unix*:”+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true}]”Windows: None</td>
+<td>在调用RabbitMQ服务器时使用的erl命令的标准参数， 应该仅用于调试目的</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS</td>
+<td>Unix*: NoneWindows: None</td>
+<td>在调用RabbitMQ服务器时使用的erl命令的附加参数。这个变量的值被附加到参数的默认列表(RABBITMQ_SERVER_ERL_ARGS).</td>
+</tr>
+<tr>
+<td style="text-align:left">RABBITMQ_SERVER_START_ARGS</td>
+<td>None</td>
+<td>在调用RabbitMQ服务器时使用的erl命令的额外参数。这不会覆盖RABBITMQ_SERVER_ERL_ARGS.</td>
+</tr>
+<tr>
+<td style="text-align:left">HOSTNAME</td>
+<td>Unix, Linux: <code>env hostname</code>MacOSX: <code>env hostname -s</code></td>
+<td>当前机器名称</td>
+</tr>
+<tr>
+<td style="text-align:left">COMPUTERNAME</td>
+<td>Windows: localhost</td>
+<td>当前机器名称， windows使用该变量</td>
+</tr>
+<tr>
+<td style="text-align:left">ERLANG_SERVICE_MANAGER_PATH</td>
+<td>Windows Service: %ERLANG_HOME%\erts-x.x.x\bin</td>
+<td>erlsrv.exe的路径， erlsrv.exe这个是erlang服务的包装脚本</td>
+</tr>
+</tbody>
+</table>
+<h3 id=""><a href="#" class="headerlink" title=" "></a> </h3><h5 id="rabbitmq-config详解（核心配置）"><a href="#rabbitmq-config详解（核心配置）" class="headerlink" title="rabbitmq.config详解（核心配置）"></a><strong>rabbitmq.config详解（核心配置）</strong></h5><p>&emsp;&emsp;该配置文件使用的是Erlang标准配置文件，语法请参照<a href="http://erlang.org/doc/man/config.html" target="_blank" rel="noopener">这里</a></p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">例： </span><br><span class="line">  [</span><br><span class="line">    &#123;rabbit, [&#123;tcp_listeners, [<span class="number">5673</span>]&#125;]&#125;</span><br><span class="line">  ].</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tcp_listeners</td>
+<td>监听AMQP连接的端口或主机/对。 Default: [5672]</td>
+</tr>
+<tr>
+<td>num_tcp_acceptors</td>
+<td>Erlang进程的数量，接受TCP监听器的连接数。 Default: 10</td>
+</tr>
+<tr>
+<td>handshake_timeout</td>
+<td>对AMQP 0-8/0-9/0-9-1握手的最大时间(在套接字连接和SSL握手之后)，以毫秒为间隔 Default: 10000</td>
+</tr>
+<tr>
+<td>ssl_listeners</td>
+<td>如上所述，用于SSL连接。 Default: []</td>
+</tr>
+<tr>
+<td>num_ssl_acceptors</td>
+<td>用于接受SSL监听连接的Erlang进程的数量。 Default: 1</td>
+</tr>
+<tr>
+<td>ssl_options</td>
+<td>SSL配置参数. 详情请看 <a href="http://www.rabbitmq.com/ssl.html#enabling-ssl" target="_blank" rel="noopener">SSL documentation</a>.Default: []</td>
+</tr>
+<tr>
+<td>ssl_handshake_timeout</td>
+<td>SSL握手超时，以毫秒为间隔。 Default: 5000</td>
+</tr>
+<tr>
+<td>vm_memory_high_watermark</td>
+<td>触发流控制的内存阈值。详情请看 <a href="http://www.rabbitmq.com/memory.html" target="_blank" rel="noopener">memory-based flow control</a>.Default: 0.4</td>
+</tr>
+<tr>
+<td>vm_memory_high_watermark_paging_ratio</td>
+<td>设置当内存使用超过总内存百分比多少时，队列开始将消息持久化到磁盘以释放内存。 详情请看 <a href="http://www.rabbitmq.com/memory.html" target="_blank" rel="noopener">memory-based flow control</a>.Default: 0.5</td>
+</tr>
+<tr>
+<td>disk_free_limit</td>
+<td>RabbitMQ存储数据的分区的磁盘空间限制。当可用的磁盘空间低于这个限制时，就会触发流控制。值可以相对于RAM的总数设置(例如，内存比例，1.0)。该值也可以设置为整数的字节数。或者，单位(例如“50 mb”)。默认情况下，空闲磁盘空间必须超过50MB。详情请看 <a href="http://www.rabbitmq.com/disk-alarms.html" target="_blank" rel="noopener">Disk Alarms</a>.Default: 50000000</td>
+</tr>
+<tr>
+<td>log_levels</td>
+<td>控制日志的粒度。该值是一个日志事件类别和日志级别对的列表。 可设置级别：　　‘none’　　‘error’　　‘warning’　　‘info’ 　　‘debug’ 　　以上下一层级别的日志输出均包含上层级别日志输出（如： warning包含warning和error）, none为不输出日志 另外，当前未分类的事件总是记录在日志中The categories are:channel - 所有与AMQP通道有关的事件connection - 对于所有与网络连接有关的事件federation - 对于所有与<a href="http://www.rabbitmq.com/federation.html" target="_blank" rel="noopener">federation</a>有关的事件mirroring - 对于与镜像队列相关的所有事件Default: [{connection, info}]</td>
+</tr>
+<tr>
+<td>frame_max</td>
+<td>框架最大允许大小(以字节为单位)与消费者进行数据交换。设置为0意味着“无限”，但会在一些QPid客户端触发一个bug。设置更大的值可能会提高吞吐量;设置较小的值可能会提高延迟。Default: 131072</td>
+</tr>
+<tr>
+<td>channel_max</td>
+<td>与消费者进行谈判的最大允许数量。设置为0意味着“无限”。使用更多的通道会增加代理的内存占用。Default: 0</td>
+</tr>
+<tr>
+<td>channel_operation_timeout</td>
+<td>通道操作超时为毫秒(内部使用，由于消息传递协议的差异和限制而不直接暴露于客户机)。 Default: 15000</td>
+</tr>
+<tr>
+<td>heartbeat</td>
+<td>该值表示服务器在连接中发送的心跳延迟，在几秒钟内。优化框架。如果设置为0，则会禁用心跳。客户端可能不会遵循服务器的建议，请参阅AMQP参考以了解更多细节。在有大量连接的情况下，禁用心跳可能改善性能，但可能会导致连接在关闭非活动连接的网络设备的出现。Default: 60 (580 prior to release 3.5.5)</td>
+</tr>
+<tr>
+<td>default_vhost</td>
+<td>当RabbitMQ创建一个新的数据库时，创建一个虚拟主机。交换amq.rabbitmq.logwill存在于这个虚拟主机中。Default: &lt;&lt;”/“&gt;&gt;</td>
+</tr>
+<tr>
+<td>default_user</td>
+<td>当RabbitMQ从头创建一个新数据库时，要创建用户名。  Default: &lt;&lt;”guest”&gt;&gt;</td>
+</tr>
+<tr>
+<td>default_pass</td>
+<td>默认用户的密码。 Default: &lt;&lt;”guest”&gt;&gt;</td>
+</tr>
+<tr>
+<td>default_user_tags</td>
+<td>默认用户的标记。 Default: [administrator]</td>
+</tr>
+<tr>
+<td>default_permissions</td>
+<td>在创建时分配给默认用户的权限。 Default:  [&lt;&lt;”.<em>“&gt;&gt;, &lt;&lt;”.</em>“&gt;&gt;, &lt;&lt;”.*”&gt;&gt;]</td>
+</tr>
+<tr>
+<td>loopback_users</td>
+<td>只允许通过环回接口连接到代理的用户列表(即localhost)。 如果您希望允许缺省的来宾用户远程连接，则需要将其更改为 [].Default:  [&lt;&lt;”guest”&gt;&gt;]</td>
+</tr>
+<tr>
+<td>cluster_nodes</td>
+<td>当一个节点开始第一次启动时，将它设置为使集群自动发生。元组的第一个元素是节点试图集群到的节点。第二个元素是磁盘或ram，并确定节点类型。 Default: {[], disc}</td>
+</tr>
+<tr>
+<td>server_properties</td>
+<td>键值对的列表，在连接上向客户端宣布。 Default: []</td>
+</tr>
+<tr>
+<td>collect_statistics</td>
+<td>统计数据收集模式。主要与管理插件有关。选项有: none (不要发布统计数据)coarse (发出每个队列/每个通道/每个连接统计信息)fine (发出的每条数据)通常情况下不需要设置该参数 Default: none</td>
+</tr>
+<tr>
+<td>collect_statistics_interval</td>
+<td>统计数据收集间隔以毫秒为间隔。 主要相关插件 <a href="http://www.rabbitmq.com/management.html#statistics-interval" target="_blank" rel="noopener">management plugin</a>.Default: 5000</td>
+</tr>
+<tr>
+<td>management_db_cache_multiplier</td>
+<td>管理插件将缓存诸如队列清单之类的代价较高的查询的时间。缓存将把最后一个查询的运行时间乘以这个值，并在此时间内缓存结果。 Default: 5</td>
+</tr>
+<tr>
+<td>auth_mechanisms</td>
+<td><a href="http://www.rabbitmq.com/authentication.html" target="_blank" rel="noopener">SASL authentication mechanisms</a> to offer to clients.Default: [‘PLAIN’, ‘AMQPLAIN’]</td>
+</tr>
+<tr>
+<td>auth_backends</td>
+<td>List of <a href="http://www.rabbitmq.com/access-control.html" target="_blank" rel="noopener">authentication and authorisation backends</a> to use.Other databases than rabbit_auth_backend_internalare available through <a href="http://www.rabbitmq.com/plugins.html" target="_blank" rel="noopener">plugins</a>.Default: [rabbit_auth_backend_internal]</td>
+</tr>
+<tr>
+<td>reverse_dns_lookups</td>
+<td>设置为true，让RabbitMQ对客户端连接执行反向DNS查找，并通过rabbitmqctl和管理插件呈现该信息。 Default: false</td>
+</tr>
+<tr>
+<td>delegate_count</td>
+<td>用于集群内部通信的委托进程的数量。当为多核CPU时可以考虑设置该值 Default: 16</td>
+</tr>
+<tr>
+<td>trace_vhosts</td>
+<td>Used internally by the <a href="http://www.rabbitmq.com/firehose.html" target="_blank" rel="noopener">tracer</a>. 通常情况下不需要设置该参数Default: []</td>
+</tr>
+<tr>
+<td>tcp_listen_options</td>
+<td>默认的套接字选项。通常情况下不需要设置该参数 Default:<code>[{backlog,       128},  {nodelay,       true},  {linger,        {true,0}},  {exit_on_close, false}]</code></td>
+</tr>
+<tr>
+<td>hipe_compile</td>
+<td>设置为true，使用HiPE预编译RabbitMQ的部分，这是Erlang的即时编译器。这将增加服务器的吞吐量，以增加启动时间的成本。 您可能会看到，在启动时延迟几分钟，您的性能会提高20-50%。这些数据是高度工作负载和硬件依赖的。HiPE支持可能不会编译到您的Erlang安装中。如果不是这样，启用这个选项只会导致一个警告消息被显示，而启动将照常进行。例如，Debian/Ubuntu用户需要安装erlangbase-base-hipe包。HiPE在某些平台上是不可用的，尤其是Windows。HiPE在17.5之前就已经知道了erlangp/otp版本的问题。HiPE推荐使用最新的erlangp/otp版本Default: false</td>
+</tr>
+<tr>
+<td>cluster_partition_handling</td>
+<td>如何处理网络分区。可用模式:  ignorepause_minority{pause_if_all_down, [nodes], ignore \</td>
+<td>autoheal} (例: [‘rabbit@node1’, ‘rabbit@node2’])autoheal详情请看<a href="http://www.rabbitmq.com/partitions.html#automatic-handling" target="_blank" rel="noopener">documentation on partitions</a> Default: ignore</td>
+</tr>
+<tr>
+<td>cluster_keepalive_interval</td>
+<td>节点应该多频繁地将keepalive消息发送到其他节点(以毫秒为单位)。请注意，这与netticktime不一样; 错过的keepalive消息不会导致节点被认为挂机。 Default: 10000</td>
+</tr>
+<tr>
+<td>queue_index_embed_msgs_below</td>
+<td>在消息的字节数中，消息将被直接嵌入到队列索引中。详情请看 <a href="http://www.rabbitmq.com/persistence-conf.html" target="_blank" rel="noopener">persister tuning</a> Default: 4096</td>
+</tr>
+<tr>
+<td>msg_store_index_module</td>
+<td>用于队列索引的实现模块。 详情请看 <a href="http://www.rabbitmq.com/persistence-conf.html" target="_blank" rel="noopener">persister tuning</a> Default: rabbit_msg_store_ets_index</td>
+</tr>
+<tr>
+<td>backing_queue_module</td>
+<td>队列内容的实现模块。通常情况下不需要设置该参数 Default: rabbit_variable_queue</td>
+</tr>
+<tr>
+<td>msg_store_file_size_limit</td>
+<td>Tunable value for the persister.  通常情况下不需要设置该参数Default: 16777216</td>
+</tr>
+<tr>
+<td>mnesia_table_loading_retry_limit</td>
+<td>在等待集群中的Mnesia tables可用时，需要重试的次数。 Default: 10</td>
+</tr>
+<tr>
+<td>mnesia_table_loading_retry_timeout</td>
+<td>在集群中等待每个重试的时间，以便可用 Default: 30000</td>
+</tr>
+<tr>
+<td>queue_index_max_ journal_entries</td>
+<td>Tunable value for the persister.  通常情况下不需要设置该参数Default: 65536</td>
+</tr>
+<tr>
+<td>queue_master_locator</td>
+<td>Queue master定位策略可用策略:&lt;&lt;”min-masters”&gt;&gt;&lt;&lt;”client-local”&gt;&gt;&lt;&lt;”random”&gt;&gt;详情请看 <a href="http://www.rabbitmq.com/ha.html#queue-master-location" target="_blank" rel="noopener">documentation on queue master location</a> Default: &lt;&lt;”client-local”&gt;&gt;</td>
+</tr>
+<tr>
+<td>lazy_queue_explicit_gc_run_operation_threshold</td>
+<td>调优： 只有在内存压力下有延迟队列时。　　　 这是触发垃圾收集器和其他内存减少活动的阈值。一个低的值可以降低性能，一个高的值可以提高性能，但是会导致更高的内存消耗。通常情况下不需要设置该参数Default: 1000</td>
+</tr>
+<tr>
+<td>queue_explicit_gc_run_operation_threshold</td>
+<td>调优： 在内存压力较大时。这是触发垃圾收集器和其他内存减少活动的阈值。一个低的值可以降低性能，一个高的值可以提高性能，但是会导致更高的内存消耗。通常情况下不需要设置该参数Default: 1000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="配置条目加密"><a href="#配置条目加密" class="headerlink" title="配置条目加密"></a><strong>配置条目加密</strong></h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 可以在RabbitMQ配置文件中加密敏感配置条目（例如密码，包含URL的凭据）。代理在开始时解密加密的条目.请注意，加密配置条目不会使系统有意义地更安全。然而，它们允许RabbitMQ的部署符合各国的规定，要求在配置文件中不应以纯文本形式显示敏感数据。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 加密值必须在Erlang加密元组内：&#123;encrypted，...&#125;。以下是默认用户加密密码的配置</span></span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">  &#123;rabbit, [</span><br><span class="line">  &#123;default_user, &lt;&lt;"guest"&gt;&gt;&#125;,</span><br><span class="line">  &#123;default_pass,</span><br><span class="line">&#123;encrypted,</span><br><span class="line"> &lt;&lt;"cPAymwqmMnbPXXRVqVzpxJdrS8mHEKuo2V+3vt1u/fymexD9oztQ2G/oJ4PAaSb2c5N/hRJ2aqP/X0VAfx8xOQ=="&gt;&gt;</span><br><span class="line">&#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;config_entry_decoder, [</span><br><span class="line"> &#123;passphrase, &lt;&lt;"mypassphrase"&gt;&gt;&#125;</span><br><span class="line"> ]&#125;</span><br><span class="line">]&#125;</span><br><span class="line">].</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意configentrydecoder密钥与RabbitMQ用于解密加密值的密码。密码短语不需要在配置文件中进行硬编码，它可以在一个单独的文件中。</span></span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">  &#123;rabbit, [</span><br><span class="line">  ...</span><br><span class="line">  &#123;config_entry_decoder, [</span><br><span class="line"> &#123;passphrase, &#123;file, "/path/to/passphrase/file"&#125;&#125;</span><br><span class="line"> ]&#125;</span><br><span class="line">]&#125;</span><br><span class="line">].</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当使用&#123;passphrase，prompt&#125;启动时，RabbitMQ也可以要求操作者输入密码</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用rabbitmqctl和encode命令加密值</span></span><br><span class="line"></span><br><span class="line">rabbitmqctl encode '&lt;&lt;"guest"&gt;&gt;' mypassphrase</span><br><span class="line">&#123;encrypted,&lt;&lt;"... long encrypted value..."&gt;&gt;&#125;</span><br><span class="line">rabbitmqctl encode '"amqp://fred:secret@host1.domain/my_vhost"' mypassphrase</span><br><span class="line">&#123;encrypted,&lt;&lt;"... long encrypted value..."&gt;&gt;&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果要解密值，请添加--decode选项</span></span><br><span class="line"></span><br><span class="line">rabbitmqctl encode --decode '&#123;encrypted, &lt;&lt;"..."&gt;&gt;&#125;' mypassphrase</span><br><span class="line">&lt;&lt;"guest"&gt;&gt;</span><br><span class="line">rabbitmqctl encode --decode '&#123;encrypted, &lt;&lt;"..."&gt;&gt;&#125;' mypassphrase</span><br><span class="line">"amqp://fred:secret@host1.domain/my_vhost"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以对不同类型的值进行编码。上面的例子编码了二进制文件（&lt;&lt;“guest”&gt;&gt;）和字符串（“amqp：// fred：secret@host1.domain/my_vhost”）。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 加密机制使用PBKDF2从密码短语中产生派生密钥。默认散列函数为SHA512，默认迭代次数为1000.默认密码为AES 256 CBC</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 您可以在配置文件中更改这些默认值：</span></span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">  &#123;rabbit, [</span><br><span class="line">  ...</span><br><span class="line">  &#123;config_entry_decoder, [</span><br><span class="line"> &#123;passphrase, "mypassphrase"&#125;,</span><br><span class="line"> &#123;cipher, blowfish_cfb64&#125;,</span><br><span class="line"> &#123;hash, sha256&#125;,</span><br><span class="line"> &#123;iterations, 10000&#125;</span><br><span class="line"> ]&#125;</span><br><span class="line">]&#125;</span><br><span class="line">].    </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在命令行：</span></span><br><span class="line"></span><br><span class="line">rabbitmqctl encode --cipher blowfish_cfb64 --hash sha256 --iterations 10000 \</span><br><span class="line"> '&lt;&lt;"guest"&gt;&gt;' mypassphrase</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/19/RabbitMQ概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2048,354 +2955,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/15/iptables网络防火墙/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/15/iptables网络防火墙/" itemprop="url">
-                  iptables网络防火墙
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-10-15 14:32:53" itemprop="dateCreated datePublished" datetime="2018-10-15T14:32:53+08:00">2018-10-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-15 13:12:06" itemprop="dateModified" datetime="2019-01-15T13:12:06+08:00">2019-01-15</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
-<li><p>网络防火墙往往处于网络的入口或者边缘</p>
-</li>
-<li><p>网络防火墙的职责就是”过滤并转发”。要想”过滤”，只能在INPUT、OUTPUT、FORWARD三条链中实现，要想”转发”，报文则只会经过FORWARD链（发往本机的报文才会经过INPUT链），所以，iptables的角色变为”网络防火墙”时，规则只能定义在FORWARD链中。</p>
-</li>
-</ul>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 准备三台linux主机，一台为外网主机，一台为内网主机，一台允当防火墙</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> A外网主机IP：10.5.5.90</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> B内网主机IP：192.168.116.130</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> C网络防火墙IP：192.168.116.129、10.5.5.91</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将虚拟机C的第二块网卡和B的网卡设置为仅主机</span></span><br><span class="line">* B</span><br><span class="line">[root@localhost ~]# vim /etc/sysconfig/network-scripts/ifcfg-eno16777736</span><br><span class="line">    IPADDR=192.168.116.130</span><br><span class="line">    NETMASK=255.255.255.0</span><br><span class="line">    GATEWAY=192.168.116.129</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将B主机的网关指向C（防火墙）主机的内网地址192.168.116.129</span></span><br><span class="line"></span><br><span class="line">* A</span><br><span class="line">[root@localhost ~]#route add -net 192.168.116.0/24 gw 10.5.5.91</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给外网主机加一条路由，让外网主机知道如何到内网主机</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 现在外网与内网主机还不能互相ping通，因为防火墙没有路由数据包</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为在CentOS中，IP地址属于主机，所以内外网的主机都可以ping通防火墙的外网地址</span></span><br><span class="line"></span><br><span class="line">* C</span><br><span class="line">[root@localhost ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启防火墙路由功能</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时内外网可以互相ping通了。</span></span><br><span class="line">[root@localhost ~]# iptables -A FORWARD -j REJECT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拒绝所有数据转发。这时内外网又不能互相ping通了。</span></span><br><span class="line"></span><br><span class="line">* A</span><br><span class="line">[root@localhost ~]# vim /var/www/html/index.html</span><br><span class="line">	10.5.5.90</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加默认主页</span></span><br><span class="line">[root@localhost ~]# systemctl start httpd</span><br><span class="line"></span><br><span class="line">* B</span><br><span class="line">[root@localhost ~]# vim /var/www/html/index.html</span><br><span class="line">	192.168.116.130</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加默认主页</span></span><br><span class="line">[root@localhost ~]# systemctl start httpd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动两台主机的httpd服务</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时两台主机是不能互相访问的</span></span><br><span class="line"></span><br><span class="line">* C</span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -s 192.168.116.0/24 -p tcp --dport 80 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让源地址是192.168.116.0网段的主机可以访问外部的80端口。只加入这一条还不行，这只是数据流出的规则，还要加数据流入的规则</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -d 192.168.116.0/24 -p tcp --sport 80 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入此条后，192.168.116.0网段的主机就可以访问外部的80端口了。</span></span><br><span class="line">[root@localhost ~]# iptables -D FORWARD 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除FORWARD中的第一条规则</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入这一条就可以将绝大多数响应报文放行了。配置完上述规则后，我们只要考虑请求报文的方向就行了，而回应报文，上述一条规则就能搞定，这样配置，即使以后有更多服务的响应报文需要放行，我们也不用再去针对响应报文设置规则了</span></span><br><span class="line">[root@localhost ~]# iptables -I FORWARD -s 192.168.116.0/24 -p tcp --dport 22 -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加入这一条就可以实现内网主机使用ssh连接外部主机了</span></span><br><span class="line">[root@test ~]# iptables -I FORWARD -p icmp -j ACCEPT</span><br><span class="line"><span class="meta">#</span><span class="bash"> 放行内外网间的ping请求</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/15/iptables自定义规则链/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/15/iptables自定义规则链/" itemprop="url">
-                  iptables自定义规则链
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2018-10-15 14:05:17" itemprop="dateCreated datePublished" datetime="2018-10-15T14:05:17+08:00">2018-10-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-01-15 12:38:26" itemprop="dateModified" datetime="2019-01-15T12:38:26+08:00">2019-01-15</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/防火墙/" itemprop="url" rel="index"><span itemprop="name">防火墙</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="创建自定义规则链"><a href="#创建自定义规则链" class="headerlink" title="创建自定义规则链"></a>创建自定义规则链</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 当默认链中的规则非常多时，不方便我们管理。所以要自定义规则链</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 自定义链并不能直接使用，而是需要被默认链引用才能够使用</span></span><br><span class="line"></span><br><span class="line">* 创建自定义链</span><br><span class="line">[root@bogon ~]# iptables -t filter -N IN_WEB</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"-t filter"</span>表示操作的表为filter表，与之前的示例相同，省略-t选项时，缺省操作的就是filter表。<span class="string">"-N IN_WEB"</span>表示创建一个自定义链，自定义链的名称为<span class="string">"IN_WEB"</span></span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80</span><br><span class="line">2         386    26796 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line">3        4087   278278 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT 44 packets, 4228 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain IN_WEB (0 references)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看filter表中的链，这条自定义链的引用计数为0 (0 references)，也就是说，这条自定义链还没有被任何默认链所引用，所以，即使IN_WEB中配置了规则，也不会生效</span></span><br><span class="line"></span><br><span class="line">* 创建自定义链规则</span><br><span class="line">[root@bogon ~]# iptables -I IN_WEB -s 10.5.5.249 -j REJECT</span><br><span class="line">[root@bogon ~]# iptables --line -nvxL IN_WEB</span><br><span class="line">Chain IN_WEB (0 references)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       10.5.5.249           0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"><span class="meta">#</span><span class="bash"> 自定义链中已经有了一条规则，但是目前，这条规则无法匹配到任何报文，因为我们并没有在任何默认链中引用它。</span></span><br><span class="line"></span><br><span class="line">* 引用自定义链</span><br><span class="line">[root@bogon ~]# iptables -I INPUT -p tcp --dport 80 -j IN_WEB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在INPUT链中添加了一条规则，访问本机80端口的tcp报文将会被这条规则匹配到，而上述规则中的<span class="string">"-j IN_WEB"</span>表示：访问80端口的tcp报文将由自定义链<span class="string">"IN_WEB"</span>中的规则进行处理。此处，我们将<span class="string">"动作"</span>替换为了<span class="string">"自定义链"</span>，当<span class="string">"-j"</span>对应的值为一个自定义链时，就表示被当前规则匹配到的报文将交由对应的自定义链处理。当IN_WEB自定义链被INPUT链引用以后，可以发现，IN_WEB链的引用计数已经变为1，表示这条自定义链已经被引用了1次，自定义链还可以引用其他的自定义链</span></span><br><span class="line">[root@bogon ~]# iptables --line -nvxL</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 IN_WEB     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line">2           0        0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80</span><br><span class="line">3         663    46156 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line">4        5196   351595 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT 76 packets, 7396 bytes)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain IN_WEB (1 references)</span><br><span class="line">num      pkts      bytes target     prot opt in     out     source               destination         </span><br><span class="line">1           0        0 REJECT     all  --  *      *       10.5.5.249           0.0.0.0/0            reject-with icmp-port-unreachable</span><br></pre></td></tr></table></figure>
-<h4 id="重命名自定义链"><a href="#重命名自定义链" class="headerlink" title="重命名自定义链"></a>重命名自定义链</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@bogon ~]# iptables -E IN_WEB WEB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"-E"</span>选项可以修改自定义链名</span></span><br><span class="line">[root@bogon ~]# iptables -nvL</span><br><span class="line">Chain INPUT (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line">   80  5672 WEB        tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line">    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80</span><br><span class="line">  888 62080 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line"> 6265  425K REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT 24 packets, 2328 bytes)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line"></span><br><span class="line">Chain WEB (2 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination         </span><br><span class="line">    1    60 REJECT     all  --  *      *       10.5.5.249           0.0.0.0/0            reject-with icmp-port-unreachable</span><br></pre></td></tr></table></figure>
-<h4 id="删除自定义链"><a href="#删除自定义链" class="headerlink" title="删除自定义链"></a>删除自定义链</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用<span class="string">"-X"</span>选项可以删除自定义链，但是删除自定义链时，需要满足两个条件：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1、自定义链没有被任何默认链引用，即自定义链的引用计数为0。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2、自定义链中没有任何规则，即自定义链为空。</span></span><br><span class="line"></span><br><span class="line">[root@bogon ~]# iptables -X WEB</span><br><span class="line">iptables: Too many links.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 提示：Too many links，是因为WEB链已经被默认链所引用</span></span><br><span class="line">[root@bogon ~]# iptables -D INPUT 1</span><br><span class="line">[root@bogon ~]# iptables -X WEB</span><br><span class="line">iptables: Directory not empty.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除引用自定义链的规则后，再次尝试删除自定义链，提示：Directory not empty，是因为WEB链中存在规则</span></span><br><span class="line">[root@bogon ~]# iptables -t filter -F WEB</span><br><span class="line">[root@bogon ~]# iptables -t filter -X WEB</span><br><span class="line"><span class="meta">#</span><span class="bash"> 清除规则后再删除自定义链就没问题了。使用<span class="string">"-X"</span>选项可以删除一个引用计数为0的、空的自定义链</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2443,7 +3002,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">188</span>
+                    <span class="site-state-item-count">190</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2823,7 +3382,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">147</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">149</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

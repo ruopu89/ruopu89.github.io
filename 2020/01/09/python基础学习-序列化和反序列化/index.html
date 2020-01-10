@@ -142,10 +142,15 @@
 <meta property="og:site_name" content="ruopu&#39;s blog">
 <meta property="og:description" content="为什么要序列化内存中的字典、列表、集合以及各种对象，如何保存到一个文件中？ 如果是自己定义的类的实例，如何保存到一个文件中？ 如何从文件中读取数据，并让它们在内存中再次变成自己对应的类的实例？ 要设计一套协议，按照某种规则，把内存中数据保存到文件中。文件是一个字节序列，所以必须把数据转换成字节序列，输出到文件。这就是序列化。反之，从文件的字节序列恢复到内存，就是反序列化。 定义serializat">
 <meta property="og:locale" content="zh-TW">
-<meta property="og:updated_time" content="2020-01-09T09:29:23.002Z">
+<meta property="og:image" content="http://yoursite.com/images/python序列化与反序列化/json1.png">
+<meta property="og:image" content="http://yoursite.com/images/python序列化与反序列化/json2.png">
+<meta property="og:image" content="http://yoursite.com/images/python序列化与反序列化/json3.png">
+<meta property="og:image" content="http://yoursite.com/images/python序列化与反序列化/messagepack1.png">
+<meta property="og:updated_time" content="2020-01-10T01:03:59.112Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python基础学习-序列化和反序列化">
 <meta name="twitter:description" content="为什么要序列化内存中的字典、列表、集合以及各种对象，如何保存到一个文件中？ 如果是自己定义的类的实例，如何保存到一个文件中？ 如何从文件中读取数据，并让它们在内存中再次变成自己对应的类的实例？ 要设计一套协议，按照某种规则，把内存中数据保存到文件中。文件是一个字节序列，所以必须把数据转换成字节序列，输出到文件。这就是序列化。反之，从文件的字节序列恢复到内存，就是反序列化。 定义serializat">
+<meta name="twitter:image" content="http://yoursite.com/images/python序列化与反序列化/json1.png">
 
 
 
@@ -396,12 +401,24 @@
                 
               
 
-              <time title="創建時間：2020-01-09 16:50:48 / 修改時間：17:29:23" itemprop="dateCreated datePublished" datetime="2020-01-09T16:50:48+08:00">2020-01-09</time>
+              <time title="創建時間：2020-01-09 16:50:48" itemprop="dateCreated datePublished" datetime="2020-01-09T16:50:48+08:00">2020-01-09</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-01-10 09:03:59" itemprop="dateModified" datetime="2020-01-10T09:03:59+08:00">2020-01-10</time>
               
             
           </span>
@@ -494,6 +511,119 @@
 <p>注意：这里的AAA定义和原来完全不同了。</p>
 <p>因此，序列化、反序列化必须保证使用同一套类的定义，否则会带来不可预料的结果。</p>
 <h3 id="序列化应用"><a href="#序列化应用" class="headerlink" title="序列化应用"></a>序列化应用</h3><p>一般来说，本地序列化的情况，应用软少。大多数场景都应用在网络传输中。将数据序列化后通过网络传输到远程节点，远程服务器上的服务将接收到的数据反序列化后，就可以使用了。但是，要注意一点，远程接收端，反序列化时必须有对应的数据类型，否则就会报错。尤其是自定义类，必须远程得有一致的定义。现在，大多数项目，都不是单机的，也不是单服务的。需要通过网络将数据传送到其他节点上去，这就需要大量的序列化、反序列化过程。但是，问题是，Python程序之间还可以都使用pickle解决序列化、反序列化，如果是跨平台、跨语言、跨协议，pickle就不太适合了，就需要公共的协议。例如XML、Json、Protocol Buffer等。不同的协议，效率不同、学习曲线不同，适用不同场景，要根据不同的情况分析选型。</p>
+<h3 id="Json"><a href="#Json" class="headerlink" title="Json"></a>Json</h3><p>JSON(JavaScript Object Notation，JS对象标记)是一种轻量级的数据交换格式。它基于ECMAScript（w3c制定的JS规范）的一个子集，采用完全独立于编程语言的文本格式来存储和表示数据。</p>
+<p><a href="http://json.org" target="_blank" rel="noopener">http://json.org</a></p>
+<h3 id="Json的数据类型"><a href="#Json的数据类型" class="headerlink" title="Json的数据类型"></a>Json的数据类型</h3><ul>
+<li>值</li>
+</ul>
+<p><strong><em>双引号</em></strong>引起来的字符串，数值，true和false，null，对象，数组，这些都是值</p>
+<p><img src="/images/python序列化与反序列化/json1.png" alt=""></p>
+<ul>
+<li>字符串</li>
+</ul>
+<p>由双引号包围起来的任意字符的组合，可以有转义字符。</p>
+<ul>
+<li>数值</li>
+</ul>
+<p>有正负，有整数、浮点数。</p>
+<ul>
+<li>对象</li>
+</ul>
+<p>无序的键值对的集合</p>
+<p>格式：<code>{key1:value1,...,keyn:valuen}</code></p>
+<p>key必须是一个字符串，需要双引号包围这个字符串。</p>
+<p>value可以是任意合法的值</p>
+<p><img src="/images/python序列化与反序列化/json2.png" alt=""></p>
+<ul>
+<li>数组</li>
+</ul>
+<p>有序的值的集合</p>
+<p>格式：<code>[val1,...,valn]</code></p>
+<p><img src="/images/python序列化与反序列化/json3.png" alt=""></p>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"person"</span>:[</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">"name"</span>:<span class="string">"tom"</span>,</span><br><span class="line">         <span class="string">"age"</span>:<span class="number">18</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">"name"</span>:<span class="string">"jerry"</span>,</span><br><span class="line">         <span class="string">"age"</span>:<span class="number">16</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"total"</span>:<span class="number">2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Json模块"><a href="#Json模块" class="headerlink" title="Json模块"></a><strong><em>Json模块</em></strong></h3><h4 id="Python与Json"><a href="#Python与Json" class="headerlink" title="Python与Json"></a>Python与Json</h4><p>Python支持少量内建数据类型到Json类型的转换。</p>
+<table>
+<thead>
+<tr>
+<th>Python类型</th>
+<th>Json类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>True</td>
+<td>true</td>
+</tr>
+<tr>
+<td>False</td>
+<td>false</td>
+</tr>
+<tr>
+<td>None</td>
+<td>null</td>
+</tr>
+<tr>
+<td>str</td>
+<td>string</td>
+</tr>
+<tr>
+<td>int</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>float</td>
+<td>float</td>
+</tr>
+<tr>
+<td>list</td>
+<td>array</td>
+</tr>
+<tr>
+<td>dict</td>
+<td>object</td>
+</tr>
+</tbody>
+</table>
+<h4 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h4><table>
+<thead>
+<tr>
+<th>Python类型</th>
+<th>Json类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dumps</td>
+<td>json编码</td>
+</tr>
+<tr>
+<td>dump</td>
+<td>json编码并存入文件</td>
+</tr>
+<tr>
+<td>loads</td>
+<td>json解码</td>
+</tr>
+<tr>
+<td>load</td>
+<td>json解码，从文件读取数据</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">d = &#123;<span class="string">'name'</span>:<span class="string">'Tom'</span>,<span class="string">'age'</span>:<span class="number">20</span>,<span class="string">'interest'</span>:[<span class="string">'music'</span>,<span class="string">'movie'</span>]&#125;</span><br><span class="line">j = json.dumps(d)</span><br><span class="line">print(j)   <span class="comment"># 请注意引号的变化</span></span><br><span class="line"></span><br><span class="line">d1 = json.loads(j)</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
+<p>一般json编码的数据很少落地，数据都是通过网络传输。传输的时候，要考虑压缩它。本质上来说它就是个文本，就是个字符串。json很简单，几乎语言编程都支持Json，所以应用范围十分广泛。</p>
+<h3 id="MessagePack"><a href="#MessagePack" class="headerlink" title="MessagePack"></a>MessagePack</h3><p>MessagePack是一个基于二进制高效的对象序列化类库，可用于跨语言通信。它可以像JSON那样，在许多种语言之间交换结构对象。但是它比JSON更快速也更轻巧。支持Python、Ruby、Java、C/C++等众多语言。宣称比Google Protocol还要快4倍。兼容json和pickle。</p>
+<p><img src="/images/python序列化与反序列化/messagepack1.png" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 72 bytes</span></span><br><span class="line">&#123;<span class="string">"person"</span>:[&#123;<span class="string">"name"</span>:<span class="string">"tom"</span>,<span class="string">"age"</span>:<span class="number">18</span>&#125;,&#123;<span class="string">"name"</span>:<span class="string">"jerry"</span>,<span class="string">"age"</span>:<span class="number">16</span>&#125;],<span class="string">"total"</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 48 bytes</span></span><br><span class="line"><span class="comment"># 82 a6 70 65 72 73 6f 6e 92 82 a4 6e 61 6d 65 a3 74 6f 6d a3 61 67 65 12 82 a4 64</span></span><br><span class="line"><span class="number">61</span> <span class="number">6</span>d <span class="number">65</span> a5 <span class="number">6</span>a <span class="number">65</span> <span class="number">72</span> <span class="number">72</span> <span class="number">79</span> a3 <span class="number">61</span> <span class="number">67</span> <span class="number">65</span> <span class="number">10</span> a5 <span class="number">74</span> <span class="number">6</span>f <span class="number">74</span> <span class="number">61</span> <span class="number">6</span>c <span class="number">02</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，大大的节约了空间。</p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p><code>pip install msgpack-python</code></p>
+<h4 id="常用方法-1"><a href="#常用方法-1" class="headerlink" title="常用方法"></a>常用方法</h4><p>packb序列化对象。提供了dumps来兼容pickle和json。</p>
+<p>unpackb 反序列化对象。提供了loads来兼容。</p>
+<p>pack 序列化对象保存到文件对象。提供了dump来兼容。</p>
+<p>unpack 反序列化对象保存到文件对象。提供了load来兼容。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> msgpack</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 源数据</span></span><br><span class="line">d = &#123;<span class="string">'person'</span>:[&#123;<span class="string">'name'</span>:<span class="string">'tom'</span>,<span class="string">'age'</span>:<span class="number">18</span>&#125;,&#123;<span class="string">'name'</span>:<span class="string">'jerry'</span>,<span class="string">'age'</span>:<span class="number">16</span>&#125;],<span class="string">'total'</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">j = json.dumps(d)</span><br><span class="line">m = msgpack.dumps(d)   <span class="comment"># 本质上就是packb</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">"json = &#123;&#125;,msgpack = &#123;&#125;"</span>.format(len(j),len(m)))</span><br><span class="line">print(j.encode(),len(j.encode()))   <span class="comment"># json和msgpack的比较</span></span><br><span class="line">print(m)</span><br><span class="line"></span><br><span class="line">u = msgpack.unpackb(m)</span><br><span class="line">print(type(u),u)</span><br><span class="line"></span><br><span class="line">u = msgpack.unpackb(m, encoding=<span class="string">'utf8'</span>)</span><br><span class="line">print(type(u),u)</span><br></pre></td></tr></table></figure>
+<p>MessagePack简单易用，高效压缩，支持语言丰富。</p>
+<p>所以，用它序列化也是一种很好的选择。</p>
 
       
     </div>
@@ -536,6 +666,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/10/python基础学习-argparse模块/" rel="prev" title="python基础学习-argparse模块">
+                python基础学习-argparse模块 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -604,7 +738,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">188</span>
+                    <span class="site-state-item-count">190</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -984,7 +1118,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">147</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">149</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
@@ -1020,7 +1158,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要序列化"><span class="nav-number">1.</span> <span class="nav-text">为什么要序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">2.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pickle库"><span class="nav-number">3.</span> <span class="nav-text">pickle库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化、反序列化实验"><span class="nav-number">4.</span> <span class="nav-text">序列化、反序列化实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化应用"><span class="nav-number">5.</span> <span class="nav-text">序列化应用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要序列化"><span class="nav-number">1.</span> <span class="nav-text">为什么要序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">2.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pickle库"><span class="nav-number">3.</span> <span class="nav-text">pickle库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化、反序列化实验"><span class="nav-number">4.</span> <span class="nav-text">序列化、反序列化实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化应用"><span class="nav-number">5.</span> <span class="nav-text">序列化应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Json"><span class="nav-number">6.</span> <span class="nav-text">Json</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Json的数据类型"><span class="nav-number">7.</span> <span class="nav-text">Json的数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实例"><span class="nav-number">7.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Json模块"><span class="nav-number">8.</span> <span class="nav-text">Json模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Python与Json"><span class="nav-number">8.1.</span> <span class="nav-text">Python与Json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常用方法"><span class="nav-number">8.2.</span> <span class="nav-text">常用方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MessagePack"><span class="nav-number">9.</span> <span class="nav-text">MessagePack</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">9.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常用方法-1"><span class="nav-number">9.2.</span> <span class="nav-text">常用方法</span></a></li></ol></li></ol></div>
             
 
           </div>
