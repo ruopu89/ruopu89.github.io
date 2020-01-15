@@ -350,6 +350,239 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/jq命令使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/15/jq命令使用/" itemprop="url">
+                  jq命令使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-01-15 12:39:20 / 修改時間：13:00:29" itemprop="dateCreated datePublished" datetime="2020-01-15T12:39:20+08:00">2020-01-15</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="命令使用案例"><a href="#命令使用案例" class="headerlink" title="命令使用案例"></a>命令使用案例</h3><ul>
+<li>基本使用</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq .</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不要少了最后的点，这是用cat打开一个json文件，再传给jq命令，输出一个更好的格式</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取某个key的值</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq '.children'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 取出json文件中的children字段下的内容</span></span><br><span class="line"></span><br><span class="line">cat abc.json|jq '.children|.[].metadata_public|.channelID'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以使用管道符取出多个字段，但要注意字段在json文件中是否是在[]中的，如果是，要加上.[]</span></span><br><span class="line"></span><br><span class="line">cat abc.json|jq '.children|.[].metadata_public|.channelID + "," + .channelName'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 还可以使用加号拼接字段，并且如果再次取相同位置的字段，可以直接写字段的名称</span></span><br><span class="line"></span><br><span class="line">cat abc.json|jq '.children|.[].metadata_public|.channelID + "," + .[].channelName'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不要这样使用，因为再次取值时，使用了.[]，这会造成第一个字段与第二个字段的笛卡尔乘积</span></span><br><span class="line"></span><br><span class="line">cat abc.json|jq '.children|.[].metadata_public|.channelID + "," + .channelName？'</span><br><span class="line"><span class="meta">#</span><span class="bash"> ? 规则适合所有正确的 filter，在 filter 最后加上 ? 可以忽略错误信息</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>keys</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq keys</span><br><span class="line"><span class="comment"># 取出所有key组成数组</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>.[]</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq .[]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有的 value</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>[.[]]</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq [.[]]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有的 value 组成的数组</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>索引</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cat abc.json|jq .[1]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 取第2个字段的值</span></span><br><span class="line"></span><br><span class="line">cat abc.json|jq .[0:2]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 取第1和2个字段的值</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>比如取出数组元素中 name 的值</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo '[&#123;"name": "foo"&#125;,&#123;"name": "bar"&#125;,&#123;"name": "foobar"&#125;]' |jq .[].name</span><br><span class="line">"foo"</span><br><span class="line">"bar"</span><br><span class="line">"foobar"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>也可以用下面会提到的管道操作</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo '[&#123;"name": "foo"&#125;,&#123;"name": "bar"&#125;,&#123;"name": "foobar"&#125;]' |jq '.[]|.name'</span><br><span class="line">"foo"</span><br><span class="line">"bar"</span><br><span class="line">"foobar"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果重新组成数组</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">echo '[&#123;"name": "foo"&#125;,&#123;"name": "bar"&#125;,&#123;"name": "foobar"&#125;]' |jq [.[].name]</span><br><span class="line">[</span><br><span class="line">  "foo",</span><br><span class="line">  "bar",</span><br><span class="line">  "foobar"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>map</code>创建数组</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">echo '[&#123;"name": "foo"&#125;,&#123;"name": "bar"&#125;,&#123;"name": "foobar"&#125;]' |jq 'map(.name)'</span><br><span class="line">[</span><br><span class="line">  "foo",</span><br><span class="line">  "bar",</span><br><span class="line">  "foobar"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>length</code> 可以获取字符串或数组的长度</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo '&#123;"url": "mozillazg.com", "name": "mozillazg"&#125;' |jq '.url|length'</span><br><span class="line">13</span><br><span class="line">echo '["mozillazg.com", "mozillazg"]' |jq '.|length'</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>map(foo)</code> 可以实现对数组的每一项进行操作，然后合并结果的功能</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo '["mozillazg.com", "mozillazg"]' | jq 'map(length)'</span><br><span class="line">[</span><br><span class="line">  13,</span><br><span class="line">  9</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>select(foo)</code> 可以实现对输入项进行判断，只返回符合条件的项</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo '["mozillazg.com", "mozillazg"]' | jq 'map(select(.|length &gt; 9))'</span><br><span class="line">[</span><br><span class="line">  "mozillazg.com"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以使用 <code>\(foo)</code> 实现字符串插值功能</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo '&#123;"url": "mozillazg.com", "name": "mozillazg"&#125;' |jq '"hi \(.name)"'</span><br><span class="line">"hi mozillazg"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意要用双引号包围起来，表示是一个字符串</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>+</code> 实现字符串拼接</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo '&#123;"url": "mozillazg.com", "name": "mozillazg"&#125;' |jq '"hi " + .name'</span><br><span class="line">"hi mozillazg"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以使用 <code>if .. then .. elif .. then .. else .. end</code> 实现条件判断</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">echo '[0, 1, 2, 3]' \</span><br><span class="line">| jq 'map(if . == 0 then "zero" elif . == 1 then "one" elif . == 2 then "two" else "many" end)'</span><br><span class="line">[</span><br><span class="line">  "zero",</span><br><span class="line">  "one",</span><br><span class="line">  "two",</span><br><span class="line">  "many"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以通过 <code>{}</code> 和 <code>[]</code> 构造新的 object 或 数组</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">echo '["mozillazg.com", "mozillazg"]' |jq '&#123;name: .[1]&#125;'</span><br><span class="line">&#123;</span><br><span class="line">  "name": "mozillazg"</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo '&#123;"url": "mozillazg.com", "name": "mozillazg"&#125;' |jq '[.name, .url]'</span><br><span class="line">[</span><br><span class="line">  "mozillazg",</span><br><span class="line">  "mozillazg.com"</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">echo '&#123;"name": "mozillazg", "ages": [1, 2]&#125;' | jq '&#123;name, age: .ages[]&#125;'</span><br><span class="line">&#123;</span><br><span class="line">  "name": "mozillazg",</span><br><span class="line">  "age": 1</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">  "name": "mozillazg",</span><br><span class="line">  "age": 2</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>join</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo '["mozillazg.com", "mozillazg"]' | jq '.|join(" | ")'</span><br><span class="line">"mozillazg.com | mozillazg"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>字符串split</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo '"mozillazg.com | mozillazg"' |jq 'split(" | ")'</span><br><span class="line">[</span><br><span class="line">  "mozillazg.com",</span><br><span class="line">  "mozillazg"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/ShellScript练习-处理json文件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2238,219 +2471,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/02/python基础学习-转：-翻译-理解Python的with语句/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/01/02/python基础学习-转：-翻译-理解Python的with语句/" itemprop="url">
-                  python基础学习-转：[翻译]理解Python的with语句
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-01-02 09:06:50" itemprop="dateCreated datePublished" datetime="2020-01-02T09:06:50+08:00">2020-01-02</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-01-09 11:47:37" itemprop="dateModified" datetime="2020-01-09T11:47:37+08:00">2020-01-09</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="转：-翻译-理解Python的With语句"><a href="#转：-翻译-理解Python的With语句" class="headerlink" title="转：[翻译] 理解Python的With语句"></a>转：[翻译] 理解Python的With语句</h1><p><a href="http://linbo.github.io/2013/01/08/python-with#comments" target="_blank" rel="noopener">http://linbo.github.io/2013/01/08/python-with#comments</a>)</p>
-<h2 id="With语句是什么？"><a href="#With语句是什么？" class="headerlink" title="With语句是什么？"></a>With语句是什么？</h2><p>Python’s with statement provides a very convenient way of dealing with the situation where you have to do a setup and teardown to make something happen. A very good example for this is the situation where you want to gain a handler to a file, read data from the file and the close the file handler.</p>
-<p>有一些任务，可能事先需要设置，事后做清理工作。对于这种场景，Python的with语句提供了一种非常方便的处理方式。一个很好的例子是文件处理，你需要获取一个文件句柄，从文件中读取数据，然后关闭文件句柄。</p>
-<p>Without the with statement, one would write something along the lines of:</p>
-<p>如果不用with语句，代码如下：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">file</span> = <span class="built_in">open</span>(<span class="string">"/tmp/foo.txt"</span>)</span><br><span class="line">data = <span class="built_in">file</span>.<span class="built_in">read</span>()</span><br><span class="line"><span class="built_in">file</span>.<span class="built_in">close</span>()</span><br></pre></td></tr></table></figure>
-<p>There are two annoying things here. First, you end up forgetting to close the file handler. The second is how to handle exceptions that may occur once the file handler has been obtained. One could write something like this to get around this:</p>
-<p>这里有两个问题。一是可能忘记关闭文件句柄；二是文件读取数据发生异常，没有进行任何处理。下面是处理异常的加强版本：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">file</span> = <span class="built_in">open</span>(<span class="string">"/tmp/foo.txt"</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    data = <span class="built_in">file</span>.<span class="built_in">read</span>()</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="built_in">file</span>.<span class="built_in">close</span>()</span><br></pre></td></tr></table></figure>
-<p>While this works well, it is unnecessarily verbose. This is where with is useful. The good thing about with apart from the better syntax is that it is very good handling exceptions. The above code would look like this, when using with:</p>
-<p>虽然这段代码运行良好，但是太冗长了。这时候就是with一展身手的时候了。除了有更优雅的语法，with还可以很好的处理上下文环境产生的异常。下面是with版本的代码：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">"/tmp /foo.txt"</span>) <span class="keyword">as</span> <span class="built_in">file</span>:</span><br><span class="line">    data = <span class="built_in">file</span>.<span class="built_in">read</span>()</span><br></pre></td></tr></table></figure>
-<p>with如何工作？ —— —</p>
-<p>while this might look like magic, the way Python handles with is more clever than magic. The basic idea is that the statement after with has to evaluate an object that responds to an <strong>enter</strong>() as well as an <strong>exit</strong>() function.</p>
-<p>这看起来充满魔法，但不仅仅是魔法，Python对with的处理还很聪明。基本思想是with所求值的对象必须有一个<strong>enter</strong>()方法，一个<strong>exit</strong>()方法。</p>
-<p>After the statement that follows with is evaluated, the <strong>enter</strong>() function on the resulting object is called. The value returned by this function is assigned to the variable following as. After every statement in the block is evaluated, the <strong>exit</strong>() function is called.</p>
-<p>紧跟with后面的语句被求值后，返回对象的<strong>enter</strong>()方法被调用，这个方法的返回值将被赋值给as后面的变量。当with后面的代码块全部被执行完之后，将调用前面返回对象的<strong>exit</strong>()方法。</p>
-<p>This can be demonstrated with the following example:</p>
-<p>下面例子可以具体说明with如何工作：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># with_example01.py</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sample</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"In __enter__()"</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Foo"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, type, value, trace)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"In __exit__()"</span></span><br><span class="line"></span><br><span class="line">            </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_sample</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> Sample()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> get_sample() <span class="keyword">as</span> sample:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"sample:"</span>, sample</span><br></pre></td></tr></table></figure>
-<p>When executed, this will result in:<br>行代码，输出如下</p>
-<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bash-<span class="number">3.2</span>$ ./with_example01.py</span><br><span class="line"><span class="built_in">In</span> <span class="variable">__enter__</span>()</span><br><span class="line">sample: Foo</span><br><span class="line"><span class="built_in">In</span> <span class="variable">__exit__</span>()</span><br></pre></td></tr></table></figure>
-<p>As you can see, The <strong>enter</strong>() function is executed The value returned by it - in this case “Foo” is assigned to sample The body of the block is executed, thereby printing the value of sample ie. “Foo” The <strong>exit</strong>() function is called. What makes with really powerful is the fact that it can handle exceptions. You would have noticed that the <strong>exit</strong>() function for Sample takes three arguments - val, type and trace. These are useful in exception handling. Let’s see how this works by modifying the above example.</p>
-<p>正如你看到的，</p>
-<ol>
-<li><strong>enter</strong>()方法被执行</li>
-<li><strong>enter</strong>()方法返回的值 - 这个例子中是”Foo”，赋值给变量’sample’</li>
-<li>执行代码块，打印变量”sample”的值为 “Foo”</li>
-<li><strong>exit</strong>()方法被调用</li>
-</ol>
-<p>with真正强大之处是它可以处理异常。可能你已经注意到Sample类的<strong>exit</strong>方法有三个参数- val, type 和 trace。 这些参数在异常处理中相当有用。我们来改一下代码，看看具体如何工作的。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># with_example02.py</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sample</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, type, value, trace)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"type:"</span>, type</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"value:"</span>, value</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"trace:"</span>, trace</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do_something</span><span class="params">(self)</span>:</span></span><br><span class="line">        bar = <span class="number">1</span>/<span class="number">0</span></span><br><span class="line">        <span class="keyword">return</span> bar + <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> Sample() <span class="keyword">as</span> sample:</span><br><span class="line">    sample.do_something()</span><br></pre></td></tr></table></figure>
-<p>Notice how in this example, instead of get_sample(), with takes Sample(). It does not matter, as long as the statement that follows with evaluates to an object that has an <strong>enter</strong>() and <strong>exit</strong>() functions. In this case, Sample()’s <strong>enter</strong>() returns the newly created instance of Sample and that is what gets passed to sample.</p>
-<p>这个例子中，with后面的get_sample()变成了Sample()。这没有任何关系，只要紧跟with后面的语句所返回的对象有 <strong>enter</strong>()和<strong>exit</strong>()方法即可。此例中，Sample()的<strong>enter</strong>()方法返回新创建的Sample对象，并赋值给变量sample。</p>
-<p>When executed:</p>
-<p>代码执行后：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">bash<span class="number">-3.2</span>$ ./with_example02.py</span><br><span class="line">type: &lt;type <span class="string">'exceptions.ZeroDivisionError'</span>&gt;</span><br><span class="line"><span class="built_in">value</span>: <span class="keyword">integer</span> division <span class="keyword">or</span> modulo <span class="keyword">by</span> <span class="literal">zero</span></span><br><span class="line">trace: &lt;traceback object <span class="keyword">at</span> <span class="number">0x1004a8128</span>&gt;</span><br><span class="line">Traceback (most recent call <span class="keyword">last</span>):</span><br><span class="line">  File <span class="string">"./with_example02.py"</span>, <span class="built_in">line</span> <span class="number">19</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    sample.do_somet hing()</span><br><span class="line">  File <span class="string">"./with_example02.py"</span>, <span class="built_in">line</span> <span class="number">15</span>, <span class="keyword">in</span> do_something</span><br><span class="line">    bar = <span class="number">1</span>/<span class="number">0</span></span><br><span class="line">ZeroDivisionError: <span class="keyword">integer</span> division <span class="keyword">or</span> modulo <span class="keyword">by</span> <span class="literal">zero</span></span><br></pre></td></tr></table></figure>
-<p>Essentially, if there are exceptions being thrown from anywhere inside the block, the <strong>exit</strong>() function for the object is called. As you can see, the type, value and the stack trace associated with the exception thrown is passed to this function. In this case, you can see that there was a ZeroDivisionError exception being thrown. People implementing libraries can write code that clean up resources, close files etc. in their <strong>exit</strong>() functions.</p>
-<p>实际上，在with后面的代码块抛出任何异常时，<strong>exit</strong>()方法被执行。正如例子所示，异常抛出时，与之关联的type，value和stack trace传给<strong>exit</strong>()方法，因此抛出的ZeroDivisionError异常被打印出来了。开发库时，清理资源，关闭文件等等操作，都可以放在<strong>exit</strong>方法当中。</p>
-<p>Thus, Python’s with is a nifty construct that makes code a little less verbose and makes cleaning up during exceptions a bit easier.</p>
-<p>因此，Python的with语句是提供一个有效的机制，让代码更简练，同时在异常产生时，清理工作更简单。</p>
-<p>I have put the code examples given here on <a href="https://github.com/sdqali/python_dojo/tree/master/with%20Github" target="_blank" rel="noopener">Github</a>.</p>
-<p>示例代码可以在<a href="https://github.com/sdqali/python_dojo/tree/master/with%20Github" target="_blank" rel="noopener">Github</a>上面找到。</p>
-<p>译注：<a href="http://blog.sdqali.in/blog/2012/07/09/understanding-pythons-with/" target="_blank" rel="noopener">本文原文见</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2498,7 +2518,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">191</span>
+                    <span class="site-state-item-count">192</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2882,7 +2902,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">149</span>
+                      
+                    
+                    <span class="site-state-item-count">150</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>

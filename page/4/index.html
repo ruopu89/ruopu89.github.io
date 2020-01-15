@@ -350,6 +350,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/01/利用ssh密钥对的私钥访问服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/01/利用ssh密钥对的私钥访问服务器/" itemprop="url">
+                  利用ssh密钥对的私钥访问服务器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-01 14:34:38 / 修改時間：16:55:55" itemprop="dateCreated datePublished" datetime="2019-11-01T14:34:38+08:00">2019-11-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">   Server</span><br><span class="line">------------  </span><br><span class="line">1. 创建密钥对</span><br><span class="line">ssh-keygen -t rsa -P &apos;&apos;</span><br><span class="line">2. 将私钥改为.pem格式</span><br><span class="line">openssl rsa -in .ssh/id_rsa -outform pem &gt; dsjali.pem</span><br><span class="line">3. 修改权限，不然连接时会报错</span><br><span class="line">chmod 400 dsjali.pem</span><br><span class="line">4. 从私钥中产生公钥</span><br><span class="line">ssh-keygen -y -f dsjali.pem </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+5xBrPVEJ3mRo/yVFtSQSv1/J09oYHkbTD+l/4or04YqUCHJ7iR+A/LMeff0c9xKCbT9h</span><br><span class="line">sb/MvJGmCZGxuE375Fwu8XZGS8SfjYSxeh0uASOcZazOiBu4Ooegj9A3Ov4C9odPqISWbTdUx286WJqdzW7RZ0ZwkFOipr</span><br><span class="line">oFrszAPnvg5xmlnMSa0afYgWhRXimmn2oyLt7PFfZIXX8PJnMs7x9B0+lwLLIVJRKrpU8if+gD80viC9wUJu3/jC1VF8Jg4Bq2aS7KiMX++L</span><br><span class="line">Y1SKoOUUc0sHa/SFZEzuouaRGgrmU9XkM3DvzlfcrGN+/14WczAZG4st</span><br><span class="line">5. 将上面的公钥写入认证文件</span><br><span class="line">vim .ssh/authorized_keys</span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+5xBrPVEJ3mRo/yVFtSQSv1/J09oYHkbTD+l/4or04YqUCHJ7iR+A/LMeff0c9xKCbT9h</span><br><span class="line">sb/MvJGmCZGxuE375Fwu8XZGS8SfjYSxeh0uASOcZazOiBu4Ooegj9A3Ov4C9odPqISWbTdUx286WJqdzW7RZ0ZwkFOipr</span><br><span class="line">oFrszAPnvg5xmlnMSa0afYgWhRXimmn2oyLt7PFfZIXX8PJnMs7x9B0+lwLLIVJRKrpU8if+gD80viC9wUJu3/jC1VF8Jg4Bq2aS7KiMX++L</span><br><span class="line">Y1SKoOUUc0sHa/SFZEzuouaRGgrmU9XkM3DvzlfcrGN+/14WczAZG4st</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">   Client</span><br><span class="line">------------</span><br><span class="line">1. 下载服务器上的.pem文件</span><br><span class="line">2. 连接</span><br><span class="line">ssh -i &quot;dsjali.pem&quot; root@39.106.93.138</span><br><span class="line"># .pem文件的权限为400，如果不是，可能报错。</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/31/python基础学习-random模块/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2371,164 +2529,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/25/axel使用方法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/25/axel使用方法/" itemprop="url">
-                  axel使用方法
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-09-25 11:15:47 / 修改時間：11:19:59" itemprop="dateCreated datePublished" datetime="2019-09-25T11:15:47+08:00">2019-09-25</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">语法：</span><br><span class="line">axel [options] url1 [url2] [url…]</span><br><span class="line"></span><br><span class="line">选项：</span><br><span class="line">--max-speed=x , -s x # 最高速度x</span><br><span class="line">--num-connections=x , -n x # 连接数x</span><br><span class="line">--output=f , -o f # 下载为本地文件f</span><br><span class="line">--search[=x] , -S [x] # 搜索镜像</span><br><span class="line">--header=x , -H x # 添加头文件字符串x（指定 HTTP header）</span><br><span class="line">--user-agent=x , -U x # 设置用户代理（指定 HTTP user agent）</span><br><span class="line">--no-proxy ， -N # 不使用代理服务器</span><br><span class="line">--quiet ， -q # 静默模式</span><br><span class="line">--verbose ，-v # 更多状态信息</span><br><span class="line">--alternate ， -a # Alternate progress indicator</span><br><span class="line">--help ，-h # 帮助</span><br><span class="line">--version ，-V # 版本信息</span><br><span class="line"></span><br><span class="line">举例：</span><br><span class="line">axel -n 10 -o /tmp/ http://www.jsdig.com/lnmp.tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载安装包指定10个线程，存到/tmp/。如果下载过程中下载中断可以再执行下载命令即可恢复上次</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 的下载进度。</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2576,7 +2576,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">191</span>
+                    <span class="site-state-item-count">192</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2960,7 +2960,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">149</span>
+                      
+                    
+                    <span class="site-state-item-count">150</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
