@@ -350,6 +350,177 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/26/zabbix监控Redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/26/zabbix监控Redis/" itemprop="url">
+                  zabbix监控Redis
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-04-26 16:26:49" itemprop="dateCreated datePublished" datetime="2019-04-26T16:26:49+08:00">2019-04-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-04-28 13:37:09" itemprop="dateModified" datetime="2019-04-28T13:37:09+08:00">2019-04-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/监控/" itemprop="url" rel="index"><span itemprop="name">监控</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="安装Redis"><a href="#安装Redis" class="headerlink" title="安装Redis"></a>安装Redis</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@zabbixagent ~]# yum install -y redis</span><br><span class="line">[root@zabbixagent ~]# vim /etc/redis.conf</span><br><span class="line">bind 0.0.0.0</span><br><span class="line">requirepass redisqwer1234</span><br><span class="line">[root@zabbixagent ~]# systemctl start redis</span><br><span class="line">[root@zabbixagent ~]# systemctl enable redis</span><br><span class="line">[root@zabbixagent ~]# ss -tln|grep 6379</span><br><span class="line">LISTEN     0      128          *:6379                     *:*</span><br></pre></td></tr></table></figure>
+<h3 id="配置zabbix-agent"><a href="#配置zabbix-agent" class="headerlink" title="配置zabbix-agent"></a>配置zabbix-agent</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@zabbixagent ~]# cd /etc/zabbix/zabbix_agentd.d/</span><br><span class="line">[root@zabbixagent zabbix_agentd.d]# vim all.conf</span><br><span class="line">UserParameter=redis_status[*],/etc/zabbix/zabbix_agentd.d/redis_status.sh "$1" "$2" "$3"</span><br><span class="line">[root@zabbixagent zabbix]# vim redis_status.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试中，如果将脚本放在zabbix_agentd.d目录下，重启zabbix-agent时会报错<span class="string">"invalid entry "</span><span class="function"><span class="title">redis_status</span></span>()&#123;<span class="string">" (not following "</span>parameter=value<span class="string">" notation) in config file "</span>/etc/zabbix/zabbix_agentd.d/redis_status.sh<span class="string">", line 3"</span>，所以将脚本放在了/etc/zabbix目录下，或在/etc/zabbix下创建一个scripts目录也可以。</span></span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line">redis_status()&#123;</span><br><span class="line">    R_PORT=$1</span><br><span class="line">    R_COMMAND=$2</span><br><span class="line">    #   (echo -en "INFO \r\n";sleep 1;)|nc 127.0.0.1 "$R_PORT" &gt; /tmp/redis_"$R_PORT".tmp</span><br><span class="line">    redis-cli -h 127.0.0.1 -p $R_PORT -a "redisqwer1234" INFO &gt; /tmp/redis_"$R_PORT".tmp</span><br><span class="line">    # 连接redis数据库，将数据库信息输出到文件</span><br><span class="line">    REDIS_STAT_VALUE=$(grep ""$R_COMMAND":" /tmp/redis_"$R_PORT".tmp|cut -d':' -f2)</span><br><span class="line">    echo $REDIS_STAT_VALUE</span><br><span class="line">&#125;</span><br><span class="line">help()&#123;</span><br><span class="line">    echo "$&#123;0&#125; + redis_status + PORT + COMMAND"</span><br><span class="line">&#125;</span><br><span class="line">main()&#123;</span><br><span class="line">    case $1 in</span><br><span class="line">    redis_status)</span><br><span class="line">        redis_status $2 $3</span><br><span class="line">        ;;</span><br><span class="line">    *)</span><br><span class="line">        help</span><br><span class="line">        ;;</span><br><span class="line">    esac</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 调用main函数时，输入的<span class="variable">$2</span>和<span class="variable">$3</span>会作为<span class="variable">$1</span>和<span class="variable">$2</span>传入redis_status函数</span></span><br><span class="line">main $1 $2 $3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這個腳本主要是使用INFO命令在redis中取出相關數值並保存到/tmp目錄下，之後根據取出的每項的數值進行監控。因為redis中設置了驗證功能，所以沒有使用nc命令，而是使用redis-cli命令進行取值，redis-cli的-a選項是指定驗證密碼的，最後的INFO是要執行的命令，這樣就可以在不進行redis-cli的情況下將相關數據打印到屏幕上了。</span></span><br><span class="line">[root@zabbixagent zabbix_agentd.d]# chmod +x redis_status.sh </span><br><span class="line">[root@zabbixagent zabbix_agentd.d]# ./redis_status.sh redis_status 6379 used_memory</span><br><span class="line">813456</span><br><span class="line">[root@zabbixagent zabbix_agentd.d]# bash redis_status.sh redis_status 6379 used_cpu_sys</span><br><span class="line">0.36</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试，取出CPU中的某个数据</span></span><br><span class="line">下面创建监控项与图形、触发器即可。</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/25/zabbix监控MySQL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2350,353 +2521,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/tmux使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/02/tmux使用/" itemprop="url">
-                  tmux使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-04-02 13:47:08" itemprop="dateCreated datePublished" datetime="2019-04-02T13:47:08+08:00">2019-04-02</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2019-10-12 11:02:51" itemprop="dateModified" datetime="2019-10-12T11:02:51+08:00">2019-10-12</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
-<p>tmux采用C/S模型构建，输入tmux命令就相当于开启了一个服务器，此时默认将新建一个会话，然后会话中默认新建一个窗口，窗口中默认新建一个面板。会话、窗口、面板之间的联系如下： </p>
-<p>一个tmux session（会话）可以包含多个window（窗口），窗口默认充满会话界面，因此这些窗口中可以运行相关性不大的任务。 </p>
-<p>一个window又可以包含多个pane（面板），窗口下的面板，都处于同一界面下，这些面板适合运行相关性高的任务，以便同时观察到它们的运行情况。 </p>
-</blockquote>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">⚡ ⚙ root@ruopu64  ~  apt install tmux</span><br></pre></td></tr></table></figure>
-<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="新建会话"><a href="#新建会话" class="headerlink" title="新建会话"></a>新建会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux</span><br><span class="line"><span class="meta"> #</span><span class="bash"> 新建会话后，在屏幕的下方会有提示，如：<span class="string">"[0] 0:zsh*        "</span><span class="built_in">test</span><span class="string">" 13:51 02-4月-19"</span></span></span><br><span class="line">⚡ root@ruopu64  ~  exit</span><br><span class="line"><span class="meta">#</span><span class="bash"> 退出会话</span></span><br><span class="line">⚡ root@ruopu64  ~  tmux new -s abc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建一个叫做abc的会话，提示信息：<span class="string">"[abc] 0:zsh*      "</span><span class="built_in">test</span><span class="string">" 13:53 02-4月-19"</span></span></span><br></pre></td></tr></table></figure>
-<h4 id="断开当前会话"><a href="#断开当前会话" class="headerlink" title="断开当前会话"></a>断开当前会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux detach</span><br><span class="line"><span class="meta">#</span><span class="bash"> 断开会话，下次还可继续操作。会话会在后台运行</span></span><br><span class="line">也可以使用快捷键Ctrl + b松开，再按d</span><br></pre></td></tr></table></figure>
-<h4 id="进入断开的会话"><a href="#进入断开的会话" class="headerlink" title="进入断开的会话"></a>进入断开的会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux a -t abc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入名称为abc的会话</span></span><br><span class="line">⚡ root@ruopu64  ~  tmux attach-session</span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入第一个会话，可以将attach-session简写为a或at</span></span><br></pre></td></tr></table></figure>
-<h3 id="启用鼠标滚动"><a href="#启用鼠标滚动" class="headerlink" title="启用鼠标滚动"></a>启用鼠标滚动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 先按ctrl+B</span><br><span class="line">2. set -g mouse on</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时就启用对所有窗口的鼠标滚动了，但不能选中文本进行复制粘贴</span></span><br><span class="line">3. 按住shift再点击鼠标右键，这时就可以看到复制粘贴了，也可以选中文本了</span><br></pre></td></tr></table></figure>
-<h4 id="查看会话"><a href="#查看会话" class="headerlink" title="查看会话"></a>查看会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux list-sessions </span><br><span class="line">1: 1 windows (created Tue Apr  2 13:55:52 2019) [70x21]</span><br><span class="line">2: 1 windows (created Tue Apr  2 13:56:05 2019) [70x21]</span><br><span class="line">abc: 1 windows (created Tue Apr  2 13:52:59 2019) [70x21]</span><br><span class="line"> ⚡ root@ruopu64  ~  tmux ls</span><br><span class="line">1: 1 windows (created Tue Apr  2 13:55:52 2019) [70x21]</span><br><span class="line">2: 1 windows (created Tue Apr  2 13:56:05 2019) [70x21]</span><br><span class="line">abc: 1 windows (created Tue Apr  2 13:52:59 2019) [70x21]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 两条命令是一样的，只是将list-sessions简写为了ls</span></span><br></pre></td></tr></table></figure>
-<h4 id="关闭会话"><a href="#关闭会话" class="headerlink" title="关闭会话"></a>关闭会话</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">⚡ root@ruopu64  ~  tmux kill-session -t 2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭名称为2的会话</span></span><br><span class="line"> ⚡ root@ruopu64  ~  tmux kill-session </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 关闭所有会话</span></span><br></pre></td></tr></table></figure>
-<h4 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h4><blockquote>
-<p>快捷键需要使用Ctrl+b激活控制台，再按下面的按键操作</p>
-</blockquote>
-<h5 id="系统操作"><a href="#系统操作" class="headerlink" title="系统操作"></a>系统操作</h5><table>
-<thead>
-<tr>
-<th>?</th>
-<th>列出所有快捷键；按q返回</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>d</td>
-<td>脱离当前会话；这样可以暂时返回Shell界面，输入tmux attach能够重新进入之前的会话</td>
-</tr>
-<tr>
-<td>D</td>
-<td>选择要脱离的会话；在同时开启了多个会话时使用</td>
-</tr>
-<tr>
-<td>Ctrl+z</td>
-<td>挂起当前会话</td>
-</tr>
-<tr>
-<td>r</td>
-<td>强制重绘未脱离的会话</td>
-</tr>
-<tr>
-<td>s</td>
-<td>列出所有会话，选择并切换会话；在同时开启了多个会话时使用</td>
-</tr>
-<tr>
-<td>:</td>
-<td>进入命令行模式；此时可以输入支持的命令，例如kill-server可以关闭服务器</td>
-</tr>
-<tr>
-<td>[</td>
-<td>进入复制模式；此时的操作与vi/emacs相同，按q/Esc退出</td>
-</tr>
-<tr>
-<td>~</td>
-<td>列出提示信息缓存；其中包含了之前tmux返回的各种提示信息</td>
-</tr>
-<tr>
-<td>:new&lt;回车&gt;</td>
-<td>启动新会话</td>
-</tr>
-<tr>
-<td>$</td>
-<td>重命名当前会话</td>
-</tr>
-</tbody>
-</table>
-<h5 id="窗口操作"><a href="#窗口操作" class="headerlink" title="窗口操作"></a>窗口操作</h5><table>
-<thead>
-<tr>
-<th>c</th>
-<th>创建新窗口</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&amp;</td>
-<td>关闭当前窗口</td>
-</tr>
-<tr>
-<td>数字键0~9</td>
-<td>切换至指定窗口</td>
-</tr>
-<tr>
-<td>p</td>
-<td>切换至上一窗口</td>
-</tr>
-<tr>
-<td>n</td>
-<td>切换至下一窗口</td>
-</tr>
-<tr>
-<td>l</td>
-<td>在前后两个窗口间互相切换</td>
-</tr>
-<tr>
-<td>w</td>
-<td>通过窗口列表切换窗口</td>
-</tr>
-<tr>
-<td>,</td>
-<td>重命名当前窗口；这样便于识别</td>
-</tr>
-<tr>
-<td>.</td>
-<td>修改当前窗口编号；相当于窗口重新排序</td>
-</tr>
-<tr>
-<td>f</td>
-<td>在所有窗口中查找指定文本</td>
-</tr>
-</tbody>
-</table>
-<h5 id="面板操作"><a href="#面板操作" class="headerlink" title="面板操作"></a>面板操作</h5><table>
-<thead>
-<tr>
-<th>”</th>
-<th>将当前面板平分为上下两块</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>%</td>
-<td>将当前面板平分为左右两块</td>
-</tr>
-<tr>
-<td>x</td>
-<td>关闭当前面板</td>
-</tr>
-<tr>
-<td>!</td>
-<td>将当前面板置于新窗口；即新建一个窗口，其中仅包含当前面板</td>
-</tr>
-<tr>
-<td>Ctrl+方向键</td>
-<td>以1个单元格为单位移动边缘以调整当前面板大小</td>
-</tr>
-<tr>
-<td>Alt+方向键</td>
-<td>以5个单元格为单位移动边缘以调整当前面板大小</td>
-</tr>
-<tr>
-<td>Space</td>
-<td>在预置的面板布局中循环切换；依次包括even-horizontal、even-vertical、main-horizontal、main-vertical、tiled</td>
-</tr>
-<tr>
-<td>q</td>
-<td>显示面板编号</td>
-</tr>
-<tr>
-<td>o</td>
-<td>在当前窗口中选择下一面板</td>
-</tr>
-<tr>
-<td>方向键</td>
-<td>移动光标以选择面板</td>
-</tr>
-<tr>
-<td>{</td>
-<td>向前置换当前面板</td>
-</tr>
-<tr>
-<td>}</td>
-<td>向后置换当前面板</td>
-</tr>
-<tr>
-<td>Alt+o</td>
-<td>逆时针旋转当前窗口的面板</td>
-</tr>
-<tr>
-<td>Ctrl+o</td>
-<td>顺时针旋转当前窗口的面板</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -2739,7 +2568,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">190</span>
+                    <span class="site-state-item-count">191</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
