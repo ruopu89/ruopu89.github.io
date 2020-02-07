@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="转：Shell中的IFS解惑原文链接：https://blog.csdn.net/whuslei/article/details/7187639 一、IFS 介绍​    Shell 脚本中有个变量叫 IFS(Internal Field Seprator) ，内部域分隔符。完整定义是The shell uses the value stored in IFS, which is the spac">
+<meta name="keywords" content="Shell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转：Shell中的IFS解惑">
+<meta property="og:url" content="http://yoursite.com/2020/01/20/转：Shell中的IFS解惑/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="转：Shell中的IFS解惑原文链接：https://blog.csdn.net/whuslei/article/details/7187639 一、IFS 介绍​    Shell 脚本中有个变量叫 IFS(Internal Field Seprator) ，内部域分隔符。完整定义是The shell uses the value stored in IFS, which is the spac">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-01-20T07:47:53.639Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="转：Shell中的IFS解惑">
+<meta name="twitter:description" content="转：Shell中的IFS解惑原文链接：https://blog.csdn.net/whuslei/article/details/7187639 一、IFS 介绍​    Shell 脚本中有个变量叫 IFS(Internal Field Seprator) ，内部域分隔符。完整定义是The shell uses the value stored in IFS, which is the spac">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/01/20/转：Shell中的IFS解惑/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>转：Shell中的IFS解惑 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/转：Shell中的IFS解惑/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">转：Shell中的IFS解惑
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-01-20 15:31:22 / 修改時間：15:47:53" itemprop="dateCreated datePublished" datetime="2020-01-20T15:31:22+08:00">2020-01-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="转：Shell中的IFS解惑"><a href="#转：Shell中的IFS解惑" class="headerlink" title="转：Shell中的IFS解惑"></a>转：Shell中的IFS解惑</h3><p>原文链接：<a href="https://blog.csdn.net/whuslei/article/details/7187639" target="_blank" rel="noopener">https://blog.csdn.net/whuslei/article/details/7187639</a></p>
+<h4 id="一、IFS-介绍"><a href="#一、IFS-介绍" class="headerlink" title="一、IFS 介绍"></a>一、IFS 介绍</h4><p>​    Shell 脚本中有个变量叫 IFS(Internal Field Seprator) ，内部域分隔符。完整定义是The shell uses the value stored in IFS, which is the space, tab, and newline characters by default, to delimit words for the read and set commands, when parsing output from command substitution, and when performing variable substitution.</p>
+<p>​    Shell 的环境变量分为 set, env 两种，其中 set 变量可以通过 export 工具导入到 env 变量中。其中，set 是显示设置shell变量，仅在本 shell 中有效；env 是显示设置用户环境变量 ，仅在当前会话中有效。换句话说，set 变量里包含了 env 变量，但 set 变量不一定都是 env 变量。这两种变量不同之处在于变量的作用域不同。显然，env 变量的作用域要大些，它可以在 subshell 中使用。</p>
+<p>​    而 IFS 是一种 set 变量，当 shell 处理”命令替换”和”参数替换”时，shell 根据 IFS 的值，默认是 space, tab, newline 来拆解读入的变量，然后对特殊字符进行处理，最后重新组合赋值给该变量。</p>
+<h4 id="二、IFS-简单实例"><a href="#二、IFS-简单实例" class="headerlink" title="二、IFS 简单实例"></a>二、IFS 简单实例</h4><ol>
+<li>查看变量 IFS 的值。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$IFS</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$IFS</span>"</span> | od -b</span></span><br><span class="line">0000000 040 011 012 012</span><br><span class="line">0000004</span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接输出IFS是看不到的，把它转化为二进制就可以看到了，<span class="string">"040"</span>是空格，<span class="string">"011"</span>是Tab，<span class="string">"012"</span>是换行符<span class="string">"\n"</span> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 。最后一个 012 是因为 <span class="built_in">echo</span> 默认是会换行的。</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>$* 和 $@ 的细微差别</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 从下面的例子中可以看出，如果是用冒号引起来，表示这个变量不用IFS替换！！所以可以看到这个变量的<span class="string">"原始</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 值<span class="string">"。反之，如果不加引号，输出时会根据IFS的值来分割后合并输出！ $* 是按照IFS中的第一个值来确定的！下</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 面这两个例子还有细微的差别！</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> IFS=:;</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">set</span> x y z</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> $*</span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"$*"</span></span></span><br><span class="line">x:y:z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$@</span></span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$@</span>"</span></span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上例 <span class="built_in">set</span> 变量其实是3个参数，而下面这个例子实质是2个参数，即 <span class="built_in">set</span> <span class="string">"x y z"</span>  和 <span class="built_in">set</span> x y z 是完全不同的。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">set</span> <span class="string">"x"</span> <span class="string">"y z"</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> $*</span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"$*"</span></span></span><br><span class="line">x:y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$@</span></span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$@</span>"</span></span></span><br><span class="line">x y z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> $* |od -b</span></span><br><span class="line">0000000 170 040 171 040 172 012</span><br><span class="line">0000006</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"$*"</span> |od -b</span></span><br><span class="line">0000000 170 072 171 040 172 012</span><br><span class="line">0000006</span><br><span class="line"><span class="meta">#</span><span class="bash"> 小结：$* 会根据 IFS 的不同来组合值，而 <span class="variable">$@</span> 则会将值用<span class="string">" "</span>来组合值！</span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>for 循环中的奇怪现象</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="variable">$var</span> ;<span class="keyword">do</span> <span class="built_in">echo</span> <span class="variable">$x</span> |od -b ;<span class="keyword">done</span></span></span><br><span class="line">0000000 012</span><br><span class="line">0000001</span><br><span class="line">0000000 040 141 012</span><br><span class="line">0000003</span><br><span class="line">0000000 142 012</span><br><span class="line">0000002</span><br><span class="line">0000000 012</span><br><span class="line">0000001</span><br><span class="line">0000000 143 012</span><br><span class="line">0000002</span><br><span class="line"><span class="meta">#</span><span class="bash"> ob命令表示转换为二进制</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 先暂且不解释 <span class="keyword">for</span> 循环的内容！看下面这个输出！IFS 的值同上！ var=<span class="string">": a:b::c:"</span>，</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$var</span> |od -b</span></span><br><span class="line">0000000 040 040 141 040 142 040 040 143 012</span><br><span class="line">0000011</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$var</span>"</span> |od -b</span></span><br><span class="line">0000000 072 040 141 072 142 072 072 143 072 012</span><br><span class="line">0000012</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"<span class="variable">$var</span>"</span>的值应该没做替换，所以还是 <span class="string">": a:b::c:"</span> (注 <span class="string">"072"</span> 表示冒号)，但是<span class="variable">$var</span> 则发生了变化！注意输</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 出的最后一个冒号没有了，也没有替换为空格！Why？</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用 <span class="variable">$var</span> 时是经历了这样一个过程！首先，按照这样的规则 [变量][IFS][变量][IFS]……根据原始 var 值中</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有的分割符(此处是<span class="string">":"</span>)划分出变量，如果IFS的值是有多个字符组成，如IFS=<span class="string">":;"</span>，那么此处的[IFS]指的是</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> IFS中的任意一个字符($* 是按第一个字符来分隔！)，如 <span class="string">":"</span> 或者 <span class="string">";"</span> ，后面不再对[IFS]做类似说明！(注：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [IFS]会有多个值，多亏 <span class="comment">#blackold 的提醒)；然后，得到类似这样的 list， ""   " a"   "b"  ""  </span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"c"</span>  。如果此时 <span class="built_in">echo</span> <span class="variable">$var</span>，则需要在这些变量之间用空格隔开，也就是<span class="string">""</span>  [space]   <span class="string">"  a"</span>  [space]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"b"</span> [space]  <span class="string">""</span> [space]  <span class="string">"c"</span> ，忽略掉空值，最终输出是 [space][space]a[space]b[space]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [space]c ！</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果最后一个字符不是分隔符，如 var=<span class="string">"a:b"</span>，那么最后一个分隔符后的变量就是最后一个变量！</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这个地方要注意下！！如果IFS就是空格，那么类似于<span class="string">" [space][space]a[space]b[space][space]c "</span>会合</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 并重复的部分，且去头空格，去尾空格，那么最终输出会变成类似 a[space]b[space]c ，所以，如果IFS是默认</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 值，那么处理的结果就很好算出来，直接合并、忽略多余空格即可！</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外，$* 和 <span class="variable">$@</span> 在函数中的处理过程是这样的(只考虑<span class="string">"原始值"</span>！)！<span class="string">"<span class="variable">$@</span>"</span>，就是像上面处理后赋值，但是 <span class="string">"$*"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 却不一样！它的值是用分隔符(如<span class="string">":"</span>)而不是空格隔开！具体例子见最后一个例子！</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 好了，现在来解释 <span class="keyword">for</span> 循环的内容。<span class="keyword">for</span> 循环遍历上面这个列表就可以了，所以 <span class="keyword">for</span> 循环的第一个输出是空！</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> (<span class="string">"012"</span>是<span class="built_in">echo</span>输出的换行符 )。。。。后面的依次类推！不信可以试试下面这个例子，结果是一样的！</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">""</span> <span class="string">" a"</span> <span class="string">"b"</span> <span class="string">""</span> <span class="string">"c"</span> ;<span class="keyword">do</span> <span class="built_in">echo</span> <span class="variable">$x</span> |od -b ;<span class="keyword">done</span></span></span><br><span class="line">0000000 012</span><br><span class="line">0000001</span><br><span class="line">0000000 040 141 012</span><br><span class="line">0000003</span><br><span class="line">0000000 012</span><br><span class="line">0000001</span><br><span class="line">0000000 142 012</span><br><span class="line">0000002</span><br><span class="line">0000000 012</span><br><span class="line">0000001</span><br><span class="line">0000000 143 012</span><br><span class="line">0000002</span><br></pre></td></tr></table></figure>
+<h4 id="三、IFS的其他实例"><a href="#三、IFS的其他实例" class="headerlink" title="三、IFS的其他实例"></a>三、IFS的其他实例</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">Example 1:</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> IFS=:</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> var=ab::<span class="built_in">cd</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$var</span></span></span><br><span class="line">ab  cd</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$var</span>"</span></span></span><br><span class="line">ab::cd</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解释下：x 的值是 <span class="string">"ab::cd"</span>，当进行到 <span class="built_in">echo</span> <span class="variable">$x</span> 时，因为$符，所以会进行变量替换。Shell 根据 IFS 的值</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将 x 分解为 ab <span class="string">""</span> <span class="built_in">cd</span>，然后<span class="built_in">echo</span>，插入空隔，ab[space]<span class="string">""</span>[space]<span class="built_in">cd</span>，忽略<span class="string">""</span>，输出  ab  <span class="built_in">cd</span> 。</span></span><br><span class="line"></span><br><span class="line">Example 2 :</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">read</span> a</span></span><br><span class="line">		xy  z</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$a</span></span></span><br><span class="line">xy  z</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解释：这是 http://bbs.chinaunix.net/thread-207178-1-1.html 上的一个例子。此时IFS是默认值，本</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 希望把所有的输入(包括空格)都放入变量a中，但是输出的a却把前面的空格给忽略了！！原因是：默认的 IFS 会按</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> space tab newline 来分割。这里需要注意的一点是，<span class="built_in">read</span> 命令的实现过程，即在读入时已经替换了。解决办</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 法是在开头加上一句 IFS=<span class="string">";"</span> ，这里必须加上双引号，因为分号有特殊含义。</span></span><br><span class="line"></span><br><span class="line">Example 3 :</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> tmp=<span class="string">"   xy z"</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> a=<span class="variable">$tmp</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$a</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"<span class="variable">$a</span>"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 解释：什么时候会根据 IFS 来<span class="string">"处理"</span>呢？我觉得是，对于不加引号的变量，使用时都会参考IFS，但是要注意其原始值！</span></span><br><span class="line"></span><br><span class="line">Example 4 ：</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">IFS_old=$IFS      #将原IFS值保存，以便用完后恢复</span><br><span class="line">IFS=$’\n’        #更改IFS值为$’\n’ ，注意，以回车做为分隔符，IFS必须为：$’\n’</span><br><span class="line">for i in $((cat pwd.txt)) #pwd.txt 来自这个命令：cat /etc/passwd &gt;pwd.txt</span><br><span class="line">do</span><br><span class="line">    echo $i</span><br><span class="line">done</span><br><span class="line">IFS=$IFS_old      #恢复原IFS值</span><br><span class="line"><span class="meta">#</span><span class="bash"> 另外一个例子，把IP地址逆转输出：</span></span><br><span class="line"></span><br><span class="line">Example 5 :</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line">IP=220.112.253.111</span><br><span class="line">IFS="."</span><br><span class="line">TMPIP=$(echo $IP)</span><br><span class="line">IFS=" " # space</span><br><span class="line">echo $TMPIP</span><br><span class="line">for x in $TMPIP ;do </span><br><span class="line">    Xip="$&#123;x&#125;.$Xip"</span><br><span class="line">done</span><br><span class="line">echo $&#123;Xip%.&#125;</span><br><span class="line"></span><br><span class="line">Complex_Example 1:  http://bbs.chinaunix.net/forum.php?mod=viewthread&amp;tid=3660898&amp;page=1#pid21798049</span><br><span class="line"></span><br><span class="line">function output_args_ifs()&#123;</span><br><span class="line">    echo "=$*"</span><br><span class="line">    echo "="$*</span><br><span class="line">    for m in $* ;do </span><br><span class="line">        echo "[$m]"</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">IFS=':'</span><br><span class="line">var='::a:b::c:::'</span><br><span class="line">output_args_ifs $var</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出为：</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> =::a:b::c::  <span class="comment"># 少了最后一个冒号！看前面就知道为什么了</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> =  a b  c </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [][]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [a][b]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [][c]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> []</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 由于 <span class="string">"output_args_ifs <span class="variable">$var</span>"</span> 中 <span class="variable">$var</span> 没有加引号，所以根据IFS替换！根据IFS划分出变量： <span class="string">""</span>  <span class="string">""</span> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"a"</span>  <span class="string">"b"</span>  <span class="string">""</span>  <span class="string">"c"</span> <span class="string">""</span> <span class="string">""</span>(可以通过输出 <span class="variable">$#</span> 来测试参数的个数！)，重组的结果为:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  <span class="string">"<span class="variable">$@</span>"</span> 的值是  <span class="string">""</span> [space] <span class="string">""</span> [space]  <span class="string">"a"</span> [space]  <span class="string">"b"</span>  [space] <span class="string">""</span> [space]  <span class="string">"c"</span> [space] </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">""</span> [space] <span class="string">""</span>，可以通过，<span class="built_in">echo</span>==&gt;<span class="string">"  a b  c   "</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"$*"</span> 的值是   <span class="string">""</span> [IFS] <span class="string">""</span> [IFS]  <span class="string">"a"</span> [IFS]  <span class="string">"b"</span>  [IFS] <span class="string">""</span> [IFS]  <span class="string">"c"</span> [IFS] <span class="string">""</span> [IFS] </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">""</span>，忽略<span class="string">""</span>，<span class="built_in">echo</span>=&gt;<span class="string">"::a:b::c::"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意， $* 和 <span class="variable">$@</span> 的值都是  <span class="string">""</span>   <span class="string">""</span>   <span class="string">"a"</span>   <span class="string">"b"</span>   <span class="string">""</span>   <span class="string">"c"</span>  <span class="string">""</span>  <span class="string">""</span> 。可以说是一个列表……因为他</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 们本来就是由 <span class="variable">$1</span> <span class="variable">$2</span> <span class="variable">$3</span>……组成的。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 所以，《Linux程序设计》里推荐使用 <span class="variable">$@</span>，而不是$*</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 总结：IFS 其实还是很麻烦的，稍有不慎就会产生很奇怪的结果，因此使用的时候要注意！我也走了不少弯路，只希</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 望能给后来者一些帮助。本文若有问题，欢迎指正！！谢谢！</span></span><br></pre></td></tr></table></figure>
+<p>如有转载，请注明blog.csdn.net/whuslei<br>参考：<br><a href="http://blog.chinaunix.net/space.php?uid=20543672&amp;do=blog&amp;id=94358" target="_blank" rel="noopener">http://blog.chinaunix.net/space.php?uid=20543672&amp;do=blog&amp;id=94358</a><br><a href="http://smilejay.com/2011/12/bash_ifs/#comment-51" target="_blank" rel="noopener">http://smilejay.com/2011/12/bash_ifs/#comment-51</a><br>(全文完)</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Shell/" rel="tag"># Shell</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/20/使用set分隔字符/" rel="next" title="使用set分隔字符">
+                <i class="fa fa-chevron-left"></i> 使用set分隔字符
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/20/使用ELK分析Nginx日志/" rel="prev" title="使用ELK分析Nginx日志">
+                使用ELK分析Nginx日志 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">201</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">152</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#转：Shell中的IFS解惑"><span class="nav-number">1.</span> <span class="nav-text">转：Shell中的IFS解惑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、IFS-介绍"><span class="nav-number">1.1.</span> <span class="nav-text">一、IFS 介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、IFS-简单实例"><span class="nav-number">1.2.</span> <span class="nav-text">二、IFS 简单实例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、IFS的其他实例"><span class="nav-number">1.3.</span> <span class="nav-text">三、IFS的其他实例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
