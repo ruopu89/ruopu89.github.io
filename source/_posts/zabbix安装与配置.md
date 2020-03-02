@@ -54,10 +54,10 @@ categories: 监控
 ## Server端
 
 ```shell
-===========================================================================================
+=======================================================================================
 环境：
 系统：CentOS Linux release 7.4.1708 (Core)，地址：192.168.2.140，此次测试将Server端与agent端安装在同一台主机上。关闭防火墙与SELinux。
-===========================================================================================
+=======================================================================================
 ------------------------------
    安装mariadb数据库
 ------------------------------
@@ -78,7 +78,8 @@ MariaDB [(none)]> FLUSH PRIVILEGES;
    安装zabbix_server
 -----------------------------
 [root@zabbix ~]# wget https://mirrors.aliyun.com/zabbix/zabbix/3.0/rhel/7/x86_64/zabbix-release-3.0-1.el7.noarch.rpm
-# 4.0版本下载地址：https://mirrors.aliyun.com/zabbix/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm 
+# 4.0版本下载地址：rpm -Uvh https://mirrors.aliyun.com/zabbix/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm 
+# 4.4版本：rpm -Uvh https://repo.zabbix.com/zabbix/4.4/rhel/8/x86_64/zabbix-release-4.4-1.el8.noarch.rpm
 [root@zabbix ~]# yum install -y zabbix-release-3.0-1.el7.noarch.rpm
 # 下载源文件并安装
 [root@zabbix ~]# vim /etc/yum.repos.d/zabbix.repo
@@ -97,8 +98,8 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
 gpgcheck=0
 # 将gpgcheck都改为0
 # 上面的repo地址可能连接有问题，可以将[zabbix]中的baseurl改为阿里地址，https://mirrors.aliyun.com/zabbix/zabbix/4.0/rhel/7/x86_64/。
-[root@zabbix ~]# yum install -y zabbix-server-mysql.x86_64 zabbix-web.noarch zabbix-get.x86_64 zabbix-web-mysql.noarch zabbix-agent.x86_64 zabbix-sender.x86_64 httpd php php-mysql php-mbstring php-gd php-bcmath php-ldap php-xml 
-# 安装4.0版本需要先安装libiksemel.so.3，libiksemel.so.3在iksemel-1.4-6.sdl7.x86_64.rpm包中，下载地址：https://centos.pkgs.org/7/puias-unsupported-x86_64/iksemel-1.4-6.sdl7.x86_64.rpm.html
+[root@zabbix ~]# yum install -y zabbix40-server-mysql.x86_64 zabbix40-web.noarch zabbix40-get.x86_64 zabbix40-web-mysql.noarch zabbix40-agent.x86_64 zabbix40-sender.x86_64 httpd php php-mysql php-mbstring php-gd php-bcmath php-ldap php-xml 
+# 安装4.0版本需要先安装libiksemel.so.3，libiksemel.so.3在iksemel-1.4-6.sdl7.x86_64.rpm包中，下载地址：http://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/iksemel-1.4-1.el6.rf.i686.rpm
 # 安装zabbix相关包
 # zabbix程序组件
 # zabbix_server：服务端守护进程
@@ -109,6 +110,9 @@ gpgcheck=0
 # zabbix_get:命令行工具，测试向agent端发起数据采集请求使用
 # zabbix_sender：命令行，测试向server端发送数据
 # zabbix_java_gateway：java网关
+# CentOS8安装4.0版本：dnf -y install httpd mariadb-server mariadb libjpeg* php-odbc php-pear php-xmlrpc php-mhash php php-pear php-cgi php-common php-mbstring php-snmp php-gd php-xml php-mysqlnd php-gettext php-bcmath php-json php-ldap
+# CentOS8依赖包：dnf -y install gcc make mariadb-devel pcre* libevent-devel libxml2-devel net-snmp-devel libcurl-devel net-snmp curl curl-devel libxml2 libevent-devel.x86_64
+# 
 
 ------------------
    导入数据库
@@ -149,7 +153,7 @@ DBPassword=zbxpass
 DBSocket=/var/lib/mysql/mysql.sock
 # 连接数据库用的sock，用rpm包安装的mysql，sock在/var/lib/mysql/mysql.sock，这是在my.cnf中定义的
 DBPort=3306
-SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
+#SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
 Timeout=4
 AlertScriptsPath=/usr/lib/zabbix/alertscripts
 ExternalScripts=/usr/lib/zabbix/externalscripts
@@ -194,9 +198,9 @@ php_value date.timezone Asia/Shanghai
 ## agent端
 
 ```shell
-----------------------------
-   安装zabbix_agent
-----------------------------
+----------------------------------------
+   在zabbixServer主机上安装zabbix_agent
+----------------------------------------
 [root@zabbix ~]# yum install zabbix-agent zabbix-sender
 # 这里以在server端安装agent端为例，可按此方法在其他主机安装agent端
 [root@zabbix ~]# cd /etc/zabbix/
@@ -218,7 +222,8 @@ Include=/etc/zabbix/zabbix_agentd.d/
 # 查看是否监听10050端口
 [root@zabbix ~]# zabbix_get -s 192.168.2.140 -k "system.cpu.switches"
 1456242
-# 测试，采集CPU的某个值
+# 测试，采集CPU的某个值，IP地址为zabbixServer的地址，此命令只能在zabbixServer主机上使用，如果在
+# zabbixAgent主机上使用，会提示:"zabbix_get [25014]: Check access restrictions in Zabbix agent configuration"
 [root@zabbix ~]# zabbix_get -s 192.168.2.140 -k "system.cpu.switches"
 zabbix_get [4179]: Get value error: cannot connect to [[192.168.2.140]:10050]: [111] Connection refused
 # 如果agent服务未启动，采集时会报错。

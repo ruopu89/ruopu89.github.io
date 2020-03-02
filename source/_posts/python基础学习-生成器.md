@@ -238,7 +238,7 @@ print(next(foo))
 
 - yield from是Python3出现的新的语法
 
-- yield from iterable 是 for item in iterable: yield item 形式的讲法糖
+- yield from iterable 是 for item in iterable: yield item 形式的语法糖
 
   - 从可迭代对象中一个个拿元素
 

@@ -11,7 +11,8 @@ categories: 网络
 * tcpdump如果不指定字节大小，默认只抓每个包的前68个字节。通常是把tcp、ip、还有包头可以抓完整的
 例：
 root@kali:~# tcpdump -i eth0 -s 0 -w a.cap
-# -i指定网卡；-s指定数据包的大小，如果用0就表示全部包，这里应该指定的是多少字节；-w指定将结果保存到一个文件中。这会抓取到所有经过eth0端口的包。70900 packets captured表示抓到了70900个包
+# -i指定网卡；-s指定数据包的大小，如果用0就表示全部包，这里应该指定的是多少字节；-w指定将结果保存到一个
+# 文件中。这会抓取到所有经过eth0端口的包。70900 packets captured表示抓到了70900个包
 ping 172.16.0.108
 # 用另一台主机ping这台kali，产生一些数据包
 tcpdump -r a.cap
@@ -49,6 +50,8 @@ tcpdump -A -n 'tcp[13] = 24' -r http.cap
 ### 简介
 
 用简单的话来定义tcpdump，就是：dump the traffic on a network，根据使用者的定义对网络上的数据包进行截获的包分析工具。 tcpdump可以将网络中传送的数据包的“头”完全截获下来提供分析。它支持针对网络层、协议、主机、网络或端口的过滤，并提供and、or、not等逻辑语句来帮助你去掉无用的信息。
+
+![](/images/tcpdump/tcpdump.png)
 
 ```shell
 * 默认启动
@@ -201,6 +204,33 @@ tcpdump采用命令行方式，它的命令格式为：
 -XX   # 当分析和打印时, tcpdump 会打印每个包的头部数据, 同时会以16进制和ASCII码形式打印出每个包的数据, 其中包括数据链路层的头部.这对于分析一些新协议的数据包很方便.
 -y    # datalinktype       设置tcpdump 只捕获数据链路层协议类型是datalinktype的数据包
 -Z    user      # 使tcpdump 放弃自己的超级权限(如果以root用户启动tcpdump, tcpdump将会有超级用户权限), 并把当前tcpdump的用户ID设置为user, 组ID设置为user首要所属组的ID(nt: tcpdump 此处可理解为tcpdump 运行之后对应的进程)。此选项也可在编译的时候被设置为默认打开.(nt: 此时user 的取值未知, 需补充)
+```
+
+
+
+### expression 表达式
+
+```shell
+==一个基本的表达式单元格式为"proto dir type ID"==
+
+对于表达式语法，参考 pcap-filter 【pcap-filter - packet filter syntax】
+
+类型 type
+host, net, port, portrange
+
+例如：host 192.168.201.128 , net 128.3, port 20, portrange 6000-6008'
+
+目标 dir
+src, dst, src or dst, src and dst
+
+协议 proto
+tcp， udp ， icmp，若未给定协议类型，则匹配所有可能的类型
+
+==表达式单元之间可以使用操作符" and / && / or / || / not / ! "进行连接，从而组成复杂的条件表达式==。如"host foo and not port ftp and not port ftp-data"，这表示筛选的数据包要满足"主机为foo且端口不是ftp(端口21)和ftp-data(端口20)的包"，常用端口和名字的对应关系可在linux系统中的/etc/service文件中找到。
+
+另外，同样的修饰符可省略，如"tcp dst port ftp or ftp-data or domain"与"tcp dst port ftp or tcp dst port ftp-data or tcp dst port domain"意义相同，都表示包的协议为tcp且目的端口为ftp或ftp-data或domain(端口53)。
+
+使用括号"()"可以改变表达式的优先级，但需要注意的是括号会被shell解释，所以应该使用反斜线""转义为"()"，在需要的时候，还需要包围在引号中。
 ```
 
 

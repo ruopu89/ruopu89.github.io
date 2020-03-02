@@ -166,7 +166,7 @@ categories: ELK
 
 请注意出于性能考虑，默认的通配符不能是关键词的首字母。
 
-![img](https://doc.yonyoucloud.com/doc/mastering-elasticsearch/notes/rm.png)
+![img](https://doc.yonyoucloud.com/doc/mastering-elasticsearch/notes/rm.png
 
 此外，Lucene支持模糊查询(fuzzy query)和邻近查询(proximity query)。语法规则是查询表达式后面接一个~符号，后面紧跟一个整数。如果查询表达式是单独一个Term，这表示我们的搜索关键词可以由Term变形(替换一个字符，添加一个字符，删除一个字符)而来，即与Term是相似的。这种搜索方式称为模糊搜索(fuzzy search)。在~符号后面的整数表示最大编辑距离。例如：执行查询表达式 "writer~2"能够搜索到含writer和writers的文档。
 

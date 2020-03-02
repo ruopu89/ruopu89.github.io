@@ -483,7 +483,7 @@ test    [administrator]
 ![](/images/rabbitmq/问题一.png)
 
 ```shell
-# 显示Node statistics not available是因为节点的web插件未启用
+# 显示Node statistics not available是因为节点的web插件未启用，所有服务器上都要装这个插件
 ---------------------
   rabbitmq2&3
 ---------------------

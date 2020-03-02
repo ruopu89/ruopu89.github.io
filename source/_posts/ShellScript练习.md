@@ -236,3 +236,55 @@ done
 
 
 
+### 统计csv文件中的数据
+
+```shell
+要求：根据每日生成的24个csv文件，统计出点播次数与点播时长，其中application_name表示点播次数，一条为一次；duration为点播时长，单位秒。
+
+步骤：
+1. 创建昨日目录
+2. 将昨日的24个文件放入上面创建的目录中
+3. 将24个csv文件合并为一个
+4. 统计点播时长与次数并输出到当前目录下
+
+#!/bin/bash
+#
+#!/bin/bash
+#
+mkdir /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`
+mv /xor/data1/report-ftp/statistics/vod/hour/`date +%Y%m%d -d "yesterday"`*.csv /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`
+cat /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/`date +%Y%m%d -d "yesterday"`*.csv >> /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/`da
+te +%Y%m%d -d "yesterday"`all.csv
+
+numCount=0
+timeCount=0
+echo "区域,点播次数,点播时长" >> /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/vodDian-`date +%Y-%m-%d_%H-%M`.txt
+
+for i in $(cat /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/`date +%Y%m%d -d "yesterday"`all.csv|awk -F ',' '{print $19}'|sort|uniq);do
+    for j in $(grep $i /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/`date +%Y%m%d -d "yesterday"`all.csv|awk -F ',' '{print $28}'|awk -F '"' '{print $2}'|awk -F '.'
+ '{print $1}');do
+        let timeCount+=${j}
+        let numCount+=1
+    done
+#    echo $i,$numCount,$timeCount >> vodDian-$(date +%Y-%m-%d_%H-%M).txt
+    echo $i,$numCount,$timeCount >> /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/vodDian-`date +%Y-%m-%d_%H-%M`.txt
+    numCount=0
+    timeCount=0
+done
+rm -rf /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/`date +%Y%m%d -d "yesterday"`all.csv
+# 最后删除汇总的csv是有必要的，这是为了避免再次执行脚本时，csv汇总文件会再次追加信息，使数据错乱。
+num=0
+time=0
+for n in $(grep -vE "application|点播次数" /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/vodDian-`date +%Y-%m-%d_%H-%M`.txt |awk -F ',' '{print $2}');do
+    let num+=$n
+done
+
+for t in $(grep -vE "application|点播次数" /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/vodDian-`date +%Y-%m-%d_%H-%M`.txt |awk -F ',' '{print $3}');do
+    let time+=$t
+done
+
+echo "总计,$num,$time" >> /xor/data1/report-ftp/statistics/vod/hour/`date +%Y-%m-%d -d "yesterday"`/vodDian-`date +%Y-%m-%d_%H-%M`.txt
+```
+
+
+

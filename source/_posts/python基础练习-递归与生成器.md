@@ -20,6 +20,8 @@ def flatmap(src,prefix=''):  # 给prefix设置一个默认值为空
     for k,v in src.items():
         if isinstance(v,(list,tuple,set,dict)):
             flatmap(v,prefix=prefix+k+'.')  # 递归调用
+# 这里写成prefix=prefix+k+'.'是有必要的，prefix里保存的就是k，每一次分离出来的k和.都保存在这里。如
+# 果不这样保存，只保存k+'.'，那么下一次循环到这里时就会用第二次的k+'.'覆盖第一次的k+'.'
         else:
             target[prefix+k] = v
             
@@ -58,7 +60,8 @@ source = {'a':{'b':1,'c':2},'d':{'e':3,'f':{'g':4}}}
 def flatmap(src): # 最外层函数只需要一个参数，就是外部的源字典，符合题意
     def _flatmap(src,dest=None,prefix=''):
         for k,v in src.items():
-            key = prefix + k   # 这里做加法处理后，key的值就是k值，如a或d
+            key = prefix + k   
+# 这里做加法处理后，key的值就是k值，如a或d。这里用key代替了上面的prefix=prefix+k+'.'中的prefix+k
             if isinstance(v,(list,tuple,set,dict)):
                 _flatmap(v,dest,key + '.')   # 递归调用
             else:
@@ -67,7 +70,8 @@ def flatmap(src): # 最外层函数只需要一个参数，就是外部的源字
     dest = {}
     _flatmap(src,dest)   
     # 在flatmap函数中调用_flatmap函数，不然_flatmap函数无法执行，会返回一个空字典。调用_flatmap是
-    # 为了让内部函数执行，不然内层函数无法执行
+    # 为了让内部函数执行，不然内层函数无法执行，并且一定要在定义完_flatmap函数后才能调用，如果写在定义
+    # _flatmap函数前，会报错。dest = {}写在下面还是写在定义_flatmap前都可以
     # 这里与装饰器并不一样，一定要在flatmap函数中调用_flatmap函数
     return dest
 
@@ -109,11 +113,13 @@ teststr = "abcd"
 teststr1 = "ManMa"
 
 def base64(src):
-    ret = bytearray()   # 返回一个新字节数组。这个数组里的元素是可变的，并且每个元素的值范围: 0 <= x < 256。
+    ret = bytearray()   
+# 返回一个新字节数组。这个数组里的元素是可变的，并且每个元素的值范围: 0 <= x < 256。这样设置后，ret的
+# 类型就是<class 'bytearray'>，ret的值就是bytearray(b'')
     length = len(src)   # 计算传入的字符的长度
     # r记录补0的个数
     r = 0
-    for offset in range(0,length,3):   # 从0开始，每3个截取一段
+    for offset in range(0,length,3):   # 从0开始，每3个截取一段。因为从0开始，所以到length结束
         if offset + 3 <= length:   # 判断是否为最后三个字节，如果超出总长度，就说明是最后三个字节
             triple = src[offset:offset + 3]   
    # 把从offset开始到offset+3个结束的三个字符，也就是一段赋值给triple。这里的判断语句就是为了分段的
@@ -121,19 +127,19 @@ def base64(src):
             triple = src[offset:]   # 如果不足3个字符，就把从offset到结束的值都赋给triple
             r = 3 - len(triple)   # 用3减去目前triple的长度，就得出了要补几个0
             triple = triple + '\x00'*r   # 补几个0，这里补的是ASCII码的0，也就是0x00
-        # triple中只有一个三字节的值，因为triple每一次都是重新赋值的，赋值之后就向下执行查找
-        # print(triple,r)
-        # 将3个字节看成一个整体围成字节bytes，大端模式
-        # 十六进制当数值时有大端和小端两种模式，大端意思是开头（低地址）权重大，小端为开头（低地址）权
-        # 重小。文件系统一般用小端模式，网络传输一般用大端模式。
-        # abc => 0x616263
+# 这里是给像abc这样的字符被0，测试补的是ASCII码的0还是十进制的0都可以
+# triple中只有一个三字节的值，因为triple每一次都是重新赋值的，赋值之后就向下执行查找print(triple,r)
+# 将3个字节看成一个整体围成字节bytes，大端模式
+# 十六进制当数值时有大端和小端两种模式，大端意思是开头（低地址）权重大，小端为开头（低地址）权重小。文件
+# 系统一般用小端模式，网络传输一般用大端模式。 abc => 0x616263
         b = int.from_bytes(triple.encode(),'big')   # 小端模式为'little'
+# 这里要先用encode将triple转为bytes类型，再将bytes类型转为数字形式，这样下面才能用二进制进行移位
 # encode()表示以 encoding 指定的编码格式编码字符串，默认编码为 'utf-8'
 # int.from_bytes()将byte转换为int类型
 # 函数格式：int.from_bytes(bytes, byteorder, *, signed=False)
 # bytes是要转换的十六进制；byteorder：选'big'和'little'，big代表正常顺序，little反之；signed：选
 # True、Flase表示是否要区分二进制的正负数含义。即是否要对原二进制数进行原码反码补码操作。
-        print(hex(b))
+        print(hex(b))  # 测试这一步好像是多余的
     # hex()将10进制整数转换成16进制，以字符串形式表示。
     # 这里先用encode将字符转换为bytes类型，再用int.from_bytes的大端模式转换为int类型，再将int类型转换为十六进制
         
@@ -144,8 +150,9 @@ def base64(src):
 # 所以这里最多为18。这里i得到的数字是18,12,6,0。这四个数字是6的倍数，看一下上面列出的两行二进制数字
             if i == 18:
                 index = b >> i 
-# 看上面第二排6bit的数字，第一次向右移18位，这里移掉一位就少一位。也就是后三段去掉，就可以得到第一段的
-# 6bit数字了，第一段6bit的十进制数字是24
+# 看上面第二排6bit的数字，第一次向右移18位，所谓的向右移就是从右侧开始向左数18位，就是被移掉的。也就是
+# 后三段去掉，就可以得到第一段的6bit数字了，第一段6bit的十进制数字是24。这里进行右移后，index是一个十
+# 进制的值。移位是从十进制转换为二进制，并向左或右移动，空出的位置补0
             else:
 # 第二次开始就进入这里，下面先右移12位，也就是得到了前两段，之后和0x3F相与，0x3F的二进制数字是
 # 111111，前面的全是0，也就是上面的前两段与这个0x3F相与，就得到 011000 010110 & 000000 111111，
@@ -153,14 +160,17 @@ def base64(src):
 # 段和0x3F相与，0x3F就是111111，不足位的地方补0，所以可以得到第三段二进制数。第四段也一样
                 index = b >> i & 0x3F   # 0x3F就是0b0011 1111
 # 上面的判断可以就写一行index = b >> i & 0x3F
-            ret.append(alphabet[index])   # 得到base64编码的列表
+            ret.append(alphabet[index])   # 得到base64编码的列表，这里将零加追加到ret中了
 # 当上面得到index时，就用这个index索引到alphabet这个自定义的base64编码表中查询对应的值，这就是abc的 
 # 由来。
             # 策略是不管是不是补零，都填满，只有最后一次可能出现补零的
             # 在最后替换掉就是了，代码清晰，而且替换至多2次
             # 在上一个循环中判断 r!=0，效率可能会高些
         for i in range(1,r+1):   # 1到r，补几个0替换几个=，r记录补了几个0，再加1是因为前包后不包
+# 因为上面将3个字符分隔为一段，不足3个字符的补1个0或者2个0，又因为上面将1个字符转换为一个2进制8位的数字
+# 所以这里只有将1个或2个0转换为等号的问题。
             ret[-i] = 0x3D   # ox3D是等号的ASCII码，把ret中从后向前，有几个是全0的就替换为等号
+# 以上面的r为基础，看补了几个0，用负索引的方式，并ret元素最后的零改为等号
 # 上面这个循环在计算在6bit的情况下应该如何把全是0的位置替换成等号，如最后一段是三个字符，如abc，这是不
 # 需要补0的，如果是两个字符，如ab，要补一个0并替换为等号，如果是一个字符，要被两个0并替换为等号
 	return ret
@@ -171,7 +181,7 @@ print(base64(teststr1))
 输出：
 0x616263   # triple的十六进制
 0x640000
-bytearray(b'YWJjZA==')
+bytearray(b'YWJjZA==')   # 两个等号证明是补了两个零
 ****************************************
 0x4d616e
 0x4d6100
@@ -267,7 +277,8 @@ def findit(str1, str2):   # 传入两个参数，都是字符串
     xmax = 0   # 这里保存的就是索引的值里最大的
     xindex = 0   # 这里保存的是最大值的索引
     for i,x in enumerate(str2):
-        matrix.append([])   # 这时的matrix就是[[]]，每次比较前都追加一个空列表
+        matrix.append([])   
+# 这时的matrix就是[[]]，每次比较前都追加一个空列表。每次i变化后，都会加入一个新的空列表
         for j,y in enumerate(str1):
             if x != y:   
             # 若两个字符不相等，这里开始比较str2中第一个元素与str1中每一个元素是否相同 
@@ -275,20 +286,21 @@ def findit(str1, str2):   # 传入两个参数，都是字符串
             else:
                 if i == 0 or j == 0:   # 两个字符相等，有字符在边上的
                     matrix[i].append(1)
-# 本来都是在索引上加1的，但为了区分是不是在边上，所以这里这样做。如果以s1与s2来看，x轴为0时，s2为d，
-# s1为abcdefg，这是在用s2中的每个元素与s1中的全部元素比较。当y邮为0时，s2是defabcd，s1是a，这是在
-# s2中的每个元素与s1的全部元素比较时，只有比较到s1的第一个元素时的情况，s1与s2比较时，只有这两种情况
-# 是在边上的
+# 本来都是在索引上加1的，但为了区分是不是在边上，所以这里这样做。这里的边上指的是x轴或y轴的第一个数，如
+# 果在边上，那么就不能再用它前面的索引值加1了，所以这里要判断一下。如以s1与s2来看，x轴为0时，s2为d，
+# s1为abcdefg，这是在用s2中的每个元素与s1中的全部元素比较。当y轴为0时，s2是defabcd，s1是a，这是在
+# 用s1中的每个元素与s2的全部元素比较，只有在用s1或s2的第一个元素与s2或s1的全部元素比较时才会有这种情况
                 else:   # 不在边上
                     matrix[i].append(matrix[i-1][j-1]+1)
-                    
+# 当x = y时，因为i和j是x和y的索引，所以就要找i和j索引的前一个值加1追加到目前的索引i的位置上
                 if matrix[i][j] > xmax:   # 判断当前加入的值和记录的最大值比较
                     xmax = matrix[i][j]   # 记录最大值，用于下次比较
-                    xindex = j   # 记录当前值的x轴偏移量，和str1[xindex+1-xmax:xindex+1]匹配
+                    xindex = j   # 记录当前值的x轴偏移量，如j此时是4，和str1[xindex+1-xmax:xindex+1]匹配
                     xindex += 1   # 只是为了计算的需要才+1，和str1[xindex - max: xindex]匹配
    # return str1[xindex+1-xmax:xindex+1]
 	return str1[xindex - xmax: xindex]
-
+# xindex - xmax这样运算完应该是一个正数，xindex+1是最大索引，因为之前j是从0开始的，所以这里为了方便
+# 计算要加1。xmax是最大值，它应该等于小于xindex？
 print(findit(s1,s2))
 print(findit(s1,s3))   # a
 print(findit(s1,s4))   # 空串
@@ -302,6 +314,22 @@ a
 
 abcd
 abcd
+# 这里matrix的值的形式如下，是不断追加的
+# [[0]]
+# [[0, 0]]
+# [[0, 0, 0]]
+# [[0, 0, 0, 1]]
+# [[0, 0, 0, 1, 0]]
+# [[0, 0, 0, 1, 0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 2]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 2, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 2, 0, 0]]
+# [[0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 2, 0, 0], [0]]
 
 - 方法二
 可不可以这样思考，字符串都是连续的字符，所以才有了下面的思路。
@@ -324,17 +352,27 @@ s2 = 'defabcdoabcdeftw'
 s3 = '1234a'
 
 def findit(str1,str2):
-    count = 0   # 看看效率，计数
+    count = 0
     length = len(str1)
     
     for sublen in range(length,0,-1):
+# 以s1为str1，s2为str2为例。第一次进入此处时，length是7，这里是range(7,0,-1)，就是7-1。第一次是
+# 7，第二次是6。这一层循环是为了控制字符串的长度，最长不能超过sublen的值
         for start in range(0,length-sublen+1):
+# 第一次进入此处时，这里是range(0,7-7+1)，也就是range(0,1)，结果这里只有start=0。通过这里的变化调
+# 整下面substr的查找范围。如第一次查找的是整个str1这个子串，第二次这里变成了range(0,2)，start是
+# 0,1。下面就变成了str1[0:6]，str1[1:7]。当sublen是5时，这里是range(0,1,2)，下面是str1[0:5]，
+# str1[1:6],str[2,7]。这里的start用于控制开始的索引值，下面的start+sublen控制结尾的索引值
             substr = str1[start:start+sublen]
+# 第一次进入此处时，这里是str1[0:7]，那么substr就是'abcdefg'，从最长的子串找起
             count += 1
-            if str2.find(substr) > -1:   # found
+# 计录一次查找子串
+            if str2.find(substr) > -1:
+# 如果在str2中找到了substr这个子串，大于-1证明找到了
                 print("count={},substrlen={}".format(count,sublen))
+# 就把count和子串的长度打印出来
                 return substr
-            
+# 最后找到返回的子串。这里有一个问题，如果
 print(findit(s1,s2))
 print(findit(s1,s3))
 输出：

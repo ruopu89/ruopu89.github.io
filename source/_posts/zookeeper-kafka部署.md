@@ -254,8 +254,12 @@ topic.metadata.refresh.interval.ms=60000
 準備三台主機，主機名分別為kafka1(10.5.5.19)、kafka2(10.5.5.24)、kafka3(10.5.5.155)。
 
 * kafka1
-到http://zookeeper.apache.org/releases.html去下载zookeeper
-yum install java-1.8.0-openjdk-deve
+到http://zookeeper.apache.org/releases.html去下载zookeeper。这里需要注意，下载的3.5.5和3.5.6
+版本中没有zookeeper-***.jar包，所以启动zookeeper会提示:
+"Could not find or load main class org.apache.zookeeper.server.quorum.QuorumPeerMain"。
+测试下载的3.4.14版本没有问题。也许是不会使用的原因
+
+yum install java-1.8.0-openjdk-devel
 # zookeeper依賴java
 tar -zxvf zookeeper-3.4.9.tar.gz -C /usr/local
 # 解壓安裝
@@ -294,9 +298,11 @@ chmod +x /etc/profile.d/java.sh
 java -version
 scp /etc/profile.d/java.sh 10.5.5.24:/etc/profile.d
 scp /etc/profile.d/java.sh 10.5.5.155:/etc/profile.d
+scp /usr/local/zookeeper/conf/zoo.cfg root@10.5.5.24:/usr/local/zookeeper/conf/
+scp /usr/local/zookeeper/conf/zoo.cfg root@10.5.5.155:/usr/local/zookeeper/conf/
 
 * kafka2&kafka3
-yum install java-1.8.0-openjdk-deve
+yum install java-1.8.0-openjdk-devel
 cd /root
 tar xf zookeeper-3.4.9.tar.gz -C /usr/local/
 cd /usr/local/
@@ -355,6 +361,11 @@ cd /usr/local/kafka/bin
 nohup ./kafka-server-start.sh ../config/server.properties &
 ss -tln
 # 這時應該監聽了默認端口9092
+vim /etc/hosts
+10.5.5.19   kafka1
+10.5.5.24	kafka2
+10.5.5.155	kafka3
+# 这里添加可以让三台主机互相通过主机名解析
 ```
 
 
@@ -424,6 +435,8 @@ kafkaServer-gc.log         server.log
 [root@kafka1 bin]# ./kafka-topics.sh --list --zookeeper localhost:2181
 test
 # 查看所有的topic
+[root@kafka1 bin]# ./kafka-topics.sh --describe --zookeeper 192.168.1.15:2181
+# 查看所有topic的详细信息
 [root@kafka1 bin]# ./kafka-topics.sh --describe --zookeeper 192.168.1.15:2181 --topic test
 Topic:test      PartitionCount:3        ReplicationFactor:1     Configs:
         Topic: test     Partition: 0    Leader: 2       Replicas: 2     Isr: 2
@@ -468,11 +481,17 @@ abc
 Using the ConsoleConsumer with old consumer is deprecated and will be removed in a future major release. Consider using the new consumer by passing [bootstrap-server] instead of [zookeeper].
 abc
 # 創建消費者，創建後終端會等待生產者生產消息。在生產者終端輸入信息後，消費者終端會顯示生產者輸入的消息，這表示消費者消費了。如果有多個地址，地址間要用逗號隔開。
+=======================================
+# 2.12版本
+ ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test1 --from-beginning
+# 三台主机的集群，kafka1、kafka2、kafka3，kafka2创建生产者，地址指定为kafka1，kafka2创建消费者。
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test1 --group nginxlog --from-beginning
+# 指定存在的组来消息信息，没有测试这个消息组是不是必须事先存在
 ```
 
 
 
-#### 查看消費者列表
+#### 查看消費者列表/查看消息堆积
 
 ```shell
 查看consumer group列表有新、旧两种命令，分别查看新版(信息保存在broker中)consumer列表和老版(信息保存在zookeeper中)consumer列表，因而需要区分指定bootstrap--server和zookeeper参数：
@@ -483,12 +502,27 @@ Note: This will only show information about consumers that use ZooKeeper (not th
 
 console-consumer-6777
 --------------------------------------------
+# 查看特定consumer group 详情，使用--group与--describe参数
+--------------------------------------------
 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --broker-info --group inbound --topic inboundMsg --zookeeper 192.168.2.182:2181
-# 结果中的Lag是待消费的数量
+# 结果中的Lag是待消费的数量。这是按topic查询堆积情况
 watch '/usr/local/kafka/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 192.168.2.182:9092 --group inbound --describe'
 # 如果是多个分区，用此命令
 --------------------------------------------
-# 查看特定consumer group 详情，使用--group与--describe参数
+[root@kafka1 bin]# ./kafka-consumer-groups.sh --describe --bootstrap-server localhost:9092  --group nginxlog --members
+# 查看消费者数量
+
+[root@kafka1 bin]# ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+# 查看有几个消费者组
+
+[root@kafka1 bin]# ./kafka-consumer-groups.sh --bootstrap-server 192.168.1.17:9092 --group nginxlog --describe
+# 这是按消费者组来查询堆积情况，结果中会显示这个组中包括的所有topic
+TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                     HOST            CLIENT-ID
+nginxlog        0          5407            5407            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0
+nginxlog        1          5406            5406            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0
+nginxlog        2          5405            5405            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0
+# 查看kafka的消息堆积情况，可以加上watch命令。不知是否与上面提到的hosts文件是否有关，最好加上可以解析
+# kafka主机名。这里的kafka的组名是在logstash的配置文件中创建的。
 ```
 
 
@@ -496,7 +530,7 @@ watch '/usr/local/kafka/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-
 #### 查看kafka日誌
 
 ```shell
-./kafka-run-class.sh kafka.tools.DumpLogSegments
+[root@kafka3 bin]# ./kafka-run-class.sh kafka.tools.DumpLogSegments
 # 我们可以看到都需要哪些参数，根据不同的需求我们可以选择不同的参数。
 [root@kafka3 bin]# ./kafka-run-class.sh kafka.tools.DumpLogSegments --files /usr/local/kafka/logs/test-0/00000000000000000000.log --print-data-log
 Dumping /usr/local/kafka/logs/test-0/00000000000000000000.log
@@ -541,6 +575,12 @@ Created topic "test-rep-one".
 # --producer-props：kafka生产者相关的配置属性，如bootstrap。 servers，client.id等。这些配置优先于通过--producer.config传递的配置。
 # bootstrap.servers：指定kafka地址与端口
 
+* 测试消费者
+bin/kafka-consumer-perf-test.bot --messages 1000000 --threads 1 --zookeeper 192.168.1.14:2181 --num-fetch-threads 3 --topic test
+# --messages：消费多少消息
+# --threads：线程数量
+# --zookeeper：zookeeper的地址
+# --num-fetch-threads：摘取数据的线程数量，即消费者的数量
 ```
 
 

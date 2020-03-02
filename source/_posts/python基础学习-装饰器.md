@@ -202,10 +202,12 @@ def logger(fn):
 # logger(add1)(40,30)
 
 # add1 = logger(add1)   
-# fn是自由变量，里面引用是成为闭包，这个变量被留下来了。python提供了一种简单的方式，@logger，如下
-@logger  # 装饰器函数，add1 = logger(add1)，这里add1被覆盖掉了，之后再调用add1就相当于调用内层函数_logger，_logger中的fn函数才是真正进行运算的。_logger函数就相当于add1函数的增加版，即实现了add1
-# 函数的功能，还增加了其他功能。把函数加上@后，就会把其下面的函数当作参数传入加@的函数中，再次调用add1
-# 时，执行的实际是logger函数
+# fn是自由变量，里面引用时成为闭包，这个变量被留下来了。python提供了一种简单的方式，@logger，如下
+@logger  
+# 装饰器函数，add1 = logger(add1)，这里add1被覆盖掉了，之后再调用add1就相当于调用内层函数_logger，
+# _logger中的fn函数才是真正进行运算的。_logger函数就相当于add1函数的增强版，即实现了add1函数的功能，
+# 还增加了其他功能。把函数加上@后，就会把其下面的函数当作参数传入加@的函数中，再次调用add1时，执行的实
+# 际是logger函数
 def add1(x,y):
     return x + y
 add1(4,100)
@@ -224,12 +226,13 @@ print(add1(x=5,y=10))
 # 装饰器是一种语法糖，对上面两行代码的代替。用@logger代替add1 = logger(add1)，而且logger函数应该写
 # 在@logger前面，不然@logger会提示不认识logger函数。这里必须先定义logger函数，之后定义装饰器函数
 # @logger，最后定义add1函数
-@ logger   # 装饰器只接收到add1函数的标识符，并不包括参数，参数由内层函数_logger管
+@logger   
+# 装饰器只接收到add1函数的标识符，并不包括参数，参数由内层函数_logger管
 def add1(x,y):   # 这里是原始的add1函数标识符
     return x + y
 print(add1(45,40))   # 这里调用的是被装饰器函数修改过的add1函数，指的是内层函数的一个引用
 
-# 装饰器函数主机是为了装饰，但函数功能增强，必免侵入式
+# 装饰器函数主要是为了装饰，但函数功能增强，必免侵入式
 ```
 
 
@@ -300,7 +303,8 @@ def logger(fn):
 # 性复制给_logger，那么当使用help或用__name__或__doc__时，就会显示add函数的属性了
     return _logger
 
-@logger   # 加入装饰器后，看一下add.__name和add.__doc__是不是还是add。结果显示是_logger，但我们想看的是add的帮助文档
+@logger   
+# 加入装饰器后，看一下add.__name和add.__doc__是不是还是add。结果显示是_logger，但我们想看的是add的帮助文档
 # 这里本身也不应该改变原函数的帮助文档。所以要添加一个copy_properties函数，并在logger函数中调用
 def add(x,y):
     'This is a function'  # 文档字符串，必须放在函数后的第一行，如果有多行，要用三引号
@@ -351,7 +355,10 @@ def logger(duration):
         return wrapper
     return _logger
 
-@logger(5)  # add = logger(5)(add)，logger()的duration参数就是这里传入的5
+@logger(5)  
+# add = logger(5)(add)，logger()的duration参数就是这里传入的5，_logger的参数就是这里传入的add，
+# 之后再通过 print('so slow') if delta > duration else print('so fast')与duration传参比较，
+# 如果执行时间大于这个传参就是慢的，否则执行就是快的
 def add(x,y):
     time.sleep(3)
     return x + y
@@ -386,7 +393,8 @@ def copy_properties(src):
         return dst 
     return _copy
 
-def logger(duration,func=lambda name,duration:print('{} took {}s'.format(name,duration))):
+def logger(duration,func=lambda name,duration:print('{} to ok {}s'.format(name,duration))): 
+# 这里前面的duration与后面的duration不是同一个，前面是logger函数的形参，后面的是匿名函数的形参
     def _logger(fn):
         @copy_properties(fn)   # wrapper = wrapper(fn)(wrapper)
         def wrapper(*args,**kwargs):
@@ -394,18 +402,21 @@ def logger(duration,func=lambda name,duration:print('{} took {}s'.format(name,du
             ret = fn(*args,**kwargs)
             delta = (datetime.datetime.now() - start).total_seconds()
             if delta > duration:
-                func(fn.__name__,duration)
+                func(fn.__name__,delta)
+           # 向匿名函数中传递两个参数，一个是执行函数的名称，一个是实际执行的时间
             return ret
         return wrapper
     return _logger
 
-@logger(5)  # add = logger(5)(add)
+@logger(3)  # add = logger(5)(add)
 def add(x,y):
     time.sleep(3)
     return x + y
 
 print(add(5,6))
 输出：
+add to ok 3s
+# 这里的add就是上面判断中fn.__name__得到的
 11
 ```
 
@@ -425,12 +436,12 @@ def logger(t):
             ret = fn(*args,**kwargs)
             duration = (datetime.datetime.now() - start).total_seconds()
             if duration > t:
-                print("function {} took {}s.".format(fn.__name__,duration))
+                print("function {} to ok {}s.".format(fn.__name__,duration))
             return ret
         return wrap
     return _logger
 
-@logger(3)   # add = logger(50)(add)
+@logger(3)   # add = logger(3)(add)
 def add(x,y):
     print("=====call add=====")
     time.sleep(5)
@@ -446,7 +457,7 @@ def logger(t1,t2):
             ret = fn(*args,**kwargs)
             duration = (datetime.datetime.now() - start).total_seconds()
             if duration > t1 and duration < t2:
-                print("function {} took {}s.".format(fn.__name__,duration))
+                print("function {} to ok {}s.".format(fn.__name__,duration))
             return ret
         return wrap
     return _logger
@@ -463,7 +474,8 @@ print(add(5,6))
 def logger(fn):
     return 10
 
-@logger  # 这里等价于add1 = logger(add1)，加了@实际就是把其下面的函数拿来做参数转入这个加了@函数
+@logger  
+# 这里等价于add1 = logger(add1)，加了@实际就是把其下面的函数拿来做参数转入这个加了@函数
 def add1(x,y):  # 这样做完，add1就变成了上面的logger函数中的return 10了
     return x + y
 
@@ -507,7 +519,7 @@ print(help(add))
 
 import datetime,time,functools
 
-def logger(duration,func=lambda name,duration:print('{} took {}s'.format(name,duration))):
+def logger(duration,func=lambda name,duration:print('{} to ok {}s'.format(name,duration))):
 	def _logger(fn):
         def wrapper(*args,**kwargs):
             start = datetime.datetime.now()
@@ -537,7 +549,7 @@ print(add(5,6),add.__name__,add.__wrapped__,add.__dict__,sep='\n')
 
 import datetime,time,functools
 
-def logger(duration,func=lambda name,duration:print('{} took {}s'.format(name,duration))):
+def logger(duration,func=lambda name,duration:print('{} to ok {}s'.format(name,duration))):
 	def _logger(fn):
         @functools.wraps(fn)
         def wrapper(*args,**kwargs):
@@ -564,7 +576,7 @@ print(add(5,6),add.__name__,add.__wrapped__,add.__dict__,sep='\n')
 
 - 装饰器是对现有函数的增强
 - 看到装饰器的图时，就会想到钢铁侠的反浩克装甲---维罗妮卡
-- 装饰之后调用的还是原函数的名字，但功能已经是装饰后听效果了
+- 装饰之后调用的还是原函数的名字，但功能已经是装饰后的效果了
 - 装饰器函数的内层函数就是原函数的增强代码，即实现原函数功能，又增加了功能
 - 函数加了@符号后，就会将其下面的函数当作参数传入到加了@符号的函数中
 - 带参装饰器可以有多个参数，并且也会把其下面的函数当作参数传入这个带参的函数中的内层函数里
@@ -629,11 +641,11 @@ def copy_properties(src):
     return _copy
 # 因为_copy就是wrapper，这里只是把原函数的属性信息复制到目标函数中，目录函数就是下面的wrapper，因为上
 # 面讲到过，装饰器就是用wrapper函数覆盖了原函数，所以要把原函数的属性保留在wrapper中
-def logger(fn): 
+def logger(duration): 
     @copy_properties(fn)  # wrapper = copy_properties(fn)(wrapper)
     def wrapper(*args,**kwargs):
         ...
-# 这实际就是把原函数内做fn，wrapper当作dst传入到了带参装饰器中
+# 这实际就是把原函数当做fn，wrapper当作dst传入到了带参装饰器中
 
 7. 多参数装饰器
 def logger(t1,t2):
@@ -654,12 +666,13 @@ def add(x,y):
 8. functools模块
 # 这个模块中的update_wrapper函数和wraps装饰器函数可以实现上面的copy_properties函数的功能，并且比我
 # 们自己写的函数的功能强。update_wrapper(wrapper,wrapped,assigned=,updated=)中的wrapper指包
-# 装，wrapped指被包装。被包装的是外面的add函数，是原函数，包装的是里面的wrapper函数。assigned表示
-# wrapper中的属性信息要被wrapped中的属性信息覆盖掉，也就是保留原函数的属性信息；updated指把wrapped
-# 中字典属性加到wrapper的字典属性中，如果key相同就覆盖了，如果不同就追加。
+# 装，wrapped指被包装。被包装的是外面的add函数，是原函数，包装功能的是里面的wrapper函数实现的。
+# assigned表示wrapper中的属性信息要被wrapped中的属性信息覆盖掉，也就是保留原函数的属性信息；updated
+# 指把wrapped中字典属性加到wrapper的字典属性中，如果key相同就覆盖了，如果不同就追加。
+
 - update_wrapper函数
 import functools
-def logger(fn):  # 这里用了两个可变参数
+def logger(fn):  
     @copy_properties(fn)
     def _logger(*args,**kwargs):
         '''This is a wrapper'''
@@ -670,7 +683,8 @@ def logger(fn):  # 这里用了两个可变参数
     functools.update_wrapper(_logger,fn)  
     # 
     # wrapped得是fn，不能是add，因为这里要用一个参数
-    print("{} {}".format(id(_logger),id(fn)))   # 看一下下面打印的add1.__wrapped__是wrapper的还是fn的
+    print("{} {}".format(id(_logger),id(fn)))   
+    # 看一下下面打印的add1.__wrapped__是_logger的还是fn的
     return _logger
 
 @logger  
@@ -682,7 +696,8 @@ def add1(x,y):
 # add1(4,100)
 print(add1.__name__,add1.__doc__,add1.__qualname__,sep='\n')
 print('*'*40)
-print(id(add1.__wrapped__))   # 这是fn的id，所以这个新增的__wrapped__就是把fn给放进去了，这样就能找到原来的函数是谁了
+print(id(add1.__wrapped__))   
+# 这是fn的id，所以这个新增的__wrapped__就是把fn给放进去了，这样就能找到原来的函数是谁了
 输出：
 139975566907728 139975566908408
 add1
@@ -695,7 +710,7 @@ add1
 # 这个装饰器函数只需要wrapped，而不需要wrapper，因为是装饰器函数，所以用@来将其下面的函数当做参数传入
 # 了，所以无需指定wrapper
 import functools
-def logger(fn):  # 这里用了两个可变参数
+def logger(fn):  
     @functools.wraps(fn)  
     # wraps函数只需要写wrapped即可，至于wrapper，因为这里用了@符号，所以会把其下面的函数当作wrapper传入，这相当于
     # functools.wraps(fn)(_logger)
@@ -706,7 +721,8 @@ def logger(fn):  # 这里用了两个可变参数
         print('after')
         return ret   
 #     functools.update_wrapper(_logger,fn)  # wrapped得是fn，不能是add，因为这里要用一个参数
-    print("{} {}".format(id(_logger),id(fn)))   # 看一下下面打印的add1.__wrapped__是wrapper的还是fn的
+    print("{} {}".format(id(_logger),id(fn)))   
+    # 看一下下面打印的add1.__wrapped__是_logger的还是fn的
     return _logger
 
 @logger  
@@ -720,7 +736,8 @@ print(add1.__name__,add1.__doc__,add1.__qualname__,sep='\n')
 print('*'*40)
 print(id(add1.__wrapped__)) 
 print('@'*40)
-print(add1.__wrapped__(4,90))  # 打印出了94,这说明__wrapped__保存了原函数的功能，这只是证明，而不是真正使用的方法
+print(add1.__wrapped__(4,90))  
+# 打印出了94，这说明__wrapped__保存了原函数的功能，这只是证明，而不是真正使用的方法
 输出：
 139975561244184 139975561244048
 add1

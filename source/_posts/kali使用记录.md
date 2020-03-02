@@ -10,7 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity ark cherrytree catfish
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity ark cherrytree catfish telegram-desktop gpick unar folder-color
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -40,6 +40,9 @@ sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfet
 # ark为解压缩软件
 # cherrytree为树状记录软件
 # catfish为搜索软件
+# gpick是取色工具，用空格取色
+# unar是一个几乎支持所有格式并能自动识别编码的解压工具，对付unzip解压后文件名乱码的压缩包尤为有效
+# folder-color可以改变文件夹的外观，安装后使用nautilus -q 退出文件夹，再打开时在文件夹上右键就可以设置了
 ```
 
 
@@ -97,11 +100,12 @@ setopt no_nomatch
 if [[ -r /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh ]];then
     source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
 fi
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting z web-search sudo history-substring-search)
+plugins=(git battery zsh-autosuggestions zsh-syntax-highlighting z web-search sudo history-substring-search)
 # z插件可以快速跳转目录
 # web-search可以在命令行使用百度、必应、google搜索，如：google abc，这表示打开默认浏览器在google中搜索abc
 # sudo插件可以在使用sudo时按两次ECS
 # history-substring-search是历史自动补全命令，oh-my-zsh 自带插件
+# 加入battery是因为使用命令行时会提示"zsh: command not found: battery_pct_prompt"
 
 export HISTSIZE=10000
 # 历史纪录条目数量，测试时用echo查看这个变量是50000，不知是在哪儿定义的
@@ -155,6 +159,23 @@ sudo mv PowerlineSymbols.otf /usr/share/fonts/OTF/
    手动更新oh-my-zsh
 =====================
 upgrade_oh_my_zsh 
+```
+
+
+
+#### telegram
+
+```shell
+https://github.com/telegramdesktop/tdesktop/releases
+https://desktop.telegram.org/
+```
+
+
+
+#### 即时通讯客户端
+
+```shell
+可以看一下franz，但似乎会收费。需要注册一个franz帐号才能使用。可以管理twitter、gmail等。地址：https://meetfranz.com/
 ```
 
 
@@ -448,6 +469,20 @@ sudo apt install p7zip
 # 查看压缩文件的内容
 7zr a win10.7z cn_windows_10_multi-***.iso
 # 创建压缩文件
+```
+
+
+
+#### 安装tcping
+
+```shell
+sudo apt install tcptraceroute
+# 如果不安装此包，使用tcping时会没有显示
+wget -O tcping https://soft.mengclaw.com/Bash/TCP-PING
+# 下载命令包并重命名为tcping
+chmod +x tcping
+sudo cp -a tcping /usr/bin/
+source .zshrc
 ```
 
 
@@ -853,6 +888,40 @@ RTNETLINK answers: File exists
 
 
 
+#### v2rayL安装
+
+```shell
+linux上的v2ray可视化客户端
+安装
+bash <(curl -s -L http://dl.thinker.ink/install.sh)
+# <与()间不要有空格
+更新
+bash <(curl -s -L http://dl.thinker.ink/update.sh)
+卸载
+bash <(curl -s -L http://dl.thinker.ink/uninstall.sh)
+启动
+/usr/bin/v2rayL/v2rayLui
+```
+
+
+
+#### proxychains
+
+```shell
+利用proxychains让命令走代理
+安装proxychains
+sudo apt install proxychains
+配置proxychains
+sudo vim /etc/proxychains.conf
+将最后一行改成：
+socks5 127.0.0.1 1080
+proxychains使用
+proxychains wget https://www.google.com
+proxychains bash
+```
+
+
+
 #### 测试网速
 
 ```shell
@@ -1009,6 +1078,32 @@ lsmod | grep bbr  #检查是否有tcp_bbr
 
 
 
+#### 调整linux内核尽量用内存，而不用swap
+
+```shell
+1.查看当前swappiness值，默认为60
+　$ cat /proc/sys/vm/swappiness
+2.修改swappiness值为10（临时修改，重启后即还原为默认值）
+　$ sudo sysctl vm.swappiness=10
+3.永久修改swappiness默认值（重启生效）
+$ sudo gedit /etc/sysctl.conf
+在文档的最后加上:
+　　vm.swappiness=10
+```
+
+
+
+#### 用户输入密码时显示星号
+
+```shell
+sudo cp /etc/sudoers{,.bak}
+sudo vim /etc/sudoers
+Defaults    env_reset,pwfeedback
+# 在这一行加入,pwfeedback
+```
+
+
+
 #### vim设置
 
 ```shell
@@ -1063,6 +1158,22 @@ vim命令粘贴带数字或符号的信息时格式混乱解决
 
 关闭高亮
 :nohl
+```
+
+
+
+#### sublime输入中文
+
+```shell
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+sudo apt-get install apt-transport-https
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+sudo apt update
+sudo apt install sublime-text
+下载的安装包启动后无法输入中文
+git clone https://github.com/lyfeyaj/sublime-test-imfix.git
+cd sublime-test-imfix && ./sublime-imfix
+最好安装中回答Y，并使用安装源安装sublime
 ```
 
 
@@ -1298,6 +1409,40 @@ tmpfs                         1.6G  9.8M  1.6G    1% /run
 # 清理大于100M的文件
 ⚡ root@ruopu64  ~  find ~/.cache -type f -atime +365
 # 清理日期大于365天的文件
+```
+
+
+
+#### 安装配置clash
+
+```shell
+1. 下载
+mkdir ~/clash
+# 这个目录在哪里创建都可以
+cd ~/clash
+axel -n 10 https://github.com/Dreamacro/clash/releases/download/v0.17.1/clash-linux-amd64-v0.17.1.gz
+# 下载包
+gzip -d clash-linux-amd64-v0.17.1.gz
+# 解压包
+chmod +x clash-linux-amd64
+./clash-linux-amd64
+# 初始化时会在~/.config/clash下创建两个文件，config.yaml  Country.mmdb。这里会出现问题，需要先停
+# 下来。首先要配置config.yaml文件，所不需要的项注释掉，如vmess。另外，Country.mmdb也有报错
+# "Can't load mmdb: error opening database: invalid MaxMind DB file"，需要手动下载Country.mmdb。
+# 如果使用./clash-linux-amd64 -d .，那么配置文件与mmdb文件就在当前目录下
+axel -n 10 https://10101.io/download/file\?cid\=301
+# 参考：https://10101.io/2018/10/27/how-to-use-clash-for-windows
+./clash-linux-amd64
+# 再次执行应该就正常了。输出如下：
+# INFO[0000] Start initial compatible provider auto       
+# INFO[0000] Start initial compatible provider Proxy      
+# INFO[0000] Start initial compatible provider load-balance 
+# INFO[0000] Start initial compatible provider fallback-auto 
+# INFO[0000] HTTP proxy listening at: 127.0.0.1:7890      
+# INFO[0000] SOCKS proxy listening at: 127.0.0.1:7891     
+# INFO[0000] RESTful API listening at: 127.0.0.1:9090
+登录：http://clash.razord.top/，进入后会要求输入地址与端口，默认是127.0.0.1:9090。这只是一个监控页面，无法修改配置。这个工具的问题是只支持ss、v2ray
+参考：https://medium.com/@muchenran2/clash-%E5%B8%B8%E7%94%A8%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E7%AE%80%E6%98%93%E7%89%88-c77aeb2a10c
 ```
 
 
@@ -1743,6 +1888,9 @@ Control+Shift+W
 
 20. 取消PPA库的方法
 sudo add-apt-repository --remove ppa:nilarimogard/webupd8
+
+21. 用户进入命令行提示"ps1_fortune:2: command not found: fortune"
+sudo apt install fortune-mod
 ```
 
 
@@ -1775,7 +1923,7 @@ userdel -r shouyu
 
 
 
-### 屏幕变成竖屏的
+#### 屏幕变成竖屏的
 
 ```shell
 使用当中，笔记本屏幕自动旋转了90度，头也要向右低90度才能正常看，原因不明
@@ -1895,6 +2043,13 @@ sudo vmware-installer -u vmware-workstation
 7. vmware使用NAT方式不能连接到网络，提示：Could not connect 'Ethernet0' to virtual network '/dev/vmnet8'. More information can be found in the vmware.log file. Failed to connect virtual device 'Ethernet0'. 将这个虚拟交换机删除，重新创建一个虚拟交换机，选择NAT方式即可解决。
 
 8. 挂起是虚拟机的操作本身的休眠功能，关闭即可。如win7的休眠功能
+
+9. vmware-workstation无法在主版本内核中运行的问题
+a. 下载高版本的vmware-workstation，如14.1.7版本，下载地址：https://my.vmware.com/group/vmware/details?downloadGroup=WKST-1417-LX&productId=686&download=true&fileId=3dd758fdc904e68f9aae93f9d9807d31&secureParam=f9ecb38be33db3611137eda2dc65d47d&uuId=d6a721f6-43aa-41cf-b308-97505fddbaf9&downloadType=
+b. 下载相应的内核编译需要使用的包，下载地址：https://github.com/mkubecek/vmware-host-modules/releases/tag/w14.1.7-k5.3。这里的包的名称以w14.1.7-k5.3或p14.1.7-k5.3命名，其中w14.1.7表示vmware-workstation的版本，k5.3表示内核的版本，p14.1.7表示vmware-player的版本
+c. 先安装vmware-workstation，之后解压编译内核需要的包并进入，依次执行：make -> make install -> modprobe -r vmmon -> insmod /lib/modules/$(uname -r)/misc/vmmon.ko -> insmod /lib/modules/$(uname -r)/misc/vmnet.ko -> rm /usr/lib/vmware/lib/libz.so.1/libz.so.1 -> ln -s /lib/x86_64-linux-gnu/libz.so.1 /usr/lib/vmware/lib/libz.so.1/libz.so.1 -> vmware-networks --start
+d. 这时以root身份打开vmware-workstation就没有问题了，如果不以root身份打开，可以会显示不了虚拟机的页面
+参考：https://blog.gloriousdays.pw/2018/09/11/linux-kernel-4-13-break-vmware-12-5/
 ```
 
 
@@ -1914,6 +2069,10 @@ sudo modprobe vboxdrv。当完成上面三步后，虚拟机可以启动了。
 #### VirtualBox虚拟机安装Ubuntu 16.04.3 LTS后安装增强功能
 
 ```shell
+下载地址：http://download.virtualbox.org/virtualbox/6.0.14/
+下载内容：VBoxGuestAdditions_6.0.14.iso
+使用虚拟机加载此iso文件，之后在虚拟机中安装即可。windows比较简单，一直下一步即可。
+
 点击安装增强功能-->bash VBoxLinuxAdditions.run
 # 实际使用时先安装了autorun.sh，但没有效果。安装VBoxLinuxAdditions.run后需要重启。
 ```
@@ -1935,6 +2094,8 @@ VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRea
 # VirtualBox原生支持Mac OS X的安装，但是只有在系统环境为Mac的环境下，才能正常引导，因为在非Mac环境下，安装程序会检测出我们的CPU不是已经识别的型号，从而拒绝进一步的安装。为此，我们需要执行以下命令来Hack
 # 如果VBoxManage没有被加入PATH的话，可能会提示VBoxManage不是可执行的命令。只需要进入VirtualBox的安装目录下Shift+右键在当前目录打开命令行执行即可~
 # 原理非常简单：利用VBox的命令行工具在虚拟机的DeviceKey中加入Apple的声明即可。
+
+*** 安装时先选择磁盘工具，选择显示所有设备，再将要安装的磁盘抹掉。之后安装可能会提示：“这个安装macOS Mojave应用程序副本已损坏”，这里要先断开虚拟机网络。之后选择实用工具中的终端，输入：date 122014102015.30，这样就调整了苹果系统的时间。之后选择退出终端。这样就可以安装了。
 ```
 
 

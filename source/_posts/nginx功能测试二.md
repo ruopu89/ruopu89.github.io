@@ -217,3 +217,26 @@ nginx -s reload
 * 到客户端访问www.ruopu.com/admin，这时显示的是Real Server 1，也就是web服务器上html中定义的内容，配置的意思就是，当访问admin时，就替换成web服务器根下的内容。当location中定义的是根时，这个斜线就没有意义了，因为访问的都是根
 ```
 
+
+
+### 设置上传大小
+
+```shell
+vim /etc/nginx/nginx.conf
+    http {
+        client_max_body_size 8M;
+        # 设置上传最大8M
+    }
+    
+# 下面设置php上传大小
+vim /etc/php5/fpm/php.ini
+;This sets the maximum amount of memory in bytes that a script is allowed to allocate
+memory_limit = 32M
+ 
+;The maximum size of an uploaded file.
+upload_max_filesize = 8M
+ 
+;Sets max size of post data allowed. This setting also affects file upload. To upload large files, this value must be larger than upload_max_filesize
+post_max_size = 16M
+```
+

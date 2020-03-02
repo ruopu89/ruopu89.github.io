@@ -23,13 +23,16 @@ categories: python
 def counter(base):
     def inc(step=1):
         nonlocal base
-# 这里因为base是自由变量，在inc函数中 base += step是在重新赋值，所以要加上nonlocal，让inc函数向上一级且不是global环境找base函数
+# 这里因为base是自由变量，指counter的形参。在inc函数中 base += step是在重新赋值，所以要加上
+# nonlocal，让inc函数向上一级且不是global环境找base函数
         base += step
         return base
     return inc
 
 foo = counter(10)
 foo1 = counter(10)
+print(foo())
+# 将counter(10)赋值给foo后，还是要加上括号才会显示foo的值，不然会显示函数的属性
 foo == foo1
 输出：
 False
@@ -38,7 +41,7 @@ False
 # 这都是因为调用 counter()之后，inc又赋值给了foo和foo1，foo和foo1变量实际不在这，所以看到foo和foo1
 # 的地址不一样。当第一次调用counter()时，counter会压栈，counter的参数也压栈，压栈后要创建一段栈帧，
 # 创建栈帧后，里面要创建临时对象。这个对象就是inc，inc要把它的函数体执行完才能把inc赋值给foo，因为执行
-# 完inc最后要return，那么return后，从return base以上就全部消失了，因为栈里要清空，之后就要以把函数
+# 完inc最后要return，那么return后，从return base以上就全部消失了，因为栈里要清空，之后就要把函数
 # 的return值赋给foo了。foo1的过程是一样的，但foo1是inc在堆里重新创建的对象，所以foo和foo1是两个完全
 # 不一样的对象。因为两个对象foo和foo1在堆中没有消亡，所以两个指向对象的函数inc在堆中也没有消亡。
 id(foo)
@@ -102,7 +105,7 @@ def sort(iterable,reverse=False):
 print(sort([1,2,5,4,2,3,5,6]))
 
 # sort函数实现。下面实现的什么排序？还能怎么改变
-def sort(iterable,key=kambda a,b:a>b):
+def sort(iterable,key=lambda a,b:a>b):
     ret = []
     for x in iterable:
         for i,y in enumerate(ret):

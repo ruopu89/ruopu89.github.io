@@ -45,6 +45,38 @@ categories: 基础
 
 
 
+#### 范围指定方法
+
+| 客户端指定方法 | 示例                      | 满足示例的客户端                 |
+| -------------- | ------------------------- | -------------------------------- |
+| IP指定单一主机 | 192.168.0.30              | 客户端IP地址为192.168.0.30       |
+| 指定网段       | 192.168.0.0/255.255.255.0 | 客户端所在网段为192.168.0.0      |
+| 指定网段       | 192.168.0.*               | 客户端所在网段为192.168.0.0      |
+| 指定网段       | 192.168.0.0/24            | 客户端所在网段为192.168.0.0      |
+| 域名单一主机   | nfs.example.com           | 客户端FQDN为nfs.example.com      |
+| 域名指定范围   | *.example.com             | 客户端FQDN的DNS后缀为example.com |
+| 所有主机       | *                         | 任何访问NFS服务器的客户端        |
+
+
+
+#### 挂载权限
+
+| 参数           | 说明                                                         |
+| -------------- | ------------------------------------------------------------ |
+| ro             | 设置共享为只读，这是默认选项                                 |
+| rw             | 设置共享为读写                                               |
+| root_squash    | 当源计算机（NFS客户端）当前用户是root时，将被映射为目标计算机（NFS服务器）匿名用户 |
+| no_root_squash | 当源计算机（NFS客户端）当前用户是root时，将被映射为目标计算机（NFS服务器）root用户 |
+| all_squash     | 将所有用户映射为目标计算机（NFS服务器）的匿名用户，这是NFS默认选项 |
+| anonuid        | 设置匿名用户的UID                                            |
+| anongid        | 设置匿名用户的GID                                            |
+| sync           | 保持数据同步，同时将数据写入内存和硬盘，这是默认选项         |
+| async          | 先将数据保存在内存，再回写入硬盘。这样可以提高效率，但有可能造成数据丢失 |
+| secure         | NFS客户端必须使用NFS保留端口（通过1024以下的端口），这是默认选项 |
+| insecure       | 允许NFS客户端不使用NFS保留端口（通过1024以上的端口）         |
+| wdelay         | 如果NFS服务器怀疑有另一个相关的写请求正在处理或马上就要达到，NFS服务器将延迟提交写请求到磁盘，这就允许使用一个操作提交多个写请求到磁盘，这样可以改善性能，这是默认选项 |
+| nowdelay       | 设置了async时该选项无效，NFS服务器将每次写操作写入磁盘       |
+
 
 
 ### 实例
@@ -77,7 +109,7 @@ Export list for 192.168.2.128:
 # -e表示顯示共享了哪些目錄，也可以選程主機上使用此命令查看某主機共享了哪些目錄
 
 =================
-   debian系统挂载
+  debian系统挂载
 =================
 ⚡ root@ruopu64  ~  apt install nfs-common
  # 安装包，如果不安装此包，挂载时会提示"mount: /mnt: bad option; for several filesystems (e.g. nfs, cifs) you might need a /sbin/mount.<type> helper program."。
@@ -120,7 +152,7 @@ exportfs -rav：不必重啓服務，重新導出
 
 ```shell
 ========
-   server
+ server
 ========
 [root@webdav ~]# useradd hadoop
 [root@webdav ~]# id hadoop
@@ -135,7 +167,7 @@ total 0
 -rw-rw-r-- 1 hadoop hadoop 0 Apr  3 16:24 a.hadoop
 
 ========
-   client
+ client
 ========
 [root@primary ~]# groupadd -g 1000 openstack
 [root@primary ~]# useradd -g 1000 -u 1000 openstack
@@ -147,7 +179,7 @@ total 0
 # 在客户端挂载NFS系统后，因为用户与组ID与服务器端一样，所以用户和组都变成了openstack
 
 ========
-   server
+ server
 ========
 [hadoop@webdav shared]$ exit
 logout
@@ -156,7 +188,7 @@ logout
 [root@webdav ~]# exportfs -ra
 
 ========
-   client
+ client
 ========
 [root@primary ~]# su - openstack
 [openstack@primary ~]$ cd /mnt
@@ -170,7 +202,7 @@ total 0
 -rw-rw-r-- 1 openstack openstack 0 Apr  3  2019 b.openstack
 
 ========
-   server
+ server
 ========
 [root@webdav ~]# ll /shared/
 总用量 0
@@ -178,7 +210,7 @@ total 0
 -rw-rw-r-- 1 hadoop hadoop 0 4月   3 16:41 b.openstack
 
 ========
-   client
+ client
 ========
 [openstack@primary mnt]$ exit
 logout
@@ -189,7 +221,7 @@ rm: 无法删除"/mnt/b.openstack": 权限不够
 
 
 ========
-   server
+ server
 ========
 [root@webdav ~]# vim /etc/exports
 /shared       192.168.2.0/24(rw,no_root_squash) 192.168.1.0/24(rw)
@@ -201,7 +233,7 @@ rm: 无法删除"/mnt/b.openstack": 权限不够
 [root@webdav ~]# exportfs -ra
 
 ========
-   client
+ client
 ========
 [root@primary ~]# umount /mnt
 [root@primary ~]# mount -t nfs 192.168.2.128:/shared /mnt

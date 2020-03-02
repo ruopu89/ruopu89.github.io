@@ -1,5 +1,5 @@
 ---
-title: 一篇文章彻底弄懂Base64编码原理(转)
+title: python基础学习-转：一篇文章彻底弄懂Base64编码原理
 date: 2019-11-21 08:16:13
 tags: Base64
 categories: python

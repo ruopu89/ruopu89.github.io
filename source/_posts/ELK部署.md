@@ -122,6 +122,7 @@ git clone git://github.com/mobz/elasticsearch-head.git
 yum install -y epel-release
 yum install npm -y
 cd elasticsearch-head/
+# 注意，再次启动监听9100端口时要到这个目录下执行npm run start &，不然会报错。
 npm install grunt -save
 # 这里可能会有报错"npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference"，需要安装openssl即可解决。
 npm install
@@ -175,6 +176,8 @@ The stdin plugin is now waiting for input:
 [INFO ] 2019-06-25 17:14:44.603 [Ruby-0-Thread-1: /usr/share/logstash/lib/bootstrap/environment.rb:6] agent - Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
 [INFO ] 2019-06-25 17:14:45.472 [Api Webserver] agent - Successfully started Logstash API endpoint {:port=>9600}
 # 这是一条使用标准输入输出的命令，上面是执行命令后的正常输出。有时会报错，不明白原因，可能是没有调动logstash，可能是没有设置JAVA_HOME环境变量，修改后一定重启logstash。
+# 再次测试时会提示找不到rydebug模块，无法加载。不清楚报错的原因。使用下面的配置文件是没有问题的。启动后
+# 会监听9600端口
     hello    # 输入hello后会有下面信息
     {
         "@timestamp" => 2019-01-24T08:47:22.515Z,    
@@ -200,7 +203,7 @@ vim /etc/logstash/conf.d/system.conf
         }
         # 输出到一个文件，用file引导，下面写明路径。
         elasticsearch {
-            hosts => ["192.168.1.20:9200"]    # 指定第一台logstash地址即可。
+            hosts => ["192.168.1.20:9200"]    # 指定第一台elaticsearch地址即可。
             index => "system-messages-%{+YYYY.MM.dd}"   # 索引的命名规则，后面加入日期
         }
         # 输出到elasticsearch，写明地址，索引的名称
@@ -311,7 +314,7 @@ vim /usr/local/nginx/conf/nginx.conf
 
 ![](/images/kibana/配置索引2.png)
 
-> 这后可以在Discover中看到我们添加的索引了，如果无法显示数据，可能是右上方的时间有误
+> 之后可以在Discover中看到我们添加的索引了，如果无法显示数据，可能是右上方的时间有误
 
 ![](/images/kibana/查看1.png)
 

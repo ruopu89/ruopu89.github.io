@@ -2,7 +2,7 @@
 title: kafka概念
 date: 2019-01-21 08:49:36
 tags: kafka概念
-categories: zookeeper&kafka
+categories: 消息队列
 ---
 
 ### 介紹
@@ -126,7 +126,7 @@ categories: zookeeper&kafka
 
 #### 性能
 
-> 需要考虑的影响性能点很多，除磁盘IO之外，我们还需要考虑网络IO，这直接关系到kafka的吞吐量问题。kafka并没有提供太多高超的技巧；对于producer端，可以将消息buffer起来，当消息的条数达到一定閾值时，批量发送给broker；对于consumer端也是一样，批量fetch多条消息。不过消息量的大小可以通过配置文件来指定。对于kafka broker端，似乎有个sendfile系统调用[^註釋]可以潜在的提升网络IO的性能。将文件的数据映射到系统内存中，socket直接读取相应的内存区域即可，而无需进程再次copy和交换。 其实对于producer/consumer/broker三者而言，CPU的开支应该都不大，因此启用消息压缩机制是一个良好的策略；压缩需要消耗少量的CPU资源，不过对于kafka而言，网络IO更应该需要考虑。可以将任何在网络上传输的消息都经过压缩。kafka支持gzip/snappy等多种压缩方式。
+> 需要考虑的影响性能点很多，除磁盘IO之外，我们还需要考虑网络IO，这直接关系到kafka的吞吐量问题。kafka并没有提供太多高超的技巧；对于producer端，可以将消息buffer起来，当消息的条数达到一定閾值时，批量发送给broker；对于consumer端也是一样，批量fetch多条消息。不过消息量的大小可以通过配置文件来指定。对于kafka broker端，似乎有个sendfile系统调用可以潜在的提升网络IO的性能。将文件的数据映射到系统内存中，socket直接读取相应的内存区域即可，而无需进程再次copy和交换。 其实对于producer/consumer/broker三者而言，CPU的开支应该都不大，因此启用消息压缩机制是一个良好的策略；压缩需要消耗少量的CPU资源，不过对于kafka而言，网络IO更应该需要考虑。可以将任何在网络上传输的消息都经过压缩。kafka支持gzip/snappy等多种压缩方式。
 
 
 

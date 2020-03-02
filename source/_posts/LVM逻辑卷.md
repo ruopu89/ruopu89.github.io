@@ -375,6 +375,9 @@ drwx------.  2 root root 16384 Oct  9 11:44 lost+found
 root@ruopu:~# lvextend -r -l +100%free /dev/ubuntu-vg/ubuntu-lv
 # 使用-r选项可以使扩容的空间当时生效，无需再使用resize2fs命令，使用-l表示指定逻辑卷的LE数，-L表示指定逻辑卷的大小，单位为“kKmMgGtT”字节。+100%free表示将所有空余空间都加进来，只能使用-l选项指定。
 root@ruopu:~# lvextend -r -L 19G /dev/ubuntu-vg/ubuntu-lv
+# 这是扩容到19G
+root@ruopu:~# lvresize -r -L +5G /dev/mapper/vg_centos-usr
+# 这是在现有基础上再扩容5G，如果原来是20G，那么扩容后就是25G
 ```
 
 ## 缩减
