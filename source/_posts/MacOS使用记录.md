@@ -1,8 +1,7 @@
 ---
-title: zookeeper问题解决
-date: 2019-05-24 23:13:29
-tags: zookeeper问题解决
-categories: 消息队列
-
+title: MacOS使用记录
+date: 2020-03-26 09:33:29
+tags: MacOS	
+categories: MacOS
 ---
 
