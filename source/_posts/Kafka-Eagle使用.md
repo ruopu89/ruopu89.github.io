@@ -23,23 +23,33 @@ cd /usr/local/
 ln -sv kafka-eagle-web-1.4.4/ kafka-eagle
 cd kafka-eagle
 vim conf/system-config.properties
-kafka.eagle.zk.cluster.alias=cluster1   # 多个集群用逗号分隔
-cluster1.zk.list=kafka1:2181,kafka2:2181,kafka3:2181  # zookeeper地址
-kafka.zk.limit.size=25
-kafka.eagle.webui.port=8048   # 监听端口
+kafka.eagle.zk.cluster.alias=cluster1,cluster2 # 集群别名，为下面配置使用。多个集群用逗号分隔
+cluster1.zk.list=dc-kafka01:2181,dc-kafka02:2181,dc-kafka03:2181 # zookeeper地址
+cluster2.zk.list=dc-control01:2181,dc-control02:2181,dc-control03:2181
+cluster1.kafka.eagle.broker.size=20
+cluster2.kafka.eagle.broker.size=20
+kafka.zk.limit.size=25  # 	Kafka Eagle Zookeeper客户端的最大连接数。
+kafka.eagle.webui.port=8048  # 监听端口
 cluster1.kafka.eagle.offset.storage=kafka
-kafka.eagle.metrics.charts=true
+cluster2.kafka.eagle.offset.storage=kafka
+# 这里如果是zk，表示存储在zookeeper中的Kafka偏移量。如果是kafka，表示存储在kafka主题中的Kafka偏移量。
+kafka.eagle.metrics.charts=true # 启用监控趋势图
 kafka.eagle.metrics.retain=30
 kafka.eagle.sql.topic.records.max=5000
 kafka.eagle.sql.fix.error=true
 kafka.eagle.topic.token=keadmin
+cluster1.kafka.eagle.sasl.enable=false
+cluster1.kafka.eagle.sasl.protocol=SASL_PLAINTEXT
+cluster1.kafka.eagle.sasl.mechanism=PLAIN
 cluster2.kafka.eagle.sasl.enable=false
 cluster2.kafka.eagle.sasl.protocol=SASL_PLAINTEXT
 cluster2.kafka.eagle.sasl.mechanism=PLAIN
+# 测试发现，可以不加集群的别名。直接使用kafka.eagle.sasl.enable，也就是去掉前面的别名，这样只写三行就可以了。
 kafka.eagle.driver=org.sqlite.JDBC
 kafka.eagle.url=jdbc:sqlite:/usr/local/kafka-eagle/db/ke.db
 kafka.eagle.username=root
 kafka.eagle.password=centos
+# 参考：https://blog.csdn.net/qq_33696779/article/details/88655560
 
 yum install -y java-1.8.0-openjdk-devel.x86_64 
 vim /etc/profile
@@ -69,3 +79,12 @@ chmod +x ke.sh
 
 ![](/images/kafka-eagle/大屏2.png)
 
+
+
+切换不同集群
+
+![](/images/kafka-eagle/集群切换.png)
+
+或者在首页的右上角也可以调整
+
+![](/images/kafka-eagle/集群切换2.png)

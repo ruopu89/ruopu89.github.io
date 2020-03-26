@@ -54,25 +54,38 @@ categories: 监控
 ## Server端
 
 ```shell
-=======================================================================================
+===================================================================================
 环境：
 系统：CentOS Linux release 7.4.1708 (Core)，地址：192.168.2.140，此次测试将Server端与agent端安装在同一台主机上。关闭防火墙与SELinux。
-=======================================================================================
+===================================================================================
 ------------------------------
    安装mariadb数据库
 ------------------------------
 [root@zabbix ~]# yum install mariadb-server
+# 也可以安装mysql5.7。
+# wget -i -c http://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm
+# yum -y install mysql57-community-release-el7-10.noarch.rpm
+# yum -y install mysql-community-server
 [root@zabbix ~]# vim /etc/my.cnf
 [mysqld]
 skip_name_resolve = ON
 innodb_file_per_table = ON
+# skip-grant-tables
+# 如果开始无法登录mysql，可以加入此行，这样就可以跳过密码验证使用mysql直接登录了
 [root@zabbix ~]# systemctl start mariadb.service
 [root@zabbix ~]# systemctl enable mariadb.service
 [root@zabbix ~]# mysql_secure_installation
 [root@zabbix ~]# mysql -uroot -pcentos
-MariaDB [(none)]> CREATE DATABASE zabbix CHARSET 'utf8';
+MariaDB [(none)]> create database zabbix character set utf8 collate utf8_bin;
+# zabbix4.4.6版本时要这样创建数据库，不然安装zabbix时无法通过
 MariaDB [(none)]> GRANT ALL ON zabbix.* TO 'zbxuser'@'%' IDENTIFIED BY 'zbxpass';
 MariaDB [(none)]> FLUSH PRIVILEGES;
+# 如果root用户没有权限给其他用户授权，可以使用
+# select host,user,grant_priv,Super_priv from mysql.user;来查询grant_priv是否为Y，
+# 如果不是，可以使用update mysql.user set grant_priv='Y' where host='localhost';改成Y，
+# 之后flush privileges;，之后就可以给其他用户授权了。如果执行grant all时提示密码强度不够，可以
+# 使用set global validate_password_policy=0;改变密码强度，
+# set global validate_password_length=4;可以改变密码长度，之后就可以用简单密码了。
 
 -----------------------------
    安装zabbix_server

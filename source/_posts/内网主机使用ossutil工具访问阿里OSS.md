@@ -93,14 +93,14 @@ if [ $? -eq 0 ];then
     done
     if [ $? -eq 0 ];then
         for j in `ls /xor/data2/bjos/current_upload/*`;do
-	    if [ `grep -c '.m3u8' $j` -gt 0 ];then 
-	    # grep的-c选项只统计匹配到的行数，这里如果大于0说明找到了内容
-			cp $j ${j}_ts
-			sed -i -e 's@.m3u8@@g' -e 's@_@/@g' ${j}_ts
-		# 内时匹配替换多个值
-	    fi
-	done
-	for w in `ls /xor/data2/bjos/current_upload/*`;do
+	    	if [ `grep -c '.m3u8' $j` -gt 0 ];then 
+	    	# grep的-c选项只统计匹配到的行数，这里如果大于0说明找到了内容
+				cp $j ${j}_ts
+				sed -i -e 's@.m3u8@@g' -e 's@_@/@g' ${j}_ts
+			# 匹配替换多个值
+	    	fi
+		done
+		for w in `ls /xor/data2/bjos/current_upload/*`;do
             while read line;do
                 /root/aliupload/ossutil64 cp -rfu -j 5 --loglevel info $line oss://bjy-edu$line
 # 直接使用ossutil64会有找不到命令的报错，但使用上并没有问题。也许是环境变量的问题，所以使用了绝对路径
@@ -122,10 +122,6 @@ if [ $? -eq 0 ];then
 else
     exit 1
 fi
-
-
-
-
 
 crontab -e
 1 */2 * * * /bin/bash /root/aliupload/filecheck.sh >>  /root/aliupload/upload.log 2&>1

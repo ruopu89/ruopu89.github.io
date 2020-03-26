@@ -1,5 +1,5 @@
 ---
-title: 'python基础学习-转：[翻译]理解Python的with语句'
+title: python基础学习-转：[翻译]理解Python的with语句
 date: 2020-01-02 09:06:50
 tags: python_with
 categories: python

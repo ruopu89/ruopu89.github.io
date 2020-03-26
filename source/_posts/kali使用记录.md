@@ -163,6 +163,21 @@ upgrade_oh_my_zsh
 
 
 
+#### FinalShell
+
+```shell
+# 一款远程连接工具
+wget www.hostbuf.com/downloads/finalshell_install_linux.sh
+chmod +x finalshell_install_linux.sh
+./finalshell_install_linux.sh
+安装路径
+/usr/lib/FinalShell/
+配置文件路径
+/home/$USER/.finalshell/
+```
+
+
+
 #### telegram
 
 ```shell
@@ -963,6 +978,20 @@ Upload: 34.47 Mbit/s
 
 
 
+#### docker安装远程迅雷下载
+
+```python
+docker pull yinheli/docker-thunder-xware   # 下载容器
+mkdir ~/thunder   # 创建一个下载目录
+cd ~
+docker run -d --name thunder --net=host -v $PWD/thunder:/app/TDOWNLOAD yinheli/docker-thunder-xware   # 运行容器
+docker logs thunder   
+# 查看绑定码，可能会报错，如果报错就使用docker restart thunder重启容器，或用stop和start也可以
+登录http://yuancheng.xunlei.com，登录后要先用帐号登录，之后输入绑定码。绑定后就可以在左上角的新建中创建下载任务了。但测试感觉效果不太好，经常无法连接到本地，需要本地重启迅雷容器
+```
+
+
+
 #### xfce4桌面
 
 ```shell
@@ -1002,6 +1031,79 @@ system-config-samba
 sudo touch /etc/libuser.conf
 # 手动添加这个配置文件
 # 参考：https://www.linuxidc.com/Linux/2018-01/150493.htm
+```
+
+
+
+#### 部署trojan
+
+```python
+# 服务端安装
+wget -N --no-check-certificate https://raw.githubusercontent.com/mark-logs-code-hub/trojan-wiz/master/ins.sh
+chmod +x ins.sh
+bash ins.sh
+# 部署BBR加速，需要使用root用户
+wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
+chmod +x tcp.sh
+./tcp.sh
+# 有多个版本，只试一下第三个锐速，其他两个没试
+还需要关闭firewalld和selinux。安装过加速软件后，还可以选择安装优化配置，这些都需要重启系统。另外安装过加速内核后，还要在重启系统后再运行脚本再运行加速软件，这是与内核对应的。如果是锐速加速，要打开80和443端口。如果是BBRPlus，加打开443端口。测试魔改版BBR效果最好，BBRPlus的效果比锐速要好一些。启动魔改版BBR软件时可以选择使用暴力BBR魔改版加速(不支持部分系统)，这里使用的是Centos7.7版本，BBR魔改版只需要打开443端口。aws的EC2主机需要打开安全组中的策略，否则无法连接或是创建新安全组。测试ubuntu16.04也可以。ubuntu18.04和centos8暂时不可以使用BBR魔改版加速
+==================================================================================
+#检查服务
+systemctl status trojan-gfw
+#开启服务
+systemctl start trojan-gfw
+#关闭服务
+systemctl stop trojan-gfw
+#查看client客户端配置文件
+cat /home/trojan/client.json
+#修改client客户端配置文件
+vi /etc/trojan/config.json
+==================================================================================
+下载/home/trojan目录下的ca-cert.pem、client.json到用户家目录。我这里放在了家目录中的trojanKEY中
+
+# ubuntu19.10客户端安装
+sudo add-apt-repository ppa:greaterfire/trojan
+sudo apt update
+sudo apt install trojan
+source ~/.zshrc
+trojan -c trojanKEY/client.json   
+# 服务监听127.0.0.1:1080端口。不用动json文件中的地址与密码。
+在chrome的SwitchyOmega中添加一条规则，使用SOCKS5代理到127.0.0.1:1080
+==================================================================================
+# windows客户端
+windows上使用trojan需要两个客户端，一个是trojan，一个是v2rayN
+v2rayN下载地址：https://github.com/2dust/v2rayN/releases/tag/3.8
+# 注意需要下载v2rayN-Core.zip，不要下载v2rayN.zip
+trojan下载地址：https://trojan-gfw.github.io/trojan/
+使用时，将json文件和key文件放置在trojan解压出的目录中，开启trojan。之后打开v2rayN，添加socks配置，127.0.0.1:1080即可。
+==================================================================================
+SwitchyOmega使用白名单地址，新建profile时选择“PAC profile”，之后点击下载即可，默认代理到127.0.0.1:1080。
+https://raw.githubusercontent.com/pexcn/daily/gh-pages/pac/whitelist.pac
+# 参考：https://juejin.im/pin/5b546961092dcb61bd7280e4
+```
+
+
+
+#### 免费Markdown编辑器
+
+```shell
+1. Typora
+2. Mark Text
+GitHub 项目地址：https://github.com/marktext/marktext/
+官方网站：https://marktext.app/
+3. VNote
+GitHub 项目地址：https://github.com/tamlok/vnote
+官方网站：https://tamlok.github.io/vnote
+4. Notable
+GitHub 项目地址：https://github.com/notable/notable
+官方网站：https://notable.md/
+5. Boostnote
+GitHub 项目地址：https://github.com/BoostIO/Boostnote
+官方网站：https://boostnote.io/
+6. Simplenote
+GitHub 项目地址，Windows、Linux 版：https://github.com/Automattic/simplenote-electron
+官网：https://simplenote.com/
 ```
 
 
@@ -1074,6 +1176,14 @@ echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
 sysctl -p 
 lsmod | grep bbr  #检查是否有tcp_bbr
+```
+
+
+
+#### Chrome浏览器开启多线程下载
+
+```shell
+打开"chrome://flags/#enable-parallel-downloading"，找到Parallel downloading，改成Enable
 ```
 
 
@@ -1769,35 +1879,28 @@ apt update
 
 
 
+#### 查看系统版本
 
+```shell
+# 查看内核版本
+root@xor-outlet1:~# uname -a
+Linux xor-outlet1 3.2.0-4-amd64 #1 SMP Debian 3.2.88-1 x86_64 GNU/Linux
 
+root@xor-outlet1:~# cat /proc/version 
+Linux version 3.2.0-4-amd64 (debian-kernel@lists.debian.org) (gcc version 4.6.3 (Debian 4.6.3-14) ) #1 SMP Debian 3.2.88-1
 
+# 查看系统版本
+root@xor-outlet1:~# lsb_release -a
+No LSB modules are available.
+Distributor ID:	Debian
+Description:	Debian GNU/Linux 7.11 (wheezy)
+Release:	7.11
+Codename:	wheezy
 
+root@xor-outlet1:~# cat /etc/issue
+Debian GNU/Linux 7 \n \l
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
@@ -2066,77 +2169,4 @@ sudo modprobe vboxdrv。当完成上面三步后，虚拟机可以启动了。
 
 
 
-#### VirtualBox虚拟机安装Ubuntu 16.04.3 LTS后安装增强功能
-
-```shell
-下载地址：http://download.virtualbox.org/virtualbox/6.0.14/
-下载内容：VBoxGuestAdditions_6.0.14.iso
-使用虚拟机加载此iso文件，之后在虚拟机中安装即可。windows比较简单，一直下一步即可。
-
-点击安装增强功能-->bash VBoxLinuxAdditions.run
-# 实际使用时先安装了autorun.sh，但没有效果。安装VBoxLinuxAdditions.run后需要重启。
-```
-
-
-
-#### VirtualBox安装MacOS方法
-
-```shell
-1. 创建MacOS虚拟机，自定义虚拟机名称为MacOS
-2. 在命令行执行
-VBoxManage modifyvm "MacOS" --cpuidset 00000001 000106e5 00100800 0098e3fd bfebfbff
-VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiSystemProduct" "iMac11,3"
-VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiSystemVersion" "1.0"
-VBoxManage setextradata "MacOS" "VBoxInternal/Devices/efi/0/Config/DmiBoardProduct" "Iloveapple"
-VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
-VBoxManage setextradata "MacOS" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRealSMC" 1
-# MacOS为虚拟机名。
-# VirtualBox原生支持Mac OS X的安装，但是只有在系统环境为Mac的环境下，才能正常引导，因为在非Mac环境下，安装程序会检测出我们的CPU不是已经识别的型号，从而拒绝进一步的安装。为此，我们需要执行以下命令来Hack
-# 如果VBoxManage没有被加入PATH的话，可能会提示VBoxManage不是可执行的命令。只需要进入VirtualBox的安装目录下Shift+右键在当前目录打开命令行执行即可~
-# 原理非常简单：利用VBox的命令行工具在虚拟机的DeviceKey中加入Apple的声明即可。
-
-*** 安装时先选择磁盘工具，选择显示所有设备，再将要安装的磁盘抹掉。之后安装可能会提示：“这个安装macOS Mojave应用程序副本已损坏”，这里要先断开虚拟机网络。之后选择实用工具中的终端，输入：date 122014102015.30，这样就调整了苹果系统的时间。之后选择退出终端。这样就可以安装了。
-```
-
-
-
-#### VirtualBox共享文件夹
-
-```shell
-因为使用apt安装的VirtualBox在安装增强功能时会有网络问题，无法下载安装，所以采用下载安装包的方法安装，另外，安装6.0版本时会有包依赖问题，所以使用了5.2.20版本
-下载地址：http://download.virtualbox.org/virtualbox/5.2.20/
-下载 Oracle_VM_VirtualBox_Extension_Pack-5.2.20-125813.vbox-extpack包，此为增强功能的包，virtualbox-5.2_5.2.20-125813~Ubuntu~bionic_amd64.deb为程序安装包
-安装好程序包后，打开页面左上解的管理，之后选择全局设定，在其中的扩展中选择添加刚才下载的增强功能包，之后就可以自动安装了。下面需要在已安装操作系统的页面上点击上方设备中的安装增强功能，之后就可以看到虚拟机操作系统中的光驱中挂载了光盘，打开安装后就可以使用VirtualBox的共享文件夹功能了。
-进入虚拟机后可以在网络中看到共享的文件夹。
-```
-
-
-
-#### VirtualBox虚拟机挂载宿主机U盘
-
-```shell
-1. 下载扩展插件，地址：http://download.virtualbox.org/virtualbox/5.2.32/。因为ubuntu18.04默认安装的是5.2.32版本所以下载这个插件Oracle_VM_VirtualBox_Extension_Pack-5.2.20-125813.vbox-extpack。
-# 6.0使用的插件：Oracle_VM_VirtualBox_Extension_Pack-6.0.0_RC1.vbox-extpack
-2. 到VirtualBox的全局设置中的扩展中加载这个插件
-3. 创建usbfs组
-sudo groupadd usbfs
-4. 将当前用户加入vboxusers和usbfs组。
-shouyu@shouyu-pc  ~  sudo vim /etc/group
-vboxusers:x:127:shouyu 
-usbfs:x:1001:shouyu 
-5. 打开虚拟机的设置，在系统中的芯片组选择ICH9，在USB设备中选择USB3.0控制器。启动虚拟机，如果是windows虚拟机，可以使用360驱动大师安装USB的驱动。这一步是必须做的。
-6. 关闭虚拟机与重启宿主机。
-7. 再次打开VirtualBox，启动虚拟机，插入U盘。会发现右下角的USB设置已经可以正常识别，勾选U盘的设备。
-```
-
-
-
-#### NAT模式下宿主机与虚拟机通讯
-
-```shell
-# 默认情况下，桥接方式支持虚拟机到主机、主机到虚拟机、虚拟机到其他主机、其他主机到虚拟机以及虚拟机之间的通讯。NAT方式只支持虚拟机到主机、虚拟机到其他主机的通讯。如果需要用宿主机与虚拟
-# 机通讯，就要配置Prot Forwarding。方法是在全局模式下找到Network，在其中创建一个虚拟网卡，之后在网卡中配置地址，如192.168.1.0/24，再点击Prot Forwarding，其中Host IP指宿主
-# 机的IP，Guest IP指虚拟机的IP，另外，端口要配置成宿主机与虚拟机都没有使用的端口
-# 这相当于VirtualBox只做了SNAT，但没有做DNAT
-```
-
+#### VirtualBox虚拟机安装Ubuntu 16.04.3 LTS后安装增强功
