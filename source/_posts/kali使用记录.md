@@ -163,6 +163,17 @@ upgrade_oh_my_zsh
 
 
 
+#### Typora
+
+```shell
+sudo add-apt-repository 'deb https://typora.io/linux ./'
+# 如果出现问题，提示没有公钥，可以使用：sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE解决，最后的一串大写字母是公钥，替换即可。
+sudo apt update
+sudo apt install typora
+```
+
+
+
 #### FinalShell
 
 ```shell
