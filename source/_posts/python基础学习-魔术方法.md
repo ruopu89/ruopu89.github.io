@@ -1833,6 +1833,167 @@ def __iter__(self):
     return iter(self.lst)
 ```
 
+上下文管理
+
+通过上下文管理，我们可以只管打开，其他的不用关心，python解释器会为我们做，python会做一些自动化操作。你这段代理的上文和下文就是上下文
+
+```python
+# with open ('test') as f:
+#    pass
+
+class Point:
+    def __init__(self):
+        print('init')
+        
+    def __enter__(self):   # 使用上下文管理__enter__方法也是必须的。这个方法是进去了帮我做的事情
+        print('enter'+self.__class__.__name__)
+        return self  # 在这个语境下应该返回self,这样p和f就一样了。__enter__方法最后return的应该是一个文件对象类型。open()方法返回的实例也应该有上下文，返回一个文件对象类型
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):  
+    # 在上下文中使用类实例化时会提示类中要有__exit__方法。这个方法是离开的时候帮忙做的事情
+    	print('Exit'+self.__class__.__name__)
+ #  __enter__和__exit__是实例的方法，没有实例也不会被调用
+		print(exc_type)   # 这一句会打印raise的类型
+    	print(exc_val)   # 这是异常类型的值 
+        print(exc_tb)   # 执行这三条语句时还是用raise。这一句会打印traceback。这三行只在抛异常时才会有，如果没有异常，会返回None
+        return 1  # 这里的return的返回值可以决定异常是否向外抛出，这里如果返回True，就是这个方法里面管，外面可以正常执行，不会看到异常。如果返回一个等效False的，就会把异常抛出去，在外面可以看到。
+    
+p = Point()
+import sys
+
+# with Point() as f:  # Point后面要有括号，不能直接使用。也就是类被实例化后才能使用
+with p as f:   # 这里会看实例p有没有__enter__，如果有就有会抛异常，然后请__enter__返回一个返回值，再把这个返回值给f,所以p和f是绝对不相等的
+   # raise Exception('Error') # 有了这个raise，下面的语句就执行不到了。添加这句后，还是会执行__exit__方法的。下面也会抛异常
+    sys.exit()  # 这句表示结束当前程序，使用这句，而不用上面的raise，还是会执行完__exit__结束
+    print(f == p)
+    print(f is p)
+# 这里会按Point类中定义的__enter__和__exit__方法做事情
+# 打开文件的时候叫文件对象，文件对象内一定实现了__enter__和__exit__方法，在__enter__时一定维护了一个文件对象，当离开with语句块时with语句块自动调用__exit__方法把资源彻底施放掉。一些预加载预处理的工作可以交给with来做
+	print(p)
+    print(f)
+    
+print('outer')
+输出：
+init
+<class '__main__.Point'>
+False
+False
+<__main__.Point object at 0x00000000000000847B8>
+None
+Point
+# 抛出的异常中的traceback是追踪在堆栈中的执行过程,traceback打印的就是红色部分的内容，它在堆栈上追踪了整个异常调度过程，它也会显示异常抛出的内容，在第几行出了问题
+```
+
+练习
+
+为加法函数计时
+
+1. 使用装饰器显示该函数的执行时长
+2. 使用上下文管理显示该函数的执行时长
+
+```python
+import datetime
+def magedu(fn):
+    def wapper(*args, **kwargs):
+        time_start = datetime.datetime.now()
+        ret = fn(*args, **kwargs)
+        print(time_start - datetime.datetime.now())
+        return ret
+    return wapper
+@magedu # add = magedu(add)
+def add(x, y):
+    return x + y
+
+print(add(40, 50)
+============================================================
+import time
+import datetime
+      
+class TimeIt:
+	def __enter__(self):
+        print('enter')
+        self.start = datetime.datetime.now()
+        return self
+      
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print('exit')
+        delta = (datetime.datetime.now() - self.start).total_seconds()
+        print(delta)
+        return 
+
+def add(x, y):
+    time.sleep(2)
+    return x + y
+
+with TimeIt() as f:
+	add(5, 6)
+============================================================
+import time
+import datetime
+from functools import wraps      
+      
+class TimeIt:
+    def __init__(self, fn):
+        self._fn = fn
+        # self.__doc__ = self._fn.__doc__
+        # self.__name__ = self._fn.__name__
+        # 加上这两条就可以调用add的doc和name方法了
+        wraps(fn)(self)  # 这一句就是上面的两句
+      
+	def __enter__(self):
+        print('enter')
+        self.start = datetime.datetime.now()
+        # return self
+        return self._fn
+# 如果下面要使用with TimeIt(add) as foo这种方式，返回self是不行的，需要返回self._fn，这等于在初始化时送进去的是什么，这里就返回什么
+      
+    def __call__(self, *args, **kwargs):
+        print('__call__')
+       #  return self._fn(*args, **kwargs)
+# 如果要在上下文中使用self()这种方式，可以这样写。要什么就送回去什么
+        start = datetime.datetime.now()
+        ret = self._fn(*args, **kwargs)
+        delta = (datetime.datetime.now() - start).total_seconds()
+        print("dec {} took {}".format(self._fn.__name__, delta)
+        return ret
+      
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print('exit')
+        delta = (datetime.datetime.now() - self.start).total_seconds()
+        print("context {} took {}".format(self._fn.__name__, delta))
+        return 
+      
+def logger(fn):
+    @wraps(fn)  # a = wraps(fn)  ;  a(wrapper)  ;  @a
+              #     @wraps(fn)(wrapper)，源是fn，目标是wrapper
+    def wrapper(*args, **kwargs):
+        start = datetime.datetime.now()
+        ret = fn(*args, **kwargs)
+        delta = (datetime.datetime.now() - start).total_seconds()
+        print("dec {} took {}".format(fn.__name__, delta)
+        return ret
+    return wrapper
+
+# @logger
+@TimeIt   # 这样使用类装饰器，这样就不需要函数装饰器了。类装饰器需要__call__方法，它可以把一个东西模拟成一个函数，像函数一样调用
+def add(x, y):  # add = TimeIt(add)
+    time.sleep(2)
+    return x + y
+              
+print(add(10, 11))
+              
+print(add.__doc__)  # add现在已经被包装成一个可调用对象，这个对象是就是TimeIt的实例，实例调用__name__是调不出来的
+print(add.__name__)
+print(add.__dict__)  
+print(type(add))
+              
+with TimeIt(add) as f:  # 这里的add是装饰器装饰过的
+	add(5, 6)
+              
+with TimeIt(add) as foo:
+	foo(5, 6)
+```
+
 
 
 

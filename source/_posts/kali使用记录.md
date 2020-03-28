@@ -1623,6 +1623,19 @@ tmpfs                         7.8G     0  7.8G    0% /sys/fs/cgroup
 
 
 
+#### 合上笔记本盖不挂起方法
+
+```shell
+vim /etc/systemd/logind.conf
+#HandleLidSwitch=suspend
+HandleLidSwitch=ignore
+# 将注释行改成上面这样
+systemctl restart systemd-logind
+# 重启后会退出到登录页面
+```
+
+
+
 ### 命令使用
 
 #### apt使用
