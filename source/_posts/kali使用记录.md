@@ -2104,6 +2104,16 @@ google-chrome --no-sandbox
 
 
 
+#### 无法添加软件源
+
+```shell
+使用add-apt-repository时提示" The following signatures couldn't be verified because the public key is not available: NO_PUBKEY BA300B7755AFCFAE"，解决方法如下：
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
+# 如果有多个，把最后的key更换即可继续操作
+```
+
+
+
 ### VMWare
 
 #### VMWare问题解决
