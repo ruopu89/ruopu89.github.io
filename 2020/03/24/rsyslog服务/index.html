@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="介绍Linux日志机制的核心是rsyslog守护进程，该服务负责监听Linux下的日志信息，并把日志信息追加到对应的日志文件中，一般在/var/log目录下。它还可以把日志信息通过网络协议发送到另一台Linux服务器上。 rsyslog的主程序为rsyslogd，配置文件路径为 /etc/rsyslog.conf，服务脚本/etc/rc.d/init.d/rsyslog rsyslog的特性包括：">
+<meta name="keywords" content="log">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rsyslog服务">
+<meta property="og:url" content="http://yoursite.com/2020/03/24/rsyslog服务/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="介绍Linux日志机制的核心是rsyslog守护进程，该服务负责监听Linux下的日志信息，并把日志信息追加到对应的日志文件中，一般在/var/log目录下。它还可以把日志信息通过网络协议发送到另一台Linux服务器上。 rsyslog的主程序为rsyslogd，配置文件路径为 /etc/rsyslog.conf，服务脚本/etc/rc.d/init.d/rsyslog rsyslog的特性包括：">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-03-25T09:21:51.708Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rsyslog服务">
+<meta name="twitter:description" content="介绍Linux日志机制的核心是rsyslog守护进程，该服务负责监听Linux下的日志信息，并把日志信息追加到对应的日志文件中，一般在/var/log目录下。它还可以把日志信息通过网络协议发送到另一台Linux服务器上。 rsyslog的主程序为rsyslogd，配置文件路径为 /etc/rsyslog.conf，服务脚本/etc/rc.d/init.d/rsyslog rsyslog的特性包括：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/24/rsyslog服务/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>rsyslog服务 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/24/rsyslog服务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">rsyslog服务
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-03-24 17:31:29" itemprop="dateCreated datePublished" datetime="2020-03-24T17:31:29+08:00">2020-03-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-03-25 17:21:51" itemprop="dateModified" datetime="2020-03-25T17:21:51+08:00">2020-03-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/rsyslog/" itemprop="url" rel="index"><span itemprop="name">rsyslog</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>Linux日志机制的核心是<a href="http://www.rsyslog.com/" target="_blank" rel="noopener">rsyslog</a>守护进程，该服务负责监听Linux下的日志信息，并把日志信息追加到对应的日志文件中，一般在/var/log目录下。它还可以把日志信息通过网络协议发送到另一台Linux服务器上。</p>
+<p>rsyslog的主程序为rsyslogd，配置文件路径为 /etc/rsyslog.conf，服务脚本/etc/rc.d/init.d/rsyslog</p>
+<p>rsyslog的特性包括：</p>
+<ul>
+<li>多线程；</li>
+<li>支持UDP，TCP，SSL，TLS，RELP；</li>
+<li>支持使用MySQL，PGSQL，Oralce实现日志存储；</li>
+<li>强大的过滤器，可实现过滤日志信息中任何部分</li>
+<li>自定义输出格式</li>
+</ul>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### MODULES ####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> The imjournal module bellow is now used as a message <span class="built_in">source</span> instead of imuxsock.</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imuxsock <span class="comment"># provides support for local system logging (e.g. via logger command)</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imjournal <span class="comment"># provides access to the systemd journal</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="variable">$ModLoad</span> imklog <span class="comment"># reads kernel messages (the same are read from journald)</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="variable">$ModLoad</span> immark  <span class="comment"># provides --MARK-- message capability</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Provides UDP syslog reception</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imudp</span></span><br><span class="line"><span class="meta">$</span><span class="bash">UDPServerRun 514</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Provides TCP syslog reception</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imtcp</span></span><br><span class="line"><span class="meta">$</span><span class="bash">InputTCPServerRun 514</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果需要将rsyslog配置成服务，需要打开udp或tcp的模块加载与监听端口，也可以全部打开。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### GLOBAL DIRECTIVES ####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Where to place auxiliary files</span></span><br><span class="line"><span class="meta">$</span><span class="bash">WorkDirectory /var/lib/rsyslog</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Use default timestamp format</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> File syncing capability is disabled by default. This feature is usually not required,</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> not useful and an extreme performance hit</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="variable">$ActionFileEnableSync</span> on</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Include all config files <span class="keyword">in</span> /etc/rsyslog.d/</span></span><br><span class="line"><span class="meta">$</span><span class="bash">IncludeConfig /etc/rsyslog.d/*.conf</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Turn off message reception via <span class="built_in">local</span> <span class="built_in">log</span> socket;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">local</span> messages are retrieved through imjournal now.</span></span><br><span class="line"><span class="meta">$</span><span class="bash">OmitLocalLogging on</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> File to store the position <span class="keyword">in</span> the journal</span></span><br><span class="line"><span class="meta">$</span><span class="bash">IMJournalStateFile imjournal.state</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### RULES ####</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Log all kernel messages to the console.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Logging much <span class="keyword">else</span> clutters up the screen.</span></span><br><span class="line"><span class="meta">#</span><span class="bash">kern.*                                                 /dev/console</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Log anything (except mail) of level info or higher.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Don<span class="string">'t log private authentication messages!</span></span></span><br><span class="line">*.info;mail.none;authpriv.none;cron.none                /var/log/messages</span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有facility的info级别，但不包括mail;authpriv;cron，因为这三个facility的级别是none</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> The authpriv file has restricted access.</span></span><br><span class="line">authpriv.*                                              /var/log/secure</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Log all the mail messages <span class="keyword">in</span> one place.</span></span><br><span class="line">mail.*                                                  -/var/log/maillog</span><br><span class="line"><span class="meta">#</span><span class="bash"> Log cron stuff</span></span><br><span class="line">cron.*                                                  /var/log/cron</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Everybody gets emergency messages</span></span><br><span class="line">*.emerg                                                 :omusrmsg:*</span><br><span class="line"><span class="meta">#</span><span class="bash"> :omusrmsg:*表示将所有emerg级别的日志通知给所有登录用户</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Save news errors of level crit and higher <span class="keyword">in</span> a special file.</span></span><br><span class="line">uucp,news.crit                                          /var/log/spooler</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这表示uucp.crit和news.crit，因为都是crit级别，所以前面将facility写在一起用逗号分隔</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Save boot messages also to boot.log</span></span><br><span class="line">local7.*                                                /var/log/boot.log</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件共分为三段，第一段MODULES是加载模块的， 第二段GLOBAL DIRECTIVES是全局配置，第三段RULES是针对具体的设置与级别将日志保存到哪里。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 第三段RULES的配置格式为：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> facility.priority   target</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 其中facility表示设施，是日志生成器，或叫日志收集管道，它从功能或程序上对日志进行分类，包括：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> auth, authpriv, cron, daemon, kern, lpr, mail, mark, news, security, user, uucp, </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> local0-local7, syslog。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> priority表示日志级别，包括：debug, info, notice, warn(warning), err(error),  </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> crit(critical), alert, emerg(要死了, panic)。指定级别方法：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> *：所有级别；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> none：没有级别，不记录；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> priority：此级别及更高级别的日志信息都记录；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> =priority：此级别。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> target表示保存的路径，指定方法有：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 文件路径：记录于指定的日志文件中，通常应该在/var/<span class="built_in">log</span>/目录下。文件路径前的<span class="string">"-"</span>表示异步写入；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 用户：将日志通知给指定用户；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> *：所有用户；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 日志服务器：@host；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> host：必须要监听在tcp或udp协议514端口上提供服务；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 管道： |COMMAND</span></span><br><span class="line"></span><br><span class="line">dmesg</span><br><span class="line">cat /var/log/dmesg</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这两条命令是一样的，查看系统启动时的日志。dmesg是一个显示内核缓冲区系统控制信息的工具</span></span><br></pre></td></tr></table></figure>
+<h3 id="日志格式"><a href="#日志格式" class="headerlink" title="日志格式"></a>日志格式</h3><p>文件记录时日志的格式：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Mar 25 09:11:26 localhost sshd[15000]: Accepted password for root from 192.168.1.17 port 55624 ssh2</span><br><span class="line">Mar 25 09:11:28 localhost sshd[15000]: error: no more sessions</span><br><span class="line">Mar 25 09:11:28 localhost sshd[15000]: error: no more sessions</span><br></pre></td></tr></table></figure>
+<p>事件产生的日期时间    主机    进程（pid）：事件内容</p>
+<p>有些日志记录二进制格式，如/var/log/wtmp, /var/log/btmp</p>
+<p>/var/log/wtmp：当前系统上成功登录的日志；查看方法：last</p>
+<p>/var/log/btmp：当前系统上失败的登录尝试；查看方法：lastb        </p>
+<p>lastlog命令：显示当前系统每一个用户最近一次的登录时间</p>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><h4 id="配置sshd日志输出"><a href="#配置sshd日志输出" class="headerlink" title="配置sshd日志输出"></a>配置sshd日志输出</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/ssh/sshd_config </span><br><span class="line"><span class="meta">#</span><span class="bash">SyslogFacility AUTHPRIV</span></span><br><span class="line">SyslogFacility local2</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注释上面一条，添加下面一条，自定义日志级别为local2</span></span><br><span class="line">systemctl restart sshd</span><br><span class="line"></span><br><span class="line">vim /etc/rsyslog.conf </span><br><span class="line">local2.*                                     /var/log/sshd.log</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在第三段配置上添加</span></span><br><span class="line">systemctl restart rsyslog</span><br><span class="line"></span><br><span class="line">再次登录，之后就可以查看到日志了</span><br><span class="line">cat /var/log/sshd.log </span><br><span class="line">Mar 25 09:11:26 localhost sshd[15000]: Accepted password for root from 192.168.1.17 port 55624 ssh2</span><br><span class="line">Mar 25 09:11:28 localhost sshd[15000]: error: no more sessions</span><br><span class="line">Mar 25 09:11:28 localhost sshd[15000]: error: no more sessions</span><br></pre></td></tr></table></figure>
+<h4 id="配置rsyslog服务"><a href="#配置rsyslog服务" class="headerlink" title="配置rsyslog服务"></a>配置rsyslog服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/rsyslog.conf </span><br><span class="line"><span class="meta">#</span><span class="bash"> Provides UDP syslog reception</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imudp</span></span><br><span class="line"><span class="meta">$</span><span class="bash">UDPServerRun 514</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Provides TCP syslog reception</span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad imtcp</span></span><br><span class="line"><span class="meta">$</span><span class="bash">InputTCPServerRun 514</span></span><br><span class="line">systemctl restart rsyslog</span><br><span class="line">ss -tlun</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 换另一台主机</span></span><br><span class="line">vim /etc/rsyslog.conf</span><br><span class="line">*.info;mail.none;authpriv.none;cron.none         @192.168.1.8</span><br><span class="line">systemctl restart rsyslog</span><br><span class="line">在这台主机上运行yum安装一个软件包，再到192.168.1.8的主机上看一下messages日志中是否有记录</span><br></pre></td></tr></table></figure>
+<h4 id="将日志保存到mysql中并安装一个日志展示工具"><a href="#将日志保存到mysql中并安装一个日志展示工具" class="headerlink" title="将日志保存到mysql中并安装一个日志展示工具"></a>将日志保存到mysql中并安装一个日志展示工具</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">wget -i -c http://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm</span><br><span class="line">yum -y install mysql57-community-release-el7-10.noarch.rpm</span><br><span class="line">yum -y install mysql-community-server</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装mysql5.7</span></span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">skip_name_resolve = ON</span><br><span class="line">innodb_file_per_table = ON</span><br><span class="line">systemctl start mysqld</span><br><span class="line">yum install rsyslog-mysql </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是rsyslog连接mysql时用的驱动</span></span><br><span class="line">less /usr/share/doc/rsyslog-mysql-5.8.10/createDB.sql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这是安装rsyslog-mysql后生成的，查看一下这个sql脚本中要在mysql中创建的数据库名称是什么</span></span><br><span class="line">mysql -uroot -p</span><br><span class="line">GRANT ALL ON Syslog.* TO 'syslog'@'192.168.%.%' IDENTIFIED BY 'syslogpass';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一个授权，Syslog是上面查看到的数据库名称</span></span><br><span class="line">FLUSH PRIVILEGES；</span><br><span class="line">mysql -usyslog -psyslogpass -h192.168.1.8</span><br><span class="line">mysql -usyslog -h192.168.1.8 -p &lt; /usr/share/doc/rsyslog-mysql-5.8.10/createDB.sql</span><br><span class="line"><span class="meta">#</span><span class="bash"> 导入数据库</span></span><br><span class="line">mysql -usyslog -psyslogpass -h192.168.1.8</span><br><span class="line">SHOW DATABASES;</span><br><span class="line">USE Syslog</span><br><span class="line">SHOW TABLES;</span><br><span class="line">vim /etc/rsyslog.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">###### MODULES #######</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash">ModLoad ommysql   <span class="comment"># 表示加载模块。om表示输出，im表示输入</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在第一段配置中加入这句</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">####### RULES ###########</span></span></span><br><span class="line">*.info;mail.none;authpriv.none;cron.none     :ommysql:192.168.1.8,Syslog,syslog,syslogpass</span><br><span class="line"><span class="meta">#</span><span class="bash"> 后面的target表示，使用ommysql这个模块或发往ommysql这个输出过滤器，之后是mysql的地址，再之后是</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数据库名称，以哪个用户名连接，连接的密码是什么</span></span><br><span class="line">systemctl restart rsyslog</span><br><span class="line">再次使用yum安装一个程序包测试，再看mysql中是否有记录</span><br><span class="line"></span><br><span class="line">mysql -uroot -p</span><br><span class="line">SELECT COUNT(*) FROM SystemEvents;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有三条记录</span></span><br><span class="line">SELECT COUNT(*) FROM SystemEventsProperties;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里没有记录</span></span><br><span class="line">SELECT * FROM SystemEvents\G</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下面安装展示工具loganalyzer</span></span><br><span class="line">yum install httpd php php-mysql php-gd</span><br><span class="line"><span class="meta">#</span><span class="bash"> php-gd是一个绘图的工具</span></span><br><span class="line">vim /var/www/html/index.php   # 编写一个php文件，测试是否连接远程mysql</span><br><span class="line">&lt;?php</span><br><span class="line"><span class="meta">	$</span><span class="bash">conn = mysql_connect(<span class="string">'192.168.1.8'</span>,<span class="string">'syslog'</span>,<span class="string">'syslogpass'</span>);</span></span><br><span class="line">	if ($conn)</span><br><span class="line">		echo "OK";</span><br><span class="line">	else</span><br><span class="line">		echo "Failure";</span><br><span class="line">?&gt;</span><br><span class="line">systemctl start httpd</span><br><span class="line">访问192.168.1.8</span><br><span class="line">下载loganalyzer-3.6.5.tar.gz</span><br><span class="line">tar xf loganalyzer-3.6.5.tar.gz</span><br><span class="line">cp /loganalyzer-3.6.5/src /var/www/html/loganalyzer</span><br><span class="line"><span class="meta">#</span><span class="bash"> 我们主要使用src目录中的文件</span></span><br><span class="line">cp /loganalyzer-3.6.5/contrib/* /var/www/html/loganalyzer</span><br><span class="line"><span class="meta">#</span><span class="bash"> contrib目录下的脚本也需要</span></span><br><span class="line">cd /var/www/html/loganalyzer</span><br><span class="line">chmod +x *.sh</span><br><span class="line">./configure.sh</span><br><span class="line">./secure.sh</span><br><span class="line">chmod 666 config.php   # 如果没有此文件，使用此命令也会创建这个文件</span><br><span class="line">访问192.168.1.8/loganalyzer/install.php，进入安装，在第七步时要选择Source Type，选择MYSQL Native，之后输出数据库的信息</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/log/" rel="tag"># log</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/11/nginx日志记录请求响应时间/" rel="next" title="nginx日志记录请求响应时间">
+                <i class="fa fa-chevron-left"></i> nginx日志记录请求响应时间
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/26/MacOS使用记录/" rel="prev" title="MacOS使用记录">
+                MacOS使用记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">222</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">165</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件"><span class="nav-number">2.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志格式"><span class="nav-number">3.</span> <span class="nav-text">日志格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举例"><span class="nav-number">4.</span> <span class="nav-text">举例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置sshd日志输出"><span class="nav-number">4.1.</span> <span class="nav-text">配置sshd日志输出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置rsyslog服务"><span class="nav-number">4.2.</span> <span class="nav-text">配置rsyslog服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将日志保存到mysql中并安装一个日志展示工具"><span class="nav-number">4.3.</span> <span class="nav-text">将日志保存到mysql中并安装一个日志展示工具</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
