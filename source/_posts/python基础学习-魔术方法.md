@@ -1994,6 +1994,204 @@ with TimeIt(add) as foo:
 	foo(5, 6)
 ```
 
+contextlib.contextmanager
+
+yield返回单值，如yield x,y就是返回单值，x,y也是单值，是被封装后的单值
+
+```python
+import contextlib
+
+@contextlib.contextmanager
+def foo():
+    print('enter')  # 这只是类似__enter__()，但并不是，只是模拟
+    yield 3,5  # 这样会输出一个元组
+    print('exit')
+    
+with foo() as f:
+    try:
+    	raise Exception
+    # 加入raise后，上面的foo函数是执行不到yield的
+    finally:
+        print('exit')   # 如果要执行到这句，就要用这种方式
+    print(f)
+输出
+enter
+None
+exit
+# 输出把None加在了中间。foo函数生成器拿到后第一次做next()的话，执行到
+# yield就停了，print('exit')不会被打印，做第二次next()时才会打印，然后
+# 整个函数就return了，也就是print('exit')后面相当于有一句return，只是没
+# 写出来。try是核心逻辑，finally是要做的清理工作。
+```
+
+total_ordering
+
+```python
+from functools import total_ordering
+# 这个方法可以做所有的比较，这是一个装饰器。但一定要定义eq方法，其他的要使用
+# 一个一般用lt方法
+@total_ordering
+class A:
+    def __init__(self, x):
+        self.x = x
+    
+    def __lt__(self, other):
+        return self. < other.x
+    
+    def __eq__(self, other):
+        return self.x == other.x
+    
+print(A(5) >= A(6))
+print(A(5) > A(6))
+print(A(5) <= A(6))
+print(A(5) == A(6))
+```
+
+反射
+
+理解反射先要理解什么是编译时什么是运行时，python是动态语言，更多的表现是在运行时，运行时指解释器加载代码后是什么状态，它更多的在意在执行的过程中是什么情况，执行过程中就是加载到内存中了。
+
+反射指在运行时，它能够通过对象找到对象相关的类型信息，类型信息指我是什么类型，我有什么属性，因为有些类型在方法上，所以就要在运行时在类上找到他类型相关的所有信息。找信息与反射的关系是从它自身反射出了它的所有类型信息，这个过程就叫反射，通过这种机制，就可以在运行时掌握所有类型信息。一个对象可以在运行时反射出自己与类型相关的所有信息，这就是反射机制。反射也称为自省
+
+```python
+class A():
+    def __init__(self):
+        self.x = 5
+
+a = A()
+setattr(A, 'y', 10)   # 给A类加一个y属性，值是10。属性必须是字符串，下面打印类的属性就可以看到了。这与实例无关
+print(A.__dict__)
+print(a.__dict__)
+print(getattr(a, 'x'))  # 使用getattr方法取a实例的x属性的值
+print(getattr(a, 'y'))  # 这样可以取到类上的属性值，这也是先找自己的dict，如果没有就找父类的dict
+print(getattr(a, 'y', 100))  # 这样是找不到的，所以给了一个缺省值100
+if hasattr(a, 'z'):
+    print(getattr(a, 'z'))
+    
+setattr(a, 'y', 1000)   # 这相当于给a.y赋值，会覆盖上面的setattr(A, 'y', 10) 
+print(A.__dict__)  # 查找顺序还是自己优先，然后是父类，之后是祖先类
+print(a.__dict__)
+print(getattr(a, 'y'))
+print(getattr(A, 'y'))
+
+setattr(a, 'mtd', lambda self: 1)  # mtd属性是加到实例上了
+print(A.__dict__)
+print(a.__dict__)
+a.mtd()  # 这里会显示mtd有问题，因为是编译时加进去的，所以不用管。这样当执行到mtd时会去找lambda函数，之后返回1。这看似没有问题，但执行时会提示缺少self，没有把实例放到第一个参数上。如果把上面改成setattr(A, 'mtd', lambda self: 1)就没问题了，但这是把属性加到类上了。在类里定义会和实例绑定
+方法可以放在实例上，只是定义时没法写进去，因为定义时还没有实例，但运行时实例就可以存在，这样就可以在实例的字典里写上key和value，只是没有绑定。推荐加到类上。上面如果不想报错，又添加到实例上，可以写成a.mtd(a)
+```
+
+在运行时需要添加属性，就需要上面的方法了。装饰器和Mixin是在编译期要定义好的，不能动态改变
+
+练习
+
+命令分发器
+
+```python
+def dispatcher():
+    cmds = {}
+    def reg(cmd, fn):
+        if isinstance(cmd, str):
+        	cmds[cmd] = fn
+        else:
+            print('error')
+    
+    def run():
+        while True:
+        	cmd = input("plz input command: ")
+            if cmd.strip() == 'quit':
+                return
+            cmds.get(cmd.strip(), defaultfn)()
+    
+    def defaultfn():
+        pass
+    
+    return reg, run
+
+reg,run = dispatcher()
+reg('cmd1', lambda : 1)
+reg('cmd2', lambda : 2)
+
+run()
+=================================================================================================
+把上面的分发器函数改成类
+class dispatcher():
+    def cmd1(self):
+        print('cmd1')
+        
+    def reg(self, cmd, fn):
+        if isinstance(cmd, str):
+            setattr(type(self), cmd, fn)
+        else:
+            print('error')
+            
+    def run(self):
+        while True:
+            cmd = input("plz input command: ")
+            if cmd.strip() == 'quit':
+                return
+            getattr(self, cmd.strip(), self.defaultfn)()
+            
+    def defaultfn(self):
+        print('default')
+        
+dis = dispatcher()
+
+dis.reg('cmd2', lambda self: print(2))
+dis.reg('cmd3', lambda self: print(3))
+
+dis.run()
+```
+
+反射相关的魔术方法
+
+```python
+class A:
+    def __init__(self, x):
+        self.x = x
+        
+    def __getattr__(self, item):
+        print('__getattr__', item)
+        
+print(A(10).x)
+print(A(10).y)
+=================================================================================================
+class Base:
+    n = 5
+    
+class A(Base):
+    m = 6
+    def __init__(self, x):
+        self.x = x
+        
+    def __getattr__(self, item):
+        print('__getattr__', item)
+        # self.__dict__[item]  = # 找不到给一个缺省值 
+        
+    def __setattr__(self, key, value):
+        print(key, value)
+# 当设置一个属性的时候，这个setattr方法是一定会被触发的，但是究竟放不放到里面去就是我们的事了   
+
+    def __delattr__(self, item):
+        print('delattr')   # 删除实例属性
+# setattr和delattr是不论是否找到了属性，就会被触发。getattr是如果找到了并且定义了才会被触发，不然即使找到也不会触发。      
+a = A(10)
+a.x = 100
+a.m = 200
+print(a.__dict__)
+print(A.__dict__)
+a.y
+a.z
+a.m
+a.n  # 这是测试__getattr__方法
+del a.x
+del a.m  # 通过实例可以访问到的属性都可以删除
+```
+
+
+
+
+
 
 
 

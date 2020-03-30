@@ -212,7 +212,9 @@ https://desktop.telegram.org/
 apt install -y tilix
 # 一款不错的linux终端仿真器
 下载配色方案，https://www.ctolib.com/Gogh.html，这里提供了一个配色方法，大根提供进200种方案，如果选择ALL，表示全部安装，或只输入要安装的方案的编号即可。如果安装全部，可能会比较慢。在https://mayccoll.github.io/Gogh/中有配色方案的样例。
+sudo apt-get install dconf-cli uuid-runtime
 bash -c  "$(wget -qO- https://git.io/vQgMr)"
+bash -c  "$(curl -sLo- https://git.io/vQgMr)"
 # 运行此命令即可安装配色方案。个人比较喜欢Mona Lisa这个方案，还有google的，github的，方
 # 案号有04，05，07，12，51，53，54，56，90，172
 apt install dconf-cli
@@ -243,6 +245,15 @@ Supported terminals:
    mate-terminal
    gnome-terminal
    tili
+```
+
+
+
+#### 安装nord-tilix配色方案
+
+```shell
+到github.com/arcticicestudio/nord-tilix/releases下载方案
+解压nord.zip，执行里面的install.sh。之后就可以在tilix的设置中找到这个配色了。也可以使用上面的方案安装
 ```
 
 
@@ -389,6 +400,20 @@ fi
 6. .tmux.conf的配置，未测试
 source /usr/local/lib/python2.7/dist-packages/powerline/bindings/tmux/powerline.conf
 set-option -g default-terminal "screen-256color"
+```
+
+
+
+#### 安装nord-tmux主题
+
+```shell
+git clone https://github.com/arcticicestudio/nord-tmux.git
+mkdir -pv ~/.tmux/themes
+mv nord-tmux ~/.tmux/themes
+vim ~/.tmux.conf
+run-shell "~/.tmux/themes/nord-tmux/nord.tmux"
+tmux source-file ~/.tmux.conf
+# 重新加载，之后可以看到nord的颜色效果
 ```
 
 
