@@ -132,6 +132,24 @@ DISABLE_UPDATE_PROMPT=true
 # 自动更新oh-my-zsh
 ```
 
+6. 安装pyenv
+
+```shell
+brew install pyenv
+brew install pyenv-virtualenv
+pyenv install -l
+pyenv install 3.8.2 -v
+# 如果因为解析不了www.python.org安装失败，可以将DNS地址改为8.8.8.8。如果还是解析不了，可以查看域名地IP，加入hosts文件中。如：www.python.org   151.101.76.223
+```
+
+7. 配置pycharm的解释器
+
+```shell
+打开pycharm左上角的Preferences -> Project:PycharmProjects -> Project Interpreter -> Show All -> + -> Virtualenv Environment -> Existing environment -> 选择刚安装的python解释器
+```
+
+
+
 
 
 ### 设置方法
@@ -186,20 +204,33 @@ git clone https://github.com/altercation/solarized.git
 cd solarized/vim-colors-solarized/colors
 cp solarized.vim ~/.vim/colors/
 vi ~/.vimrc
-syntax enable
-set background=dark
-colorscheme solarized
-# set rtp+=/Users/zhouhan/powerline/powerline/bindings/vim.
-# 因为没搞清powerline是如何安装的，所以这句暂时注释
-set guifont=Monaco\ for\ Powerline:h14.5
-set laststatus=2
-let g:Powerline_symbols = 'fancy'
-set encoding=utf-8
-set t_Co=256
-set number
-set fillchars+=stl:\ ,stlnc:\
-set term=xterm-256color
-set termencoding=utf-8
+  1 set nocompatible
+  2 set hlsearch
+  3 set showmatch
+  4 set history=1000
+  5 set cursorline
+  6 set showcmd
+  7 set autoindent
+  8 set expandtab
+  9 set wrap
+ 10 set incsearch
+ 11 set ignorecase
+ 12 set tabstop=4
+ 13 set softtabstop=4
+ 14 set shiftwidth=4
+ 15
+ 16 syntax on
+ 17 set background=dark
+ 18 colorscheme nord
+ 19 set rtp+=/Users/shouyu/powerline/powerline/bindings/vim
+ 20 set guifont=Monaco\ for\ Powerline:h14.5
+ 21 set laststatus=2
+ 22 set encoding=utf-8
+ 23 set t_Co=256
+ 24 set number
+ 25 set fillchars+=stl:\ ,stlnc:\
+ 26 set term=xterm-256color
+ 27 set termencoding=utf-8
 
 brew install xz coreutils
 # 安装coreutils（使文件夹和文件显示为彩色）
@@ -234,6 +265,21 @@ Import -> 选择克隆的nord-iterm2目录中的src/xml/Nord.itermcolors。之
 后就可以在右正解的Color Persets...中选择Nord配色方案了
 ```
 
+8. 提示打不开“XXX”，因为它来自身份不明的开发者
+
+```shell
+sudo spctl --master-disable
+# 关闭后就可以安装了
+sudo spctl --status
+# 查看状态
+```
+
+9. 安装后黑苹果颜色不正，一直闪烁反转
+
+```shell
+下载SwitchResX4.8.0破解版，安装后右上角会有软件的图标，选择Millions for color，不要选Billions for color
+```
+
 
 
 ### 快捷键
@@ -259,6 +305,27 @@ Command + Shift + 5，这是另一种截图方法，打开的是不同的屏幕�
 3. spotlight搜索
 
 多媒体键 + 空格：打开右上角的聚集搜索
+
+
+
+### brew命令
+
+```shell
+$ brew --help #简洁命令帮助
+$ man brew #完整命令帮助
+$ brew install git #安装软件包(这里是示例安装的Git版本控制)
+$ brew uninstall git #卸载软件包
+$ brew search git #搜索软件包
+$ brew list #显示已经安装的所有软件包
+$ brew list 包名 # 查看已安装软件包的安装路径，也就是都在哪些路径下产生了文件
+$ brew update #同步远程最新更新情况，对本机已经安装并有更新的软件用*标明
+$ brew outdated #查看已安装的哪些软件包需要更新
+$ brew upgrade git #更新单个软件包
+$ brew info git #查看软件包信息
+$ brew home git #访问软件包官方站
+$ brew cleanup #清理所有已安装软件包的历史老版本
+$ brew cleanup git #清理单个已安装软件包的历史版本
+```
 
 
 

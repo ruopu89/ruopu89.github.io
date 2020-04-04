@@ -76,6 +76,20 @@ print(dir(dog))
 print(dog.__dict__)
 
 # 执行结果
+animal Module's names = ['Animal', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__']
+-----------------------------------
+Current Module's names = ['Animal', 'Cat', 'Dog', '__annotations__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'animal']
+animal Module's names = <module 'animal' from '/Users/shouyu/PycharmProjects/test/animal.py'>
+object's __dict__  = ['__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__']
+Animal's dir() = ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'x']
+Cat's dir()  = ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'x', 'y']
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+['_Animal__age', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_name', 'weight', 'x', 'y']
+['_Animal__age', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_name', 'weight', 'x', 'y']
+['_Animal__age', '__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '_name', 'weight', 'x', 'y']
+Dog's dir = ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'x']
+['dog']
+{'_name': 'snoppy', '_Animal__age': 10, 'weight': 20}
 ```
 
 
@@ -120,10 +134,19 @@ print(A('tom'), A('tom'))
 print([A('tom'), A('tom')])
 print('~~~~~~~~~~~~~~~~~~')
 s = {A('tom'), A('tom')}   # set
-print(s)   # 去重了吗
+print(s)   # 去重了吗，没有
 print({tuple('t'), tuple('t')})
 print({('tom',), ('tom',)})
 print({'tom', 'tom'})
+输出：
+1
+tom tom
+[tom, tom]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{tom, tom}
+{('t',)}
+{('tom',)}
+{'tom'}
 ```
 
 上例中`set`为什么不能剔除相同的`key`？
@@ -151,6 +174,15 @@ print(s)
 print({tuple('t'), tuple('t')})
 print({('tom',), ('tom',)})
 print({'tom', 'tom'})
+输出：
+1
+tom tom
+[tom, tom]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{tom}
+{('t',)}
+{('tom',)}
+{'tom'}
 ```
 
 | 方法     | 意义                                              |
@@ -1489,6 +1521,9 @@ hash
 
 ```python
 from collections import Hashable
+# 3.8.2版本中如果没有collections模块，要用pip3 install collections-extended，使用时要用
+# from _collections_abc import Hashable或用from collections.abc import Hashable，不然会提示:"DeprecationWarning: Using or importing the ABCs from
+# 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working"
 
 class A:
     X = 123
@@ -1498,12 +1533,15 @@ class A:
     def __hash__(self):  # hash冲突。两个对象在一个hash的计算空间中，可能算出的两个key是一样的
         return 1   # 这里只能用整型，不能用字符串
 #    __hash__ = None
-# 如果实例再调用hash就是在调用__hash__这个方法，这个方法就等于None，相当于调用None()。这时调用时会提示是不可hash类型。不可hash类型就是这样实现的。如果两个同时引用同一内存的东西，
+# 如果实例再调用hash就是在调用__hash__这个方法，这个方法就等于None，相当于调用None()。这时调用时会提示是不可hash类型。
+# 不可hash类型就是这样实现的。
 
 	def __eq__(self, other):
         return True  # 不管什么情况都认为两个实例相等，这时不管初始化时放什么值都相等了。如果把这里改成False，下面的显示结果也会是去重的，可能是set()先用了一个is来判断，之后再调用__eq__。也就是set先判断内存地址是否相同，相同就去重
     	return self.y == other.y   # 应该这样写，而不是简单的True或False
-# self.y == other.y叫二元操作符，相当于self.y在调用自己类型的__eq__方法，而不是这里定义的__eq__方法，other.y作为other参数
+# 当前的实例对象self和另一个实例对象other把y拿出来比较数据属性是否相同
+# self.y == other.y叫二元操作符，self.y叫对象，==是操作符，相当于self.y对象在调用__eq__方法，而后面的other.y做为other参数。self.y是什么类型就调用什么类型的__eq__方法，而不是这里定义的__eq__方法，比如这里初始化时定义了self.y = 'y'，那么self.y就会调用字符串的__eq__方法。这里要看自己的逻辑，如果初始化定义了两个属性，这里可以判断一个属性相等就可以了，也可以判断两个属性相等才行，如return self.y == other.y and self.x == other.x
+# 用取模算法去理解hash算法
 		
     
 # hash(o)  # 相当于调用o.__hash__()，None是不能调用的，所以o是不能调用的
@@ -1526,6 +1564,13 @@ def hash(x):
     return x % 3   # 取模hash，有可能重复
 
 print(isinstance(A(4), Hashable)
+输出：
+1
+[<__main__.A object at 0x10bdf0760>, <__main__.A object at 0x10be5c430>]
+1
+{<__main__.A object at 0x10bdf0760>}
+1
+True
 ```
 
 
@@ -2174,7 +2219,7 @@ class A(Base):
 
     def __delattr__(self, item):
         print('delattr')   # 删除实例属性
-# setattr和delattr是不论是否找到了属性，就会被触发。getattr是如果找到了并且定义了才会被触发，不然即使找到也不会触发。      
+# setattr和delattr是不论是否找到了属性，就会被触发。getattr是如果找到了并且定义了才会被触发，不然即使找到也不会触发。一般delete都是删除自己有的属性，setattr有没有没关系，都可以加进来，getattr如果没有就找不到，应该抛异常的，但是因为有getattr方法，如果找不到getattr就会拦一道，有了这个拦截，异常就没有了。
 a = A(10)
 a.x = 100
 a.m = 200
@@ -2188,7 +2233,261 @@ del a.x
 del a.m  # 通过实例可以访问到的属性都可以删除
 ```
 
+`__getattribute__`
 
+```python
+class Base:
+    n = 5
+    
+class A(Base):
+    m = 6
+    def __init__(self, x):
+        self.x = x
+        
+    def __getattribute__(self, item):  # 这个方法会最先执行，但一般不用
+        print('__getattribute__', item)
+# get的意思就是拿回来，回去是靠return的，这些get方法一个return都没有，get方法一般就是把什么东西给人家送回去，但这里没有return，所以返回的是None。__getattr__方法是在翻了一遍字典没有翻到时执行的。__getattribute__是还没到字典去就起作用了，在找字典前，__getattribute__会拦住并执行一次
+		# raise AttributeError(item)  # 这会跳过翻字典的过程，下面的getattr也会执行一次
+    	# return self.__dict__[item]  # 这会产生递归调用，出现问题
+        return object.__getattribute__(self, item)   # 这样做是没必要的
+        
+    def __getattr__(self, item):
+        print('__getattr__', item)
+        # self.__dict__[item]  = # 找不到给一个缺省值 
+        
+    def __setattr__(self, key, value):
+        print(key, value)
+# 当设置一个属性的时候，这个setattr方法是一定会被触发的，但是究竟放不放到里面去就是我们的事了   
+
+    def __delattr__(self, item):
+        print('delattr')  
+        
+a = A(10)
+print(a.x)  # 这里getattribute调用了
+```
+
+描述器
+
+用到了`__get__()`、`__set__()`、`__delete__()`三个方法中的一个创建的类就叫描述器。描述器与类属性有关
+
+```python
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        self.x = 100
+    
+print(B.x.a1)
+
+b = B()
+print(B.x.a1)
+print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
+print(b.x)
+输出：
+A.init
+a1
+B.init
+a1
+=================================================================================================
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+    def __get__(self, instance, owner):
+        print('A.__get__',self, instance, owner)
+        return self   # 这里返回self，下面就可以使用b.x.a1了
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        # self.x = 100
+        self.x = A()
+    
+print(B.x.a1)
+print(B.x)  # 这里打印的是None，因为__get__方法没有return，所以上面一句等于是在找None.a1，所以会报错。
+输出：
+A.init
+<__main__.A object at 0x00000000000001045C0> None <class '__main__.B'>
+# 第一段就是__get__方法中的self，第二段的None是instance的值，第三段是owner，owner表示描述器被谁用到了，用它来当做属性，owner是类。当你通过一个属性去访问的时候，如果这个属性刚好是另一个类的实例，而且这个类又实现了描述器三个方法中的一个的话，那它就是描述器。也就是通过属性要访问描述器。当创建的描述器使用__get__方法时，第一个拿到的是它自己self，还能拿到这个描述器属主相关的类型信息owner，和属主相关的实例instance
+
+b = B()
+print(B.x.a1)  # 这里还是会报错，因为B.x返回的是None，None没有a1属性
+print(B.x)
+# print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
+print(b.x)
+输出：
+B.init
+
+<__main__.A object at 0x00000000000001045C0> <__main__.B object at 0x0000000000006F4F28> <class '__main__.B'>
+# 因为使用了b.x调用描述器，这时的instance有值了
+
+当一个类的类属性等于另一个类的实例的时候，且被等于的这个类实现了三种方法中的一种，也就是被等于的类是描述器的话。如果通过类属性可以访问，它就会触发get方法。如果是通过实例的属性访问它，就不会触发get方法。可以看一下上面B.x会触发，b.x不会触发。这符合字典的搜索顺序
+只有__get__是非数据描述器，有__get__和__set__是数据描述器。一定要作为人家的类属性访问
+=================================================================================================
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+    def __get__(self, instance, owner):
+        print('A.__get__',self, instance, owner)
+        return self   # 这里返回self，下面就可以使用b.x.a1了
+    
+    def __set__(self, instance, owner):
+        print('A.__set__', self, instance, value)
+
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        # self.x = 100
+        self.x = A()
+        
+print(B.x)
+print(B.x.a1)
+print()
+
+b = B()
+print(B.x)
+print(b.x.a1)
+
+print(b.__dict__)
+print(B.__dict__)
+# 当一个类的类属性是数据描述器的话，对这个类的实例属性的操作，相当于操作类属性。如果不非数据描述器，就是操作实例属性。也就是数据描述器只能操作类属性。property()是数据描述器。少用类来操作属性，要用实例来操作。类中的所有方法都是非数据描述器
+```
+
+练习
+
+```python
+from functools import partial
+
+class StaticMethod:
+    def __init__(self, fn):
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        return self.fn
+
+class ClassMethod:
+    def __init__(self, fn):
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        # return self.fn(owner)  # 这样会返回异常，因为self.fn(owner)返回的是None
+        return partial(self.fn, owner)  # 这样就不会报错了
+    
+class A:
+    @staticMethod
+    def foo():  # foo = StaticMethod(foo)
+        print('static')
+    # 上面三行代码实际等于foo = StaticMethod()这一行代码
+    
+    @ClassMethod
+    def bar(cls):
+        print(cls.__name__)
+    
+A.foo()  # 未来是要这样用的，先要拿到A.foo，然后才能使用A.foo()，也可以像下面这样
+f = A.foo  # 调用A.foo时，后面的foo指向一个描述器，因为foo = StaticMethod(foo)，foo是StaticMethod的参数，因为在访问StaticMethod，所以会调用__get__方法
+print(f)  # 结果显示A.foo触发了__get__方法
+输出：
+<__main__.StaticMethod object at 0x000000000000A745F8> None <class '__main__.A'>
+# 结果说明触发了__get__方法，第一段表示__get__方法中的self是StaticMethod的实例；第二段因为没有实例，所以会返回None；第三段的owner是A类。如果想返回的东西加括号就能用，上面的__get__方法要返回self.fn，self.fn保存着原来的foo，被原封不动的返回来了，所以原来的foo加括号是可以的
+<function A.foo at 0x0000000109E598>
+f()
+f = A.bar
+print(f)
+f(A)  # 这等价于A.bar(A)
+f()
+```
+
+```python
+class Person:
+    def __init__(self, name:str, age:int):
+        if not self.checkdata((('name',str),('age',int))):
+            return raise
+        self.name = name
+        self.age = age
+        
+    def checkdata(self,):
+        for data, tp in params:
+            if not isinstance(data, tp):
+                return False
+            
+===============================================================================
+class Typed:
+    def __init__(self, type):
+        self.type = type
+    
+    def __get__(self, instance, owner):
+        pass
+    
+    def __set__(self, instance, value):
+        print('T.set', self, instance, value)
+        if not isinstance(value, self.type):
+            raise ValueError(value)
+    
+class Person:
+    name = Typed(str)
+    age = Typed(int)
+    
+    def __init__(self, name:str, age:int):
+        self.name = name
+        self.age = age
+        
+p1 = Person('tom', 18)
+===============================================================================
+class Typed:
+    def __init__(self, type):
+        self.type = type
+    
+    def __get__(self, instance, owner):
+        pass
+    
+    def __set__(self, instance, value):
+        print('T.set', self, instance, value)
+        if not isinstance(value, self.type):
+            raise ValueError(value)
+
+import inspect
+class TypeAssert:
+    def __init__(self, cls):
+        self.cls = cls
+        
+    def __call__(self, *args, **kwargs):
+        params = inspect.signature(self.cls).parameters      
+		print(params)  # 输出：(name:str, age:int)
+		for name,param in params.items():
+    		print(name, param.annotation)
+            if param.annotation != param.empty:
+                setattr(self.cls, name, Typed(param.annotation))
+      
+@TypeAssert    
+class Person:   # Person = TypeAssert(Person)
+    # name = Typed(str)
+    # age = Typed(int)
+    
+    def __init__(self, name:str, age:int):
+        self.name = name
+        self.age = age
+     
+p1 = Person('tom', 18)
+```
 
 
 
