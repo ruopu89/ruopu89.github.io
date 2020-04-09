@@ -164,7 +164,7 @@ pyenv install 3.8.2 -v
 
    pac地址也可以使用：https://www.hijk.pw/trojan-pac.php?p=1080
 
-   也可以使用SOCK5代理，服务器地址127.0.0.1:1080
+   也可以使用SOCK5代理，服务器地址127.0.0.1:1080。在chrome浏览器上可以设置SwitchyOmega中的PAC网址为：https://raw.githubusercontent.com/pexcn/daily/gh-pages/pac/whitelist.pac
 
 4. 设置git，解决git clone慢的问题
 

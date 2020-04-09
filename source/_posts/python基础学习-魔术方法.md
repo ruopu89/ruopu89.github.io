@@ -116,7 +116,7 @@ Dog's dir = ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq
 
 | 方法       | 意义                                                         |
 | ---------- | ------------------------------------------------------------ |
-| `__hash__` | 内建函数`hash()`调用的返回值，返回一个整数。如果定义这个方法该类的实例就可hash。 |
+| `__hash__` | 内建函数`hash()`调用的返回值，返回一个整数。如果定义了这个方法，该类的实例就可hash。 |
 
 ```python
 class A:
@@ -225,6 +225,9 @@ class Point:
         return hash((self.x, self.y))
     
     def __eq__(self, other):
+        print('*'*100)
+        print(self.x, self.y, other.x, other.y)
+# 调用这个方法时，如print(p1 == p2)，这里的p1就是self，p2就是other
         return self.x == other.x and self.y == other.y
     
 p1 = Point(4, 5)
@@ -237,6 +240,14 @@ print(p1 == p2)   # True使用__eq__
 print(hex(id(p1)), hex(id(p2)))
 print(set((p1, p2)))
 print(isinstance(p1, Hashable))
+输出：
+-1009709641759730766
+-1009709641759730766
+False
+True
+0x10a336b20 0x10a336880
+{<__main__.Point object at 0x10a336b20>}
+True
 ```
 
 
@@ -249,9 +260,9 @@ print(isinstance(p1, Hashable))
 
 ```python
 class A: pass
-
+# 因为没有定义bool或len方法，所以返回全为真
 print(bool(A()))
-if A():
+if A():  
     print('Real A')
     
 class B:
@@ -270,6 +281,12 @@ class C:
 print(bool(C()))
 if C():
     print('Real C')
+输出：
+True
+Real A
+True
+False
+False
 ```
 
 
@@ -292,7 +309,7 @@ class A:
         return 'repr: {},{}'.format(self.name, self.age)
     
     def __str__(self):
-        return 'str: {},{}'.format(self.name, self.age).encode()
+        return 'str: {},{}'.format(self.name, self.age)
     
     def __bytes__(self):
         # return "{} is {}".format(self.name, self.age).encode()
@@ -310,6 +327,15 @@ print(['a'],(s,))   # 字符串在基本数据类型内部输出有引号
 print({s, 'a'})
 
 print(bytes(A('tom')))
+输出：
+str: tom,18
+[repr: tom,18]
+['str: tom,18']
+str:a,1
+1
+['a'] ('1',)
+{'1', 'a'}
+b'tom is 18'
 ```
 
 
@@ -375,7 +401,7 @@ p1 = Point(1, 1)
 p2 = Point(1, 1)
 points = (p1, p2)
 print(points[0].add(points[1]))
-# 运算符重载
+# add方法就是运算符重载
 print(points[0] + points[1])
 print(p1 == p2)
 ```
@@ -420,6 +446,11 @@ print(tom > jerry)
 print(tom < jerry)
 print(tom >= jerry)
 print(tom <= jerry)
+输出：
+True
+False
+True
+False
 ```
 
 上例中大大简化代码，但是一般来说比较实现等于或者小于方法也就够了，其它可以不实现，所以这个装饰器只是看着很美好，且可能会带来性能问题，建议需要什么方法就自己创建，少用这个装饰器。
@@ -1519,11 +1550,14 @@ hash
 
 用hash就是为了O1的时间复杂度。缓存的目的是再查，缓冲是为了匹配生产者与消费者的速度
 
+
+
 ```python
 from collections import Hashable
 # 3.8.2版本中如果没有collections模块，要用pip3 install collections-extended，使用时要用
-# from _collections_abc import Hashable或用from collections.abc import Hashable，不然会提示:"DeprecationWarning: Using or importing the ABCs from
-# 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working"
+# from _collections_abc import Hashable或用from collections.abc import Hashable，不然会提示:
+# "DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' 
+# is deprecated since Python 3.3, and in 3.9 it will stop working"
 
 class A:
     X = 123
@@ -1537,16 +1571,21 @@ class A:
 # 不可hash类型就是这样实现的。
 
 	def __eq__(self, other):
-        return True  # 不管什么情况都认为两个实例相等，这时不管初始化时放什么值都相等了。如果把这里改成False，下面的显示结果也会是去重的，可能是set()先用了一个is来判断，之后再调用__eq__。也就是set先判断内存地址是否相同，相同就去重
+        # return True  # 这样定义，不管什么情况都认为两个实例相等，这时不管初始化时放什么值都相等了。如果把这里改成
+# False，下面的显示结果也会是去重的，可能是set()先用了一个is来判断，之后再调用__eq__。也就是set先判断内存地址是否相同，相
+# 同就去重
     	return self.y == other.y   # 应该这样写，而不是简单的True或False
 # 当前的实例对象self和另一个实例对象other把y拿出来比较数据属性是否相同
-# self.y == other.y叫二元操作符，self.y叫对象，==是操作符，相当于self.y对象在调用__eq__方法，而后面的other.y做为other参数。self.y是什么类型就调用什么类型的__eq__方法，而不是这里定义的__eq__方法，比如这里初始化时定义了self.y = 'y'，那么self.y就会调用字符串的__eq__方法。这里要看自己的逻辑，如果初始化定义了两个属性，这里可以判断一个属性相等就可以了，也可以判断两个属性相等才行，如return self.y == other.y and self.x == other.x
+# self.y == other.y叫二元操作符，self.y叫对象，==是操作符，相当于self.y对象在调用__eq__方法，而后面的other.y做为
+# other参数。self.y是什么类型就调用什么类型的__eq__方法，而不是这里定义的__eq__方法，比如这里初始化时定义了
+# self.y = 'y'，那么self.y就会调用字符串的__eq__方法。这里要看自己的逻辑，如果初始化定义了两个属性，这里可以判断一个属性
+# 相等就可以了，也可以判断两个属性相等才行，如return self.y == other.y and self.x == other.x
 # 用取模算法去理解hash算法
 		
     
 # hash(o)  # 相当于调用o.__hash__()，None是不能调用的，所以o是不能调用的
 # o.__hash__()
-print(hash(A())) # hash要对里面的对象调用hash的方法
+print(hash(A(5))) # hash要对里面的对象调用hash的方法
 
 lst = [A(4), A(5)]  # 因为A()是不可迭代类型，所以不能用list()，而用这种方法
 print(lst)
@@ -1587,6 +1626,7 @@ a.__equal__(b)  # b就是__eq__(self, other)中的other，a就是self
 练习
 
 ```python
+# 设计二维坐标类Point，使其成为可hash类型，并比较2个坐标的实例是否相等？
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -1642,7 +1682,10 @@ print(bool(Point(4, 5)))
     
     def __str__(self):
         return str('abc')
-# python默认使用repr对每个元素求打印，如果定义了str，就要用str对对象做强制转换。所以下面打印单个元素时都会调用str方法，包括使用for循环时，也是一个个打印。在打印lst时调用了repr。如果不是直播使用print或format直接对函数起作用的话，就要用repr。否则使用str。也就是，如果print()直接作用于对象，就会强行调用对象的str方法，包括for循环也是直接作用于对象。但print(str)时就要调用repr了，因为并不是print直接作用到对象上。所以可以将repr和str的返回值写成一样的
+# python默认使用repr对每个元素求打印，如果定义了str，就要用str对对象做强制转换。所以下面打印单个元素时都会调用str方法，包
+# 括使用for循环时，也是一个个打印。在打印lst时调用了repr。如果不是直接使用print或format直接对函数起作用的话，就要用
+# repr。否则使用str。也就是，如果print()直接作用于对象，就会强行调用对象的str方法，包括for循环也是直接作用于对象。但
+# print(str时就要调用repr了，因为并不是print直接作用到对象上。所以可以将repr和str的返回值写成一样的
 p1 = Point(4, 5)
 p2 = Point(5, 6)
 print(p1)
@@ -1653,6 +1696,13 @@ for x in lst:
 print(*lst)
 print(list(map(str, lst)))  # map后是一个可迭代对象，所以返回的是地址
 print(lst)  # lst找lst的print方法，lst里的元素不会这样处理。
+输出：
+abc
+abc
+abc
+abc abc
+['abc', 'abc']
+[123, 123]
 ```
 
 
@@ -1669,7 +1719,7 @@ class A:
     def __sub__(self, other):  # 减法
         self.x = self.x - other.x
         return self  # 这是就地修改，下面是new一个新的。
-      #   return A(self.x - other.x)   # 一般应该返回自己本身 
+      #   return A(self.x - other.x)   # 一般应该返回自己本身，这一行相当于上面两行代码。这里直接返回self.x - other.x也可以吧
     
     def __ne__(self, other):
         return self.x != other.x
@@ -1706,6 +1756,14 @@ print(list(reversed(sorted(lst))))
 a1 += a2
 print(a1)
 # 可以通过查看int的源码，查看大部分运算符方法的使用方法
+输出：
+-6
+-6
+False
+True
+[4, 6, 10]
+[10, 6, 4]
+14
 ```
 
 练习
@@ -1726,6 +1784,23 @@ class Point:
         tmpx = self.x + other.x
         tmpy = self.y + other.y
         return Point(tmpx, tmpy)
+        
+    def __str__(self):
+        return '<Point: {},{}>'.format(self.x, self.y)
+    
+    def __repr__(self):
+        return '<Point: {},{}>'.format(self.x, self.y)
+
+p1 = Point(1, 1)
+p2 = Point(1, 1)
+points = (p1, p2)
+print(points)
+print(points[0] + points[1])
+print(p1 == p2)
+输出：
+(<Point: 1,1>, <Point: 1,1>)
+<Point: 2,2>
+True
 ```
 
 容器相关方法
@@ -2488,32 +2563,4 @@ class Person:   # Person = TypeAssert(Person)
      
 p1 = Person('tom', 18)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
