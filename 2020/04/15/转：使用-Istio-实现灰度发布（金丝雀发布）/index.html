@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="灰度发布（又名金丝雀发布）介绍当应用上线以后，运维面临的一大挑战是如何能够在不影响已上线业务的情况下进行升级。做过产品的同学都清楚，不管在发布前做过多么完备的自动化和人工测试，在发布后都会出现或多或少的故障。根据墨菲定律，可能会出错的版本发布一定会出错。 “ANYTHING THAN CAN GO WRONG WILL GO WRONG” –MURPHY’S LAW 因此我们不能寄希望于在线下测试">
+<meta name="keywords" content="发布">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转：使用 Istio 实现灰度发布（金丝雀发布）">
+<meta property="og:url" content="http://yoursite.com/2020/04/15/转：使用-Istio-实现灰度发布（金丝雀发布）/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="灰度发布（又名金丝雀发布）介绍当应用上线以后，运维面临的一大挑战是如何能够在不影响已上线业务的情况下进行升级。做过产品的同学都清楚，不管在发布前做过多么完备的自动化和人工测试，在发布后都会出现或多或少的故障。根据墨菲定律，可能会出错的版本发布一定会出错。 “ANYTHING THAN CAN GO WRONG WILL GO WRONG” –MURPHY’S LAW 因此我们不能寄希望于在线下测试">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio1.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio2.png">
+<meta property="og:image" content="https://zhaohuabing.com/https://img.zhaohuabing.com/in-post/istio-canary-release/canary-example-only-v1.PNG">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio3.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio4.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio5.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio6.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio7.png">
+<meta property="og:image" content="http://yoursite.com/images/Istio/Istio8.png">
+<meta property="og:image" content="http://yoursite.com/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/Istio/Istio9.png">
+<meta property="og:updated_time" content="2020-04-15T02:51:37.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="转：使用 Istio 实现灰度发布（金丝雀发布）">
+<meta name="twitter:description" content="灰度发布（又名金丝雀发布）介绍当应用上线以后，运维面临的一大挑战是如何能够在不影响已上线业务的情况下进行升级。做过产品的同学都清楚，不管在发布前做过多么完备的自动化和人工测试，在发布后都会出现或多或少的故障。根据墨菲定律，可能会出错的版本发布一定会出错。 “ANYTHING THAN CAN GO WRONG WILL GO WRONG” –MURPHY’S LAW 因此我们不能寄希望于在线下测试">
+<meta name="twitter:image" content="http://yoursite.com/images/Istio/Istio1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/15/转：使用-Istio-实现灰度发布（金丝雀发布）/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>转：使用 Istio 实现灰度发布（金丝雀发布） | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/15/转：使用-Istio-实现灰度发布（金丝雀发布）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">转：使用 Istio 实现灰度发布（金丝雀发布）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-04-15 10:35:10 / 修改時間：10:51:37" itemprop="dateCreated datePublished" datetime="2020-04-15T10:35:10+08:00">2020-04-15</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/灰度发布/" itemprop="url" rel="index"><span itemprop="name">灰度发布</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="灰度发布（又名金丝雀发布）介绍"><a href="#灰度发布（又名金丝雀发布）介绍" class="headerlink" title="灰度发布（又名金丝雀发布）介绍"></a>灰度发布（又名金丝雀发布）介绍</h2><p>当应用上线以后，运维面临的一大挑战是如何能够在不影响已上线业务的情况下进行升级。做过产品的同学都清楚，不管在发布前做过多么完备的自动化和人工测试，在发布后都会出现或多或少的故障。根据墨菲定律，可能会出错的版本发布一定会出错。</p>
+<p>“ANYTHING THAN CAN GO WRONG WILL GO WRONG” –MURPHY’S LAW</p>
+<p>因此我们不能寄希望于在线下测试时发现所有潜在故障。在无法百分百避免版本升级故障的情况下，需要通过一种方式进行可控的版本发布，把故障影响控制在可以接受的范围内，并可以快速回退。</p>
+<p>可以通过<a href="https://martinfowler.com/bliki/CanaryRelease.html" target="_blank" rel="noopener">灰度发布（又名金丝雀发布）</a>来实现业务从老版本到新版本的平滑过渡，并避免升级过程中出现的问题对用户造成的影响。</p>
+<p>“金丝雀发布”的来源于矿工们用金丝雀对矿井进行空气测试的做法。以前矿工挖煤的时候，矿工下矿井前会先把金丝雀放进去，或者挖煤的时候一直带着金丝雀。金丝雀对甲烷和一氧化碳浓度比较敏感，会先报警。所以大家都用“金丝雀”来搞最先的测试。</p>
+<p>下图中，左下方的少部分用户就被当作“金丝雀”来用于测试新上线的1.1版本。如果新版本出现问题，“金丝雀”们会报警，但不会影响其他用户业务的正常运行。</p>
+<p><img src="/images/Istio/Istio1.png" alt=""></p>
+<p>灰度发布（金丝雀发布）的流程如下：</p>
+<ul>
+<li>准备和生产环境隔离的“金丝雀”服务器。</li>
+<li>将新版本的服务部署到“金丝雀”服务器上。</li>
+<li>对“金丝雀”服务器上的服务进行自动化和人工测试。</li>
+<li>测试通过后，将“金丝雀”服务器连接到生产环境，将少量生产流量导入到“金丝雀”服务器中。</li>
+<li>如果在线测试出现问题，则通过把生产流量从“金丝雀”服务器中重新路由到老版本的服务的方式进行回退，修复问题后重新进行发布。</li>
+<li>如果在线测试顺利，则逐渐把生产流量按一定策略逐渐导入到新版本服务器中。</li>
+<li>待新版本服务稳定运行后，删除老版本服务。</li>
+</ul>
+<h2 id="Istio实现灰度发布-金丝雀发布-的原理"><a href="#Istio实现灰度发布-金丝雀发布-的原理" class="headerlink" title="Istio实现灰度发布(金丝雀发布)的原理"></a>Istio实现灰度发布(金丝雀发布)的原理</h2><p>从上面的流程可以看到，如果要实现一套灰度发布的流程，需要应用程序和运维流程对该发布过程进行支持，工作量和难度的挑战是非常大的。虽然面对的问题类似，但每个企业或组织一般采用不同的私有化实现方案来进行灰度发布,为解决该问题导致研发和运维花费了大量的成本。</p>
+<p>Istio通过高度的抽象和良好的设计采用一致的方式解决了该问题，采用sidecar对应用流量进行了转发，通过Pilot下发路由规则，可以在不修改应用程序的前提下实现应用的灰度发布。</p>
+<p>备注：采用kubernetes的<a href="https://kubernetes.io/docs/tasks/run-application/rolling-update-replication-controller/" target="_blank" rel="noopener">滚动升级(rolling update)</a>功能也可以实现不中断业务的应用升级,但滚动升级是通过逐渐使用新版本的服务来替换老版本服务的方式对应用进行升级，在滚动升级不能对应用的流量分发进行控制，因此无法采用受控地把生产流量逐渐导流到新版本服务中，也就无法控制服务升级对用户造成的影响。</p>
+<p>采用Istio后，可以通过定制路由规则将特定的流量（如指定特征的用户）导入新版本服务中，在生产环境下进行测试，同时通过渐进受控地导入生产流量，可以最小化升级中出现的故障对用户的影响。并且在同时存在新老版本服务时，还可根据应用压力对不同版本的服务进行独立的缩扩容，非常灵活。采用Istio进行灰度发布的流程如下图所示：</p>
+<p><img src="/images/Istio/Istio2.png" alt=""></p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>下面采用Istion自带的BookinfoInfo示例程序来试验灰度发布的流程。</p>
+<h3 id="测试环境安装"><a href="#测试环境安装" class="headerlink" title="测试环境安装"></a>测试环境安装</h3><p>首先参考<a href="http://zhaohuabing.com/2017/11/04/istio-install_and_example/" target="_blank" rel="noopener">手把手教你从零搭建Istio及Bookinfo示例程序</a>安装Kubernetes及Istio控制面。</p>
+<p>因为本试验并不需要安装全部3个版本的reviews服务，因此如果已经安装了该应用，先采用下面的命令卸载。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">istio-<span class="number">0.2</span>.<span class="number">10</span><span class="regexp">/samples/</span>bookinfo<span class="regexp">/kube/</span>cleanup.sh</span><br></pre></td></tr></table></figure>
+<h3 id="部署V1版本的服务"><a href="#部署V1版本的服务" class="headerlink" title="部署V1版本的服务"></a>部署V1版本的服务</h3><p>首先只部署V1版本的Bookinfo应用程序。由于示例中的yaml文件中包含了3个版本的reviews服务，我们先将V2和V3版本的Deployment从yaml文件istio-0.2.10/samples/bookinfo/kube/bookinfo.yaml中删除。</p>
+<p>从Bookinfo.yaml中删除这部分内容:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">reviews-v2</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">reviews</span></span><br><span class="line"><span class="attr">        version:</span> <span class="string">v2</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">reviews</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">istio/examples-bookinfo-reviews-v2:0.2.3</span></span><br><span class="line"><span class="attr">        imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">9080</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">reviews-v3</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">reviews</span></span><br><span class="line"><span class="attr">        version:</span> <span class="string">v3</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">reviews</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">istio/examples-bookinfo-reviews-v3:0.2.3</span></span><br><span class="line"><span class="attr">        imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">9080</span>    </span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
+<p>部署V1版本的Bookinfo程序。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f &lt;(istioctl kube-<span class="keyword">inject</span> -f istio-<span class="number">0.2</span>.<span class="number">10</span><span class="regexp">/samples/</span>bookinfo<span class="regexp">/kube/</span>bookinfo.yaml)</span><br></pre></td></tr></table></figure>
+<p>通过kubectl命令行确认pod部署，可以看到只有V1版本的服务。</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pods</span><br><span class="line"></span><br><span class="line">NAME                              READY     STATUS    RESTARTS   AGE</span><br><span class="line">details-v1<span class="number">-3688945616</span>-nhkqk       <span class="number">2</span>/<span class="number">2</span>       Running   <span class="number">0</span>          <span class="number">2</span>m</span><br><span class="line">productpage-v1<span class="number">-2055622944</span>-m3fql   <span class="number">2</span>/<span class="number">2</span>       Running   <span class="number">0</span>          <span class="number">2</span>m</span><br><span class="line">ratings-v1<span class="number">-233971408</span><span class="number">-0</span>f3s9        <span class="number">2</span>/<span class="number">2</span>       Running   <span class="number">0</span>          <span class="number">2</span>m</span><br><span class="line">reviews-v1<span class="number">-1360980140</span><span class="number">-0</span>zs9z       <span class="number">2</span>/<span class="number">2</span>       Running   <span class="number">0</span>          <span class="number">2</span>m</span><br></pre></td></tr></table></figure>
+<p>在浏览器中打开应用程序页面，地址为istio-ingress的External IP。由于V1版本的reviews服务并不会调用rating服务，因此可以看到Product 页面显示的是不带星级的评价信息。</p>
+<p>此时系统中微服务的部署情况如下图所示（下面的示意图均忽略和本例关系不大的details和ratings服务）：<img src="https://zhaohuabing.com/https://img.zhaohuabing.com/in-post/istio-canary-release/canary-example-only-v1.PNG" alt="img"></p>
+<h3 id="部署V2版本的reviews服务"><a href="#部署V2版本的reviews服务" class="headerlink" title="部署V2版本的reviews服务"></a>部署V2版本的reviews服务</h3><p>在部署V2版本的reviews服务前，需要先创建一条缺省路由规则route-rule-default-reviews.yaml，将所有生产流量都导向V1版本，避免对线上用户的影响。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">apiVersion</span>: config.istio.io/v1alpha2</span><br><span class="line"><span class="attribute">kind</span>: RouteRule</span><br><span class="line"><span class="attribute">metadata</span>:</span><br><span class="line">  <span class="attribute">name</span>: reviews-default</span><br><span class="line"><span class="attribute">spec</span>:</span><br><span class="line">  <span class="attribute">destination</span>:</span><br><span class="line">    <span class="attribute">name</span>: reviews</span><br><span class="line">  <span class="attribute">precedence</span>: <span class="number">1</span></span><br><span class="line">  <span class="attribute">route</span>:</span><br><span class="line">  - <span class="attribute">labels</span>:</span><br><span class="line">      <span class="attribute">version</span>: v1</span><br></pre></td></tr></table></figure>
+<p>启用该路由规则。</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">istioctl</span> create -f route-rule-<span class="keyword">default</span>-reviews.yaml -n <span class="keyword">default</span></span><br></pre></td></tr></table></figure>
+<p>创建一个V2版本的部署文件bookinfo-reviews-v2.yaml，内容如下</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">apiVersion</span>: extensions/v1beta1</span><br><span class="line"><span class="attribute">kind</span>: Deployment</span><br><span class="line"><span class="attribute">metadata</span>:</span><br><span class="line">  <span class="attribute">name</span>: reviews-v2</span><br><span class="line"><span class="attribute">spec</span>:</span><br><span class="line">  <span class="attribute">replicas</span>: <span class="number">1</span></span><br><span class="line">  <span class="attribute">template</span>:</span><br><span class="line">    <span class="attribute">metadata</span>:</span><br><span class="line">      <span class="attribute">labels</span>:</span><br><span class="line">        <span class="attribute">app</span>: reviews</span><br><span class="line">        <span class="attribute">version</span>: v2</span><br><span class="line">    <span class="attribute">spec</span>:</span><br><span class="line">      <span class="attribute">containers</span>:</span><br><span class="line">      - <span class="attribute">name</span>: reviews</span><br><span class="line">        <span class="attribute">image</span>: istio/<span class="attribute">examples-bookinfo-reviews-v2</span>:<span class="number">0.2</span>.<span class="number">3</span></span><br><span class="line">        <span class="attribute">imagePullPolicy</span>: IfNotPresent</span><br><span class="line">        <span class="attribute">ports</span>:</span><br><span class="line">        - <span class="attribute">containerPort</span>: <span class="number">9080</span></span><br></pre></td></tr></table></figure>
+<p>部署V2版本的reviews服务。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f &lt;(<span class="name">istioctl</span> kube-inject -f  bookinfo-reviews-v2.yaml)</span><br></pre></td></tr></table></figure>
+<p>此时系统中部署了V1和V2两个版本的reviews服务，但所有的业务流量都被规则reviews-default导向了V1，如下图所示：</p>
+<p><img src="/images/Istio/Istio3.png" alt=""></p>
+<h3 id="将测试流量导入到V2版本的reviews服务"><a href="#将测试流量导入到V2版本的reviews服务" class="headerlink" title="将测试流量导入到V2版本的reviews服务"></a>将测试流量导入到V2版本的reviews服务</h3><p>在进行模拟测试时，由于测试环境和生产环境的网络，服务器，操作系统等环境存在差异，很难完全模拟生产环境进行测试。为了减少环境因素的对测试结果的影响，我们希望能在生产环境中进行上线前的测试，但如果没有很好的隔离措施，可能会导致测试影响已上线的业务，对企业造成损失。</p>
+<p>通过采用Istio的路由规则，可以在类生产环境中进行测试，又完全隔离了线上用户的生产流量和测试流量，最小化模拟测试对已上线业务的影响。如下图所示：</p>
+<p><img src="/images/Istio/Istio4.png" alt=""></p>
+<p>创建一条规则，将用户名为 test-user 的流量导入到V2</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">apiVersion</span>: config.istio.io/v1alpha2</span><br><span class="line"><span class="attribute">kind</span>: RouteRule</span><br><span class="line"><span class="attribute">metadata</span>:</span><br><span class="line">  <span class="attribute">name</span>: reviews-test-user</span><br><span class="line"><span class="attribute">spec</span>:</span><br><span class="line">  <span class="attribute">destination</span>:</span><br><span class="line">    <span class="attribute">name</span>: reviews</span><br><span class="line">  <span class="attribute">precedence</span>: <span class="number">2</span></span><br><span class="line">  <span class="attribute">match</span>:</span><br><span class="line">    <span class="attribute">request</span>:</span><br><span class="line">      <span class="attribute">headers</span>:</span><br><span class="line">        <span class="attribute">cookie</span>:</span><br><span class="line">          <span class="attribute">regex</span>: <span class="string">"^(.*?;)?(user=test-user)(;.*)?$"</span></span><br><span class="line">  <span class="attribute">route</span>:</span><br><span class="line">  - <span class="attribute">labels</span>:</span><br><span class="line">      <span class="attribute">version</span>: v2</span><br></pre></td></tr></table></figure>
+<p>注意：precedence属性用于设置规则的优先级，在同时存在多条规则的情况下，优先级高的规则将先执行。这条规则的precedence设置为2，以确保其在缺省规则之前运行，将test-user用户的请求导流到V2版本reviews服务中。</p>
+<p>启用该规则。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">istioctl <span class="keyword">create</span> -f route-rule-<span class="keyword">test</span>-reviews-v2.yaml -n <span class="keyword">default</span></span><br></pre></td></tr></table></figure>
+<p>以test-user用户登录，可以看到V2版本带星级的评价页面。</p>
+<p><img src="/images/Istio/Istio5.png" alt=""></p>
+<p>注销test-user，只能看到V1版本不带星级的评价页面。如下图所示：</p>
+<p><img src="/images/Istio/Istio6.png" alt=""></p>
+<h3 id="将部分生产流量导入到V2版本的reviews服务"><a href="#将部分生产流量导入到V2版本的reviews服务" class="headerlink" title="将部分生产流量导入到V2版本的reviews服务"></a>将部分生产流量导入到V2版本的reviews服务</h3><p>在线上模拟测试完成后，如果系统测试情况良好，可以通过规则将一部分用户流量导入到V2版本的服务中，进行小规模的“金丝雀”测试。</p>
+<p>修改规则route-rule-default-reviews.yaml，将50%的流量导入V2版本。</p>
+<blockquote>
+<p>  备注：本例只是描述原理，因此为简单起见，将50%流量导入V2版本，在实际操作中，更可能是先导入较少流量，然后根据监控的新版本运行情况将流量逐渐导入，如采用5%，10%，20%，50% …的比例逐渐导入。</p>
+</blockquote>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">apiVersion</span>: config.istio.io/v1alpha2</span><br><span class="line"><span class="attribute">kind</span>: RouteRule</span><br><span class="line"><span class="attribute">metadata</span>:</span><br><span class="line">  <span class="attribute">name</span>: reviews-default</span><br><span class="line"><span class="attribute">spec</span>:</span><br><span class="line">  <span class="attribute">destination</span>:</span><br><span class="line">    <span class="attribute">name</span>: reviews</span><br><span class="line">  <span class="attribute">precedence</span>: <span class="number">1</span></span><br><span class="line">  <span class="attribute">route</span>:</span><br><span class="line">  - <span class="attribute">labels</span>:</span><br><span class="line">      <span class="attribute">version</span>: v1</span><br><span class="line">    <span class="attribute">weight</span>: <span class="number">50</span></span><br><span class="line">  - <span class="attribute">labels</span>:</span><br><span class="line">      <span class="attribute">version</span>: v2</span><br><span class="line">    <span class="attribute">weight</span>: <span class="number">50</span></span><br><span class="line">istioctl replace -f route-rule-default-reviews.yaml -n default</span><br></pre></td></tr></table></figure>
+<p>此时系统部署如下图所示：</p>
+<p><img src="/images/Istio/Istio7.png" alt=""></p>
+<h3 id="将所有生产流量导入到到V2版本的reviews服务"><a href="#将所有生产流量导入到到V2版本的reviews服务" class="headerlink" title="将所有生产流量导入到到V2版本的reviews服务"></a>将所有生产流量导入到到V2版本的reviews服务</h3><p>如果新版本的服务运行正常，则可以将所有流量导入到V2版本。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">apiVersion</span>: config.istio.io/v1alpha2</span><br><span class="line"><span class="attribute">kind</span>: RouteRule</span><br><span class="line"><span class="attribute">metadata</span>:</span><br><span class="line">  <span class="attribute">name</span>: reviews-default</span><br><span class="line"><span class="attribute">spec</span>:</span><br><span class="line">  <span class="attribute">destination</span>: </span><br><span class="line">    <span class="attribute">name</span>: reviews</span><br><span class="line">  <span class="attribute">precedence</span>: <span class="number">1</span></span><br><span class="line">  <span class="attribute">route</span>:</span><br><span class="line">  - <span class="attribute">labels</span>:</span><br><span class="line">      <span class="attribute">version</span>: v2</span><br><span class="line">    <span class="attribute">weight</span>: <span class="number">100</span></span><br><span class="line">istioctl replace -f route-rule-default-reviews.yaml -n default</span><br></pre></td></tr></table></figure>
+<p>系统部署如下图所示：</p>
+<p><img src="/images/Istio/Istio8.png" alt=""></p>
+<p>此时不管以任何用户登录，都只能看到V2版本带星级的评价页面，如下图所示：</p>
+<p><img src="/media/shouyu/C64CC89B4CC8879F/works/GitHub/ruopu89.github.io/themes/hexo-theme-next/source/images/Istio/Istio9.png" alt=""></p>
+<blockquote>
+<p>  备注：如果灰度发布的过程中新版本的服务出现问题，则可以通过修改路由规则，将流量重新导入到V1版本的服务中，将V2版本故障修复后再进行测试。</p>
+</blockquote>
+<h3 id="删除V1版本的reviews服务"><a href="#删除V1版本的reviews服务" class="headerlink" title="删除V1版本的reviews服务"></a>删除V1版本的reviews服务</h3><p>待V2版本上线稳定运行后，删除V1版本的reviews服务和测试规则。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl <span class="keyword">delete</span> pod reviews-v1<span class="number">-1360980140</span><span class="number">-0</span>zs9z</span><br><span class="line"></span><br><span class="line">istioctl <span class="keyword">delete</span> -f route-rule-<span class="keyword">test</span>-reviews-v2.yaml -n <span class="keyword">default</span></span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://istio.io/docs/" target="_blank" rel="noopener">Istio官方文档</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/发布/" rel="tag"># 发布</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/26/MacOS使用记录/" rel="next" title="MacOS使用记录">
+                <i class="fa fa-chevron-left"></i> MacOS使用记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">223</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">33</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">166</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#灰度发布（又名金丝雀发布）介绍"><span class="nav-number">1.</span> <span class="nav-text">灰度发布（又名金丝雀发布）介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Istio实现灰度发布-金丝雀发布-的原理"><span class="nav-number">2.</span> <span class="nav-text">Istio实现灰度发布(金丝雀发布)的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作步骤"><span class="nav-number">3.</span> <span class="nav-text">操作步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试环境安装"><span class="nav-number">3.1.</span> <span class="nav-text">测试环境安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署V1版本的服务"><span class="nav-number">3.2.</span> <span class="nav-text">部署V1版本的服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署V2版本的reviews服务"><span class="nav-number">3.3.</span> <span class="nav-text">部署V2版本的reviews服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将测试流量导入到V2版本的reviews服务"><span class="nav-number">3.4.</span> <span class="nav-text">将测试流量导入到V2版本的reviews服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将部分生产流量导入到V2版本的reviews服务"><span class="nav-number">3.5.</span> <span class="nav-text">将部分生产流量导入到V2版本的reviews服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将所有生产流量导入到到V2版本的reviews服务"><span class="nav-number">3.6.</span> <span class="nav-text">将所有生产流量导入到到V2版本的reviews服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除V1版本的reviews服务"><span class="nav-number">3.7.</span> <span class="nav-text">删除V1版本的reviews服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

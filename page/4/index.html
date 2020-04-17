@@ -350,6 +350,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/使用set分隔字符/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/20/使用set分隔字符/" itemprop="url">
+                  使用set分隔字符
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-01-20 15:24:46 / 修改時間：16:11:32" itemprop="dateCreated datePublished" datetime="2020-01-20T15:24:46+08:00">2020-01-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 将时间格式的字符串转为秒</span></span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line">d="00:20:40.28"</span><br><span class="line">IFS=":"</span><br><span class="line">set -- $d</span><br><span class="line">hr=$(($1*3600))</span><br><span class="line">min=$(($2*60))</span><br><span class="line">sec=$&#123;3%.*&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 百分号的含意：<span class="variable">$&#123;string%substring&#125;</span>：从变量<span class="variable">$string</span>的结尾, 删除最短匹配<span class="variable">$substring</span>的子串。这里的<span class="variable">$3</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 就是40，所以是取消40以后的所有部分，也就是<span class="string">".28"</span>。</span></span><br><span class="line">echo "total secs: $((hr+min+sec))"</span><br><span class="line"></span><br><span class="line">bash -x test1.sh</span><br><span class="line">输出：</span><br><span class="line">+ d=00:20:40</span><br><span class="line">+ IFS=:</span><br><span class="line">+ set -- 00 20 40</span><br><span class="line">+ hr=0</span><br><span class="line">+ min=1200</span><br><span class="line">+ sec=40</span><br><span class="line">+ echo 'total secs: 1240'</span><br><span class="line">total secs: 1240</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到，<span class="built_in">set</span>会以IFS为分隔符，将d的内容重新分隔。另外，<span class="built_in">set</span>后的--表示选项的结束，后面的都当做参数处理而不是选项。例：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">echo</span> -- -e hello和<span class="built_in">echo</span> -e hello是不一样的，前者-e是一个普通参数，后者-e则是一个选项</span></span><br></pre></td></tr></table></figure>
+<h3 id="IFS介绍"><a href="#IFS介绍" class="headerlink" title="IFS介绍"></a>IFS介绍</h3><p>​    Shell 脚本中有个变量叫 IFS(Internal Field Seprator) ，内部域分隔符。完整定义是The shell uses the value stored in IFS, which is the space, tab, and newline characters by default, to delimit words for the read and set commands, when parsing output from command substitution, and when performing variable substitution.</p>
+<p>​    Shell 的环境变量分为 set, env 两种，其中 set 变量可以通过 export 工具导入到 env 变量中。其中，set 是显示设置shell变量，仅在本 shell 中有效；env 是显示设置用户环境变量 ，仅在当前会话中有效。换句话说，set 变量里包含了 env 变量，但 set 变量不一定都是 env 变量。这两种变量不同之处在于变量的作用域不同。显然，env 变量的作用域要大些，它可以在 subshell 中使用。</p>
+<p>​    而 IFS 是一种 set 变量，当 shell 处理”命令替换”和”参数替换”时，shell 根据 IFS 的值，默认是 space, tab, newline 来拆解读入的变量，然后对特殊字符进行处理，最后重新组合赋值给该变量。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/jq命令使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2365,181 +2526,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/02/python基础学习-转：面向对象编程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/01/02/python基础学习-转：面向对象编程/" itemprop="url">
-                  python基础学习-转：面向对象编程
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-01-02 17:22:27 / 修改時間：17:23:55" itemprop="dateCreated datePublished" datetime="2020-01-02T17:22:27+08:00">2020-01-02</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017495723838528" target="_blank" rel="noopener">https://www.liaoxuefeng.com/wiki/1016959663602400/1017495723838528</a></p>
-<p>面向对象编程——Object Oriented Programming，简称OOP，是一种程序设计思想。OOP把对象作为程序的基本单元，一个对象包含了数据和操作数据的函数。</p>
-<p>面向过程的程序设计把计算机程序视为一系列的命令集合，即一组函数的顺序执行。为了简化程序设计，面向过程把函数继续切分为子函数，即把大块函数通过切割成小块函数来降低系统的复杂度。</p>
-<p>而面向对象的程序设计把计算机程序视为一组对象的集合，而每个对象都可以接收其他对象发过来的消息，并处理这些消息，计算机程序的执行就是一系列消息在各个对象之间传递。</p>
-<p>在Python中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。</p>
-<p>我们以一个例子来说明面向过程和面向对象在程序流程上的不同之处。</p>
-<p>假设我们要处理学生的成绩表，为了表示一个学生的成绩，面向过程的程序可以用一个dict表示：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">std1</span> = &#123; <span class="string">'name'</span>: <span class="string">'Michael'</span>, <span class="string">'score'</span>: <span class="number">98</span> &#125;</span><br><span class="line"><span class="attr">std2</span> = &#123; <span class="string">'name'</span>: <span class="string">'Bob'</span>, <span class="string">'score'</span>: <span class="number">81</span> &#125;</span><br></pre></td></tr></table></figure>
-<p>而处理学生成绩可以通过函数实现，比如打印学生的成绩：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_score</span><span class="params">(std)</span>:</span></span><br><span class="line">    print(<span class="string">'%s: %s'</span> % (std[<span class="string">'name'</span>], std[<span class="string">'score'</span>]))</span><br></pre></td></tr></table></figure>
-<p>如果采用面向对象的程序设计思想，我们首选思考的不是程序的执行流程，而是<code>Student</code>这种数据类型应该被视为一个对象，这个对象拥有<code>name</code>和<code>score</code>这两个属性（Property）。如果要打印一个学生的成绩，首先必须创建出这个学生对应的对象，然后，给对象发一个<code>print_score</code>消息，让对象自己把自己的数据打印出来。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="title">object</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>, name, score)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="keyword">self</span>.score = score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">print_score</span><span class="params">(<span class="keyword">self</span>)</span></span><span class="symbol">:</span></span><br><span class="line">        print(<span class="string">'%s: %s'</span> % (<span class="keyword">self</span>.name, <span class="keyword">self</span>.score))</span><br></pre></td></tr></table></figure>
-<p>给对象发消息实际上就是调用对象对应的关联函数，我们称之为对象的方法（Method）。面向对象的程序写出来就像这样：</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bart = Student('Bart Simpson', 59)</span><br><span class="line">lisa = Student('Lisa Simpson', 87)</span><br><span class="line">bart.print_score()</span><br><span class="line">lisa.print_score()</span><br></pre></td></tr></table></figure>
-<p>面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class是一种抽象概念，比如我们定义的Class——Student，是指学生这个概念，而实例（Instance）则是一个个具体的Student，比如，Bart Simpson和Lisa Simpson是两个具体的Student。</p>
-<p>所以，面向对象的设计思想是抽象出Class，根据Class创建Instance。</p>
-<p>面向对象的抽象程度又比函数要高，因为一个Class既包含数据，又包含操作数据的方法。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>数据封装、继承和多态是面向对象的三大特点</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2587,7 +2573,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">222</span>
+                    <span class="site-state-item-count">223</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2664,7 +2650,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">32</span>
+                      
+                    
+                    <span class="site-state-item-count">33</span>
                     <span class="site-state-item-name">分類</span>
                   </a>
                 </div>
@@ -3007,7 +2995,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">165</span>
+                      
+                    
+                    <span class="site-state-item-count">166</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
