@@ -503,6 +503,9 @@ class A(dict):
     
 a = A()
 print(a['k'])
+输出：
+Missing key : k
+None
 ```
 
 思考
@@ -517,6 +520,7 @@ print(a['k'])
 class Cart:
     def __init__(self):
         self.items = []
+# 在初始化时自定义self.items = []，这样就定义了一个列表，之后用self.items就可以打印整个列表，self.items.append()可以向列表中添加内容。     
         
     def __len__(self):
         return len(self.items)
@@ -548,6 +552,7 @@ cart.additem(3)
 # 长度、bool
 print(len(cart))
 print(bool(cart))
+print(cart)
 
 # 迭代
 for x in cart:
@@ -565,6 +570,19 @@ print(cart)
 # 链式编程实现加法
 print(cart + 4 + 5 + 6)
 print(cart.__add__(17).__add__(18))
+输出：
+3
+True
+[1, 'abc', 3]
+1
+abc
+3
+True
+False
+abc
+[1, 'xyz', 3]
+[1, 'xyz', 3, 4, 5, 6]
+[1, 'xyz', 3, 4, 5, 6, 17, 18]
 ```
 
 
@@ -580,6 +598,9 @@ def foo():
 foo()
 # 等价于
 foo.__call__()
+输出：
+__main__ foo
+__main__ foo
 ```
 
 函数即对象，对象`foo`加上`()`，就是调用对象的`__call__()`方法
@@ -604,7 +625,10 @@ class Point:
 p = Point(4, 5)
 print(p)
 print(p())
-
+输出：
+<__main__.Point object at 0x7fd3b9770a90>
+<Point 4:5>
+    
 class Adder:
     def __call__(self, *args):
         ret = 0
@@ -616,6 +640,9 @@ class Adder:
 adder = Adder()
 print(adder(4, 5, 6))
 print(adder.ret)
+输出：
+15
+15
 ```
 
 练习：
@@ -647,9 +674,9 @@ class Fib:
     def __init__(self):
         self.items = [0, 1, 1]
         
-    def __call_(self, index):
+    def __call__(self, index):
         return self[index]
-    
+# 当使用fib(5)，这样调用时，但调用call方法，之后会返回self[index]，self[index]会调用getitem方法，返回实际的数字    
     def __iter__(self):
         return iter(self.items)
     
@@ -676,7 +703,7 @@ print(fib(5), len(fib))   # 全部计算
 print(fib(10), len(fib))   # 部分计算
 for x in fib:
     print(x)
-print(fib[5], fib[6])  # 索引访问 ，不计算
+print(fib[5], fib[6])  # 索引访问 ，不计算。使用索引直接调用__getitem__方法，计算出索引位置的值。
 ```
 
 可以看出使用类来实现斐波那契数列也是非常好的实现，还可以缓存数据，便于检索。
@@ -685,7 +712,7 @@ print(fib[5], fib[6])  # 索引访问 ，不计算
 
 ### 上下文管理
 
-文件IO操作可以对文件对象使用上下文管理，使用`with..as`语法
+文件IO操作可以对文件对象使用上下文管理，使用`with...as`语法
 
 ```python
 with open('test') as f:
@@ -702,7 +729,7 @@ with Point() as p:   #  AttributeError: __exit__
     pass
 ```
 
-提示属性错误，没有`__exit__`，看了需要这个属性
+提示属性错误，没有`__exit__`，看来需要这个属性
 
 
 
@@ -712,7 +739,7 @@ with Point() as p:   #  AttributeError: __exit__
 
 | 方法        | 意义                                                         |
 | ----------- | ------------------------------------------------------------ |
-| `__enter__` | 进入与此对象相关的上下文 。如果存在该方法，`with`语法会把该方法的返回值作为绑定到`as`子句中指定的变量上 |
+| `__enter__` | 进入与此对象相关的上下文 。如果存在该方法，`with`语法会把该方法的返回值绑定到`as`子句中指定的变量上 |
 | `__exit__`  | 退出与此对象相关的上下文                                     |
 
 ```python
@@ -783,6 +810,10 @@ with Point() as f:
     print('do sth.')
     
 print('outer')
+输出：
+init
+enter
+exit
 ```
 
 从执行结果来看，依然执行了`__exit__`函数，哪怕是退出Python运行环境。
@@ -878,6 +909,14 @@ with p as f:
     print('do sth.')
     
 print('outer')
+输出：
+init
+enter
+<class 'Exception'>
+New Error
+<traceback object at 0x7f8171ce62c0>
+exit
+outer
 ```
 
 
@@ -896,9 +935,39 @@ import time
 def add(x, y):
     time.sleep(2)
     return x + y
+
+print(add(2, 3))
 ```
 
 装饰器实现
+
+```python
+import time
+import datetime
+from functools import wraps
+
+def timeit(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        start = datetime.datetime.now()
+        ret = fn(*args, **kwargs)
+        delta = (datetime.datetime.now() - start).total_seconds()
+        print('{} took {}s'.format(fn.__name__, delta))
+        return ret
+    return wrapper
+
+@timeit
+def add(x, y):   # timeit(add)
+    time.sleep(2)
+    return x + y
+
+print(add(4, 5))
+输出：
+add took 2.002056s
+9
+```
+
+上下文实现
 
 ```python
 import time
@@ -920,10 +989,27 @@ def add(x, y):
     time.sleep(2)
     return x + y
 
-print(add(4, 5))
+class Timeit:
+    def __init__(self, fn):
+        self.fn = fn
+        
+    def __enter__(self):
+        self.start = datetime.datetime.now()
+        return self.fn
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        delta = (datetime.datetime.now() - self.start).total_seconds()
+        print("{} took {}s".format(self.fn.__name__, delta))
+        
+with Timeit(add) as fn:
+    # print(fn(4, 6))
+    print(add(4, 7))
+输出：
+11
+add took 2.001579s
 ```
 
-上下文实现
+另一种实现，使用可调用对象实现
 
 ```python
 import time
@@ -963,6 +1049,10 @@ class Timeit:
     
 with Timeit(add) as timeitobj:
     print(timeitobj(5, 6))
+输出：
+5 6
+11
+add took 2.001707s
 ```
 
 根据上面的代码，能不能把类当做装饰器用？
@@ -1000,6 +1090,9 @@ def add(x, y):
 
 add(4, 5)
 print(add.__doc__)
+输出：
+add took 2.001804s. call
+None
 ```
 
 思考
@@ -1034,7 +1127,7 @@ class Timeit:
         # 把函数对象的文档字符串赋给类
         # self.__doc__ = fn.__doc__
         # update_wrapper(self, fn)
-        wraps(fn)(self)
+        wraps(fn)(self)  # 这是什么意思？
         
     def __enter__(self):
         self.start = datetime.datetime.now()
@@ -1061,6 +1154,11 @@ print(add(10, 5))
 print(add.__doc__)
 
 print(Timeit(add).__doc__)
+输出：
+add took 2.002079s. call
+15
+This is add function.
+This is add function.
 ```
 
 上面的类即可以用在上下文管理，又可以用做装饰器
@@ -1103,6 +1201,10 @@ def foo():
 with foo() as f:
     # raise Exception()
     print(f)
+输出：
+enter
+None
+exit
 ```
 
 `f`接收`yield`语句的返回值
@@ -1188,7 +1290,7 @@ class Point:
         self.y = y
         
     def __str__(self):
-        return "Point({}, {})".format(Self.x, self.y)
+        return "Point({}, {})".format(self.x, self.y)
     
     def show(self):
         print(self.x, self.y)
@@ -1201,7 +1303,14 @@ print(p.__dict__)
 p.z = 10
 print(p.__dict__)
 print(dir(p))  # ordered list
-print(p.__dir__())  # list
+print(sorted(p.__dir__())) # list
+输出：
+Point(4, 5)
+{'x': 4, 'y': 5}
+{'x': 4, 'y': 16}
+{'x': 4, 'y': 16, 'z': 10}
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'show', 'x', 'y', 'z']
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'show', 'x', 'y', 'z']
 ```
 
 上例通过属性字典`__dict__`来访问对象的属性，本质上也是利用的反射的能力。
@@ -1259,6 +1368,19 @@ print(p1.sub)
 # add在谁里面，sub在谁里面
 print(p1.__dict__)
 print(Point.__dict__)
+输出：
+<__main__.Point object at 0x7f9a8bf6ea90>
+<__main__.Point object at 0x7f9a8bf88490>
+{'x': 4, 'y': 5}
+{'x': 4, 'y': 16, 'z': 10}
+Point(4, 16)
+<function <lambda> at 0x7f9a8bf0a4c0>
+<bound method <lambda> of <__main__.Point object at 0x7f9a8bf6ea90>>
+Point(14, 26)
+Point(0, 0)
+<function <lambda> at 0x7f9a8bf0a700>
+{'x': 4, 'y': 16, 'z': 10, 'sub': <function <lambda> at 0x7f9a8bf0a700>}
+{'__module__': '__main__', '__init__': <function Point.__init__ at 0x7f9a8bf0a550>, '__str__': <function Point.__str__ at 0x7f9a8bf0a5e0>, 'show': <function Point.show at 0x7f9a8bf0a670>, '__dict__': <attribute '__dict__' of 'Point' objects>, '__weakref__': <attribute '__weakref__' of 'Point' objects>, '__doc__': None, 'add': <function <lambda> at 0x7f9a8bf0a4c0>}
 ```
 
 思考
@@ -1503,7 +1625,7 @@ print(Point.z)
 ### 笔记
 
 ```python
-python的名字空间指模块或作用域
+python的名词空间指模块或作用域
 
 dir()
 # 收集当前模块的信息
@@ -1636,6 +1758,21 @@ class Point:
         if self is other:
             return True
         return self.x == other.x and self.y == other.y
+    
+p = Point(4, 5)
+p1 = Point(4, 5)
+p2 = Point(3, 4)
+print(p)
+print(p == p1)
+print(p == p2)
+print(p.__eq__(p1))
+print(p.__eq__(p2))
+输出：
+<__main__.Point object at 0x7ff1f73c6a90>
+True
+False
+True
+False
 ```
 
 
@@ -1685,17 +1822,19 @@ print(bool(Point(4, 5)))
 # python默认使用repr对每个元素求打印，如果定义了str，就要用str对对象做强制转换。所以下面打印单个元素时都会调用str方法，包
 # 括使用for循环时，也是一个个打印。在打印lst时调用了repr。如果不是直接使用print或format直接对函数起作用的话，就要用
 # repr。否则使用str。也就是，如果print()直接作用于对象，就会强行调用对象的str方法，包括for循环也是直接作用于对象。但
-# print(str时就要调用repr了，因为并不是print直接作用到对象上。所以可以将repr和str的返回值写成一样的
-p1 = Point(4, 5)
+# print(lst)时就要调用repr了，因为并不是print直接作用到对象上。所以可以将repr和str的返回值写成一样的
+
+p1 = Point(4, 5)  
 p2 = Point(5, 6)
-print(p1)
-lst = [p1, p2]
-for x in lst:
+print(p1)   # __str__等效于print方法
+lst = [p1, p2]   
+for x in lst:   # for循环也会调用__str__方法
     print(x)
 
-print(*lst)
-print(list(map(str, lst)))  # map后是一个可迭代对象，所以返回的是地址
-print(lst)  # lst找lst的print方法，lst里的元素不会这样处理。
+print(*lst)   # 这相当于强行str了
+print(list(map(str, lst)))  # map后是一个可迭代对象，所以返回的是地址。这也是强行str的方法
+print(lst)  # lst里还有print，lst是找lst的print方法，lst里的元素不会这样处理。相当于元素没有直接被print打印出来。因为这是lst内部的元素，它要调用对象的另一种表达方法__repr__。如果不是用str()强制转换，或用format、print()直接对对象起作用的话，那就要用__repr__，这是python内部所使用的，默认会用内建函数__repr__来对每个元素求打印，也就是所谓的字符串输出。所以print()如果直接作用于对象，那就强行调用对象的str，所以返回abc，for循环也是一个个元素拿出来，对于每个元素来讲，就是直接用print来打印，所以还是调用__str__。但这里打印lst时相当于打印[p1, p2]，但print不知道[p1, p2]是什么，所以就尝试调用__repr__，因为并不是print函数直接作用在[p1, p2]上面的，所以打印的是123。
+# 实际就是内建的几个函数，它直接作用在对象上，这样就会调用对象的str。如果并不直接作用在元素或对象上，就会调用它的repr方法 
 输出：
 abc
 abc
@@ -1719,7 +1858,7 @@ class A:
     def __sub__(self, other):  # 减法
         self.x = self.x - other.x
         return self  # 这是就地修改，下面是new一个新的。
-      #   return A(self.x - other.x)   # 一般应该返回自己本身，这一行相当于上面两行代码。这里直接返回self.x - other.x也可以吧
+      #   return A(self.x - other.x)   # 这一行相当于上面两行代码。这里也可以直接返回self.x - other.x。一般应该返回自己本身，所以这里返回数值不太合适，要用A()包装一下。只是要返回实例本身，要实现__str__方法才能打印出数值。具体打印出的是什么内容要看__str__方法是如何定义的。
     
     def __ne__(self, other):
         return self.x != other.x
@@ -1730,13 +1869,15 @@ class A:
     def __lt__(self, other):
         return self.x < other.x  # 实现一个方法就行了，知道了小于，就知道大于和等于了
     
-    def __repr__(self):
+    def __str__(self):
         return str(self.x)
     
     def __iadd__(self, other):
         self.x = self.x + other.x
         return self  # 这样就不用new了，像下面的语句一样。
       #  return A(self.x + other.x)
+        
+    __repr__ = __str__    
     
 a1 = A(4)
 a2 = A(10)
@@ -1764,6 +1905,27 @@ True
 [4, 6, 10]
 [10, 6, 4]
 14
+===========================================================================================================
+# 测试一下返回self如何打印
+class A:              
+    def __init__(self,
+        self.x = x    
+        self.y = y    
+                      
+    def __show__(self)
+        print('self {}
+        return self   
+                      
+    def __str__(self):
+        return '{} {}'
+                      
+    __repr__ = __str__
+                      
+p = A(3, 54)          
+print(p.__show__())   
+输出：
+self 3 54
+3 54
 ```
 
 练习
@@ -2341,226 +2503,4 @@ a = A(10)
 print(a.x)  # 这里getattribute调用了
 ```
 
-描述器
-
-用到了`__get__()`、`__set__()`、`__delete__()`三个方法中的一个创建的类就叫描述器。描述器与类属性有关
-
-```python
-class A:
-    def __init__(self):
-        print('A.init')
-        self.a1 = 'a1'
-        
-
-class B:
-    x = A()  # B类被扫描完就会生成A实例
-    
-    def __init__(self):
-        print('B.init')
-        self.x = 100
-    
-print(B.x.a1)
-
-b = B()
-print(B.x.a1)
-print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
-print(b.x)
-输出：
-A.init
-a1
-B.init
-a1
-=================================================================================================
-class A:
-    def __init__(self):
-        print('A.init')
-        self.a1 = 'a1'
-        
-    def __get__(self, instance, owner):
-        print('A.__get__',self, instance, owner)
-        return self   # 这里返回self，下面就可以使用b.x.a1了
-
-class B:
-    x = A()  # B类被扫描完就会生成A实例
-    
-    def __init__(self):
-        print('B.init')
-        # self.x = 100
-        self.x = A()
-    
-print(B.x.a1)
-print(B.x)  # 这里打印的是None，因为__get__方法没有return，所以上面一句等于是在找None.a1，所以会报错。
-输出：
-A.init
-<__main__.A object at 0x00000000000001045C0> None <class '__main__.B'>
-# 第一段就是__get__方法中的self，第二段的None是instance的值，第三段是owner，owner表示描述器被谁用到了，用它来当做属性，owner是类。当你通过一个属性去访问的时候，如果这个属性刚好是另一个类的实例，而且这个类又实现了描述器三个方法中的一个的话，那它就是描述器。也就是通过属性要访问描述器。当创建的描述器使用__get__方法时，第一个拿到的是它自己self，还能拿到这个描述器属主相关的类型信息owner，和属主相关的实例instance
-
-b = B()
-print(B.x.a1)  # 这里还是会报错，因为B.x返回的是None，None没有a1属性
-print(B.x)
-# print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
-print(b.x)
-输出：
-B.init
-
-<__main__.A object at 0x00000000000001045C0> <__main__.B object at 0x0000000000006F4F28> <class '__main__.B'>
-# 因为使用了b.x调用描述器，这时的instance有值了
-
-当一个类的类属性等于另一个类的实例的时候，且被等于的这个类实现了三种方法中的一种，也就是被等于的类是描述器的话。如果通过类属性可以访问，它就会触发get方法。如果是通过实例的属性访问它，就不会触发get方法。可以看一下上面B.x会触发，b.x不会触发。这符合字典的搜索顺序
-只有__get__是非数据描述器，有__get__和__set__是数据描述器。一定要作为人家的类属性访问
-=================================================================================================
-class A:
-    def __init__(self):
-        print('A.init')
-        self.a1 = 'a1'
-        
-    def __get__(self, instance, owner):
-        print('A.__get__',self, instance, owner)
-        return self   # 这里返回self，下面就可以使用b.x.a1了
-    
-    def __set__(self, instance, owner):
-        print('A.__set__', self, instance, value)
-
-
-class B:
-    x = A()  # B类被扫描完就会生成A实例
-    
-    def __init__(self):
-        print('B.init')
-        # self.x = 100
-        self.x = A()
-        
-print(B.x)
-print(B.x.a1)
-print()
-
-b = B()
-print(B.x)
-print(b.x.a1)
-
-print(b.__dict__)
-print(B.__dict__)
-# 当一个类的类属性是数据描述器的话，对这个类的实例属性的操作，相当于操作类属性。如果不非数据描述器，就是操作实例属性。也就是数据描述器只能操作类属性。property()是数据描述器。少用类来操作属性，要用实例来操作。类中的所有方法都是非数据描述器
-```
-
-练习
-
-```python
-from functools import partial
-
-class StaticMethod:
-    def __init__(self, fn):
-        print(fn)
-        self.fn = fn
-        
-    def __get__(self, instance, owner):
-        print(self, instance, owner)
-        return self.fn
-
-class ClassMethod:
-    def __init__(self, fn):
-        print(fn)
-        self.fn = fn
-        
-    def __get__(self, instance, owner):
-        print(self, instance, owner)
-        # return self.fn(owner)  # 这样会返回异常，因为self.fn(owner)返回的是None
-        return partial(self.fn, owner)  # 这样就不会报错了
-    
-class A:
-    @staticMethod
-    def foo():  # foo = StaticMethod(foo)
-        print('static')
-    # 上面三行代码实际等于foo = StaticMethod()这一行代码
-    
-    @ClassMethod
-    def bar(cls):
-        print(cls.__name__)
-    
-A.foo()  # 未来是要这样用的，先要拿到A.foo，然后才能使用A.foo()，也可以像下面这样
-f = A.foo  # 调用A.foo时，后面的foo指向一个描述器，因为foo = StaticMethod(foo)，foo是StaticMethod的参数，因为在访问StaticMethod，所以会调用__get__方法
-print(f)  # 结果显示A.foo触发了__get__方法
-输出：
-<__main__.StaticMethod object at 0x000000000000A745F8> None <class '__main__.A'>
-# 结果说明触发了__get__方法，第一段表示__get__方法中的self是StaticMethod的实例；第二段因为没有实例，所以会返回None；第三段的owner是A类。如果想返回的东西加括号就能用，上面的__get__方法要返回self.fn，self.fn保存着原来的foo，被原封不动的返回来了，所以原来的foo加括号是可以的
-<function A.foo at 0x0000000109E598>
-f()
-f = A.bar
-print(f)
-f(A)  # 这等价于A.bar(A)
-f()
-```
-
-```python
-class Person:
-    def __init__(self, name:str, age:int):
-        if not self.checkdata((('name',str),('age',int))):
-            return raise
-        self.name = name
-        self.age = age
-        
-    def checkdata(self,):
-        for data, tp in params:
-            if not isinstance(data, tp):
-                return False
-            
-===============================================================================
-class Typed:
-    def __init__(self, type):
-        self.type = type
-    
-    def __get__(self, instance, owner):
-        pass
-    
-    def __set__(self, instance, value):
-        print('T.set', self, instance, value)
-        if not isinstance(value, self.type):
-            raise ValueError(value)
-    
-class Person:
-    name = Typed(str)
-    age = Typed(int)
-    
-    def __init__(self, name:str, age:int):
-        self.name = name
-        self.age = age
-        
-p1 = Person('tom', 18)
-===============================================================================
-class Typed:
-    def __init__(self, type):
-        self.type = type
-    
-    def __get__(self, instance, owner):
-        pass
-    
-    def __set__(self, instance, value):
-        print('T.set', self, instance, value)
-        if not isinstance(value, self.type):
-            raise ValueError(value)
-
-import inspect
-class TypeAssert:
-    def __init__(self, cls):
-        self.cls = cls
-        
-    def __call__(self, *args, **kwargs):
-        params = inspect.signature(self.cls).parameters      
-		print(params)  # 输出：(name:str, age:int)
-		for name,param in params.items():
-    		print(name, param.annotation)
-            if param.annotation != param.empty:
-                setattr(self.cls, name, Typed(param.annotation))
-      
-@TypeAssert    
-class Person:   # Person = TypeAssert(Person)
-    # name = Typed(str)
-    # age = Typed(int)
-    
-    def __init__(self, name:str, age:int):
-        self.name = name
-        self.age = age
-     
-p1 = Person('tom', 18)
-```
 

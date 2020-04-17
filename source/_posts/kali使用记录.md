@@ -10,7 +10,7 @@ categories: 渗透测试
 #### 需要安装的包
 
 ```shell
-sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity ark cherrytree catfish telegram-desktop gpick unar folder-color
+sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfetch preload okular xarchiver meld jq remmina* smplayer keepnote thunderbird evolution tofrodos ffmpeg obs-studio indicator-china-weather nethogs ethstatus bmon gufw fish audacity ark cherrytree catfish telegram-desktop gpick unar folder-color zeal kolourpaint4
 # gimp是作图工具
 # axel是命令行下载工具
 # screenfetch是显示系统信息的
@@ -43,6 +43,8 @@ sudo apt install -y tmux fping mtr htop net-tools bind9utils gimp axel screenfet
 # gpick是取色工具，用空格取色
 # unar是一个几乎支持所有格式并能自动识别编码的解压工具，对付unzip解压后文件名乱码的压缩包尤为有效
 # folder-color可以改变文件夹的外观，安装后使用nautilus -q 退出文件夹，再打开时在文件夹上右键就可以设置了
+# zeal是Dash在Linux和windows上的替换品，可以查看多种语言的帮助文档。官网：https://zealdocs.org/download.html#linux。具体需要什么语言的文档需要打开软件后下载
+# kolourpaint4是画图工具
 ```
 
 
@@ -2210,8 +2212,19 @@ sudo vmware-installer -u vmware-workstation
 9. vmware-workstation无法在主版本内核中运行的问题
 a. 下载高版本的vmware-workstation，如14.1.7版本，下载地址：https://my.vmware.com/group/vmware/details?downloadGroup=WKST-1417-LX&productId=686&download=true&fileId=3dd758fdc904e68f9aae93f9d9807d31&secureParam=f9ecb38be33db3611137eda2dc65d47d&uuId=d6a721f6-43aa-41cf-b308-97505fddbaf9&downloadType=
 b. 下载相应的内核编译需要使用的包，下载地址：https://github.com/mkubecek/vmware-host-modules/releases/tag/w14.1.7-k5.3。这里的包的名称以w14.1.7-k5.3或p14.1.7-k5.3命名，其中w14.1.7表示vmware-workstation的版本，k5.3表示内核的版本，p14.1.7表示vmware-player的版本
-c. 先安装vmware-workstation，之后解压编译内核需要的包并进入，依次执行：make -> make install -> modprobe -r vmmon -> insmod /lib/modules/$(uname -r)/misc/vmmon.ko -> insmod /lib/modules/$(uname -r)/misc/vmnet.ko -> rm /usr/lib/vmware/lib/libz.so.1/libz.so.1 -> ln -s /lib/x86_64-linux-gnu/libz.so.1 /usr/lib/vmware/lib/libz.so.1/libz.so.1 -> vmware-networks --start
-d. 这时以root身份打开vmware-workstation就没有问题了，如果不以root身份打开，可以会显示不了虚拟机的页面
+c. 先安装vmware-workstation，之后解压编译内核需要的包并进入，依次执行：
+sudo su -
+cd /media/shouyu/C64CC89B4CC8879F/Tools/ubuntutool/VMware/vmware14.1.7/vmware-host-modules-w14.1.7-k5.3
+# 到下载的编译目录中
+make
+make install   # 编译安装后才会在/lib/modules/$(uname -r)目录中生成misc目录，否则没有这个目录
+modprobe -r vmmon
+insmod /lib/modules/$(uname -r)/misc/vmmon.ko
+insmod /lib/modules/$(uname -r)/misc/vmnet.ko
+rm /usr/lib/vmware/lib/libz.so.1/libz.so.1
+ln -s /lib/x86_64-linux-gnu/libz.so.1 /usr/lib/vmware/lib/libz.so.1/libz.so.1
+vmware-networks --start
+d. 这时以root身份打开vmware-workstation就没有问题了，如果不以root身份打开，可能会显示不了虚拟机的页面，测试用普通用户也没问题
 参考：https://blog.gloriousdays.pw/2018/09/11/linux-kernel-4-13-break-vmware-12-5/
 ```
 

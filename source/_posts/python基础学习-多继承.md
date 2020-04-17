@@ -451,7 +451,7 @@ b'\x81\xa1d\x08'
 
 参考
 
-对于链表来说，第一个结点是一个独立的对象，结点自己知道内容是什么，下一跳是什么。而链表则是一个窗口，它内部装着一个个结点对象。所以，建议设计2个类，一个结点Node类，一个链表LinkedList类。
+对于链表来说，每一个结点是一个独立的对象，结点自己知道内容是什么，下一跳是什么。而链表则是一个容器，它内部装着一个个结点对象。所以，建议设计2个类，一个结点Node类，一个链表LinkedList类。
 
 将链表的整体看作一个对象，是一个容器，容器中间放的是相同的，只是实例不同而已。实例有两个属性，一个是插入的内容，一个是内容指向
 
@@ -463,9 +463,17 @@ class SingleNode:
     """
     代表一个节点，存储节点Node
     """
-    def __init__(self, val, next=None):   # 这是向类中放数据的过程，value是一个值，就代表上图中的一个个数字。如5、7。next只作为形参，想给值也可以。next不会与next方法冲突，因为这个next只在这个作用域中生效，global中的next已经被这个next覆盖掉了。函数加载时在栈上，用完就会消失。下面的self.next更不会冲突，因为了self作为限定。链表是有序的，不能乱。但在内存上不一定是连续的，所以不能像列表一样移位。
+    def __init__(self, val, next=None):   
+# 这是向类中放数据的过程，value是一个值，就代表上图中的一个个数字。如5、7。next只作为形参，想给值也可以。next不会与next方法冲
+# 突，因为这个next只在这个作用域中生效，global中的next已经被这个next覆盖掉了。函数加载时在栈上，用完就会消失。下面的
+# self.next更不会冲突，因为有self作为限定。链表是有序的，不能乱。但在内存上不一定是连续的，所以不能像列表一样移位。
         self.val = val
         self.next =  next   
+        
+    def __str__(self):
+        return str(self.val)
+
+    __repr__ = __str__
 
 class LinkedList:
     """
@@ -477,9 +485,14 @@ class LinkedList:
         self.tail = None
         
     def append(self, val):
-# 这个方法的逻辑是，有一个节点，它是SingleNode的实例。之后看一下自己有多少个元素，这里有一个head和tail，这两个属性中保存的应该是SingleNode的实例，如果当前的尾部是None，说明也没有头部，如果有一个元素，尾部一定会指向这个元素而不是None。如果是None，就给头部加一个元素node，第一个元素即是头也是尾。之后再把这个node加到容器中，同时把尾部修正为当前node。这是第一种情况，容器中还没有元素。第二次进来，就知道当前的尾部是谁了，这时就不执行if语句了，这时头部就定死了不会动了。直接将node追加到容器中，因为是第二个元素了，所以尾部还要修正为当前的node。这时元素间还没有关系，所以要用prev.next修正一下
+# 这个方法的逻辑是，有一个节点，它是SingleNode的实例。之后看一下自己有多少个元素，这里有一个head和tail，这两个属性中保存的应该
+# 是SingleNode的实例，如果当前的尾部是None，说明也没有头部，如果有一个元素，尾部一定会指向这个元素而不是None。如果是None，就
+# 给头部加一个元素node，第一个元素即是头也是尾。之后再把这个node加到容器中，同时把尾部修正为当前node。这是第一种情况，容器中还
+# 没有元素。第二次进来，就知道当前的尾部是谁了，这时就不执行if语句了，这时头部就定死了不会动了。直接将node追加到容器中，因为是第
+# 二个元素了，所以尾部还要修正为当前的node。这时元素间还没有关系，所以要用prev.next修正一下
         node = SingleNode(val)
-# SingleNode(val)是将SingleNode实例化的过程，将val放进去，就会返回self.val和self.next，这时的self.next就指向None，也就是向链表尾部追加一个数字，这个数字就是self.val，下一个也就是self.next指向的是None。
+# SingleNode(val)是将SingleNode实例化的过程，将val放进去，就会返回self.val和self.next，这时的self.next就指向None，也就
+# 是向链表尾部追加一个数字，这个数字就是self.val，下一个也就是self.next指向的是None。
 		prev = self.tail
 # 这是前一个node
 	#	prev.next = node  # ?，如果tail就是None，那么一进来就是None了，所在要做判断。
@@ -490,16 +503,31 @@ class LinkedList:
 		else:
         	prev.next = node
 # 只有一个节点时是没有next的，只有prev不是None时才要将元素间建立关联。所以这句不能放在if语句外面
-        self.nodes.append(node)   
-# 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，不然会次追加都要从头开始算
+        self.nodes.append(node)
+# 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，
+# 不然每次追加都要从头开始算
 		self.tail = node
 # tail无论什么情况都应该是node，也就是无论是否为空，tail也应该是最新的node，这是将尾部设置为当前节点。
+
+a = LinkedList()
+a.append(3)
+print(a)
+print(a.nodes)
+输出：
+<__main__.LinkedList object at 0x7ff960e6be50>
+# 这里打印的是a实例的内存地址，注意观察打印内容，是LinkedList类的地址，下面中括号中的SingleNode类的地址。
+[<__main__.SingleNode object at 0x7f57cad638b0>]
+# 使用a.nodes打印成这样就是因为在SingleNode类中没有实现打印功能，定义了__repr__方法后就可以打印为[3]了。
+# 这里实例化的a就是链表这个容器，我们要打印容器中的内容，还要在定义内容的地方实现打印。所以用print(a.nodes)只会打印内存地址，要打印出内容，需要在SingleNode中定义__repr__方法
 ====================================================================================
 class SingleNode:
     """
     代表一个节点，存储节点Node
     """
-    def __init__(self, val, next=None, prev=None):   # 这是向类中放数据的过程，value是一个值，就代表上图中的一个个数字。如5、7。next只作为形参，想给值也可以。next不会与next方法冲突，因为这个next只在这个作用域中生效，global中的next已经被这个next覆盖掉了。函数加载时在栈上，用完就会消失。下面的self.next更不会冲突，因为了self作为限定。链表是有序的，不能乱。但在内存上不一定是连续的，所以不能像列表一样移位。
+    def __init__(self, val, next=None, prev=None):   
+# 这是向类中放数据的过程，value是一个值，就代表上图中的一个个数字。如5、7。next只作为形参，想给值也可以。next不会与next方法冲
+# 突，因为这个next只在这个作用域中生效，global中的next已经被这个next覆盖掉了。函数加载时在栈上，用完就会消失。下面的
+# self.next更不会冲突，因为有self作为限定。链表是有序的，不能乱。但在内存上不一定是连续的，所以不能像列表一样做位运算。
         self.val = val
         self.next =  next   
         self.prev = prev
@@ -525,9 +553,14 @@ class LinkedList:
         return len(self.nodes)
     
     def append(self, val):
-# 这个方法的逻辑是，有一个节点，它是SingleNode的实例。之后看一下自己有多少个元素，这里有一个head和tail，这两个属性中保存的应该是SingleNode的实例，如果当前的尾部是None，说明也没有头部，如果有一个元素，尾部一定会指向这个元素而不是None。如果是None，就给头部加一个元素node，第一个元素即是头也是尾。之后再把这个node加到容器中，同时把尾部修正为当前node。这是第一种情况，容器中还没有元素。第二次进来，就知道当前的尾部是谁了，这时就不执行if语句了，这时头部就定死了不会动了。直接将node追加到容器中，因为是第二个元素了，所以尾部还要修正为当前的node。这时元素间还没有关系，所以要用prev.next修正一下
+# 这个方法的逻辑是，有一个节点，它是SingleNode的实例。之后看一下自己有多少个元素，这里有一个head和tail，这两个属性中保存的应该
+# 是SingleNode的实例，如果当前的尾部是None，说明也没有头部，如果有一个元素，尾部一定会指向这个元素而不是None。如果是None，就
+# 给头部加一个元素node，第一个元素即是头也是尾。之后再把这个node加到容器中，同时把尾部修正为当前node。这是第一种情况，容器中还
+# 没有元素。第二次进来，就知道当前的尾部是谁了，这时就不执行if语句了，这时头部就定死了不会动了。直接将node追加到容器中，因为是第
+# 二个元素了，所以尾部还要修正为当前的node。这时元素间还没有关系，所以要用prev.next修正一下
         node = SingleNode(val)
-# SingleNode(val)是将SingleNode实例化的过程，将val放进去，就会返回self.val和self.next，这时的self.next就指向None，也就是向链表尾部追加一个数字，这个数字就是self.val，下一个也就是self.next指向的是None。
+# SingleNode(val)是将SingleNode实例化的过程，将val放进去，就会返回self.val和self.next，这时的self.next就指向None，也就
+# 是向链表尾部追加一个数字，这个数字就是self.val，下一个也就是self.next指向的是None。
 		prev = self.tail
 # 这是前一个node
 	#	prev.next = node  # ?，如果tail就是None，那么一进来就是None了，所在要做判断。
@@ -539,12 +572,13 @@ class LinkedList:
         	prev.next = node
 # 只有一个节点时是没有next的，只有prev不是None时才要将元素间建立关联。所以这句不能放在if语句外面
         self.nodes.append(node)   
-# 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，不然会次追加都要从头开始算
+# 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，
+# 不然会次追加都要从头开始算
 		self.tail = node
 # tail无论什么情况都应该是node，也就是无论是否为空，tail也应该是最新的node，这是将尾部设置为当前节点。
 
 	def iternodes(self, reverse=False):  # 暂时只能实现单向。iter表示生成器
-        current = self.head   # 这是头部的元素‘
+        current = self.head   # 这是头部的元素
         while current:        # 空元素是进不来的
             yield current
             current = current.next
@@ -620,14 +654,6 @@ for item in ll.iternodes():
 借助列表实现
 
 ```python
-class SinleNode:
-    def __init__(self, item, next=None):
-        self.item = item
-        self.next = next
-        
-    def __repr__(self):
-        return repr(self.item)
-    
 class SingleNode:   # 节点保存内容和下一跳
     def __init__(self, item, next=None):
         self.item = item
@@ -646,18 +672,30 @@ class LinkedList:
         node = SingleNode(item)
         if self.head is None:
             self.head = node   # 设置开头结点，以后不变
+            # print(self.head.__dict__, a)
         else:
             self.tail.next = node   # 当前最后一个结点关联下一跳
+# 这里的self.tail和self.head实际就是SingleNode类的实例，因为使用下面三种方法可以看出，self.tail和self.head的字典中都有
+# item和next属性，而self的字典中有head, tail, items三个属性，而没有item和next属性。证明self是LinkedList类的实例。在没有
+# 给self.head和self.tail赋值node前，这两个元素是没有item和next属性的。
+			# print(self.tail.__dict__, 1)
+            # print(self.head.__dict__, 2)
+            # print(self.__dict__, 3)
+            # print(self.tail.__dict__, b)
         self.tail = node   # 更新结尾结点
-        
+        # print(self.tail.__dict__, c)
         self.items.append(node)
         return self
     
     def iternodes(self):
         current = self.head
+# 如果不使用append方法，self.head就不会有值，所以这里一定是使用过append方法后，才能正常输出，否则current只会等于None。赋值
+# 以后，current也就拥有了item和next属性。感觉做是传染病一样，先是用SingleNode(item)赋值给node，再把node赋值给self.head，
+# 现在又把self.head赋值给current。但current的值是一个个得到的，先得到abc，并输出
         while current:
             yield current
             current = current.next
+# current中只有一个值，要用next方法指向下一个来修正current到下一个值
             
     def getitem(self, index):
         return self.items[index]
@@ -706,7 +744,7 @@ class SingleNode:
     """
     def __init__(self, val, next=None, prev=None):  
         self.val = val
-        self.next =  next   
+        self.next = next   
         self.prev = prev
         
     def __repr__(self):
@@ -733,6 +771,7 @@ class LinkedList:
 		else:  # 大于1个元素时进入这里
         	self.tail.next = node   # 原来的尾部指向自己
             node.prev = self.tail  # 前一个指向尾部
+# prev属性实际在node实例上，所以要改node实例，而不是self.prev
 		self.tail = node  # 最后把自己修正成尾部
 
 
@@ -792,12 +831,7 @@ class LinkedList:
             node.prev = prev
             node.next = current
             current.prev = node
-            
-            
-            
-        
-    
-    
+
 ll = LinkedList()
 node = SingleNode('abc')
 ll.append(node)
@@ -827,6 +861,17 @@ ll.pop()
 ll.pop()
 for node in ll.iternodes(True):
     print(node)
+输出：
+6
+6
+5
+4
+3
+2
+1
+abc
+456
+123
 ====================================================================================
 class SingleNode:
     def __init__(self, item, prev=None, next=None):

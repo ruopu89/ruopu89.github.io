@@ -816,3 +816,230 @@ class A:
         self._data = value
 ```
 
+
+
+### 笔记 
+
+描述器
+
+用到了`__get__()`、`__set__()`、`__delete__()`三个方法中的一个创建的类就叫描述器。描述器与类属性有关
+
+```python
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        self.x = 100
+    
+print(B.x.a1)
+
+b = B()
+print(B.x.a1)
+# print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
+print(b.x)
+输出：
+A.init
+a1
+B.init
+a1
+=================================================================================================
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+    def __get__(self, instance, owner):
+        print('A.__get__',self, instance, owner)
+        return self   # 这里返回self，下面就可以使用b.x.a1了
+# 加入__get__方法，现调用A类时，就会被这个方法拦截
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        # self.x = 100
+        self.x = A()
+    
+print(B.x.a1)
+print(B.x)  # 这里打印的是None，因为__get__方法没有return，所以上面一句等于是在找None.a1，所以会报错。
+输出：
+A.init
+<__main__.A object at 0x00000000000001045C0> None <class '__main__.B'>
+# 第一段就是__get__方法中的self，第二段的None是instance的值，第三段是owner，owner表示描述器被谁用到了，用它来当做属性，owner是类。当你通过一个属性去访问的时候，如果这个属性刚好是另一个类的实例，而且这个类又实现了描述器三个方法中的一个的话，那它就是描述器。也就是通过属性要访问描述器。当创建的描述器使用__get__方法时，第一个拿到的是它自己self，还能拿到这个描述器属主相关的类型信息owner，和属主相关的实例instance
+
+b = B()
+print(B.x.a1)  # 这里还是会报错，因为B.x返回的是None，None没有a1属性
+print(B.x)
+# print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
+print(b.x)
+输出：
+B.init
+
+<__main__.A object at 0x00000000000001045C0> <__main__.B object at 0x0000000000006F4F28> <class '__main__.B'>
+# 因为使用了b.x调用描述器，这时的instance有值了
+
+当一个类的类属性等于另一个类的实例的时候，且被等于的这个类实现了三种方法中的一种，也就是被等于的类是描述器的话。如果通过类属性可以访问，它就会触发get方法。如果是通过实例的属性访问它，就不会触发get方法。可以看一下上面B.x会触发，b.x不会触发。这符合字典的搜索顺序
+只有__get__是非数据描述器，有__get__和__set__是数据描述器。一定要作为人家的类属性访问
+=================================================================================================
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+    def __get__(self, instance, owner):
+        print('A.__get__',self, instance, owner)
+        return self   # 这里返回self，下面就可以使用b.x.a1了
+    
+    def __set__(self, instance, owner):
+        print('A.__set__', self, instance, value)
+
+
+class B:
+    x = A()  # B类被扫描完就会生成A实例
+    
+    def __init__(self):
+        print('B.init')
+        # self.x = 100
+        self.x = A()
+        
+print(B.x)
+print(B.x.a1)
+print()
+
+b = B()
+print(B.x)
+print(b.x.a1)
+
+print(b.__dict__)
+print(B.__dict__)
+# 当一个类的类属性是数据描述器的话，对这个类的实例属性的操作，相当于操作类属性。如果是非数据描述器，就是操作实例属性。也就是数据描述器只能操作类属性。property()是数据描述器。少用类来操作属性，要用实例来操作。类中的所有方法都是非数据描述器
+```
+
+练习
+
+```python
+from functools import partial
+
+class StaticMethod:
+    def __init__(self, fn):
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        return self.fn
+
+class ClassMethod:
+    def __init__(self, fn):
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        # return self.fn(owner)  # 这样会返回异常，因为self.fn(owner)返回的是None
+        return partial(self.fn, owner)  # 这样就不会报错了
+    
+class A:
+    @staticMethod
+    def foo():  # foo = StaticMethod(foo)
+        print('static')
+    # 上面三行代码实际等于foo = StaticMethod()这一行代码
+    
+    @ClassMethod
+    def bar(cls):
+        print(cls.__name__)
+    
+A.foo()  # 未来是要这样用的，先要拿到A.foo，然后才能使用A.foo()，也可以像下面这样
+f = A.foo  # 调用A.foo时，后面的foo指向一个描述器，因为foo = StaticMethod(foo)，foo是StaticMethod的参数，因为在访问StaticMethod，所以会调用__get__方法
+print(f)  # 结果显示A.foo触发了__get__方法
+输出：
+<__main__.StaticMethod object at 0x000000000000A745F8> None <class '__main__.A'>
+# 结果说明触发了__get__方法，第一段表示__get__方法中的self是StaticMethod的实例；第二段因为没有实例，所以会返回None；第三段的owner是A类。如果想返回的东西加括号就能用，上面的__get__方法要返回self.fn，self.fn保存着原来的foo，被原封不动的返回来了，所以原来的foo加括号是可以的
+<function A.foo at 0x0000000109E598>
+f()
+f = A.bar
+print(f)
+f(A)  # 这等价于A.bar(A)
+f()
+```
+
+```python
+class Person:
+    def __init__(self, name:str, age:int):
+        if not self.checkdata((('name',str),('age',int))):
+            return raise
+        self.name = name
+        self.age = age
+        
+    def checkdata(self,):
+        for data, tp in params:
+            if not isinstance(data, tp):
+                return False
+            
+===============================================================================
+class Typed:
+    def __init__(self, type):
+        self.type = type
+    
+    def __get__(self, instance, owner):
+        pass
+    
+    def __set__(self, instance, value):
+        print('T.set', self, instance, value)
+        if not isinstance(value, self.type):
+            raise ValueError(value)
+    
+class Person:
+    name = Typed(str)
+    age = Typed(int)
+    
+    def __init__(self, name:str, age:int):
+        self.name = name
+        self.age = age
+        
+p1 = Person('tom', 18)
+===============================================================================
+class Typed:
+    def __init__(self, type):
+        self.type = type
+    
+    def __get__(self, instance, owner):
+        pass
+    
+    def __set__(self, instance, value):
+        print('T.set', self, instance, value)
+        if not isinstance(value, self.type):
+            raise ValueError(value)
+
+import inspect
+class TypeAssert:
+    def __init__(self, cls):
+        self.cls = cls
+        
+    def __call__(self, *args, **kwargs):
+        params = inspect.signature(self.cls).parameters      
+		print(params)  # 输出：(name:str, age:int)
+		for name,param in params.items():
+    		print(name, param.annotation)
+            if param.annotation != param.empty:
+                setattr(self.cls, name, Typed(param.annotation))
+      
+@TypeAssert    
+class Person:   # Person = TypeAssert(Person)
+    # name = Typed(str)
+    # age = Typed(int)
+    
+    def __init__(self, name:str, age:int):
+        self.name = name
+        self.age = age
+     
+p1 = Person('tom', 18)
+```
