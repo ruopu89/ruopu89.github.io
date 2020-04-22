@@ -350,6 +350,360 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/使用ELK分析Nginx日志/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/20/使用ELK分析Nginx日志/" itemprop="url">
+                  使用ELK分析Nginx日志
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-01-20 16:57:19" itemprop="dateCreated datePublished" datetime="2020-01-20T16:57:19+08:00">2020-01-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ELK/" itemprop="url" rel="index"><span itemprop="name">ELK</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>使用filebeat收集nginx日志，输出到kafka；logstash从kafka中消费日志，通过grok进行数据格式化，输出到elasticsearch中，kibana从elasticsearch中获取日志，进行过滤出图。</p>
+<h3 id="部署wordpress"><a href="#部署wordpress" class="headerlink" title="部署wordpress"></a>部署wordpress</h3><p>这里部署wordpress主要为了得到nginx的访问日志。</p>
+<table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14:80</td>
+<td>nginx/php/mariadb-server</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nginx php-fpm php mariadb-server php-mysqlnd</span><br><span class="line">systemctl start php-fpm nginx mariadb-server</span><br><span class="line">systemctl enable php-fpm nginx mariadb-server</span><br><span class="line">mysql_secure_installation</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化mariadb</span></span><br><span class="line">mysql -uroot -pcentos</span><br><span class="line">create database wordpress;</span><br><span class="line">grant all on wordpress.* to 'wps'@'localhost' identified by 'centos';</span><br><span class="line">flush privileges;</span><br><span class="line">tar xf wordpress-5.2.2-zh_CN.tar.gz -C /usr/share/nginx/html</span><br><span class="line">cd /usr/share/nginx/html/wordpress</span><br><span class="line">cp wp-config-sample.php wp-config.php</span><br><span class="line">vim wp-config.php</span><br><span class="line">            /** WordPress数据库的名称 */</span><br><span class="line">            define('DB_NAME', 'wordpress');</span><br><span class="line"></span><br><span class="line">            /** MySQL数据库用户名 */</span><br><span class="line">            define('DB_USER', 'wps');</span><br><span class="line"></span><br><span class="line">            /** MySQL数据库密码 */</span><br><span class="line">            define('DB_PASSWORD', 'centos');</span><br><span class="line"></span><br><span class="line">            /** MySQL主机 */</span><br><span class="line">            define('DB_HOST', 'localhost');</span><br><span class="line"></span><br><span class="line">            /** 创建数据表时默认的文字编码 */</span><br><span class="line">            define('DB_CHARSET', 'utf8');</span><br><span class="line"></span><br><span class="line">            /** 数据库整理类型。如不确定请勿更改 */</span><br><span class="line">            define('DB_COLLATE', '');</span><br><span class="line">访问：http://172.16.103.130/wordpress进行安装</span><br></pre></td></tr></table></figure>
+<h3 id="部署zookeeper"><a href="#部署zookeeper" class="headerlink" title="部署zookeeper"></a>部署zookeeper</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.17</td>
+<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
+<td>kafka1/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.15</td>
+<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
+<td>kafka2/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.16</td>
+<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
+<td>kafka3/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">   三台主机</span><br><span class="line">------------</span><br><span class="line">到http://zookeeper.apache.org/releases.html去下载zookeeper。这里需要注意，下载的3.5.5和3.5.6</span><br><span class="line">版本中没有zookeeper-***.jar包，所以启动zookeeper会提示:</span><br><span class="line">"Could not find or load main class org.apache.zookeeper.server.quorum.QuorumPeerMain"。</span><br><span class="line">测试下载的3.4.14版本没有问题。也许是不会使用的原因</span><br><span class="line"></span><br><span class="line">yum install java-1.8.0-openjdk-devel</span><br><span class="line"><span class="meta">#</span><span class="bash"> zookeeper依賴java</span></span><br><span class="line">tar -zxvf zookeeper-3.4.14.tar.gz -C /usr/local</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解壓安裝</span></span><br><span class="line">cd /usr/local</span><br><span class="line">ln -sv zookeeper-3.4.14 zookeeper</span><br><span class="line">cd zookeeper/conf</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line">vim zoo.cfg</span><br><span class="line">	tickTime=2000</span><br><span class="line">    initLimit=10</span><br><span class="line">    syncLimit=5</span><br><span class="line">    dataDir=/usr/local/zookeeper/data</span><br><span class="line">    dataLogDir=/usr/local/zookeeper/logs</span><br><span class="line">    clientPort=2181</span><br><span class="line">    server.1=192.168.1.17:2888:3888</span><br><span class="line">    server.2=192.168.1.15:2888:3888</span><br><span class="line">    server.3=192.168.1.16:2888:3888</span><br><span class="line"><span class="meta">#</span><span class="bash"> tickTime：这个时间是作为Zookeeper服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> dataDir：顾名思义就是 Zookeeper保存数据的目录，默认情况下，Zookeeper将写数据的日志文件也保存在这个目录里。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper 服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 5个心跳的时间（也就是 tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是 5*2000=10 秒</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> syncLimit：这个配置项标识 Leader 与Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是5*2000=10 秒</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> server.A=B：C：D：其中 A 是一个数字，表示这个是第几号服务器；B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意：dataDir,dataLogDir中的wwb是当前登录用户名，data，logs目录开始是不存在，需要使用mkdir命令创建相应的目录。并且在该目录下创建文件myid。serve1,server2,server3该文件内容分别为1,2,3。</span></span><br><span class="line">cd /usr/local/zookeeper</span><br><span class="line">mkdir &#123;data,logs&#125;</span><br><span class="line">cd data</span><br><span class="line">echo 1 &gt; myid</span><br><span class="line"><span class="meta">#</span><span class="bash"> kafka2、3分别在這裡改為<span class="built_in">echo</span> 2 &gt; myid或<span class="built_in">echo</span> 3 &gt; myid</span></span><br><span class="line">cd</span><br><span class="line">scp zookeeper-3.4.14.tar.gz 192.168.1.15:/root</span><br><span class="line">scp zookeeper-3.4.14.tar.gz 192.168.1.16:/root</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从第一台主机复制到另外两台主机上</span></span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">chmod +x /etc/profile.d/java.sh</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line">java -version</span><br><span class="line">scp /etc/profile.d/java.sh 192.168.1.15:/etc/profile.d</span><br><span class="line">scp /etc/profile.d/java.sh 192.168.1.16:/etc/profile.d</span><br><span class="line">scp /usr/local/zookeeper/conf/zoo.cfg root@192.168.1.15:/usr/local/zookeeper/conf/</span><br><span class="line">scp /usr/local/zookeeper/conf/zoo.cfg root@192.168.1.16:/usr/local/zookeeper/conf/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从第一台主机复制到另外两台主机上</span></span><br><span class="line">cd /usr/local/zookeeper/bin</span><br><span class="line">./zkServer.sh start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 啟動zookeeper</span></span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時只有leader節點會監聽2888端口，另外兩台是不監聽的。三台主機都會監聽2181和3888端口</span></span><br><span class="line">./zkCli.sh -server localhost:2181</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這裡如果連接的是本機的zookeeper可以不用參數和地址，連接集群中其他zookeeper需要。</span></span><br></pre></td></tr></table></figure>
+<h3 id="部署kafka"><a href="#部署kafka" class="headerlink" title="部署kafka"></a>部署kafka</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.17</td>
+<td>kafka_2.12-2.2.1</td>
+<td>kafka1/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.15</td>
+<td>kafka_2.12-2.2.1</td>
+<td>kafka2/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.16</td>
+<td>kafka_2.12-2.2.1</td>
+<td>kafka3/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">   三台主機</span><br><span class="line">-------------</span><br><span class="line">cd /root</span><br><span class="line">tar xf kafka_2.12-2.2.1.tgz -C /usr/local</span><br><span class="line">cd /usr/local</span><br><span class="line">ln -sv kafka_2.12-2.2.1 kafka</span><br><span class="line">cd kafka/config/</span><br><span class="line">vim server.properties</span><br><span class="line">	broker.id=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主機這裡的id是不台一樣的，分別為1、2、3</span></span><br><span class="line">    num.network.threads=3</span><br><span class="line">    num.io.threads=8</span><br><span class="line">    socket.send.buffer.bytes=102400</span><br><span class="line">    socket.receive.buffer.bytes=102400</span><br><span class="line">    socket.request.max.bytes=104857600</span><br><span class="line">    log.dirs=/usr/local/kafka/logs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這裡改了日誌地址</span></span><br><span class="line">    num.partitions=1</span><br><span class="line">    num.recovery.threads.per.data.dir=1</span><br><span class="line">    log.retention.hours=168</span><br><span class="line">    log.segment.bytes=1073741824</span><br><span class="line">    log.retention.check.interval.ms=300000</span><br><span class="line">    zookeeper.connect=192.168.1.17:2181,192.168.1.15:2181,192.168.1.16:2181</span><br><span class="line"><span class="meta">#</span><span class="bash"> zookeeper集群內的所有地址都寫入</span></span><br><span class="line">    zookeeper.connection.timeout.ms=6000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件基本使用默認配置，之後會再查看配置文件詳細設置</span></span><br><span class="line">mkdir /usr/local/kafka/logs</span><br><span class="line">cd /usr/local/kafka/bin</span><br><span class="line">nohup ./kafka-server-start.sh ../config/server.properties &amp;</span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時應該監聽了默認端口9092</span></span><br><span class="line">vim /etc/hosts</span><br><span class="line">192.168.1.17   kafka1</span><br><span class="line">192.168.1.15	kafka2</span><br><span class="line">192.168.1.16	kafka3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里添加可以让三台主机互相通过主机名解析</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建topic</span></span><br><span class="line">[root@kafka1 bin]# ./kafka-topics.sh --create --topic nginxlog --replication-factor 3 --partitions 3 --zookeeper 192.168.1.16:2181</span><br><span class="line">Created topic nginxlog.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为kafka1启动失败了，所以192.168.1.16变成了主节点</span></span><br></pre></td></tr></table></figure>
+<h3 id="部署ElasticSearch"><a href="#部署ElasticSearch" class="headerlink" title="部署ElasticSearch"></a>部署ElasticSearch</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.19</td>
+<td></td>
+<td>elasticsearch1/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.20</td>
+<td></td>
+<td>elasticsearch2/CentOS8</td>
+</tr>
+<tr>
+<td>192.168.1.18</td>
+<td></td>
+<td>elasticsearch3/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">---------------</span><br><span class="line">    三台主机</span><br><span class="line">---------------</span><br><span class="line">systemctl start chronyd</span><br><span class="line">systemctl enable chronyd</span><br><span class="line">chronyc</span><br><span class="line"><span class="meta">chronyc&gt;</span><span class="bash"> waitsync</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步三台主机时间</span></span><br><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装阿里源</span></span><br><span class="line">yum makecache</span><br><span class="line">yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">ssh-keygen -t rsa -P ''</span><br><span class="line"><span class="meta">#</span><span class="bash"> elasticsearch1创建密钥</span></span><br><span class="line">ssh-copy-id -i root@192.168.1.20</span><br><span class="line">ssh-copy-id -i root@192.168.1.18</span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">    export JAVA_HOME=/usr</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> elasticsearch1创建并发送到另外两台主机</span></span><br><span class="line">scp /etc/profile.d/java.sh root@192.168.1.20:/etc/profile.d/</span><br><span class="line">scp /etc/profile.d/java.sh root@192.168.1.18:/etc/profile.d/</span><br><span class="line">上传elasticsearch-6.5.4.rpm到三台主机</span><br><span class="line">yum install elasticsearch-6.5.4.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主机安装</span></span><br><span class="line">vim /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">	cluster.name: myelk</span><br><span class="line">    # 集群的名称，名称相同的主机就是处于同一个集群</span><br><span class="line">    node.name: node1</span><br><span class="line">    # 集群情况下，当前node的名字，每个node应该不一样。要将此文件复制到另两个节点</span><br><span class="line">    path.data: /elkdata/data</span><br><span class="line">    # 数据目录</span><br><span class="line">    path.logs: /elkdata/logs</span><br><span class="line">    # 日志目录</span><br><span class="line">    # bootstrap.memory_lock: true</span><br><span class="line">    # 服务启动时即锁定足够大的内存，提高效率。测试中如果打开此项，启动会失败，提示内存未锁定</span><br><span class="line">    network.host: 0.0.0.0</span><br><span class="line">    # 监听的地址</span><br><span class="line">    http.port: 9200</span><br><span class="line">    # 客户端访问端口</span><br><span class="line">    discovery.zen.ping.unicast.hosts: ["192.168.1.19", "192.168.1.20", "192.168.1.18"]</span><br><span class="line">    # 组播范围</span><br><span class="line">    discovery.zen.minimum_master_nodes: 2</span><br><span class="line">    # 设置此项为了必免脑裂，这里的数字是总节点数除以2加1算出来的。</span><br><span class="line">scp /etc/elasticsearch/elasticsearch.yml root@192.168.1.20:/etc/elasticsearch/</span><br><span class="line">scp /etc/elasticsearch/elasticsearch.yml root@192.168.1.18:/etc/elasticsearch/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将配置文件发送到另外两台主机</span></span><br><span class="line">vim /etc/elasticsearch/jvm.options</span><br><span class="line">    -Xms1g  # 初始化的堆内存</span><br><span class="line">    -Xmx1g  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 最大堆内存，可以改大此值。这两个值要保持一致。或将上面配置文件中的bootstrap.memory_lock的值改为<span class="literal">false</span></span></span><br><span class="line">mkdir /elkdata/&#123;data,logs&#125; -pv</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主机创建数据和日志目录</span></span><br><span class="line">chown -R elasticsearch.elasticsearch /elkdata/</span><br><span class="line">systemctl start elasticsearch.service</span><br><span class="line">systemctl status elasticsearch.service</span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动会有一些慢，要等一会儿才能看到监听了9200和9300端口</span></span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">    elasticsearch1</span><br><span class="line">-----------------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装elasticsearch-head插件</span></span><br><span class="line">yum install -y git</span><br><span class="line">git clone git://github.com/mobz/elasticsearch-head.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载elasticsearch-head插件，这个插件是为了实现简单的集群监控、主机信息显示和管理等功能</span></span><br><span class="line">yum install epel-release.noarch</span><br><span class="line">yum install -y npm</span><br><span class="line">cd elasticsearch-head/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里一定要到这个目录下再启动插件才能启动，不然会报错</span></span><br><span class="line">npm install grunt -save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里可能会有报错<span class="string">"npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference"</span>，需要安装openssl即可解决。</span></span><br><span class="line">npm install</span><br><span class="line">npm run start &amp;</span><br><span class="line">vim /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">    #---------------------------------- http --------------------------------</span><br><span class="line">    http.cors.enabled: true     # 打开http功能</span><br><span class="line">    http.cors.allow-origin: "*"     # 允许谁访问</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置elasticsearch允许远程访问</span></span><br><span class="line">systemctl restart elasticsearch</span><br><span class="line">systemctl enable elasticsearch.service</span><br></pre></td></tr></table></figure>
+<h3 id="部署logstash"><a href="#部署logstash" class="headerlink" title="部署logstash"></a>部署logstash</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14:9600</td>
+<td>logstash-6.5.4.rpm</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传logstash-6.5.4.rpm到服务器上</span></span><br><span class="line">yum -y install java-1.8.0-openjdk-devel</span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">export JAVA_HOME=/usr</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line">yum -y install logstash-6.5.4.rpm</span><br><span class="line">systemctl start logstash</span><br><span class="line">systemctl enable logstash</span><br><span class="line">/usr/share/logstash/bin/logstash -e "input&#123;stdin&#123;&#125;&#125; output&#123;stdout&#123; codec =&gt; "rydebug"&#125;&#125;"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试时会提示找不到rydebug模块，无法加载。这里是否应该为rubydebug，未测试。使用下面的配置文件是没有</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 问题的。启动后会监听9600端口</span></span><br><span class="line">vim /etc/logstash/conf.d/system.conf   # 这个配置文件只作为测试使用</span><br><span class="line">    input &#123;</span><br><span class="line">        file&#123;</span><br><span class="line">            type =&gt; "messagelog"</span><br><span class="line">            path =&gt; "/var/log/messages"</span><br><span class="line">            start_position =&gt; "beginning"   # 首次从头收集</span><br><span class="line">        &#125;</span><br><span class="line">        # 从文件输入，类型是messagelog，写明路径，最后指定从头收集</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    output &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">            path =&gt; "/tmp/123.txt"</span><br><span class="line">        &#125;</span><br><span class="line">        # 输出到一个文件，用file引导，下面写明路径。</span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">            hosts =&gt; ["192.168.1.20:9200"]    # 指定第一台elaticsearch地址即可。</span><br><span class="line">            index =&gt; "system-messages-%&#123;+YYYY.MM.dd&#125;"   # 索引的命名规则，后面加入日期</span><br><span class="line">        &#125;</span><br><span class="line">        # 输出到elasticsearch，写明地址，索引的名称</span><br><span class="line">    &#125;</span><br><span class="line">/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf -t</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-f指定配置文件，-t表示测试配置文件是否正确</span></span><br><span class="line">chmod 644 /var/log/messages</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让普通用户可以读系统日志</span></span><br><span class="line">systemctl start logstash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动logstash。也可以使用/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf在前台启动</span></span><br><span class="line">tail -f /tmp/123.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到输出的日志文件了</span></span><br><span class="line">访问192.168.1.19:9100，在其中的数据浏览中修改上方的连接地址为第一台elasticsearch的地址，之后就可以看到一个叫system-messages-2019.01.24的索引了</span><br></pre></td></tr></table></figure>
+<h3 id="修改nginx配置"><a href="#修改nginx配置" class="headerlink" title="修改nginx配置"></a>修改nginx配置</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14</td>
+<td>nginx</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@nwps ~]# vim /etc/nginx/nginx.conf</span><br><span class="line">http &#123;</span><br><span class="line">    ...</span><br><span class="line">    log_format access1 '&#123;"@timestamp":"$time_iso8601",'</span><br><span class="line">                         '"host":"$server_addr",'</span><br><span class="line">                         '"clientip":"$remote_addr",'</span><br><span class="line">                         '"size":$body_bytes_sent,'</span><br><span class="line">                         '"responsetime":$request_time,'</span><br><span class="line">                         '"upstreamtime":"$upstream_response_time",'</span><br><span class="line">                         '"upstreamhost":"$upstream_addr",'</span><br><span class="line">                         '"http_host":"$host",'</span><br><span class="line">                         '"url":"$uri",'</span><br><span class="line">                         '"domain":"$host",'</span><br><span class="line">                         '"xff":"$http_x_forwarded_for",'</span><br><span class="line">                         '"referer":"$http_referer",'</span><br><span class="line">                         '"status":"$status"&#125;';</span><br><span class="line">	server &#123;</span><br><span class="line">		...</span><br><span class="line">        access_log  /var/log/nginx/host.access.log  access1;</span><br><span class="line">        # 在server中加入此条，记录访问wordpress的日志</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置日志格式为Json格式。相对普通日志格式,json易于识别,每个值都有与其相对于的key,易于提取日志内容及方便后续进一步对日志的分析。可以到http://www.kjson.com/上验证Json格式是否正确。</span></span><br><span class="line">[root@nginx1 ~]# nginx -t</span><br><span class="line">nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok</span><br><span class="line">nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful</span><br><span class="line">[root@nginx1 ~]# nginx -s reload</span><br></pre></td></tr></table></figure>
+<h3 id="安装配置filebeat"><a href="#安装配置filebeat" class="headerlink" title="安装配置filebeat"></a>安装配置filebeat</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14</td>
+<td>filebeat-6.5.4</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传filebeat-6.5.4.rpm到主机</span></span><br><span class="line">vim /etc/filebeat/filebeat.yml</span><br><span class="line">filebeat.prospectors:</span><br><span class="line">- input_type: log</span><br><span class="line">  enabled: true</span><br><span class="line">  paths:</span><br><span class="line">    - /var/log/nginx/host.access.log</span><br><span class="line">  fields:</span><br><span class="line">    log_topics: nginxlog</span><br><span class="line">    json.keys_under_root: true</span><br><span class="line">    json.overwrite_keys: true</span><br><span class="line"> </span><br><span class="line">output.kafka:</span><br><span class="line">  enabled: true</span><br><span class="line">  hosts: ["192.168.1.17:9092"]</span><br><span class="line">  topic: '%&#123;[fields][log_topics]&#125;'</span><br><span class="line">  partition.round_robin:</span><br><span class="line">  reachable_only: false</span><br><span class="line">  compression: gzip</span><br><span class="line">  max_message_bytes: 1000000</span><br><span class="line">  required_acks: 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置输出到kafka中</span></span><br><span class="line">/usr/share/filebeat/bin/filebeat -e -c /etc/filebeat/filebeat.yml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在前台启动，查看效果</span></span><br><span class="line">systemctl start filebeat</span><br><span class="line">systemctl enable filebeat</span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到第一台kafka查看效果</span></span><br><span class="line">scp /etc/hosts root@192.168.1.14:/etc</span><br><span class="line"><span class="meta">#</span><span class="bash"> filebeat主机需要可以通过主机名解析kafka的地址，不然下面命令启动filebeat后虽然能收到信息，但会报错</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 解析不了kafka的地址。</span></span><br><span class="line">./kafka-console-consumer.sh --bootstrap-server 192.168.1.17:9092 --topic nginxlog --from-beginning</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这条命令可以在前台监控发送过来的消息</span></span><br><span class="line">找一台主机访问nginx主机的wordpress页面，可以用curl访问多次，这时应该可以看到kafka上有发过来的信息</span><br></pre></td></tr></table></figure>
+<h3 id="配置logstash"><a href="#配置logstash" class="headerlink" title="配置logstash"></a>配置logstash</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14:9600</td>
+<td>logstash-6.5.4.rpm</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 这台logstash的作用是消息kafka中的消息，创建了和topic一样名称的消费者组</span></span><br><span class="line">[root@nwps ~]# mv /etc/logstash/conf.d/system.conf&#123;,.bak&#125;</span><br><span class="line">[root@nwps ~]# vim /etc/logstash/conf.d/nginx.conf</span><br><span class="line">input &#123;</span><br><span class="line">    kafka &#123;</span><br><span class="line">         type =&gt; "nginxlog"</span><br><span class="line">         topics =&gt; ["nginxlog"]</span><br><span class="line">         bootstrap_servers =&gt; ["192.168.1.17:9092"]</span><br><span class="line">         group_id =&gt; "nginxlog"   # 在kafka中创建的组名</span><br><span class="line">         auto_offset_reset =&gt; latest</span><br><span class="line">         codec =&gt; "json"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">filter &#123;</span><br><span class="line">    if [type] == "nginxlog" &#123;</span><br><span class="line">         grok &#123;</span><br><span class="line">             match =&gt; &#123;"message" =&gt; "%&#123;COMBINEDAPACHELOG&#125;"&#125;</span><br><span class="line">             remove_field =&gt; "message"</span><br><span class="line">         &#125;</span><br><span class="line">         date &#123;</span><br><span class="line">             match =&gt; ["timestamp" , "dd/MMM/YYYY:HH:mm:ss Z"]</span><br><span class="line">         &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">        geoip &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            <span class="built_in">source</span> =&gt; <span class="string">"clientip"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            target =&gt; <span class="string">"geoip"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            database =&gt; <span class="string">"/etc/logstash/conf.d/GeoLite2-City.mmdb"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            add_field =&gt; [<span class="string">"[geoip][coordinates]"</span>, <span class="string">"%&#123;[geoip][longitude]&#125;"</span>]</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            add_field =&gt; [<span class="string">"[geoip][coordinates]"</span>, <span class="string">"%&#123;[geoip][latitude]&#125;"</span>]</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        &#125;   <span class="comment"># 注释这段有点问题，未查看具体原因</span></span></span><br><span class="line">         mutate &#123;</span><br><span class="line">             convert =&gt; ["[geoip][coordinates]", "float"]</span><br><span class="line">         &#125;</span><br><span class="line">         useragent &#123;</span><br><span class="line">             source =&gt; "agent"</span><br><span class="line">             target =&gt; "userAgent"</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">    if [type] == 'nginxlog' &#123;</span><br><span class="line">         elasticsearch &#123;</span><br><span class="line">             hosts =&gt; ["http://192.168.1.19:9200"]</span><br><span class="line">             index =&gt; "logstash-nginxlog-%&#123;+YYYY.MM.dd&#125;"</span><br><span class="line">         &#125;</span><br><span class="line">         stdout &#123;codec =&gt; rubydebug&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@nwps ~]# /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/nginx.conf </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在前台启动，查看效果。如果正常的话，应该可以看到被消费的信息在前台打印出来。类似下面这样：</span></span><br><span class="line">&#123;</span><br><span class="line">    "@timestamp" =&gt; 2020-01-27T16:41:36.459Z,</span><br><span class="line">       "message" =&gt; "&#123;\"@timestamp\":\"2020-01-28T00:41:36+08:00\",\"host\":\"192.168.1.14\",\"clientip\":\"192.168.1.109\",\"size\":\"185\",\"responsetime\":\"0.000\",\"upstreamtime\":\"-\",\"upstreamhost\":\"-\",\"http_host\":\"192.168.1.14\",\"url\":\"/wordpress\",\"domain\":\"192.168.1.14\",\"xff\":\"-\",\"referer\":\"-\",\"status\":\"301\"&#125;",</span><br><span class="line">        "source" =&gt; "/var/log/nginx/host.access.log",</span><br><span class="line">        "offset" =&gt; 2514148,</span><br><span class="line">        "fields" =&gt; &#123;</span><br><span class="line">        "log_topics" =&gt; "nginxlog",</span><br><span class="line">              "json" =&gt; &#123;</span><br><span class="line">             "overwrite_keys" =&gt; true,</span><br><span class="line">            "keys_under_root" =&gt; true</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">          "host" =&gt; &#123;</span><br><span class="line">        "name" =&gt; "nwps"</span><br><span class="line">    &#125;,</span><br><span class="line">      "@version" =&gt; "1",</span><br><span class="line">          "tags" =&gt; [</span><br><span class="line">        [0] "_grokparsefailure"</span><br><span class="line">    ],</span><br><span class="line">          "type" =&gt; "nginxlog",</span><br><span class="line">          "beat" =&gt; &#123;</span><br><span class="line">            "name" =&gt; "nwps",</span><br><span class="line">        "hostname" =&gt; "nwps",</span><br><span class="line">         "version" =&gt; "6.5.4"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到第一台kafka查看效果</span></span><br><span class="line">[root@kafka1 bin]# ./kafka-consumer-groups.sh --bootstrap-server 192.168.1.17:9092 --group nginxlog --describe</span><br><span class="line"></span><br><span class="line">TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                     HOST            CLIENT-ID</span><br><span class="line">nginxlog        0          5407            5407            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line">nginxlog        1          5406            5406            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line">nginxlog        2          5405            5405            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看kafka的消息堆积情况，可以加上watch命令。不知是否与上面提到的hosts文件是否有关，最好加上可以解析</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kafka主机名。这里的kafka的组名是在logstash的配置文件中创建的。</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装配置kibana"><a href="#安装配置kibana" class="headerlink" title="安装配置kibana"></a>安装配置kibana</h3><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>服务</th>
+<th>主机名/系统</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.14:5601</td>
+<td>kibana-6.5.4.rpm</td>
+<td>nwps/CentOS8</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传kibana-6.5.4.rpm到主机</span></span><br><span class="line">yum install -y kibana-6.5.4-x86_64.rpm</span><br><span class="line">vim /etc/kibana/kibana.yml</span><br><span class="line">    server.port: 5601</span><br><span class="line">    server.host: "localhost"   # 这里是监听的地址</span><br><span class="line">    elasticsearch.url: "http://192.168.1.19:9200"   # 调用elasticsearch的接口，写一个就可以</span><br><span class="line">systemctl start kibana</span><br><span class="line">vim /etc/nginx/conf.d/kibana.conf</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name test.kibana.com;</span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass http://localhost:5601;</span><br><span class="line">         proxy_http_version 1.1;</span><br><span class="line">         proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">         proxy_set_header Connection 'upgrade';</span><br><span class="line">         proxy_set_header Host $host;</span><br><span class="line">         proxy_cache_bypass $http_upgrade;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">nginx -s reload</span><br><span class="line">本地添加hosts文件，可以解析test.kibana.com到192.168.1.14</span><br><span class="line">访问test.kibana.com</span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">   给nginx开启认证功能</span><br><span class="line">-----------------------</span><br><span class="line">yum install -y httpd-tools</span><br><span class="line">htpasswd -bc /etc/nginx/conf.d/htpasswd.users kibanauser centos</span><br><span class="line">vim /etc/nginx/conf.d/kibana.conf</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name test.kibana.com;</span><br><span class="line">    auth_basic "Restricted Access";</span><br><span class="line">    auth_basic_user_file /etc/nginx/conf.d/htpasswd.users;</span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass http://localhost:5601;</span><br><span class="line">         proxy_http_version 1.1;</span><br><span class="line">         proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">         proxy_set_header Connection 'upgrade';</span><br><span class="line">         proxy_set_header Host $host;</span><br><span class="line">         proxy_cache_bypass $http_upgrade;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/转：Shell中的IFS解惑/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2310,244 +2664,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/02/python基础学习-路径操作/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/01/02/python基础学习-路径操作/" itemprop="url">
-                  python基础学习-路径操作
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-01-02 17:42:12" itemprop="dateCreated datePublished" datetime="2020-01-02T17:42:12+08:00">2020-01-02</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="路径操作模块"><a href="#路径操作模块" class="headerlink" title="路径操作模块"></a>路径操作模块</h3><h4 id="3-4版本之前"><a href="#3-4版本之前" class="headerlink" title="3.4版本之前"></a>3.4版本之前</h4><ul>
-<li>os.path模块</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> path</span><br><span class="line"></span><br><span class="line">p = path.join(<span class="string">'/etc'</span>,<span class="string">'sysconfig'</span>,<span class="string">'network'</span>)</span><br><span class="line"><span class="comment"># 构建一个目录</span></span><br><span class="line">print(type(p),p)</span><br><span class="line"><span class="comment"># 如果是windows系统，这里的/会有问题</span></span><br><span class="line">print(path.exists(p))  <span class="comment"># 返回一个布尔型数据</span></span><br><span class="line"><span class="comment"># 判断目录是否存在</span></span><br><span class="line">print(path.split(p))   <span class="comment"># (head,tail)</span></span><br><span class="line"><span class="comment"># 路径切割，把最后一个/后和其前面的路径切分开</span></span><br><span class="line">print(path.abspath(<span class="string">'.'</span>))</span><br><span class="line"><span class="comment"># 查看绝对路径，点代表当前路径</span></span><br><span class="line">p = path.join(<span class="string">'o:/'</span>,p,<span class="string">'test.txt'</span>)</span><br><span class="line">print(path.dirname(p))</span><br><span class="line"><span class="comment"># </span></span><br><span class="line">print(path.basename(p))</span><br><span class="line"><span class="comment"># </span></span><br><span class="line">print(path.splitdrive(p))</span><br><span class="line"><span class="comment"># 驱动器</span></span><br><span class="line"></span><br><span class="line">p1 = path.abspath(__file__)</span><br><span class="line">print(p1,path.basename(p1))</span><br><span class="line"><span class="keyword">while</span> p1 ~= path.dirname(p1):</span><br><span class="line">    p1 = path.dirname(p1)</span><br><span class="line">    print(p1,path.basename(p1))</span><br></pre></td></tr></table></figure>
-<h4 id="3-4版本开始"><a href="#3-4版本开始" class="headerlink" title="3.4版本开始"></a>3.4版本开始</h4><p>建议使用pathlib模块，提供Path对象来操作。包括目录和文件。</p>
-<h3 id="pathlib模块"><a href="#pathlib模块" class="headerlink" title="pathlib模块"></a>pathlib模块</h3><p><code>from pathlib import Path</code></p>
-<h3 id="目录操作"><a href="#目录操作" class="headerlink" title="目录操作"></a>目录操作</h3><p>初始化</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">p = Path()   <span class="comment"># 当前目录</span></span><br><span class="line">type(p)</span><br><span class="line"><span class="comment"># 这时p的类型就不是字符串了，而是pathlib下的一个类型，系统不同，这个类型也不同</span></span><br><span class="line">p = Path(<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c/d'</span>)   <span class="comment"># 当前目录下的a/b/c/d。用逗号分隔，不需要使用/</span></span><br><span class="line">p = Path(<span class="string">'/etc'</span>)   <span class="comment"># 根下的etc目录</span></span><br><span class="line">p.absolute()</span><br><span class="line"><span class="comment"># 查看绝对路径</span></span><br><span class="line">p = p.joinpath(<span class="string">'a'</span>,<span class="string">'b'</span>)</span><br><span class="line"><span class="comment"># 做一个a/b目录路径</span></span><br><span class="line">p.absolute()</span><br><span class="line"><span class="comment"># 查看上面做的路径，但目录并没有创建 </span></span><br><span class="line">p = p / <span class="string">'c'</span> / <span class="string">'d'</span></span><br><span class="line">p</span><br><span class="line"><span class="comment"># 输出：PosixPath('a/b/c/d')</span></span><br><span class="line">p /= <span class="string">'e'</span></span><br><span class="line"><span class="comment"># 这相当于加等，输出：PosixPath('a/b/c/d/e')</span></span><br><span class="line">p1 = Path(<span class="string">'/etc'</span>)</span><br><span class="line"><span class="comment"># 做一个绝对路径</span></span><br><span class="line">p1.absolute()</span><br><span class="line"><span class="comment"># 查看绝对路径 </span></span><br><span class="line">p2 = <span class="string">'/'</span> / <span class="string">'etc'</span> / <span class="string">'sysconfig'</span></span><br><span class="line"><span class="comment"># 这样是不对的，会报错。因为字符串拼接要用加号，这里用/表示除号，所以报错</span></span><br><span class="line">p2 = Path(<span class="string">''</span>)</span><br><span class="line"><span class="comment"># 这是定义p2为当前目录，也就是点</span></span><br><span class="line">p2 = <span class="string">'/etc'</span> / <span class="string">'sysconfig'</span></span><br><span class="line"><span class="comment"># 这样还是会报错，问题和上面一样</span></span><br><span class="line">p2 = p2 / <span class="string">'/etc'</span> / <span class="string">'sysconfig'</span></span><br><span class="line"><span class="comment"># 只有加上当前的路径，再加后面的字符串才可以。这相当于用/etc/sysconfig覆盖p2的路径</span></span><br><span class="line">p2.parts</span><br><span class="line"><span class="comment"># 分解路径，以/为分隔符</span></span><br><span class="line">p2.joinpath(<span class="string">'a/b'</span>,<span class="string">'c'</span>)</span><br><span class="line"><span class="comment"># 路径拼接</span></span><br><span class="line">str(p2)</span><br><span class="line"><span class="comment"># 获取字符串</span></span><br><span class="line">bytes(p2)</span><br><span class="line">p2.parent</span><br><span class="line"><span class="comment"># 显示父目录 </span></span><br><span class="line">p2.parent.parent</span><br><span class="line"><span class="comment"># 如果p2是当前路径，这样做的话，当前路径的父目录还是当前路径，要用p2.absolute().parent才可以</span></span><br><span class="line"></span><br><span class="line">list(p2.parents)</span><br><span class="line">p2 /= <span class="string">'a/b/c/d'</span></span><br><span class="line">list(p2.parents)</span><br><span class="line"><span class="comment"># 迭代目录组成列表</span></span><br><span class="line">next(iter(p2.parents))</span><br><span class="line"><span class="comment"># 先用iter将p2.parents的值变成迭代器，再用next拿一个。如果对象没有parents，也就是没有父目录，那么这</span></span><br><span class="line"><span class="comment">#  样使用会报错，没法再拿路径了</span></span><br></pre></td></tr></table></figure>
-<p>路径拼接和分解</p>
-<p><strong><em>操作符<code>/</code></em></strong></p>
-<p>Path对象 / Path对象</p>
-<p>Path对象 / 字符串 或者 字符串 / Path对象</p>
-<p><strong><em>分解</em></strong></p>
-<p>parts属性，可以返回路径中的每一个部分</p>
-<p><strong><em>joinpath</em></strong></p>
-<p><code>joinpath(*other)</code>连接多个字符串到Path对象中</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">p = Path()</span><br><span class="line">p = p / <span class="string">'a'</span></span><br><span class="line">p1 = <span class="string">'b'</span> / p</span><br><span class="line">p2 = Path(<span class="string">'c'</span>)</span><br><span class="line">p3 = p2 / p1</span><br><span class="line">print(p3.parts)</span><br><span class="line">pe.joinpath(<span class="string">'etc'</span>,<span class="string">'init.d'</span>,Path(<span class="string">'httpd'</span>))</span><br></pre></td></tr></table></figure>
-<p>获取路径</p>
-<p>str 获取路径字符串</p>
-<p>bytes 获取路径字符串的bytes</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = Path(<span class="string">'/etc'</span>)</span><br><span class="line">print(str(p),bytes(p))</span><br></pre></td></tr></table></figure>
-<p>父目录</p>
-<p>parent 目录的逻辑父目录</p>
-<p>parents 父目录序列，索引0是直接的父</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p = Path(<span class="string">'/a/b/c/d'</span>)</span><br><span class="line">print(p.parent.parent)</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> p.parents:</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure>
-<p>name、stem、suffix、suffixes、with_suffix(suffix)、with_name(name)</p>
-<p>name：目录的最后一个部分</p>
-<p>suffix：目录中最后一个部分的扩展名</p>
-<p>stem：目录最后一个部分，没有后缀</p>
-<p>suffixes：返回多个扩展名列表</p>
-<p>with_suffix(suffix)：补充扩展名到路径尾部，返回新的路径，扩展名存在则无效</p>
-<p>with_name(name)：替换目录最后一个部分并返回一个新的路径</p>
-<p><strong>Path的方法拿到的大多数是对象，所以可以使用对象的方法拼接路径，这更方便。返回对象后方便对前面的结果继续处理，如使用<code>p2.parent.parent</code></strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">p = Path(<span class="string">'/magedu/mysqlinstall/mysql.tar.gz'</span>)</span><br><span class="line">print(p.name)</span><br><span class="line">print(p.suffix)</span><br><span class="line">print(p.suffixes)</span><br><span class="line">print(p.stem)</span><br><span class="line">print(p.with_name(<span class="string">'mysql-5.tgz'</span>))</span><br><span class="line">p = Path(<span class="string">'README'</span>)</span><br><span class="line">print(p.with_suffix(<span class="string">'.txt'</span>))</span><br></pre></td></tr></table></figure>
-<p>cwd()：返回当前工作目录</p>
-<p>home()：返回当前家目录</p>
-<p>is_dir()：是否是目录，目录存在返回True</p>
-<p>is_file()：是否是普通文件，文件存在返回True</p>
-<p>is_symlink()：是否是软链接</p>
-<p>is_socket()：是否是socket文件</p>
-<p>is_block_device()：是否是块设备</p>
-<p>is_char_device()：是否是字符设备</p>
-<p>is_absolute()：是否是绝对路径</p>
-<p>resolve()：返回一个新的路径，这个新路径就是当前Path对象的绝对路径，如果是软链接则直接被解析</p>
-<p>absolute()：也可以获取绝对路径，但是推荐使用resolve()</p>
-<p>exists()：目录或文件是否存在</p>
-<p>rmdir()：删除空目录。没有提供判断目录为空的方法</p>
-<p>touch(mode=0o666,exist_ok=True)：创建一个文件</p>
-<p>as_uri()：将路径返回成URI，例如：file:///etc/passwd</p>
-<p>mkdir(mode=0o777,parents=False,exist_ok=False)</p>
-<p>parents：是否创建父目录，True等同于mkdir -p；False时，父目录不存在，则抛出FileNotFoundError；exist_ok参数，在3.5版本加入。False时，路径存在，抛出FileExistsError；True时，FileExistsError被忽略</p>
-<p>iterdir()：迭代当前目录</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">p = Path()</span><br><span class="line">p /= <span class="string">'a/b/c/d'</span></span><br><span class="line">p.exists()   <span class="comment"># True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建目录</span></span><br><span class="line">p.mkdir()   <span class="comment"># FileNotFoundError</span></span><br><span class="line">p.mkdir(parents=<span class="keyword">True</span>)</span><br><span class="line">p.exists()   <span class="comment"># True</span></span><br><span class="line">p.mkdir(parents=<span class="keyword">True</span>)</span><br><span class="line">p.mkdir(parents=<span class="keyword">True</span>,exist_ok=<span class="keyword">True</span>)</span><br><span class="line">p /= <span class="string">'readme.txt'</span></span><br><span class="line">p.parent.rmdir()</span><br><span class="line">p.parent.exists()   <span class="comment"># False 'a/b/c'</span></span><br><span class="line">p.mkdir()   <span class="comment"># FileNotFoundError</span></span><br><span class="line">p.mkdir(parents=<span class="keyword">True</span>)   <span class="comment"># 成功</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 遍历，并判断文件类型，如果是目录是否可以判断其是否为空？</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> p.parents[len(p.parents)<span class="number">-1</span>].iterdir():</span><br><span class="line"><span class="comment"># 迭代所有路径</span></span><br><span class="line">    print(x,end=<span class="string">'\t'</span>)</span><br><span class="line">    <span class="keyword">if</span> x.is_dir():</span><br><span class="line">        flag = <span class="keyword">False</span></span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> x.iterdir():</span><br><span class="line"><span class="comment"># 如果能进来迭代，就证明目录不为空，下面就可以判断，如果是flag = false就是空目录，如果是True就不是空目录</span></span><br><span class="line">            flag = <span class="keyword">True</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="comment"># for 循环是否可以使用else子句</span></span><br><span class="line">        print(<span class="string">'dir'</span>,<span class="string">'Not Empth'</span> <span class="keyword">if</span> flag <span class="keyword">else</span> <span class="string">'Empyt'</span>,sep=<span class="string">'\t'</span>)</span><br><span class="line">    <span class="keyword">elif</span> x.is_file():</span><br><span class="line">        print(<span class="string">'file'</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'other file'</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h4><p>glob(pattern)：通配给定的模式</p>
-<p>rglob(pattern)：通配给定的模式，递归目录</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回一个生成器</span></span><br><span class="line">list(p.glob(<span class="string">'test*'</span>))   <span class="comment"># 返回当前目录对象下的test开头的文件</span></span><br><span class="line">list(p.glob(<span class="string">'**/*.py'</span>))   <span class="comment"># 递归所有目录，等同rglob</span></span><br><span class="line"><span class="comment"># 如果是*/*.py表示当前层，因为/前是一个星号。如果是**/*.py表示从当前路径算起往下所有目录，任意层次目录都要查找。.py前面的*表示任意个字符，/前的一个*表示任意一级，如果/前是两个*，表示任意个字符任意级</span></span><br><span class="line">g = p.rglob(<span class="string">'*.py'</span>)   <span class="comment"># 生成器，rglob表示递归查找</span></span><br><span class="line">next(g)</span><br></pre></td></tr></table></figure>
-<h4 id="匹配"><a href="#匹配" class="headerlink" title="匹配"></a>匹配</h4><p>match(pattern)：模式匹配，成功返回True</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Path(<span class="string">'a/b.py'</span>).match(<span class="string">'*.py'</span>)   <span class="comment"># True</span></span><br><span class="line">Path(<span class="string">'/a/b/c.py'</span>).match(<span class="string">'b/*.py'</span>)   <span class="comment"># True</span></span><br><span class="line">Path(<span class="string">'/a/b/c.py'</span>).match(<span class="string">'a/*.py'</span>)   <span class="comment"># False</span></span><br><span class="line">Path(<span class="string">'/a/b/c.py'</span>).match(<span class="string">'a/*/*.py'</span>)   <span class="comment"># True</span></span><br><span class="line">Path(<span class="string">'/a/b/c.py'</span>).match(<span class="string">'z/**/*.py'</span>)   <span class="comment"># True</span></span><br><span class="line">Path(<span class="string">'/a/b/c.py'</span>).match(<span class="string">'**/*.py'</span>)   <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
-<p>stat()：相当于stat命令</p>
-<p>lstat()同stat()，但如果是符号链接，则显示符号链接本身的文件信息</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ ln -s test t</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line">p = Path(<span class="string">'test'</span>)</span><br><span class="line">p.stat()</span><br><span class="line">p1 = Path(<span class="string">'t'</span>)</span><br><span class="line">p1.stat()</span><br><span class="line">p1.lstat()</span><br></pre></td></tr></table></figure>
-<h3 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h3><p><code>open(mode=&#39;r&#39;,buffering=-1,encoding=None,errors=None,newline=None)</code></p>
-<p>使用方法类似内奸函数open。返回一个文件对象</p>
-<p>3.5增加的新函数</p>
-<p>read_bytes()：以’rb’读取路径对应文件，并返回二进制流。看源码</p>
-<p>read_text(encoding=None,errors=None)：以’rt’方式读取路径对应文件，返回文本</p>
-<p>Path.write_bytes(data)：以’wb’方式写入数据到路径对应文件</p>
-<p>write_text(data,encoding=None,errors=None)：以’wt’方式写入字符串到路径对应文件</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">p = Path(<span class="string">'my_binary_file'</span>)</span><br><span class="line">p.write_bytes(<span class="string">b'Binary file contents'</span>)</span><br><span class="line">p.read_bytes()   <span class="comment"># b'Binary file contents'</span></span><br><span class="line"></span><br><span class="line">p = Path(<span class="string">'my_text_file'</span>)</span><br><span class="line">p.write_text(<span class="string">'Text file contents'</span>)</span><br><span class="line">p.read_text()   <span class="comment"># 'Text file contents'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line">p = Path(<span class="string">'o:test.py'</span>)</span><br><span class="line">p.write_text(<span class="string">'hello python'</span>)</span><br><span class="line">print(p.read_text())</span><br><span class="line"><span class="keyword">with</span> p.open() <span class="keyword">as</span> f:</span><br><span class="line">    print(f.read(<span class="number">5</span>))</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2595,7 +2711,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">224</span>
+                    <span class="site-state-item-count">225</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
