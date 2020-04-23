@@ -399,6 +399,46 @@ class A:
         
 A.stmtd()
 A().stmtd()
+========================================================
+from functools import partial
+
+class StaticMethod:
+    def __init__(self, fn):  # 这样就可以在作为装饰器时把函数当作fn参数传进来了
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        return self.fn
+
+class ClassMethod:
+    def __init__(self, fn):  # 这样就可以在作为装饰器时把函数当作fn参数传进来了
+        print(fn)
+        self.fn = fn
+        
+    def __get__(self, instance, owner):
+        print(self, instance, owner)
+        # return self.fn(owner)
+        return partial(self.fn, owner)  # 这样做只会返回固定的类名称
+
+class A:   
+    @StaticMethod
+    def foo(): # foo = StaticMethod(foo),原来的foo在上面的__init__方法中
+        print('static')
+    # 这里做完了，就相当于foo = StaticMethod(foo)。未来要用A.foo的方法调用
+    
+    @ClassMethod
+    def bar(cls):  # 设置这个函数就是打印类的名称
+        print(cls.__name__)
+    
+f = A.foo  # 这一句触发了__get__方法
+print(f)
+f()
+
+f = A.bar
+print(f)
+# f(A)  # 这相当于A.bar(A)。我们的目录是A.bar()
+f()   # 返回是None类型，因为def bar(cls)没有返回值
 ```
 
 ```python
@@ -849,6 +889,7 @@ A.init
 a1
 B.init
 a1
+100
 =================================================================================================
 class A:
     def __init__(self):
@@ -868,25 +909,42 @@ class B:
         # self.x = 100
         self.x = A()
     
-print(B.x.a1)
+print(B.x.a1) # 如果上面的__get__方法没有return，会报错：AttributeError: 'NoneType' object has no attribute 'a1'
 print(B.x)  # 这里打印的是None，因为__get__方法没有return，所以上面一句等于是在找None.a1，所以会报错。
 输出：
 A.init
-<__main__.A object at 0x00000000000001045C0> None <class '__main__.B'>
+A.__get__ <__main__.A object at 0x7fd61853da90> None <class '__main__.B'>
 # 第一段就是__get__方法中的self，第二段的None是instance的值，第三段是owner，owner表示描述器被谁用到了，用它来当做属性，owner是类。当你通过一个属性去访问的时候，如果这个属性刚好是另一个类的实例，而且这个类又实现了描述器三个方法中的一个的话，那它就是描述器。也就是通过属性要访问描述器。当创建的描述器使用__get__方法时，第一个拿到的是它自己self，还能拿到这个描述器属主相关的类型信息owner，和属主相关的实例instance
+a1
+# 上面三行是print(B.x.a1)输出的，下面是print(B.x)输出的
+A.__get__ <__main__.A object at 0x7fd61853da90> None <class '__main__.B'>
+<__main__.A object at 0x7fd61853da90>  # 这是__get__方法中return self的输出
 
 b = B()
-print(B.x.a1)  # 这里还是会报错，因为B.x返回的是None，None没有a1属性
+输出：
+A.init  # 这是B类的x属性输出的
+B.init  # 这是实例化B类时的输出
+A.init  # 这是实例化B类时self.x的输出
+
+print(B.x.a1)  # 如果__get__方法没有return，这里还是会报错，因为B.x返回的是None，None没有a1属性
+输出：
+A.__get__ <__main__.A object at 0x7f4d58791a90> None <class '__main__.B'>
+a1
+
 print(B.x)
 # print(b.x.a1)  # 这会报异常，因为b.x是从实例的dict拿的，b.x是100，100没有a1属性
+输出：
+A.__get__ <__main__.A object at 0x7f3e353ffa90> None <class '__main__.B'>
+<__main__.A object at 0x7f3e353ffa90>
 print(b.x)
 输出：
-B.init
+A.__get__ <__main__.A object at 0x7fbc1a70ca90> <__main__.B object at 0x7fbc1a738f40> <class '__main__.B'>
+<__main__.A object at 0x7fbc1a70ca90>
+# 在B类初始化的设置中如果没有设置self.x = A()，就会使b实例访问B类的x属性，这时因为使用了b.x调用描述器，这时的instance有值了，查看b实例的字典中是没有x属性的
+<__main__.A object at 0x7f99d1059f70>
+# 如果B类初始化的设置中使用了self.x = A()，当使用b.x时就是调用实例的x属性，就不会触发__get__方法。查看b实例的字典中有x属性。当使用实例调用x属性时，输出的instance就有值了
 
-<__main__.A object at 0x00000000000001045C0> <__main__.B object at 0x0000000000006F4F28> <class '__main__.B'>
-# 因为使用了b.x调用描述器，这时的instance有值了
-
-当一个类的类属性等于另一个类的实例的时候，且被等于的这个类实现了三种方法中的一种，也就是被等于的类是描述器的话。如果通过类属性可以访问，它就会触发get方法。如果是通过实例的属性访问它，就不会触发get方法。可以看一下上面B.x会触发，b.x不会触发。这符合字典的搜索顺序
+当一个类的类属性等于另一个类的实例的时候，且被等于的这个类实现了三种方法中的一种，也就是被等于的类是描述器的话。如果通过类属性可以访问（可以是实例调用类属性），它就会触发get方法。如果是通过实例的属性访问它，就不会触发get方法。可以看一下上面B.x会触发，b.x不会触发。也就是，实例可以访问类属性，但类属性不会加到实例字典中，这符合字典的搜索顺序
 只有__get__是非数据描述器，有__get__和__set__是数据描述器。一定要作为人家的类属性访问
 =================================================================================================
 class A:
@@ -911,16 +969,79 @@ class B:
         self.x = A()
         
 print(B.x)
+输出：
+A.init
+A.__get__ <__main__.A object at 0x7f76206a1a90> None <class '__main__.B'>
+<__main__.A object at 0x7f76206a1a90>
+
 print(B.x.a1)
-print()
+输出：
+A.__get__ <__main__.A object at 0x7f9b2ce55a90> None <class '__main__.B'>
+a1
 
 b = B()
+输出：
+B.init
+A.init
+A.__set__ <__main__.A object at 0x7f67678a6a90> <__main__.B object at 0x7f67678c0490> <__main__.A object at 0x7f67678c0970>
+
 print(B.x)
+输出：
+A.__get__ <__main__.A object at 0x7f63a5c5da90> None <class '__main__.B'>
+<__main__.A object at 0x7f63a5c5da90>
+
 print(b.x.a1)
+输出：
+A.__get__ <__main__.A object at 0x7fa23c0d8a90> <__main__.B object at 0x7fa23c104fd0> <class '__main__.B'>
+a1
 
 print(b.__dict__)
+输出：
+{}
+# 可以看到，加入__set__方法后，b实例的字典中就没有x属性了，尽管在B类初始化时定义了x属性。如果没有定义__set__方法，b实例会有一个x属性。
+
 print(B.__dict__)
-# 当一个类的类属性是数据描述器的话，对这个类的实例属性的操作，相当于操作类属性。如果是非数据描述器，就是操作实例属性。也就是数据描述器只能操作类属性。property()是数据描述器。少用类来操作属性，要用实例来操作。类中的所有方法都是非数据描述器
+输出：
+{'__module__': '__main__', 'x': <__main__.A object at 0x7f626a321a90>, '__init__': <function B.__init__ at 0x7f626a2bd700>, '__dict__': <attribute '__dict__' of 'B' objects>, '__weakref__': <attribute '__weakref__' of 'B' objects>, '__doc__': None}
+# 当一个类的类属性是数据描述器的话（如上面的B类），对这个类的实例属性的操作，相当于操作类属性。如果是非数据描述器，就是操作实例属性。也就是数据描述器只能操作类属性。property()是数据描述器。少用类来操作属性，要用实例来操作。类中的所有方法都是非数据描述器
+=================================================================================================
+class A:
+    def __init__(self):
+        print('A.init')
+        self.a1 = 'a1'
+        
+    def __get__(self, instance, owner):
+        print('A.__get__',self, instance, owner)
+        return self   # 这里返回self，下面就可以使用b.x.a1了
+    
+    def __set__(self, instance, owner):
+        print('A.__set__', self, instance, value)
+        
+class B:
+    x = A()
+    
+    def __init__(self):
+        print('B.init')
+        
+    @classmethod
+    def clsmtd(cls):
+        pass
+    
+    @staticmethod
+    def stmtd():
+        pass
+    
+    @property
+    def age(self):
+        return self.age
+    
+print(B.__dict__)
+输出：
+A.init
+{'__module__': '__main__', 'x': <__main__.A object at 0x7f201e79ea90>, '__init__': <function B.__init__ at 0x7f201e73a700>, 'clsmtd': <classmethod object at 0x7f201e7caf40>, 'stmtd': <staticmethod object at 0x7f201e8001c0>, 'age': <property object at 0x7f201e73f770>, '__dict__': <attribute '__dict__' of 'B' objects>, '__weakref__': <attribute '__weakref__' of 'B' objects>, '__doc__': None}
+# 'clsmtd': <classmethod object at 0x7f201e7caf40>这样的输出表示是描述器
+
+B().age = 500
 ```
 
 练习

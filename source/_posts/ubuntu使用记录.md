@@ -1,8 +1,8 @@
 ---
 title: kali使用记录
 date: 2019-03-12 08:53:20
-tags: kali使用
-categories: 渗透测试
+tags: ubuntu使用
+categories: ubuntu
 ---
 
 ### 软件安装
@@ -97,7 +97,7 @@ vim ~/.zshrc
 export ZSH="/home/shouyu/.oh-my-zsh"
 ZSH_THEME="agnoster"
 # 修改为这个主题，个人喜欢。主题也可以使用random，每次打开一个终端窗口时都会随机打开一个主题
-export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/opt/electron-ssr:/usr/local/bin:/usr/local/sbin:/usr/local/jdk1.8/jdk1.8.0_211/bin/:/home/shouyu/anaconda3/bin
+export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/opt/electron-ssr:/usr/local/bin:/usr/local/sbin:/usr/local/jdk1.8/jdk1.8.0_211/bin/:/home/shouyu/anaconda3/bin:/opt/baidunetdisk:/home/shouyu/.pyenv/bin:/snap/bin
 setopt no_nomatch
 if [[ -r /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh ]];then
     source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
@@ -1147,6 +1147,78 @@ GitHub 项目地址，Windows、Linux 版：https://github.com/Automattic/simple
 
 
 
+#### 安装使用multipass
+
+```shell
+multipass就是为了快速创建ubuntu系统，进行开发与测试
+可以在ubuntu的商店安装multipass，也可以使用下面的命令行
+sudo snap install multipass --classic
+# 要使用snap安装
+因为网络太慢，安装后可以到https://cloud-images.ubuntu.com/下载***-cloudimg-amd64.img文件到本地，如：
+axel -n 10000 http://cloud-images.ubuntu.com/releases/server/releases/bionic/release-20200129.1/ubuntu-18.04-server-cloudimg-amd64.img
+也可以使用命令行下载，先使用下面命令查询可下载的版本
+使用multipass命令需要将/snap/bin加入到环境变量中。
+shouyu@shouyu-pc:~|⇒  multipass find   # 查询可下载版本
+Image                   Aliases           Version          Description
+snapcraft:core          core16            20200409         Snapcraft builder for Core 16
+snapcraft:core18                          20200409         Snapcraft builder for Core 18
+core                    core16            20200213         Ubuntu Core 16
+core18                                    20200210         Ubuntu Core 18
+daily:16.04             xenial            20200415         Ubuntu 16.04 LTS
+daily:18.04             bionic,lts        20200416         Ubuntu 18.04 LTS
+daily:19.10             eoan              20200413.1       Ubuntu 19.10
+daily:20.04             devel,focal       20200418         Ubuntu 20.04 LTS
+shouyu@shouyu-pc:~|⇒  multipass launch core          
+Retrieving image: 1% 
+# 这是选择安装哪个版本的ubuntu，core是Image的名称。下载的速度非常慢
+multipass launch --name test
+# 这是官网建议的创建虚拟机的方法，但使用的Image应该是最新的。
+# 测试并不太好用
+下载镜像后，可以使用命令行创建系统，如下
+multipass launch --name ubuntu1804 file:///home/shouyu/下载/ubuntu-18.04-server-cloudimg-amd64.img
+# 可以使用--name来定义虚拟系统的名称，后面要用file://来引导镜像的路径
+==================================================================================================
+可以指定启动实例名字( -n, --name <name> )，分配cpu数量( -c, --cpus <cpus> 默认是1)，设置磁盘容量( -d, 
+--disk <disk> 默认5G，最小512M)，设置内存分配( -m, --mem <mem> 最小128M，默认1G)，并且可以指定 
+cloud-init(https://cloud-atlas.readthedocs.io/zh_CN/latest/kvm/cloud-init.html#cloud-init)
+==================================================================================================
+
+○ multipass ls                                                                                     # 使用此命令查看已创建的虚拟系统
+Name                    State             IPv4             Image
+seasoned-booklouse      Running           10.107.187.151   Not Available
+ubuntu1804              Running           10.107.187.75    Not Available
+
+multipass shell ubuntu1804
+# 连接到虚拟系统中
+
+multipass stop seasoned-booklouse
+○ multipass ls                     
+Name                    State             IPv4             Image
+seasoned-booklouse      Stopped           --               Not Available
+multipass start seasoned-booklouse
+# 停止与启动虚拟系统
+multipass help
+multipass help launch
+# 其他命令可以查看帮助，方法如上，help后面加上子命令会查看到子命令的选项
+=================================================================================================
+可供参考的文章
+https://www.bboy.app/2020/01/19/microk8s%E5%88%9D%E4%BD%93%E9%AA%8C/
+https://www.bboy.app/2020/01/17/%E4%BD%BF%E7%94%A8Multipass%E5%9C%A8%E4%BD%A0%E7%9A%84windows%E6%88%96%E8%80%85mac%E7%94%B5%E8%84%91%E4%B8%8A%E5%BF%AB%E9%80%9F%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAUbuntu%E8%99%9A%E6%8B%9F%E6%9C%BA/
+https://www.bboy.app/2020/01/17/%E8%A7%A3%E5%86%B3Ubuntu%20snap%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98/
+```
+
+
+
+#### 安装smartdns
+
+```shell
+docker run -d -p 127.0.0.53:53:53/udp --restart=always --name gsmartdns ghostry/smartdns
+# 设置将本机的127.0.0.53的53号端口映射到容器的53端口，不然可能会与其他软件端口冲突。另外在resolv.conf中设置非53端口的DNS好
+# 像也有问题，默认都是只输出地址即可，如果加上端口会有问题。所以最后这里在创建容器时直播改变地址。
+```
+
+
+
 ### 设置方法
 
 #### apt源
@@ -1223,6 +1295,16 @@ lsmod | grep bbr  #检查是否有tcp_bbr
 
 ```shell
 打开"chrome://flags/#enable-parallel-downloading"，找到Parallel downloading，改成Enable
+```
+
+
+
+#### ubuntu备份
+
+```shell
+1. 在ubuntu上找到backup软件，在其中的里设置好要备份到的位置，可以是本地磁盘或是云盘中。之后就可以备份了，如果使用本地磁盘，可能会提示：没有权限操作备份到的目录，需要授权。方法如下：
+sudo setfacl -m u:shouyu:rwx -R /media/shouyu/0d3e747f-4fed-4a49-bf68-cddf9f927350
+# 注意要用-R选项递归授权
 ```
 
 

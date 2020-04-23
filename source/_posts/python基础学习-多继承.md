@@ -500,13 +500,13 @@ class LinkedList:
 # 如果前一个是None，一定是在尾部，并且是空的。如果尾部是空的，头也会是空的。如果有一个元素，尾部也不应该是空的
             self.head = node
 # 这表示上一个节点的下一个就是我们现在要插入的。这也是当前节点
-		else:
+        else:
         	prev.next = node
 # 只有一个节点时是没有next的，只有prev不是None时才要将元素间建立关联。所以这句不能放在if语句外面
         self.nodes.append(node)
 # 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，
 # 不然每次追加都要从头开始算
-		self.tail = node
+        self.tail = node
 # tail无论什么情况都应该是node，也就是无论是否为空，tail也应该是最新的node，这是将尾部设置为当前节点。
 
 a = LinkedList()
@@ -568,16 +568,16 @@ class LinkedList:
 # 如果前一个是None，一定是在尾部，并且是空的。如果尾部是空的，头也会是空的。如果有一个元素，尾部也不应该是空的
             self.head = node
 # 这表示上一个节点的下一个就是我们现在要插入的。这也是当前节点
-		else:
-        	prev.next = node
+        else:
+            prev.next = node
 # 只有一个节点时是没有next的，只有prev不是None时才要将元素间建立关联。所以这句不能放在if语句外面
         self.nodes.append(node)   
 # 把节点追加到列表中，但前面和后面的节点还没有关联，所以要在初始化时加self.head和self.tail。因为有追加，所以要加self.tail，
 # 不然会次追加都要从头开始算
-		self.tail = node
+        self.tail = node
 # tail无论什么情况都应该是node，也就是无论是否为空，tail也应该是最新的node，这是将尾部设置为当前节点。
 
-	def iternodes(self, reverse=False):  # 暂时只能实现单向。iter表示生成器
+    def iternodes(self, reverse=False):  # 暂时只能实现单向。iter表示生成器
         current = self.head   # 这是头部的元素
         while current:        # 空元素是进不来的
             yield current
@@ -758,21 +758,23 @@ class LinkedList:
     容器类，按某种方式存储一个个节点
     """
     def __init__(self):
-       # self.nodes = []   # 创建一个容器，放上面的元素。不能用set，有可能去重。另外set是无序的对不需要插入的列表来说，检索方便，所以使用了列表。但是插入、remove不合适
+       # self.nodes = []   # 创建一个容器，放上面的元素。不能用set，有可能去重，另外set是无序的。对不需要插入的列表来说，
+    # 检索方便，所以使用了列表。但是插入、remove不合适
         self.head = None
         self.tail = None
 # 这里没有设计self.size是因为这个数据在多线程的情况下不会太准确  
 
     def append(self, val):
-        node = SingleNode(val)
-		if self.head is None:  
+        node = SingleNode(val)  # 当前新增的数字
+        if self.head is None:  
 # 加第一个元素时才会到这里
-            self.head = node
-		else:  # 大于1个元素时进入这里
-        	self.tail.next = node   # 原来的尾部指向自己
+            self.head = node  # 如果第一个元素是None，那么就把头设置为node
+        else:  # 大于1个元素时进入这里
+            self.tail.next = node   # 原来的尾部指向自己
             node.prev = self.tail  # 前一个指向尾部
-# prev属性实际在node实例上，所以要改node实例，而不是self.prev
-		self.tail = node  # 最后把自己修正成尾部
+# prev属性实际在node实例上，所以要改node实例，而不是self.prev。每次调用append方法时都要用到node实例，所以从第二次进来就要让
+# 实例知道node的前一个数字是谁。
+        self.tail = node  # 最后把自己修正成尾部
 
 
 	def iternodes(self, reverse=False):  # 暂时只能实现单向。iter表示生成器
@@ -782,31 +784,36 @@ class LinkedList:
             current = current.prev if reverse else current.next
             
     def pop(self):  # 从尾部弹出一个
-        if self.tail is None:  # 如果尾部是None，就抛异常. == 0
+        if self.tail is None:  # 如果尾部是None，就抛异常。 == 0
             raise Exception('Empty')
         tail = self.tail
         prev = tail.prev
        #  next = tail.next # None， 尾部的下一个一定是None
-        if prev is None:  # ==1
-            self.head = None
-            self.tail = None
+        if prev is None:  # ==1。判断上面定义的tail和prev是否符合条件
+            self.head = None   # 如果前一个是None，就表示头是None，否则前一个应该有值
+            self.tail = None   #  头是None，就表示尾也是None。
+# 当符合这个条件时就证明只有最后一个值了。再调用pop方法时头和尾就应该是None了。
         else: # > 1
             self.tail = prev
             prev.next = None
+# 符合这个条件时，就是大小1个元素的时候，弹出一个元素后，尾部就应该变成尾部的前一个元素，前一个元素的下一个元素（也就是尾部）就应
+# 该变成None了，因为被弹出了。
         return tail.val
     
     def getitem(self, index):
         if index < 0:
             return None   # 不支持负索引
-        current = None
+        current = None   # 初始化一个current。
         for i,node in enumerate(self.iternodes()):
-            if i == index:
-                current = node
+            if i == index:  
+                current = node   # 如果i等于index时，将i对应的node赋值给current，之后跳出整个循环
                 break
-        if current is not None:
+        if current is not None:   # 判断上面的循环，看current是否为None，如果不为None就返回current本身
             return current
+# 这里似乎不应该会出现current等于None的情况，如果index小于0,会在第一个if条件判断处拦截，index大于等于0时会在下面的for循环拦
+# 截并重新给current赋值，所以不应该会有current等于None的情况。
         
-    def insert(self, index, val):
+    def insert(self, index, val):  # 这只能实现从头或尾追加
         if index < 0:
             raise Exception('Error')
         
@@ -815,22 +822,24 @@ class LinkedList:
             if i == index:
                 current = node
                 break
+# 这里就是要用enumerate函数来确定index及其对应的值，最后赋值给current
         if current is None:
             self.append(val)
             return 
-        
+# 这里返回的是None，真正返回的内容已经在append方法中返回了。
+# 什么情况下current会等于None？
         prev = current.prev
         next = current.next
         
         node = SingleNode(val)
         if prev is None:  # 头部插入
-            self.head = node
-            node.next = current
-            current.prev = node
+            self.head = node   # 这就是在设置插入到头部了
+            node.next = current  
+            current.prev = node  # 插入到头部后，再整理一下关系。头部的下一个是current，current的前一个是node
         else:
-            node.prev = prev
+            node.prev = prev  # 如果前一个不是None，那么前一个就是current.prev
             node.next = current
-            current.prev = node
+            current.prev = node 
 
 ll = LinkedList()
 node = SingleNode('abc')
@@ -853,7 +862,7 @@ ll.append(node)
 ll.insert(6, 6)
 ll.insert(7, 7)
 ll.insert(0, '123')
-ll.insert(1, '456')
+ll.insert(1, '456')  # 在中间插入是无效的，但与pop方法结合时又是起作用的。
 ll.insert(30, 'abcdefg')
 
 ll.pop()
@@ -882,7 +891,7 @@ class SingleNode:
     def __repr__(self):
         # return repr(self.item)
         return "({} <== {} ==> {})".format(self.prev.item if self.prev else None, self.item, self.next.item if self.next else None)
-    
+# 打印时有三个值，第一个是前一个值，第二个是当前值，第三个是后一个值。
 class LinkedList:
     def __init__(self):
         self.head = None
@@ -898,11 +907,14 @@ class LinkedList:
             node.prev = self.tail   # 前后关联
         self.tail = node   # 更新结尾结点
         return self
+# 第一次调用append方法后，self.tail和self.head都被赋值为node。第二次进入时，就等于在给SingleNode
+# 的实例属性next和prev赋值。当打印时，因为数据是SingleNode类的，所以要在SingleNode类中实现打印方
+# 法，LinkedList类只是提供了不同的方法。
     def insert(self, index, item):
         if index < 0:   # 不接受负数
             raise IndexError('Not negative index {}'.format(index))
             
-        current = None
+        current = None  # current是当前的值
         for i, node in enumerate(self.iternodes()):
             if i == index:   # 找到了
                 current = node
@@ -910,16 +922,23 @@ class LinkedList:
         else:   # 没有break，尾部追加
             self.append(item)
             return
-        
+# for循环的意思是通过用i与用户提供的index比对，如果一样就说明这里用户要找的值，也就是current(当前值)的值，之后就
+# break跳出循环，不会再执行else语句，直接执行下面的语句。如果没有找到，这应该是第一次加入值或索引超过了现有的范围
+# （如下面的ll.insert(20, 'def'），这时就会执行到else语句，这会调用append方法追加数据，之后就直播返回了，不会再
+# 执行下面的语句。 
         # break，找到了
         node = SingleNode(item)
         prev = current.prev
         next = current
-        
+# 当找到以后，这里就会给node，prev，next重新赋值，这三个变量分别代表要插入的值，前一个和后一个值，上面
+# 的current是用户指定的值，我们是要在这个值的前面插入值。下面进行判断，如果prev是空，说是current就是
+# 头部了，这样就要在头部前面插入，所以将头部调整为node。否则，前一个的下一个就是当前插入的node，插入后
+# 当前的node的前一个就是current.prev，current已经在上面的for循环中赋值成了node。最后，将新插入的值
+# 的下一个调整为current，也就是next，再将next的前一个调整为新插入的node
         if prev is None:  # 首部
             self.head = node
         else:
-            prev.next = node
+            prev.next = node  # 这个prev是上面
             node.prev = prev
         node.next = next
         next.prev = node
@@ -940,6 +959,13 @@ class LinkedList:
         return item
     
     def remove(self, index):
+# remove方法的逻辑与insert方法的差不多，先判断容器是否为空或用户输入的索引值不符合要求。之后找到用户输
+# 入的索引对应的值并赋值给current上，再设置current的前一个和后一个值。判断四种情况，如果前一个和后一个
+# 都是None，那么删除后，将头和尾都设置成None，说明删除的已经是最后一个值了。如果前一个是None，说明删除
+# 的就是头，删除后将头调整为下一个next，就是头变成了next，下一个的前一个就成了None。如果下一个next是
+# None，说明已经在尾部了，删除后将尾部调整为前一个prev，前一个的下一个调整为None。最后如果不符合前面说
+# 的三种情况，说明在中间，删除后将前一个的下一个调整为下一个next，下一个的前一个调整为前一个。最后删除用
+# 户指定的current的值。
         if self.tail is None: # 空
             raise Exception('Empty')
             
@@ -995,8 +1021,8 @@ print('============')
 
 ll.remove(6)
 ll.remove(5)
-ll.remove(0)
-ll.remove(1)
+ll.remove(0)  # 从头部删除需要注意，原本索引为1的元素，在删除头部后就会变成索引为0。
+ll.remove(1)  # 在删除了索引为0的元素后，这里删除索引为1的元素的值实际是2而不是1
 
 for x in ll.iternodes():
     print(x)
