@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="UDP服务端编程测试命令 12netstat -anp udp | find &quot;9988&quot;  # windows查找udp是否启动端口echo &quot;123abc&quot; | nc -u 127.0.0.1 9988  # linux下发给服务端数据 UDP服务端编程流程  创建socket对象。socket.SOCK_DGRAM 绑定IP和Port，bind()方法 传输数据 接收数据，socket.re">
+<meta name="keywords" content="python网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-UDP编程">
+<meta property="og:url" content="http://yoursite.com/2020/06/17/python基础学习-UDP编程/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="UDP服务端编程测试命令 12netstat -anp udp | find &quot;9988&quot;  # windows查找udp是否启动端口echo &quot;123abc&quot; | nc -u 127.0.0.1 9988  # linux下发给服务端数据 UDP服务端编程流程  创建socket对象。socket.SOCK_DGRAM 绑定IP和Port，bind()方法 传输数据 接收数据，socket.re">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/python网络编程tcp编程/udp服务端编程流程.png">
+<meta property="og:updated_time" content="2020-06-17T06:35:35.819Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-UDP编程">
+<meta name="twitter:description" content="UDP服务端编程测试命令 12netstat -anp udp | find &quot;9988&quot;  # windows查找udp是否启动端口echo &quot;123abc&quot; | nc -u 127.0.0.1 9988  # linux下发给服务端数据 UDP服务端编程流程  创建socket对象。socket.SOCK_DGRAM 绑定IP和Port，bind()方法 传输数据 接收数据，socket.re">
+<meta name="twitter:image" content="http://yoursite.com/images/python网络编程tcp编程/udp服务端编程流程.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/17/python基础学习-UDP编程/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-UDP编程 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/17/python基础学习-UDP编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-UDP编程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-06-17 11:52:39 / 修改時間：14:35:35" itemprop="dateCreated datePublished" datetime="2020-06-17T11:52:39+08:00">2020-06-17</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="UDP服务端编程"><a href="#UDP服务端编程" class="headerlink" title="UDP服务端编程"></a>UDP服务端编程</h3><p>测试命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">netstat -anp udp | find "9988"  # windows查找udp是否启动端口</span><br><span class="line">echo "123abc" | nc -u 127.0.0.1 9988  # linux下发给服务端数据</span><br></pre></td></tr></table></figure>
+<h4 id="UDP服务端编程流程"><a href="#UDP服务端编程流程" class="headerlink" title="UDP服务端编程流程"></a>UDP服务端编程流程</h4><p><img src="/images/python网络编程tcp编程/udp服务端编程流程.png" alt=""></p>
+<ul>
+<li>创建socket对象。<code>socket.SOCK_DGRAM</code></li>
+<li>绑定IP和Port，bind()方法</li>
+<li>传输数据<ul>
+<li>接收数据，<code>socket.recvfrom(bufsize[, flags])</code>，获得一个二元组(string, address)</li>
+<li>发送数据，<code>socket.sendto(string, address)</code>发给某地址某信息</li>
+</ul>
+</li>
+<li>释放资源</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line"></span><br><span class="line">server.bind((<span class="string">'0.0.0.0'</span>, <span class="number">9999</span>))  <span class="comment"># 立即绑定一个udp端口</span></span><br><span class="line">data = server.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞等待数据</span></span><br><span class="line">data = sever.recvfrom(<span class="number">1024</span>)  <span class="comment"># 阻塞等待数据(value, (ip, port))</span></span><br><span class="line">server.sendto(<span class="string">b'7'</span>, (<span class="string">'192.168.142.1'</span>, <span class="number">10000</span>))</span><br><span class="line"></span><br><span class="line">server.close()</span><br></pre></td></tr></table></figure>
+<p>UDP客户端编程流程</p>
+<ul>
+<li>创建socket对象。<code>socket.SOCK_DGRAM</code></li>
+<li>发送数据，<code>socket.sendto(string, address)</code>发给某地址某信息</li>
+<li>接收数据，<code>socket.recvfrom(bufsize[, flags])</code>，获得一个二元组(string, address)</li>
+<li>释放资源</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">client = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">raddr = (<span class="string">'192.168.142.1'</span>, <span class="number">10000</span>)</span><br><span class="line"></span><br><span class="line">client.connect(raddr)</span><br><span class="line">client.sendto(<span class="string">b'8'</span>, raddr)</span><br><span class="line">client.send(<span class="string">b'9'</span>)</span><br><span class="line">data = client.recvfrom(<span class="number">1024</span>)  <span class="comment"># 阻塞等待数据(value, (ip, port))</span></span><br><span class="line">data = client.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞等待数据</span></span><br><span class="line"></span><br><span class="line">client.close()</span><br></pre></td></tr></table></figure>
+<p>注意：UDP是无连接协议，所以可以只有任何一端，例如客户端数据发往服务端，服务端存在与否无所谓</p>
+<p>UDP编程中bind、send、sendto、recv、recvfrom方法使用</p>
+<p>UDP的socket对象创建后，是没有占用本地地址和端口的。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bind方法</td>
+<td>可以指定本地地址和端口laddr，会立即占用</td>
+</tr>
+<tr>
+<td>connect方法</td>
+<td>可以立即占用本地地址和端口，填充远端地址和端口raddr</td>
+</tr>
+<tr>
+<td>sendto方法</td>
+<td>可以立即占用本地地址和端口，并把数据发往指定远端。只有有了本地绑定端口，sendto就可以向任何远端发送数据</td>
+</tr>
+<tr>
+<td>send方法</td>
+<td>需要和connect方法配合，可以使用已经从本地端口把数据发往raddr指定的远端</td>
+</tr>
+<tr>
+<td>recv方法</td>
+<td>要求一定要在占用了本地端口后，返回接收的数据</td>
+</tr>
+<tr>
+<td>recvfrom方法</td>
+<td>要求一定要占用了本地端口后，返回接收的数据和对端地址的二元组</td>
+</tr>
+</tbody>
+</table>
+<h3 id="练习–UDP版群聊"><a href="#练习–UDP版群聊" class="headerlink" title="练习–UDP版群聊"></a>练习–UDP版群聊</h3><h4 id="UDP版群聊服务端代码"><a href="#UDP版群聊服务端代码" class="headerlink" title="UDP版群聊服务端代码"></a>UDP版群聊服务端代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 服务端类的基本架构</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatUDPServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.sock = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 立即绑定</span></span><br><span class="line">        self.sock.recvfrom(<span class="number">1024</span>)  <span class="comment"># 阻塞接收数据</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.close()</span><br></pre></td></tr></table></figure>
+<p>在上面代码的基础之上扩充</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(threadName)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatUDPServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.sock = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">        self.clients = set()  <span class="comment"># 记录客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 立即绑定</span></span><br><span class="line">        <span class="comment"># 启动线程</span></span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">'recv'</span>).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data, raddr = self.sock.recvfrom(<span class="number">1024</span>)  <span class="comment"># 阻塞接收ovrn</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> data.strip() == <span class="string">b'quit'</span>:</span><br><span class="line">                <span class="comment"># 有可能发来数据的不在clients中</span></span><br><span class="line">                <span class="keyword">if</span> raddr <span class="keyword">in</span> self.clients:</span><br><span class="line">                    self.clients.remove(raddr)</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; leaving'</span>.format(raddr))</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">                </span><br><span class="line">            self.clients.add(raddr)</span><br><span class="line">            </span><br><span class="line">            msg = <span class="string">'&#123;&#125;. from &#123;&#125;:&#123;&#125;'</span>.format(data.decode(), *raddr)</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> c <span class="keyword">in</span> self.clients:</span><br><span class="line">                self.sock.sendto(msg, c)  <span class="comment"># 不保证对方能够收到</span></span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> self.clients:</span><br><span class="line">            self.sock.sendto(<span class="string">b'bye'</span>, c)</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cs = ChatUDPServer()</span><br><span class="line">    cs.start()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">"&gt;&gt;&gt;"</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cs.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        logging.info(threading.enumerate())</span><br><span class="line">        logging.info(cs.clients)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h4 id="UDP群聊客户端代码"><a href="#UDP群聊客户端代码" class="headerlink" title="UDP群聊客户端代码"></a>UDP群聊客户端代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading </span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(threadName)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatUdpClient</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rip=<span class="string">'127.0.0.1'</span>, rport=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">        self.raddr = (rip, rport)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.connect(self.raddr)  <span class="comment"># 占用本地地址和端口，设置远端地址和端口</span></span><br><span class="line">        </span><br><span class="line">        threading.Thread(target=self._sendhb, name=<span class="string">'heartbeat'</span>, daemon=<span class="keyword">True</span>).start()</span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">'recv'</span>).start()</span><br><span class="line">        </span><br><span class="line">	</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data, raddr = self.sock.recvfrom(<span class="number">1024</span>) </span><br><span class="line">            </span><br><span class="line">            msg = <span class="string">'&#123;&#125;. from &#123;&#125;:&#123;&#125;'</span>.format(data.decode(), *raddr)</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self, msg:str)</span>:</span></span><br><span class="line">        self.sock.sendto(msg.encode(), self.raddr)</span><br><span class="line">       </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        </span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cc1 = ChatUdpClient()</span><br><span class="line">    cc2 = ChatUdpClient()</span><br><span class="line">    cc1.start()</span><br><span class="line">    cc2.start()</span><br><span class="line">    print(cc1.sock)</span><br><span class="line">    print(cc2.sock)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">"Input your words &gt;&gt;&gt;"</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cc1.stop()</span><br><span class="line">            cc2.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        cc1.send(cmd)</span><br><span class="line">        cc2.send(cmd)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>上面的例子并不完善，如果客户端断开了，服务端不知道。每一个服务端还需要对所有客户端发送数据，包括已经断开的客户端</p>
+<h4 id="代码改进"><a href="#代码改进" class="headerlink" title="代码改进"></a>代码改进</h4><h5 id="服务端代码改进"><a href="#服务端代码改进" class="headerlink" title="服务端代码改进"></a>服务端代码改进</h5><p>加一个ack机制和心跳heartbeat。心跳，就是一端定时发往另一端的消息，一般每次数据越少越好。心跳时间间隔约定好就行。ack即响应，一端收到另一端的消息后返回的消息</p>
+<p>心跳机制</p>
+<ol>
+<li>一般来说是客户端定时发往服务端的，服务端并不需要ack回复客户端，只需要记录该客户端还活着就行了。</li>
+<li>如果是服务端定时发往客户端的，一般需要客户端ack响应来表示活着，如果没有收到ack的客户端，服务端移除其信息。这种实现软为复杂，用的较少</li>
+<li>也可以双向都发心跳的，用的更少</li>
+</ol>
+<p>在服务器端代码中使用第一种机制改进</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(threadName)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatUDPServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>, interval=<span class="number">10</span>)</span>:</span></span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.sock = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 记录客户端，改为字典</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        self.interval = interval  <span class="comment"># 默认10秒，超时就要移除对应的客户端</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 立即绑定</span></span><br><span class="line">        <span class="comment"># 启动线程</span></span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">'recv'</span>).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            localset = set()  <span class="comment"># 清理超时</span></span><br><span class="line">            data, raddr = self.sock.recvfrom(<span class="number">1024</span>)  <span class="comment"># 阻塞接收ovrn</span></span><br><span class="line">            </span><br><span class="line">            current = datetime.datetime.now().timestamp()  <span class="comment"># float</span></span><br><span class="line">            <span class="keyword">if</span> data.strip() == <span class="string">b'^hb^'</span>:  <span class="comment"># 心跳信息</span></span><br><span class="line">                print(<span class="string">'^^^^^^^^^^hb'</span>, raddr)</span><br><span class="line">                self.client[raddr] = current</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">elif</span> data.strip() == <span class="string">b'quit'</span>:</span><br><span class="line">                <span class="comment"># 有可能发来数据的不在clients中</span></span><br><span class="line">                self.clients.pop(raddr, <span class="keyword">None</span>)</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; leaving'</span>.format(raddr))</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">                </span><br><span class="line">            <span class="comment"># 有信息来就更新时间</span></span><br><span class="line">            <span class="comment"># 什么时候比较心跳时间呢？发送信息的时候，反正要遍历一遍</span></span><br><span class="line">            self.clients[raddr] = current</span><br><span class="line">            </span><br><span class="line">            msg = <span class="string">'&#123;&#125;. from &#123;&#125;:&#123;&#125;'</span>.format(data.decode(), *raddr)</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">for</span> c, stamp <span class="keyword">in</span> self.clients.items():</span><br><span class="line">                <span class="keyword">if</span> current - stamp &gt; self.interval:</span><br><span class="line">                    localset.add(c)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    self.sock.sendto(msg, c)  <span class="comment"># 不保证对方能够收到</span></span><br><span class="line">            <span class="keyword">for</span> c, <span class="keyword">in</span> localset:</span><br><span class="line">                self.clients.pop(c)</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> self.clients:</span><br><span class="line">            self.sock.sendto(<span class="string">b'bye'</span>, c)</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cs = ChatUDPServer()</span><br><span class="line">    cs.start()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">"&gt;&gt;&gt;"</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cs.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        logging.info(threading.enumerate())</span><br><span class="line">        logging.info(cs.clients)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h4 id="客户端代码改进"><a href="#客户端代码改进" class="headerlink" title="客户端代码改进"></a>客户端代码改进</h4><p>增加定时发送心跳代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading </span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(threadName)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatUdpClient</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rip=<span class="string">'127.0.0.1'</span>, rport=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket(type=socket.SOCK_DGRAM)</span><br><span class="line">        self.raddr = (rip, rport)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.connect(self.raddr)  <span class="comment"># 占用本地地址和端口，设置远端地址和端口</span></span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">'recv'</span>).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_sendhb</span><span class="params">(self)</span>:</span>  <span class="comment"># 心跳</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.wait(<span class="number">5</span>):</span><br><span class="line">            self.send(<span class="string">'^hb^'</span>)</span><br><span class="line">            </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data, raddr = self.sock.recvfrom(<span class="number">1024</span>) </span><br><span class="line">            </span><br><span class="line">            msg = <span class="string">'&#123;&#125;. from &#123;&#125;:&#123;&#125;'</span>.format(data.decode(), *raddr)</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self, msg:str)</span>:</span></span><br><span class="line">        self.sock.sendto(msg.encode(), self.raddr)</span><br><span class="line">       </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.send(<span class="string">'quit'</span>)  <span class="comment"># 通知服务端退出</span></span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cc1 = ChatUdpClient()</span><br><span class="line">    cc2 = ChatUdpClient()</span><br><span class="line">    cc1.start()</span><br><span class="line">    cc2.start()</span><br><span class="line">    print(cc1.sock)</span><br><span class="line">    print(cc2.sock)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">"Input your words &gt;&gt;&gt;"</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cc1.stop()</span><br><span class="line">            cc2.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        cc1.send(cmd)</span><br><span class="line">        cc2.send(cmd)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h3 id="UDP协议应用"><a href="#UDP协议应用" class="headerlink" title="UDP协议应用"></a>UDP协议应用</h3><p>UDP是无连接协议，它基于以下假设：网络足够好，消息不会丢包，包不会乱序</p>
+<p>但是，即使是在局域网，也不能保证不丢包，而且包的到达不一定有序。</p>
+<p>应用场景视频、音频传输，一般来说，丢些包，问题不大，最多丢些图像、听不清话语，可以重新发话语来解决。海量采集数据，例如传感器发来的数据，丢几十、几百条数据也没有关系。DNS协议，数据内容小，一个包就能查询到结果，不存在乱序，丢包，重新请求解析。</p>
+<p>一般来说，UDP性能优于TCP，但是可靠性要求高的场合的还是要选择TCP协议</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python网络编程/" rel="tag"># python网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/12/python基础学习-TCP编程/" rel="next" title="python基础学习-TCP编程">
+                <i class="fa fa-chevron-left"></i> python基础学习-TCP编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/17/python基础学习-SocketServer/" rel="prev" title="python基础学习-SocketServer">
+                python基础学习-SocketServer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">247</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">176</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#UDP服务端编程"><span class="nav-number">1.</span> <span class="nav-text">UDP服务端编程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP服务端编程流程"><span class="nav-number">1.1.</span> <span class="nav-text">UDP服务端编程流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#练习–UDP版群聊"><span class="nav-number">2.</span> <span class="nav-text">练习–UDP版群聊</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP版群聊服务端代码"><span class="nav-number">2.1.</span> <span class="nav-text">UDP版群聊服务端代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP群聊客户端代码"><span class="nav-number">2.2.</span> <span class="nav-text">UDP群聊客户端代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码改进"><span class="nav-number">2.3.</span> <span class="nav-text">代码改进</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#服务端代码改进"><span class="nav-number">2.3.1.</span> <span class="nav-text">服务端代码改进</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端代码改进"><span class="nav-number">2.4.</span> <span class="nav-text">客户端代码改进</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UDP协议应用"><span class="nav-number">3.</span> <span class="nav-text">UDP协议应用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

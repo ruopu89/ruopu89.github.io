@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Socket介绍Socket套接字Python中提供socket.py标准库，非常底层的接口库 Socket是一种通用的网络编程接口，和网络层次没有一一对应的关系。 协议族AF表示Address Family，用于socket()第一个参数    名称 含义     AF_INET IPV4   AF_INET6 IPV6   AF_UNIX Unix Domain Socket，windows没">
+<meta name="keywords" content="python网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-TCP编程">
+<meta property="og:url" content="http://yoursite.com/2020/06/12/python基础学习-TCP编程/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="Socket介绍Socket套接字Python中提供socket.py标准库，非常底层的接口库 Socket是一种通用的网络编程接口，和网络层次没有一一对应的关系。 协议族AF表示Address Family，用于socket()第一个参数    名称 含义     AF_INET IPV4   AF_INET6 IPV6   AF_UNIX Unix Domain Socket，windows没">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/python网络编程tcp编程/tcpsocket.png">
+<meta property="og:updated_time" content="2020-06-17T03:52:21.376Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-TCP编程">
+<meta name="twitter:description" content="Socket介绍Socket套接字Python中提供socket.py标准库，非常底层的接口库 Socket是一种通用的网络编程接口，和网络层次没有一一对应的关系。 协议族AF表示Address Family，用于socket()第一个参数    名称 含义     AF_INET IPV4   AF_INET6 IPV6   AF_UNIX Unix Domain Socket，windows没">
+<meta name="twitter:image" content="http://yoursite.com/images/python网络编程tcp编程/tcpsocket.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/12/python基础学习-TCP编程/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-TCP编程 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/12/python基础学习-TCP编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-TCP编程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-06-12 16:30:33" itemprop="dateCreated datePublished" datetime="2020-06-12T16:30:33+08:00">2020-06-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-06-17 11:52:21" itemprop="dateModified" datetime="2020-06-17T11:52:21+08:00">2020-06-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Socket介绍"><a href="#Socket介绍" class="headerlink" title="Socket介绍"></a>Socket介绍</h3><h4 id="Socket套接字"><a href="#Socket套接字" class="headerlink" title="Socket套接字"></a>Socket套接字</h4><p>Python中提供socket.py标准库，非常底层的接口库</p>
+<p>Socket是一种通用的网络编程接口，和网络层次没有一一对应的关系。</p>
+<h4 id="协议族"><a href="#协议族" class="headerlink" title="协议族"></a>协议族</h4><p>AF表示Address Family，用于socket()第一个参数</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AF_INET</td>
+<td>IPV4</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>IPV6</td>
+</tr>
+<tr>
+<td>AF_UNIX</td>
+<td>Unix Domain Socket，windows没有</td>
+</tr>
+</tbody>
+</table>
+<p>Socket类型</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOCK_STREAM</td>
+<td>面向连接的流套接字，默认值，TCP协议</td>
+</tr>
+<tr>
+<td>SOCK_DGRAM</td>
+<td>无连接的数据报文套接字。UDP协议</td>
+</tr>
+</tbody>
+</table>
+<h3 id="TCP编程"><a href="#TCP编程" class="headerlink" title="TCP编程"></a>TCP编程</h3><p>Socket编程，需要两端，一般来说需要一个服务端、一个客户端，服务端称为Server，客户端称为Client</p>
+<h3 id="TCP服务端编程"><a href="#TCP服务端编程" class="headerlink" title="TCP服务端编程"></a>TCP服务端编程</h3><h4 id="服务器端编程步骤"><a href="#服务器端编程步骤" class="headerlink" title="服务器端编程步骤"></a>服务器端编程步骤</h4><ul>
+<li><p>创建Socket对象</p>
+</li>
+<li><p>绑定IP地址Address和端口Port。bind()方法</p>
+<p>IPv4地址为一个二元组<code>(&#39;IP地址字符串&#39;, Port)</code></p>
+</li>
+<li><p>开始监听，将在指定的IP的端口上监听。listen()方法</p>
+</li>
+<li><p>获取用于传送数据的Socket对象</p>
+<p><code>socket.accept()</code> -&gt; <code>(socket object, address info)</code></p>
+<p>accept方法阻塞等待客户端建立连接，返回一个新的Socket对象和客户端地址的二元组</p>
+<p>地址是远程客户端的地址，IPv4中它是一个二元组<code>(clientaddr, port)</code></p>
+<ul>
+<li><p>接收数据</p>
+<p><code>recv(bufsize[, flags])</code>使用缓冲区接收数据</p>
+</li>
+<li><p>发送数据</p>
+<p><code>send(bytes)</code>发送数据</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python网络编程tcp编程/tcpsocket.png" alt=""></p>
+<p>问题</p>
+<p>两次绑定同一个监听端口会怎么样？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">x = socket.socket()  <span class="comment"># 创建socket对象</span></span><br><span class="line">s.bind(<span class="string">'127.0.0.1'</span>, <span class="number">9999</span>)  <span class="comment"># 一个二元组</span></span><br><span class="line">s.listen()  <span class="comment"># 开始监听</span></span><br><span class="line"><span class="comment"># 开启一个连接</span></span><br><span class="line">s1, info = s.accept()  <span class="comment"># 阻塞直到和客户端成功建立连接，返回一个socket对象和客户端地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用缓冲区获取数据</span></span><br><span class="line">data = s1.recv(<span class="number">1024</span>)</span><br><span class="line">print(data, info)</span><br><span class="line">s1.send(<span class="string">b'magedu.com ack'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启另外一个连接</span></span><br><span class="line">s2, _ = s.accept()</span><br><span class="line"></span><br><span class="line">data = s2.recv(<span class="number">1024</span>)</span><br><span class="line">s2.send(<span class="string">b'hello python'</span>)</span><br><span class="line"></span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure>
+<p>上例accept和recv是阻塞的，主线程经常被阻塞住而不能工作。怎么办</p>
+<h4 id="练习-–-写一个群聊程序"><a href="#练习-–-写一个群聊程序" class="headerlink" title="练习 – 写一个群聊程序"></a>练习 – 写一个群聊程序</h4><p>需求分析</p>
+<p>聊天工具是CS程序，C是每一个客户端，S是服务器端</p>
+<p>服务器应该具有的功能：</p>
+<p>启动服务，包括绑定地址和端口，监听</p>
+<p>建立连接，能和多个客户端建立连接</p>
+<p>接收不同用户的信息</p>
+<p>分发，将接收的某个用户的信息转发到已连接的所有客户端</p>
+<p>停止服务</p>
+<p>记录连接的客户端</p>
+<p>代码实现</p>
+<p>服务端应该对应一个类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">chatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip, port)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    	</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">       </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>在此基础上，扩展完成</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y/%m/%d %H:%M:%S&#125; &#123;&#125;:&#123;&#125;\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br></pre></td></tr></table></figure>
+<p>基本功能完成，但是有问题。使用Event改进。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+<p>这一版基本能用了，测试通过。但是还有要完善的地方。例如各种异常的判断，客户端断开连接后字典中的移除客户端数据等 。</p>
+<p>客户端主动断开带来的问题</p>
+<p>服务端知道自己何时断开，如果客户端断开，服务器不知道。</p>
+<p>所以，好的做法是，客户端开发出特殊消息通知服务器端断开连接。但是，如果客户端主动断开，服务端主动发送一个空消息，超时返回异常，捕获异常并清理连接。</p>
+<p>即使为客户端提供了断开命令，也不能保证客户端会使用它断开连接。但是还是要增加这个退出功能。</p>
+<p>增加客户端退出命令</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = data.decode().strip()</span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                sock.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">	logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br></pre></td></tr></table></figure>
+<p>程序还有瑕疵，但是业务功能基本完成了</p>
+<h4 id="socket常用方法"><a href="#socket常用方法" class="headerlink" title="socket常用方法"></a>socket常用方法</h4><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>socket.recv(bufsize[, flags])</td>
+<td>获取数据。默认是阻塞的方式</td>
+</tr>
+<tr>
+<td>socket.recvfrom(bufsize[, flags])</td>
+<td>获取数据，返回一个二元组(bytes, address)</td>
+</tr>
+<tr>
+<td>socket.recv_into(buffer[, nbytes[, flags]])</td>
+<td>获取到nbytes的数据后，存储到buffer中。如果nbytes没有指定或为0,将buffer大小的数据存入buffer中。返回接收到的字节数</td>
+</tr>
+<tr>
+<td>socket.recvfrom_into(buffer[, nbytes[, flags]])</td>
+<td>获取数据，返回一个二元组(bytes, address)到buffer中</td>
+</tr>
+<tr>
+<td>socket.send(bytes[, flags])</td>
+<td>TCP发送数据</td>
+</tr>
+<tr>
+<td>socket.sendall(bytes[, flags])</td>
+<td>TCP发送全部数据，成功返回None</td>
+</tr>
+<tr>
+<td>socket.sendto(string[, flag], address)</td>
+<td>UDP发送数据</td>
+</tr>
+<tr>
+<td>socket.sendfile(file, offset=0, count=None)</td>
+<td>发送一个文件直到EOF，使用高性能的os.sendfile机制，返回发送的字节数。如果win下不支持sendfile，或者不是普通文件，使用send()发送文件。offset告诉起始位置。3.5版本开始</td>
+</tr>
+<tr>
+<td>socket.getpeername()</td>
+<td>返回连接套接字的远程地址。返回值通常是元组(ipaddr, port)</td>
+</tr>
+<tr>
+<td>socket.getsockname()</td>
+<td>返回套接字自己的地址。通常是一个元组(ipaddr, port)</td>
+</tr>
+<tr>
+<td>socket.setblocking(flag)</td>
+<td>如果flag为0,则将套接字设为非阻塞模式，否则将套接字设为阻塞模式（默认值）。非阻塞模式下，如果调用recv()没有发现任何数据，或send()调用无法立即发送数据，那么将引起socket.error异常</td>
+</tr>
+<tr>
+<td>socket.settimeout(value)</td>
+<td>设置套接字操作的超时期，timeout是一个浮点数，单位是秒。值为None表示没有超时期。一般，超时期应该在刚创建套接字时设置，因为它们可能用于连接的操作（如connect()）</td>
+</tr>
+<tr>
+<td>socket.setsockopt(level, optname, value)</td>
+<td>设置套接字选项的值。比如缓冲区大小。太多了，去看文档。不同系统，不同版本都不尽相同</td>
+</tr>
+</tbody>
+</table>
+<h4 id="MakeFile"><a href="#MakeFile" class="headerlink" title="MakeFile"></a>MakeFile</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.makefile(mode=<span class="string">'r'</span>, buffering=<span class="keyword">None</span>, *, encoding=<span class="keyword">None</span>, errors=<span class="keyword">None</span>, newline=<span class="keyword">None</span>)</span><br></pre></td></tr></table></figure>
+<p>创建一个与该套接字相关连的文件对象，将recv方法看做读方法，将send方法看做写方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用makefile的简单例子</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">sockserver = socket.socket()</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sockserver.bind(addr)</span><br><span class="line">sockserver.listen()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">s, _ = sockserver.accept()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">f = s.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line"></span><br><span class="line">line = f.read(<span class="number">10</span>)  <span class="comment"># 阻塞等</span></span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">print(line)</span><br><span class="line">f.write(<span class="string">'Return your msg: &#123;&#125;'</span>.format(line))</span><br><span class="line">f.flush()</span><br></pre></td></tr></table></figure>
+<p>上例不能循环接收消息，修改一下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line">sockserver = socket.socket()</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sockserver.bind(addr)</span><br><span class="line">sockserver.listen()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">event = threading.Event()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(sock:socket.socket, e:threading.Event)</span>:</span></span><br><span class="line">    s, _ = sock.accept()</span><br><span class="line">    f = s.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        line = f.readline()</span><br><span class="line">        print(line)</span><br><span class="line">        <span class="keyword">if</span> line.strip()  == <span class="string">'quit'</span>:  <span class="comment"># 注意要发quit\n</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        f.write(<span class="string">'Return your msg: &#123;&#125;'</span>.format(line))</span><br><span class="line">        f.flush()</span><br><span class="line">    f.close()</span><br><span class="line">    sock.close()</span><br><span class="line">    e.wait(<span class="number">3</span>)</span><br><span class="line">    </span><br><span class="line">t = threading.Thread(target=accept, args=(sockserver, event))</span><br><span class="line">t.start()</span><br><span class="line">t.join()</span><br><span class="line"></span><br><span class="line">print(sockserver)</span><br></pre></td></tr></table></figure>
+<h4 id="makefile练习"><a href="#makefile练习" class="headerlink" title="makefile练习"></a>makefile练习</h4><p>使用makefile改写群聊类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            f = sock.makefile(<span class="string">'rw'</span>)  <span class="comment"># 支持读写</span></span><br><span class="line">            self.clients[client] = f  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(f, client), name=<span class="string">'recv'</span>).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, f, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = f.readline()  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = data.strip()</span><br><span class="line">            <span class="comment"># 客户端退出命令</span></span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                f.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data)</span><br><span class="line">            logging.info(msg)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.write(msg)</span><br><span class="line">                s.flush()</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">	logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br></pre></td></tr></table></figure>
+<p>上例完成了基本功能，但是，如果客户端主动断开，或者readline出现异常，就不会从clients中移除作废的socket。可以使用异常处理解决这个问题。</p>
+<h4 id="ChatServer实验用完整代码"><a href="#ChatServer实验用完整代码" class="headerlink" title="ChatServer实验用完整代码"></a>ChatServer实验用完整代码</h4><p>注意，这个代码为实验用，代码中的瑕疵还有很多。Socket太底层了，实际开发中很少使用这么底层的接口。增加一些异常处理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            f = sock.makefile(<span class="string">'rw'</span>)  <span class="comment"># 支持读写</span></span><br><span class="line">            self.clients[client] = f  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(f, client), name=<span class="string">'recv'</span>).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, f, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">            	data = f.readline()  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.error(e)  <span class="comment"># 有任何异常，退出</span></span><br><span class="line">                data = <span class="string">'quit'</span></span><br><span class="line">            msg = data.strip()</span><br><span class="line">            <span class="comment"># 客户端退出命令</span></span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                f.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data)</span><br><span class="line">            logging.info(msg)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.write(msg)</span><br><span class="line">                s.flush()</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cs = ChatServer()</span><br><span class="line">    cs.start()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">        <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">            cs.stop()</span><br><span class="line">            threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h3 id="TCP客户端编程"><a href="#TCP客户端编程" class="headerlink" title="TCP客户端编程"></a>TCP客户端编程</h3><h4 id="客户端编程步骤"><a href="#客户端编程步骤" class="headerlink" title="客户端编程步骤"></a>客户端编程步骤</h4><ul>
+<li>创建Socket对象</li>
+<li>连接到远端服务端的ip和port，connect()方法</li>
+<li>传输数据<ul>
+<li>使用send、recv方法发送、接收数据</li>
+</ul>
+</li>
+<li>关闭连接，释放资源</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">client = socket.socket()</span><br><span class="line">ipaddr = (<span class="string">'127.0.0.1'</span>, <span class="number">9999</span>)</span><br><span class="line">client.connect(ipaddr)  <span class="comment"># 直接连接服务器</span></span><br><span class="line"></span><br><span class="line">client.send(<span class="string">b'abcd\n'</span>)</span><br><span class="line">data = client.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞等待</span></span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line">client.close()</span><br></pre></td></tr></table></figure>
+<p>开始编写客户端类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatClient</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动对远端服务器的连接</span></span><br><span class="line">        self.sock.connect(self.addr)</span><br><span class="line">        self.send(<span class="string">"I'm ready."</span>)</span><br><span class="line">        <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">"recv"</span>).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span>  <span class="comment"># 接收客户端的数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                data = self.sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞 </span></span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.error(e)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *self.addr, data.strip())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self, msg:str)</span>:</span></span><br><span class="line">        data = <span class="string">"&#123;&#125;\n"</span>.format(msg.strip()).encode()  <span class="comment"># 服务端需要一个换行符</span></span><br><span class="line">        self.sock.send(data)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.wait(<span class="number">3</span>)</span><br><span class="line">        self.event.set()</span><br><span class="line">        logging.info(<span class="string">'Client stops.'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cc = ChatClient()</span><br><span class="line">    cc.start()</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cc.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        cc.send(cmd)  <span class="comment"># 发送消息</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>同样，这样的客户端还是有些问题的，仅用于测试。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python网络编程/" rel="tag"># python网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/10/阿里云问题解决-ECS挂载OSS/" rel="next" title="阿里云问题解决-ECS挂载OSS">
+                <i class="fa fa-chevron-left"></i> 阿里云问题解决-ECS挂载OSS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/17/python基础学习-UDP编程/" rel="prev" title="python基础学习-UDP编程">
+                python基础学习-UDP编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">247</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">176</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Socket介绍"><span class="nav-number">1.</span> <span class="nav-text">Socket介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Socket套接字"><span class="nav-number">1.1.</span> <span class="nav-text">Socket套接字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#协议族"><span class="nav-number">1.2.</span> <span class="nav-text">协议族</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP编程"><span class="nav-number">2.</span> <span class="nav-text">TCP编程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP服务端编程"><span class="nav-number">3.</span> <span class="nav-text">TCP服务端编程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#服务器端编程步骤"><span class="nav-number">3.1.</span> <span class="nav-text">服务器端编程步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#练习-–-写一个群聊程序"><span class="nav-number">3.2.</span> <span class="nav-text">练习 – 写一个群聊程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#socket常用方法"><span class="nav-number">3.3.</span> <span class="nav-text">socket常用方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MakeFile"><span class="nav-number">3.4.</span> <span class="nav-text">MakeFile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#makefile练习"><span class="nav-number">3.5.</span> <span class="nav-text">makefile练习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ChatServer实验用完整代码"><span class="nav-number">3.6.</span> <span class="nav-text">ChatServer实验用完整代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP客户端编程"><span class="nav-number">4.</span> <span class="nav-text">TCP客户端编程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端编程步骤"><span class="nav-number">4.1.</span> <span class="nav-text">客户端编程步骤</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
