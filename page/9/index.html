@@ -350,6 +350,896 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/18/python基础学习-高阶函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/18/python基础学习-高阶函数/" itemprop="url">
+                  python基础学习-高阶函数
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-18 13:58:23" itemprop="dateCreated datePublished" datetime="2019-11-18T13:58:23+08:00">2019-11-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-05-27 17:39:18" itemprop="dateModified" datetime="2020-05-27T17:39:18+08:00">2020-05-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="高阶函数"><a href="#高阶函数" class="headerlink" title="高阶函数"></a>高阶函数</h3><ul>
+<li>First Class Object<ul>
+<li>函数在Python中是一等公民</li>
+<li>函数也是对象，可调用的对象</li>
+<li>函数可以作为普通变量、参数、返回值等等</li>
+</ul>
+</li>
+<li><p>高阶函数</p>
+<ul>
+<li>数学概念<code>y=g(f(x))</code></li>
+<li>在数学和计算机科学中，高阶函数应当是至少满足下面一个条件的函数<ul>
+<li>接受一个或多个函数作为参数</li>
+<li>输出一个函数</li>
+</ul>
+</li>
+<li>嵌套函数并返回函数的是高阶函数</li>
+</ul>
+</li>
+<li><p>计数器</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">(base)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(step=<span class="number">1</span>)</span>:</span></span><br><span class="line">        <span class="keyword">nonlocal</span> base</span><br><span class="line"><span class="comment"># 这里因为base是自由变量，指counter的形参。在inc函数中 base += step是在重新赋值，所以要加上nonlocal，</span></span><br><span class="line"><span class="comment"># 让inc函数向上一级且不是global环境找base函数，这样才不会报错</span></span><br><span class="line">        base += step</span><br><span class="line">        <span class="keyword">return</span> base</span><br><span class="line">    <span class="keyword">return</span> inc</span><br><span class="line"></span><br><span class="line">foo = counter(<span class="number">10</span>)</span><br><span class="line">foo1 = counter(<span class="number">10</span>)</span><br><span class="line">print(foo())</span><br><span class="line"><span class="comment"># 将counter(10)赋值给foo后，还是要加上括号才会显示foo的值，不然会显示函数的属性</span></span><br><span class="line">foo == foo1</span><br><span class="line">输出：</span><br><span class="line"><span class="number">11</span></span><br><span class="line"><span class="keyword">False</span></span><br><span class="line"><span class="comment"># 内存分为堆和栈，在堆内存中做对象的创建，栈是相对有限的空间，堆比栈大一些，但堆里是乱的(实际没这么乱，只是这</span></span><br><span class="line"><span class="comment"># 样理解)，所以虚拟机才要回收走。我们在堆上创建两个对象foo和foo1，这两个对象都是inc创建出来的，这都是因为调</span></span><br><span class="line"><span class="comment"># 用 counter()之后，inc又赋值给了foo和foo1，foo和foo1变量实际不在这，所以看到foo和foo1的地址不一样。当</span></span><br><span class="line"><span class="comment"># 第一次调用counter()时，counter会压栈，counter的参数也压栈，压栈后要创建一段栈帧，创建栈帧后，里面要创建</span></span><br><span class="line"><span class="comment"># 临时对象。这个对象就是inc，inc要把它的函数体执行完才能把inc赋值给foo，因为执行完inc最后要return，那么</span></span><br><span class="line"><span class="comment"># return后，从return base以上就全部消失了，因为栈里要清空，之后就要把函数的return值赋给foo了。foo1的过程</span></span><br><span class="line"><span class="comment"># 是一样的，但foo1是inc在堆里重新创建的对象，所以foo和foo1是两个完全不一样的对象。因为两个对象foo和foo1在</span></span><br><span class="line"><span class="comment"># 堆中没有消亡，所以两个指向对象的函数inc在堆中也没有消亡。</span></span><br><span class="line">id(foo)</span><br><span class="line">输出：<span class="number">140341302380608</span></span><br><span class="line">id(foo1)</span><br><span class="line">输出：<span class="number">140341302381832</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>分析<ul>
+<li>函数counter是不是一个高阶函数</li>
+<li>上面代码有没有什么问题？怎么改进</li>
+<li>如何调用完成计数功能</li>
+<li><code>foo = counter(10)</code>和<code>foo1 = counter(10)</code>，请问foo和foo1相等吗？</li>
+</ul>
+</li>
+</ul>
+<h3 id="自定义sort函数"><a href="#自定义sort函数" class="headerlink" title="自定义sort函数"></a>自定义sort函数</h3><ul>
+<li>排序问题<ul>
+<li>依照内建函数sorted，请自行实现一个sort函数（不使用内建函数），能够为列表元素排序</li>
+</ul>
+</li>
+<li>思路<ul>
+<li>内建函数sorted函数是返回一个新的列表，可以设置升序或降序，可以设置一个排序的函数。自定义的sort函数也要实现这个功能</li>
+<li>新建一个列表，遍历原列表，和新列表的值依次比较决定如何插入到新列表中</li>
+</ul>
+</li>
+<li>思考<ul>
+<li>sorted函数的实现原理，扩展到map、filter函数的实现原理</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># sort函数实现。下面实现的什么排序？还能怎么改变</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(iterable)</span>:</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> iterable:</span><br><span class="line">        <span class="keyword">for</span> i,y <span class="keyword">in</span> enumerate(ret):   </span><br><span class="line">        <span class="comment"># 使用enumerate是为了给列表中的元素添加上索引，以方便下面比较。比较会将iterable中的数字与所</span></span><br><span class="line">        <span class="comment"># 有ret列表中的数字比较，比较一次就进行一次下面的操作，当每轮全部比较完时，iterable中的数字也</span></span><br><span class="line">        <span class="comment"># 就找到了在ret列表中应该放的确切位置</span></span><br><span class="line">            <span class="keyword">if</span> x &gt; y:   <span class="comment"># 找到大的就地插入。如果换成x &lt; y呢，函数什么意思呢？</span></span><br><span class="line">                ret.insert(i,x)   <span class="comment"># 降序</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:   <span class="comment"># 不大于，说明是最小的，尾部追加</span></span><br><span class="line">            ret.append(x)  <span class="comment"># 因为第一次ret中什么也没有，所以会在这里直播将数据追加到ret中</span></span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line"><span class="comment"># 开始这里是没有函数的，但我们认为if x &gt; y: 可以利用函数把它变成更加灵活的表现形式，要把它抽象出来，可</span></span><br><span class="line"><span class="comment"># 以先写成一个if三元的形式，然后把它抽象成一个内部的函数，之后再把它变成一个外部函数，变成外部函数后要把</span></span><br><span class="line"><span class="comment"># 它的形参和本地变量去掉，变成一个通用的函数。函数的封装要通用，它尽量不要直接引用外部的变量，除了在嵌套</span></span><br><span class="line"><span class="comment"># 函数中使用闭包的时候。写函数的原则是，外部变量都应该不是通过可见性来访问的，而是通过传参的方式传递给你</span></span><br><span class="line"><span class="comment"># 的。核心的逻辑，如果是可变的，把它提取出去，作为参数传递进来，因为函数是一等公民</span></span><br><span class="line">print(sort([<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>]))</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(iterable)</span>:</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> iterable:</span><br><span class="line">        print(<span class="string">'s'</span>,ret)</span><br><span class="line">        <span class="keyword">for</span> i,y <span class="keyword">in</span> enumerate(ret):</span><br><span class="line">            print(<span class="string">'0'</span>,ret)</span><br><span class="line">            <span class="keyword">if</span> x &gt; y:</span><br><span class="line">                print(<span class="string">'1'</span>,ret)</span><br><span class="line">                ret.insert(i,x)</span><br><span class="line">                print(<span class="string">'2'</span>,ret)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ret.append(x) <span class="comment"># 因为第一次ret中什么也没有，所以会在这里直播将数据追加到ret中</span></span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">输出：</span><br><span class="line">s []</span><br><span class="line">s [<span class="number">6</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>]</span><br><span class="line">s [<span class="number">6</span>, <span class="number">4</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>]</span><br><span class="line">s [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>]</span><br><span class="line">s [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">1</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">2</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line">s [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">0</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">1</span> [<span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line"><span class="number">2</span> [<span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line">[<span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>]</span><br><span class="line">===========================================================================================</span><br><span class="line"><span class="comment"># sort函数实现。用一个参数控制顺序</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(iterable,reverse=False)</span>:</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> iterable:</span><br><span class="line">        <span class="keyword">for</span> i,y <span class="keyword">in</span> enumerate(ret):</span><br><span class="line">            flag = x &gt; y <span class="keyword">if</span> reverse <span class="keyword">else</span> x &lt; y</span><br><span class="line">            <span class="keyword">if</span> flag:   <span class="comment"># 是否能进一步改进。这里的if flag就相当于if x&gt;y或if x&lt;y，之后再向下执行</span></span><br><span class="line">                ret.insert(i,x)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ret.append(x)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">print(sort([<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>]))</span><br><span class="line"></span><br><span class="line"><span class="comment"># sort函数实现。下面实现的什么排序？还能怎么改变</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(iterable,key=lambda a,b:a&gt;b)</span>:</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> iterable:</span><br><span class="line">        <span class="keyword">for</span> i,y <span class="keyword">in</span> enumerate(ret):</span><br><span class="line">            <span class="keyword">if</span> key(x,y):   <span class="comment"># 函数的返回值是bool。</span></span><br><span class="line">                ret.insert(i,x)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ret.append(x)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">print(sort([<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>]))</span><br><span class="line"></span><br><span class="line"><span class="comment"># sort函数实现</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sort</span><span class="params">(iterable,reverse=False,key=lambda x,y:x&lt;y)</span>:</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> iterable:</span><br><span class="line">        <span class="keyword">for</span> i,y <span class="keyword">in</span> enumerate(ret):</span><br><span class="line">            flag = key(x,y) <span class="keyword">if</span> <span class="keyword">not</span> reverse <span class="keyword">else</span> <span class="keyword">not</span> key(x,y)  <span class="comment"># not key(x,y)相当于key(y,x)</span></span><br><span class="line">            <span class="keyword">if</span> flag:</span><br><span class="line">                ret.insert(i,x)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ret.append(x)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">print(sort([<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>]))</span><br></pre></td></tr></table></figure>
+<h3 id="内建函数-高阶函数"><a href="#内建函数-高阶函数" class="headerlink" title="内建函数-高阶函数"></a>内建函数-高阶函数</h3><ul>
+<li><code>sorted(iterable[,key][,reverse])</code><ul>
+<li>排序</li>
+<li>返回一个新的列表，对一个可迭代对象的所有元素排序，排序规则为key定义的函数，reverse表示是否排序翻转</li>
+<li><code>sorted(lst,key=lambda x:6-x)</code>   返回新列表</li>
+<li><code>list.sort(key=lambda x:6-x)</code>   就地修改</li>
+</ul>
+</li>
+<li><code>filter(function,iterable)</code>-&gt;<code>filter object</code><ul>
+<li>过滤数据</li>
+<li>过滤可迭代对象的元素，返回一个迭代器</li>
+<li>function参数是具有一个参数的函数，返回bool</li>
+<li>例如，过滤出数列中能被3整除的数字<ul>
+<li><code>list(filter(lambda x:x%3 == 0,[1,9,55,150,-3,78,28,123]))</code></li>
+<li>因为<code>x%3 == 0</code>是一个逻辑表达式，那一定会返回<code>True</code>或<code>False</code>，这个表达式的值就是<code>return</code>值，所以这里返回的是一个<code>bool</code>类型。把<code>x%3 == 0</code>可以改为<code>0</code>或<code>True</code>，效果是怎样的？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>map(func,*iterables)</code> -&gt; <code>map object</code><ul>
+<li>映射</li>
+<li>对多个可迭代对象的元素按照指定的函数进行映射，返回一个迭代器<ul>
+<li><code>list(map(lambda x:2*x+1,range(5)))</code></li>
+<li><code>dict(map(lambda x:(x%5,x),range(500)))</code><ul>
+<li>只会显示下面5个信息是因为通过key过滤掉重复数据了?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="柯里化-Currying"><a href="#柯里化-Currying" class="headerlink" title="柯里化 Currying"></a>柯里化 Currying</h3><ul>
+<li>柯里化<ul>
+<li>指的是将原来接受两个参数的函数变成新的接受一个参数的函数的过程。新的函数返回一个以原有第二个参数为参数的函数</li>
+<li><code>z = f(x,y)</code>转换成<code>z = f(x)(y)</code>的形式</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 举例：将加法函数柯里化</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x,y)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> x + y</span><br><span class="line"><span class="comment"># 转换如下：</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_add</span><span class="params">(y)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> x + y</span><br><span class="line">    <span class="keyword">return</span> _add   <span class="comment"># 这里应该返回一个函数</span></span><br><span class="line">add(<span class="number">5</span>)(<span class="number">6</span>)</span><br><span class="line"><span class="comment"># 通过嵌套函数就可以把函数转换成柯里化函数</span></span><br><span class="line"><span class="comment"># 我们需要将add(4,5) ==&gt; add(4)(5) ==&gt; func(5) ==&gt; func=add(4)</span></span><br><span class="line">foo = add(<span class="number">4</span>)</span><br><span class="line">print(foo(<span class="number">5</span>))</span><br><span class="line"><span class="comment"># 等价于下面的写法</span></span><br><span class="line">pinrt(add(<span class="number">4</span>)(<span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<h3 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h3><ul>
+<li>函数在Python中是一等公民</li>
+<li>函数也是对象，是可调用的对象</li>
+<li><strong>函数可以作为普通变量、参数、返回值等等</strong></li>
+<li>高阶函数<ul>
+<li>在数学和计算机科学中，高阶函数应当是<strong>至少满足下面一个条件</strong>的函数<ul>
+<li><strong>接受一个或多个函数作为参数</strong></li>
+<li><strong>输出一个函数</strong></li>
+</ul>
+</li>
+<li>嵌套函数并返回函数的是高阶函数</li>
+</ul>
+</li>
+<li>柯里化指的是将原来接受两个参数的函数变成新的接受一个参数的函数的过程。新的函数返回一个以原有第二个参数为参数的函数</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/15/ngrok简单配置与使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/15/ngrok简单配置与使用/" itemprop="url">
+                  ngrok简单配置与使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-15 17:08:50" itemprop="dateCreated datePublished" datetime="2019-11-15T17:08:50+08:00">2019-11-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络/" itemprop="url" rel="index"><span itemprop="name">网络</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    ngrok是一个内网穿透的解决方案，它可以使你通过公网服务器连接到你本地的服务器</p>
+<h3 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">--------------</span><br><span class="line">   公网服务器</span><br><span class="line">--------------</span><br><span class="line">yum install -y gcc git mercurial bzr subversion golang golang-pkg-windows-amd64 golang-pkg-windows-386</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装所需包</span></span><br><span class="line">git clone https://github.com/inconshreveable/ngrok.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 克隆到本地</span></span><br></pre></td></tr></table></figure>
+<h3 id="生成证书"><a href="#生成证书" class="headerlink" title="生成证书"></a>生成证书</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">cd ngrok</span><br><span class="line">mkdir cert</span><br><span class="line">cd cert</span><br><span class="line">export NGROK_DOMAIN="abc.com"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里的域名就是你要访问的域名，需要在互联网可以解析到</span></span><br><span class="line">openssl genrsa -out rootCA.key 2048</span><br><span class="line">openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=$NGROK_DOMAIN" -days 5000 -out rootCA.pem</span><br><span class="line">openssl genrsa -out device.key 2048</span><br><span class="line">openssl req -new -key device.key -subj "/CN=$NGROK_DOMAIN" -out device.csr</span><br><span class="line">openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成密钥</span></span><br><span class="line">cp rootCA.pem ../assets/client/tls/ngrokroot.crt </span><br><span class="line">cp device.crt ../assets/server/tls/snakeoil.crt </span><br><span class="line">cp device.key ../assets/server/tls/snakeoil.key </span><br><span class="line"><span class="meta">#</span><span class="bash"> 将密钥复制到指定位置</span></span><br><span class="line">cd ..</span><br><span class="line">GOOS=linux GOARCH=amd64 make release-server</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成服务端包</span></span><br><span class="line">GOOS=linux GOARCH=amd64 make release-client</span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成linux客户端名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> windows客户端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=windows GOARCH=amd64 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=windows GOARCH=386 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> MacOS客户端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=darwin GOARCH=amd64 make release-client</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> GOOS=darwin GOARCH=386 make release-client</span></span><br><span class="line">./bin/ngrokd -domain="$NGROK_DOMAIN" -httpAddr=":28080" -httpsAddr=":28443" -tunnelAddr=":24443"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定端口并启动ngrok服务，如果不指定端口，http默认端口80，https默认端口443，tunnel默认端口4443，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> tunnel端口是服务端与客户端联系的端口</span></span><br></pre></td></tr></table></figure>
+<h3 id="客户端配置"><a href="#客户端配置" class="headerlink" title="客户端配置"></a>客户端配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">登录服务器下载上面生成的客户端包，因为使用的是ubuntu客户端，所以下载ngrok包就可以了</span><br><span class="line">vim ngrok.cfg                                                                   </span><br><span class="line">server_addr: "abc.com:24443"</span><br><span class="line">trust_host_root_certs: false</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一个ngrok的配置文件，注意这个文件是yaml文件，所以对格式要求很严格。冒号与后面引号之间是有空格的。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置的配置文件可以放在家目录，叫.ngrok</span></span><br><span class="line">./ngrok -config ngrok.cfg -proto=tcp 22</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这样可以启动客户端，这里用-config指定了配置文件，本地与服务器都使用tcp协议，本地监听22端口，服务器会</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听一个随机端口，本地要监听哪个端口，要取决于要连接的服务监听的端口，如这里要使用ssh服务，输出如下：</span></span><br><span class="line">ngrok                                                                                    </span><br><span class="line">Tunnel Status                 online   # 这里要变成online才是正常，开始是connecting</span><br><span class="line">Version                       1.7/1.7</span><br><span class="line">Forwarding                    tcp://abc.com:38139 -&gt; 127.0.0.1:22</span><br><span class="line">Web Interface                 127.0.0.1:4040</span><br><span class="line"><span class="meta">#</span><span class="bash"> Conn                        1</span></span><br><span class="line">Avg Conn Time                 24193.12ms                                               </span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里有一个问题，当连接成功后，域名是没有前缀的。所有添加域名解析时，就直接解析域名即可。使用这种方法可</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 以添加不同的端口映射到本地，如3389端口。但这里的问题是，服务器一端打开的随机端口，所以每次都需要手动修</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 改安全组的配置，放开指定端口</span></span><br><span class="line"></span><br><span class="line">./ngrok -subdomain ngrok -config=./ngrok.cfg</span><br><span class="line"><span class="meta">#</span><span class="bash"> -subdomain指定域名的前缀，如域名是abc.com，那么连接后就是ngrok.abc.com，这样启动客户端后要监听80</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 端口。这里如果加了域名前缀，那么在添加域名解析时，就要在添加A记录时，添加一个泛域名解析，如*.ngrok</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/14/python基础学习-生成器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/14/python基础学习-生成器/" itemprop="url">
+                  python基础学习-生成器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-14 11:26:56" itemprop="dateCreated datePublished" datetime="2019-11-14T11:26:56+08:00">2019-11-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-05-27 12:03:27" itemprop="dateModified" datetime="2020-05-27T12:03:27+08:00">2020-05-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
+<li>生成器 generator ***<ul>
+<li>生成器指的是生成器对象，可以由生成器表达式得到，也可以使用yield关键字得到一个生成器函数，调用这个函数得到一个生成器对象</li>
+</ul>
+</li>
+<li>生成器函数<ul>
+<li>函数体中包含<code>yield</code>语句的函数就是生成器函数，返回生成器对象</li>
+<li>生成器对象，是一个可迭代对象，是一个迭代器。迭代器一定是一个可迭代对象，但可迭代对象不一定是迭代器</li>
+<li>生成器对象，是延迟计算、惰性求值的</li>
+<li>包含yield语句的生成器函数生成<strong><em>生成器对象</em></strong>的时候，<strong><em>生成器函数的函数体不会立即执行</em></strong></li>
+<li><code>next(generator)</code>会从函数的当前位置向后执行到之后碰到的第一个<code>yield</code>语句，会弹出值，并暂停函数执行</li>
+<li>再次调用next函数，和上一条一样的处理过程</li>
+<li>没有多余的<code>yield</code>语句能被执行，继续调用<code>next</code>函数，会抛出StopIteration异常</li>
+<li>通过生成器表达式或生成器函数就可以得到一个生成器对象或简称生成器</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line">print(type(inc))   <span class="comment"># 返回函数类型，因为inc是标识符</span></span><br><span class="line">print(type(inc()))   <span class="comment"># 返回值是generator类型，是生成器对象</span></span><br><span class="line">输出：</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">function</span>'&gt;</span></span><br><span class="line"><span class="class">&lt;<span class="title">class</span> '<span class="title">generator</span>'</span></span><br><span class="line"><span class="class"></span></span><br><span class="line">x = inc()</span><br><span class="line">print(type(x))</span><br><span class="line">print(next(x))</span><br><span class="line"><span class="keyword">for</span> m <span class="keyword">in</span> x:</span><br><span class="line">    print(m,<span class="string">'*'</span>)</span><br><span class="line"><span class="keyword">for</span> m <span class="keyword">in</span> x:  <span class="comment"># 不会进入这里执行</span></span><br><span class="line">    print(m,<span class="string">'**'</span>)</span><br><span class="line">输出：</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">function</span>'&gt;</span></span><br><span class="line"><span class="class">&lt;<span class="title">class</span> '<span class="title">generator</span>'&gt;</span></span><br><span class="line"><span class="class">&lt;<span class="title">class</span> '<span class="title">generator</span>'&gt;</span></span><br><span class="line"><span class="class">0</span></span><br><span class="line"><span class="class">1 *</span></span><br><span class="line"><span class="class">2 *</span></span><br><span class="line"><span class="class">3 *</span></span><br><span class="line"><span class="class">4 *</span></span><br><span class="line"><span class="class"># 普通的函数调用<span class="title">fn</span><span class="params">()</span>，函数会立即执行完毕，因为用的是<span class="title">return</span>语句，但是生成器函数可以使用<span class="title">next</span>函数多次执行</span></span><br><span class="line"><span class="class"># 生成器函数等价于生成器表达式，只不过生成器函数可以更加的复杂。</span></span><br><span class="line"><span class="class"></span></span><br><span class="line">y = (i for i in range(5))</span><br><span class="line">print(type(y))</span><br><span class="line">print(next(y))</span><br><span class="line">print(next(y))</span><br><span class="line"></span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'line 1'</span>)</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span></span><br><span class="line">    print(<span class="string">'line 2'</span>)</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">2</span></span><br><span class="line">    print(<span class="string">'line 3'</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">3</span>    <span class="comment"># 生成器内一般不会加return语句</span></span><br><span class="line"></span><br><span class="line">next(gen())  <span class="comment"># line 1 遇到yield暂停，之后跳到下一句next(gen())执行</span></span><br><span class="line"><span class="comment"># 有yiele语句就会是一个生成器，这里调用一次这个gen()函数，就会返回一个生成器对象，生成器对象要拨一下转</span></span><br><span class="line"><span class="comment"># 一下，转到第一次遇到yield的时候，会返回1给next()，但我们不关心，print函数第一次返回line 1。</span></span><br><span class="line"><span class="comment"># 遇到yield语句就要暂停一下，yield语句就是拨一下转一下，是next函数在拨它，执行到第一次碰到yield为止。</span></span><br><span class="line"><span class="comment"># 所以第一次返回line 1，这个返回值我们是可以拿到的。(***return会终止当前函数执行，yield不会终止当前</span></span><br><span class="line"><span class="comment"># 函数执行，而是暂停到yield，这个暂停很特别，一般地如果一个函数没有执行完是不能执行下一句的。但这里没有</span></span><br><span class="line"><span class="comment"># 执行完gen()函数，而直接跳到了下一个gen()函数去执行了。***)yield有让出的意思，这里yield就让出了函</span></span><br><span class="line"><span class="comment"># 数，让出了当前的控制，给下一个语句，这里就是让给下一个next(gen())执行，让出给谁并不重要。所以执行第</span></span><br><span class="line"><span class="comment"># 二次gen()又生成了一个生成器，之后又重新开始执行，这是一个新的gen()函数调用，所以还是返回line 1。函</span></span><br><span class="line"><span class="comment"># 数随着调用的结束而消亡了，所以第二次调用会重新开始。</span></span><br><span class="line">next(gen())  <span class="comment"># line 1 </span></span><br><span class="line">g = gen()  <span class="comment"># 这里是第三次生成一个生成器对象并赋给了变量g</span></span><br><span class="line">print(next(g)) </span><br><span class="line"><span class="comment"># line 1   # 执行到这里先打印一个line 1，然后 yield返回一个1，这回next(g)是拨同一个生成器对象了，</span></span><br><span class="line"><span class="comment"># 因为用print包裹起来了，所以还会打印一个1</span></span><br><span class="line"><span class="comment"># print </span></span><br><span class="line">print(next(g)) <span class="comment"># line 2  # 这里是又拨了g函数一下，所以找下一个yield，先打印line 2，再打印2</span></span><br><span class="line">print(next(g))  <span class="comment"># StopIteration  这里先打印一个line 3，之后没有yield了，而且我们使用了next</span></span><br><span class="line"><span class="comment"># 函数调用，next函数是找下一个yield的，也就是找下一个生成器对象的值的，而不是找return的，因为找不到</span></span><br><span class="line"><span class="comment"># yield，所以返回StopIteration。最后一句也不会执行了。如果注释这一行就不会报错了，因为next是找下一个</span></span><br><span class="line"><span class="comment"># yield的，但没有了，这里会抛异常，但我们给了一个缺省值'End'，所以打印‘End'，而不会抛异常</span></span><br><span class="line">print(next(g, <span class="string">'End'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 一个生成器函数中，可以有多个yield表达式或return语句，碰到return，这个函数就结束了，但生成器对象还</span></span><br><span class="line"><span class="comment"># 在，因为引用还在，但每一次next都是要找到下一个yield</span></span><br><span class="line"><span class="comment"># 这里为什么用next()调用就会重新调用函数，一直返回line 1，而用print(next())就会在函数中继续向下执</span></span><br><span class="line"><span class="comment"># 行？这与g = gen()有关系，这一句是将gen()函数调用的值都赋给了g，而且是一个generator类型，用next()</span></span><br><span class="line"><span class="comment"># 一直取g的下一个值，所以会显示line 1 1 line 2 2。如果用print(next(gen()))，这一样会一直显示line 1</span></span><br><span class="line">- 在生成器函数中，使用多个<span class="keyword">yield</span>语句，执行一次后会暂停执行，把<span class="keyword">yield</span>表达式的值返回</span><br><span class="line">- 再次执行会执行到下一个<span class="keyword">yield</span>语句</span><br><span class="line">- <span class="keyword">return</span>语句依然可以终止函数运行，但<span class="keyword">return</span>语句的返回值不能被获取到</span><br><span class="line">- <span class="keyword">return</span>会导致无法继续获取下一个值，抛出StopIteration异常</span><br><span class="line">- 如果函数没有显示的<span class="keyword">return</span>语句，如果生成器函数执行到结尾，一样会抛出StopIteration异常</span><br></pre></td></tr></table></figure>
+<h3 id="生成器应用"><a href="#生成器应用" class="headerlink" title="生成器应用"></a>生成器应用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 无限循环</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(c)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> next(c)</span><br><span class="line">c = counter()</span><br><span class="line">print(inc(c))</span><br><span class="line">print(inc(c))</span><br><span class="line">输出：</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="comment"># 根据生成器定义，有yield的是生成器函数，生成器函数返回的是生成器对象，这里把生成器对象赋值给了变量c，之后一直用next在拨动c变量，所以输出是连续的</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    c = counter()</span><br><span class="line">    <span class="keyword">return</span> next(c)</span><br><span class="line"></span><br><span class="line">print(inc())</span><br><span class="line">print(inc())</span><br><span class="line">print(inc())</span><br><span class="line">输出：</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="comment"># 执行了三次print(inc())，因为每次都创建一个生成器对象inc()，所以并不是同一个生成器对象，所以打印三次1</span></span><br><span class="line"><span class="comment"># 按上例中所说，这里把生成器对象定义在了inc()函数中，每次又都调用一次inc函数，所以每次都是新的函数，新的生成器对象，所以输出的全是1。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计数器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">            <span class="keyword">yield</span> i</span><br><span class="line">    c = counter()</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span>:next(c)   <span class="comment"># c对于lambda来讲是自由变量，这里是一个闭包</span></span><br><span class="line">foo = inc()</span><br><span class="line">print(foo())</span><br><span class="line">print(foo())</span><br><span class="line"><span class="comment"># inc()函数调用的返回值是lambda:next(c)，lambda:next(c)不是生成器而只是拨了一下c，</span></span><br><span class="line"><span class="comment"># lambda:next(c)是一个新的函数，新的函数中并没有yield语句。counter()才是生成器函数。c是生成器对象，</span></span><br><span class="line"><span class="comment"># 我们在lambda函数中拨它，所以foo只是lambda函数的引用值，之后再调用 foo()函数，这相当于在拨c，所以这里输出1和2</span></span><br><span class="line"><span class="comment"># 根据生成器定义，这里把生成器对象赋值给了c变量，并且定义在了inc函数中，再将inc返回的函数赋值给foo，每次调</span></span><br><span class="line"><span class="comment"># 用foo函数的时候应该会产生一个新的生成器对象，但因为inc函数返回的是函数，并且引用了c变量，这就形成了闭包，</span></span><br><span class="line"><span class="comment"># c变量被保存了下来，所以输出可以是连续的。如果返回的只是next(c)，那么就会只输出1，因为生成器对象总是新的。</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(w)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> next(w)</span><br><span class="line"></span><br><span class="line">c = counter()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    s = inc(c)</span><br><span class="line">    <span class="keyword">if</span> s == <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    print(s)</span><br><span class="line"><span class="comment"># 输出1到99, 因为在拨动同一个生成器对象</span></span><br><span class="line"><span class="comment"># ============================================================</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span>  i</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    c = counter()</span><br><span class="line">    <span class="keyword">return</span> next(c)</span><br><span class="line"></span><br><span class="line">s = inc()</span><br><span class="line">print(s)</span><br><span class="line">print(s)</span><br><span class="line"><span class="comment"># 因为生成器对象定义在了inc函数中，所以每次调用都会产生新的生成器对象，所以输出的只是1。</span></span><br><span class="line"><span class="comment"># ==========================================================================</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span>  i</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    c = counter()</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">lambda</span> :next(c)</span><br><span class="line"></span><br><span class="line">s = inc()</span><br><span class="line">print(s())</span><br><span class="line">print(s())</span><br><span class="line"><span class="comment"># 生成器对象虽然定义在inc函数中，但因为使用了闭包，所以c变量的值被保留了下来</span></span><br><span class="line"><span class="comment"># ===============================================================================</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(c)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> next(c)</span><br><span class="line"></span><br><span class="line"><span class="comment"># c = counter()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    c = counter()</span><br><span class="line">    g = inc(c)</span><br><span class="line">    print(g)</span><br><span class="line">    <span class="keyword">if</span> g == <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="comment"># 20200526晚在台式机上测试，c = counter()这行放在while循环里就可以累加，放在循环外就一直显示1，为什么?</span></span><br><span class="line"><span class="comment"># 是否与全局变量不可改变有关，写在里面时是局部变量，可变</span></span><br><span class="line"><span class="comment"># 20200527早在笔记本上测试，情况刚好相反，放在外面就可以连续输出，放在while中就只会输出1, 按照生成器的定</span></span><br><span class="line"><span class="comment"># 义，这更符合生成器的定义。在台式机上测试为什么是另一种情况，原因不明。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lambda表达式是匿名函数</span></span><br><span class="line"><span class="comment"># return返回的是一个匿名函数</span></span><br><span class="line"><span class="comment"># 等价于下面的代码</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">()</span>:</span></span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">            <span class="keyword">yield</span> i</span><br><span class="line">   c = counter()</span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">_inc</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">return</span> next(c)</span><br><span class="line">   <span class="keyword">return</span> _inc</span><br><span class="line"><span class="comment"># 上面三行相当于之前的lambda:next(c)</span></span><br><span class="line">foo = inc()</span><br><span class="line">print(foo())</span><br><span class="line">print(foo())</span><br><span class="line">print(foo())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理递归问题</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">()</span>:</span></span><br><span class="line">    x = <span class="number">0</span> </span><br><span class="line">    y = <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="keyword">yield</span> y</span><br><span class="line">        x,y = y,x+y</span><br><span class="line">        </span><br><span class="line">foo = fib()  <span class="comment"># 固定生成器对象</span></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">5</span>):</span><br><span class="line">    print(<span class="string">'#####'</span>,next(foo))</span><br><span class="line"><span class="comment"># 这里迭代5次后，下面再次用next(foo)时，会接着这里向下连续输出，所以下面不会输出到第100个斐波那契数列，而是输出到第105个</span></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    next(foo)</span><br><span class="line">print(next(foo))    </span><br><span class="line"><span class="comment"># 等价于下面的代码</span></span><br><span class="line">pre = <span class="number">0</span></span><br><span class="line">cur = <span class="number">1</span>  <span class="comment"># No1</span></span><br><span class="line">print(pre,cur,end=<span class="string">' '</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># recursion</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib1</span><span class="params">(n,pre=<span class="number">0</span>,cur=<span class="number">1</span>)</span>:</span></span><br><span class="line">    pre,cur = cur,pre+cur</span><br><span class="line">    print(cur,end=<span class="string">' '</span>)</span><br><span class="line">    <span class="keyword">if</span> n == <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    fib1(n<span class="number">-1</span>,pre,cur)</span><br><span class="line">print(fib1(<span class="number">100</span>))</span><br></pre></td></tr></table></figure>
+<ul>
+<li>协程 coroutine<ul>
+<li>生成器的高级用法</li>
+<li>比进程、线程轻量级</li>
+<li>是在用户空间调度函数的一种实现</li>
+<li>Python3 asyncio就是协程实现，已经加入到标准库</li>
+<li>Python3.5 使用 async、await关键字直接原生支持协程</li>
+<li>协程调度器实现思路<ul>
+<li>有2个生成器A、B</li>
+<li>next(A)后，A执行到了yield语句暂停，然后去执行next(B)，B执行到yield语句也暂停，然后再次调用 next(A)，再调用next(B)，周而复始，就实现了调度的效果</li>
+<li>可以引入调度的策略来实现切换的方式</li>
+</ul>
+</li>
+<li>协程是一种非抢占式调度</li>
+</ul>
+</li>
+</ul>
+<h3 id="yield-from"><a href="#yield-from" class="headerlink" title="yield from"></a>yield from</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">1000</span>):</span><br><span class="line">        <span class="keyword">yield</span> x</span><br><span class="line">        </span><br><span class="line">foo = inc()</span><br><span class="line">print(next(foo))</span><br><span class="line">print(next(foo))</span><br><span class="line">print(next(foo))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 等价于下面的代码</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">from</span> range(<span class="number">1000</span>)</span><br><span class="line">    <span class="comment"># 这一种代码相当于上面的for循环的两句代码</span></span><br><span class="line">foo = inc()</span><br><span class="line">print(next(foo))</span><br><span class="line">print(next(foo))</span><br><span class="line">print(next(foo))</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>yield from是Python3出现的新的语法</p>
+</li>
+<li><p>yield from iterable 是 for item in iterable: yield item 形式的语法糖</p>
+<ul>
+<li>从可迭代对象中一个个拿元素</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">counter</span><span class="params">(n)</span>:</span>   <span class="comment"># 生成器、迭代器</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(n):</span><br><span class="line">		<span class="keyword">yield</span> x</span><br><span class="line">          </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(n)</span>:</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="keyword">from</span> counter(n)</span><br><span class="line"><span class="comment"># 上面两个函数是一样的，只是inc函数使用了语法糖，用inc函数再调用counter函数和counter函数直接输出的结果是一样的 </span></span><br><span class="line">foo = inc(<span class="number">10</span>)</span><br><span class="line">print(next(foo))</span><br><span class="line">print(next(foo))</span><br></pre></td></tr></table></figure>
+<h3 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h3><ul>
+<li>生成器generator指的是生成器对象，可以由生成器表达式得到，也可以使用yield关键字得到一个生成器函数，调用这个函数得到一个生成器对象</li>
+<li><strong>生成器函数</strong><ul>
+<li><strong><em>函数体中包含yield语句的函数就是生成器函数，返回生成器对象</em></strong>。</li>
+<li>生成器对象，是一个可迭代对象，是一个迭代器。迭代器一定是一个可迭代对象，但可迭代对象不一定是迭代器</li>
+<li>生成器对象，是延迟计算、惰性求值的</li>
+<li>包含yield语句的生成器函数生成<strong><em>生成器对象</em></strong>的时候，<strong><em>生成器函数的函数体不会立即执行</em></strong></li>
+<li>next(generator)会从函数的当前位置向后执行到之后碰到的第一个yield语句，会弹出值，并暂停函数执行</li>
+<li>再次调用next函数，和上一条一样的处理过程</li>
+<li>没有多余的yield语句能被执行，继续调用next函数，会抛出StopIteration异常</li>
+<li>通过生成器表达式或生成器函数就可以得到一个生成器对象或简称生成器</li>
+</ul>
+</li>
+<li>总结<ul>
+<li>最重要是使用生成器表达式或生成器函数就可以返回生成器对象，之后就可以使用<code>next</code>方法对生成器对象进行迭代，如果生成器对象赋值给了一个变量，用<code>next</code>一直拨动这个变量，输出就会向定义中一样，执行到<code>yield</code>就会停下来，直到下一次使用<code>next</code>拨动这个生成器对象。如果每次都产生新的生成器对象，那么输出一直会是同一个值。另外有yield的就是生成器函数</li>
+<li>生成器表达式/生成器函数 –&gt; 生成器对象 –&gt; <code>next</code></li>
+</ul>
+</li>
+<li><p>yield from iterable 是 for item in iterable: yield item 形式的语法糖</p>
+<ul>
+<li>从可迭代对象中一个个拿元素</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/13/python基础学习-匿名函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/13/python基础学习-匿名函数/" itemprop="url">
+                  python基础学习-匿名函数
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2019-11-13 13:50:23" itemprop="dateCreated datePublished" datetime="2019-11-13T13:50:23+08:00">2019-11-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-05-26 16:36:53" itemprop="dateModified" datetime="2020-05-26T16:36:53+08:00">2020-05-26</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="匿名函数"><a href="#匿名函数" class="headerlink" title="匿名函数"></a>匿名函数</h3><ul>
+<li>匿名，即没有名字</li>
+<li>匿名函数，即没有名字的函数<ul>
+<li>没有名字如何定义</li>
+<li>没有名字如何调用</li>
+<li>如果能调用，如何使用</li>
+</ul>
+</li>
+<li>python借助Lambda表达式构建匿名函数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">语法：<span class="keyword">lambda</span> 参数列表: 表达式</span><br><span class="line"><span class="keyword">lambda</span> x:x**<span class="number">2</span></span><br><span class="line">(<span class="keyword">lambda</span> x:x**<span class="number">2</span>)(<span class="number">4</span>)  <span class="comment"># 调用</span></span><br><span class="line">输出：<span class="number">16</span></span><br><span class="line">foo = <span class="keyword">lambda</span> x,y:(x+y)**<span class="number">2</span>  <span class="comment"># 不推荐这么用</span></span><br><span class="line">foo(<span class="number">2</span>,<span class="number">1</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(x,y)</span>:</span>  <span class="comment"># 建议使用普通函数</span></span><br><span class="line">    <span class="keyword">return</span>(x+y)**<span class="number">2</span></span><br><span class="line">foo(<span class="number">2</span>,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用lambda关键字来定义匿名函数</li>
+<li>参数列表不需要小括号</li>
+<li>冒号是用来分割参数列表和表达式的</li>
+<li>不需要使用return，表达式的值，就是匿名函数返回值</li>
+<li>lambda表达式(匿名函数)只能写在一行上，被称为单行函数</li>
+<li>用途<ul>
+<li>在高阶函数传参时，使用lambda表达式，往往能简化代码</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">lst = [<span class="number">1</span>]</span><br><span class="line"><span class="comment"># lst.sort?</span></span><br><span class="line"><span class="comment"># key=None,reverse=False</span></span><br><span class="line">lst.sort(key=str)</span><br><span class="line">lst.append(<span class="string">'a'</span>)</span><br><span class="line"><span class="comment"># lst.sort()</span></span><br><span class="line"><span class="comment"># 没办法比较，因为类型不一样，需要统一类型</span></span><br><span class="line">lst.sort(key=str)   <span class="comment"># 送进去一个函数，和lambda函数一样，都是送进去函数</span></span><br><span class="line">lst.append(<span class="number">2</span>)</span><br><span class="line">lst.sort(key=str)   <span class="comment"># 这里key就是向进传函数的</span></span><br><span class="line">lst </span><br><span class="line"></span><br><span class="line">print((<span class="keyword">lambda</span> :<span class="number">0</span>)())  <span class="comment"># 返回0</span></span><br><span class="line"><span class="comment"># 上面一句相当于</span></span><br><span class="line"><span class="comment"># def fn():</span></span><br><span class="line"><span class="comment">#     return 0</span></span><br><span class="line">print((<span class="keyword">lambda</span> x,y=<span class="number">3</span>:x+y)(<span class="number">5</span>))</span><br><span class="line">print((<span class="keyword">lambda</span> x,y=<span class="number">3</span>:x+y)(<span class="number">5</span>,<span class="number">6</span>))</span><br><span class="line">输出：<span class="number">11</span></span><br><span class="line">print((<span class="keyword">lambda</span> x,*,y=<span class="number">30</span>:x+y)(<span class="number">5</span>))</span><br><span class="line">输出：<span class="number">35</span></span><br><span class="line">print((<span class="keyword">lambda</span> x,*,y=<span class="number">30</span>:x+y)(<span class="number">5</span>,y=<span class="number">10</span>))</span><br><span class="line">输出：<span class="number">15</span></span><br><span class="line">print((<span class="keyword">lambda</span> *args:(x <span class="keyword">for</span> x <span class="keyword">in</span> args))(*range(<span class="number">5</span>)))</span><br><span class="line">输出：&lt;generator object &lt;<span class="keyword">lambda</span>&gt;.&lt;locals&gt;.&lt;genexpr&gt; at <span class="number">0x7f056cf7c138</span>&gt;</span><br><span class="line">print((<span class="keyword">lambda</span> *args:[x+<span class="number">1</span> <span class="keyword">for</span> x <span class="keyword">in</span> args])(*range(<span class="number">5</span>)))</span><br><span class="line">输出：[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"><span class="comment"># print((lambda args:[x+1 for x in args])(range(5)))的输出也是一样的[1, 2, 3, 4, 5]，生成器与字典</span></span><br><span class="line"><span class="comment"># 也一样可以取消星号。</span></span><br><span class="line">print((<span class="keyword">lambda</span> *args:&#123;x+<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> args&#125;)(*range(<span class="number">5</span>)))</span><br><span class="line">输出：&#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;</span><br><span class="line">[x <span class="keyword">for</span> x <span class="keyword">in</span> (<span class="keyword">lambda</span> *args:map(<span class="keyword">lambda</span> x:x+<span class="number">1</span>,args))(*range(<span class="number">5</span>))]  <span class="comment"># 高阶函数</span></span><br><span class="line">标准输出：Out:[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">[x <span class="keyword">for</span> x <span class="keyword">in</span> (<span class="keyword">lambda</span> *args:map(<span class="keyword">lambda</span> x:(x+<span class="number">1</span>,args),args))(*range(<span class="number">5</span>))] <span class="comment"># 这里的星号不能去掉</span></span><br><span class="line">标准输出：</span><br><span class="line">Out:[(<span class="number">1</span>, (<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)),</span><br><span class="line"> 	 (<span class="number">2</span>, (<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)),</span><br><span class="line"> 	 (<span class="number">3</span>, (<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)),</span><br><span class="line"> 	 (<span class="number">4</span>, (<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)),</span><br><span class="line"> 	 (<span class="number">5</span>, (<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>))]</span><br></pre></td></tr></table></figure>
+<h3 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h3><ul>
+<li><p>语法：<code>lambda 参数列表: 表达式</code></p>
+</li>
+<li><p>使用lambda关键字来定义匿名函数</p>
+</li>
+<li>参数列表不需要小括号</li>
+<li>冒号是用来分割参数列表和表达式的</li>
+<li><strong>不需要使用return，表达式的值，就是匿名函数返回值</strong></li>
+<li>lambda表达式(匿名函数)只能写在一行上，被称为单行函数</li>
+<li>用途<ul>
+<li>在高阶函数传参时，使用lambda表达式，往往能简化代码</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/13/python基础练习-递归函数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2063,739 +2953,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/01/利用ssh密钥对的私钥访问服务器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/11/01/利用ssh密钥对的私钥访问服务器/" itemprop="url">
-                  利用ssh密钥对的私钥访问服务器
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-11-01 14:34:38" itemprop="dateCreated datePublished" datetime="2019-11-01T14:34:38+08:00">2019-11-01</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">   Server</span><br><span class="line">------------  </span><br><span class="line">1. 创建密钥对</span><br><span class="line">ssh-keygen -t rsa -P &apos;&apos;</span><br><span class="line">2. 将私钥改为.pem格式</span><br><span class="line">openssl rsa -in .ssh/id_rsa -outform pem &gt; dsjali.pem</span><br><span class="line">3. 修改权限，不然连接时会报错</span><br><span class="line">chmod 400 dsjali.pem</span><br><span class="line">4. 从私钥中产生公钥</span><br><span class="line">ssh-keygen -y -f dsjali.pem </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+5xBrPVEJ3mRo/yVFtSQSv1/J09oYHkbTD+l/4or04YqUCHJ7iR+A/LMeff0c9xKCbT9h</span><br><span class="line">sb/MvJGmCZGxuE375Fwu8XZGS8SfjYSxeh0uASOcZazOiBu4Ooegj9A3Ov4C9odPqISWbTdUx286WJqdzW7RZ0ZwkFOipr</span><br><span class="line">oFrszAPnvg5xmlnMSa0afYgWhRXimmn2oyLt7PFfZIXX8PJnMs7x9B0+lwLLIVJRKrpU8if+gD80viC9wUJu3/jC1VF8Jg4Bq2aS7KiMX++L</span><br><span class="line">Y1SKoOUUc0sHa/SFZEzuouaRGgrmU9XkM3DvzlfcrGN+/14WczAZG4st</span><br><span class="line">5. 将上面的公钥写入认证文件</span><br><span class="line">vim .ssh/authorized_keys</span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+5xBrPVEJ3mRo/yVFtSQSv1/J09oYHkbTD+l/4or04YqUCHJ7iR+A/LMeff0c9xKCbT9h</span><br><span class="line">sb/MvJGmCZGxuE375Fwu8XZGS8SfjYSxeh0uASOcZazOiBu4Ooegj9A3Ov4C9odPqISWbTdUx286WJqdzW7RZ0ZwkFOipr</span><br><span class="line">oFrszAPnvg5xmlnMSa0afYgWhRXimmn2oyLt7PFfZIXX8PJnMs7x9B0+lwLLIVJRKrpU8if+gD80viC9wUJu3/jC1VF8Jg4Bq2aS7KiMX++L</span><br><span class="line">Y1SKoOUUc0sHa/SFZEzuouaRGgrmU9XkM3DvzlfcrGN+/14WczAZG4st</span><br><span class="line"></span><br><span class="line">------------</span><br><span class="line">   Client</span><br><span class="line">------------</span><br><span class="line">1. 下载服务器上的.pem文件</span><br><span class="line">2. 连接</span><br><span class="line">ssh -i &quot;dsjali.pem&quot; root@39.106.93.138</span><br><span class="line"># .pem文件的权限为400，如果不是，可能报错。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/31/python基础学习-random模块/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/10/31/python基础学习-random模块/" itemprop="url">
-                  python基础学习-random模块
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-10-31 08:28:39" itemprop="dateCreated datePublished" datetime="2019-10-31T08:28:39+08:00">2019-10-31</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p><code>random.choice(seq)</code></p>
-<p>从非空序列 <em>seq</em> 返回一个随机元素。 如果 <em>seq</em> 为空，则引发 <a href="https://docs.python.org/zh-cn/3/library/exceptions.html#IndexError" target="_blank" rel="noopener"><code>IndexError</code></a>。</p>
-</li>
-<li><p><code>random.shuffle(x[, random])</code></p>
-<p>将序列 <em>x</em> 随机打乱位置。可选参数 <em>random</em> 是一个0参数函数，在 [0.0, 1.0) 中返回随机浮点数；默认情况下，这是函数 <a href="https://docs.python.org/zh-cn/3/library/random.html#random.random" target="_blank" rel="noopener"><code>random()</code></a> 。要改变一个不可变的序列并返回一个新的打乱列表，请使用<code>sample(x, k=len(x))</code>。请注意，即使对于小的 <code>len(x)</code>，<em>x</em> 的排列总数也可以快速增长，大于大多数随机数生成器的周期。 这意味着长序列的大多数排列永远不会产生。 例如，长度为2080的序列是可以在 Mersenne Twister 随机数生成器的周期内拟合的最大序列。</p>
-</li>
-<li><p><code>random.random()</code></p>
-<p>返回 [0.0, 1.0) 范围内的下一个随机浮点数。</p>
-</li>
-<li><p><code>random.sample(population, k)</code></p>
-<p>返回从总体序列或集合中选择的唯一元素的 <em>k</em> 长度列表。 用于无重复的随机抽样。返回包含来自总体的元素的新列表，同时保持原始总体不变。 结果列表按选择顺序排列，因此所有子切片也将是有效的随机样本。 这允许抽奖获奖者（样本）被划分为大奖和第二名获胜者（子切片）。总体成员不必是 <a href="https://docs.python.org/zh-cn/3/glossary.html#term-hashable" target="_blank" rel="noopener">hashable</a> 或 unique 。 如果总体包含重复，则每次出现都是样本中可能的选择。要从一系列整数中选择样本，请使用 <a href="https://docs.python.org/zh-cn/3/library/stdtypes.html#range" target="_blank" rel="noopener"><code>range()</code></a> 对象作为参数。 对于从大量人群中采样，这种方法特别快速且节省空间：<code>sample(range(10000000), k=60)</code> 。如果样本大小大于总体大小，则引发 <a href="https://docs.python.org/zh-cn/3/library/exceptions.html#ValueError" target="_blank" rel="noopener"><code>ValueError</code></a> 。</p>
-</li>
-<li><p><code>random.uniform(a, b)</code></p>
-<p>返回一个随机浮点数 <em>N</em> ，当 <code>a &lt;= b</code> 时 <code>a &lt;= N &lt;= b</code> ，当 <code>b &lt; a</code> 时 <code>b &lt;= N &lt;= a</code> 。取决于等式 <code>a + (b-a) * random()</code> 中的浮点舍入，终点 <code>b</code> 可以包括或不包括在该范围内。</p>
-</li>
-<li><p><code>random.randrange(stop)</code></p>
-</li>
-<li><p><code>random.randrange(start, stop[, step])</code></p>
-<p>从 <code>range(start, stop, step)</code> 返回一个随机选择的元素。 这相当于 <code>choice(range(start, stop, step))</code> ，但实际上并没有构建一个 range 对象。位置参数模式匹配 <a href="https://docs.python.org/zh-cn/3/library/stdtypes.html#range" target="_blank" rel="noopener"><code>range()</code></a> 。不应使用关键字参数，因为该函数可能以意外的方式使用它们。在 3.2 版更改: <a href="https://docs.python.org/zh-cn/3/library/random.html#random.randrange" target="_blank" rel="noopener"><code>randrange()</code></a> 在生成均匀分布的值方面更为复杂。 以前它使用了像<code>int(random()*n)</code>这样的形式，它可以产生稍微不均匀的分布。</p>
-</li>
-<li><p><code>random.randint(a, b)</code></p>
-<p>返回随机整数 <em>N</em> 满足 <code>a &lt;= N &lt;= b</code>。相当于 <code>randrange(a, b+1)</code>。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/30/python基础练习-字典/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/10/30/python基础练习-字典/" itemprop="url">
-                  python基础练习-字典
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-10-30 17:20:43" itemprop="dateCreated datePublished" datetime="2019-10-30T17:20:43+08:00">2019-10-30</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-05-20 16:40:25" itemprop="dateModified" datetime="2020-05-20T16:40:25+08:00">2020-05-20</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="字典练习"><a href="#字典练习" class="headerlink" title="字典练习"></a>字典练习</h3><ul>
-<li>用户输入一个数字<ul>
-<li>打印每一位数字及其重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">num = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> d.get(c):</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    d[c] += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">print(d)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> num:</span><br><span class="line">    <span class="keyword">if</span> c <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[c] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[c] += <span class="number">1</span></span><br><span class="line">print(d)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>数字重复统计<ul>
-<li>随机产生100个整数</li>
-<li>数字的范围[-1000,1000]</li>
-<li>升序输出所有不同的数字及其重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">n = <span class="number">100</span></span><br><span class="line">nums = [<span class="number">0</span>] * n</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">    nums[i] = random.randint(<span class="number">-1000</span>,<span class="number">1000</span>)</span><br><span class="line">print(nums)</span><br><span class="line">t = nums.copy()</span><br><span class="line">t.sort()</span><br><span class="line">print(t)</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> nums:</span><br><span class="line">    <span class="keyword">if</span> x <span class="keyword">not</span> <span class="keyword">in</span> d.keys():</span><br><span class="line">        d[x] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        d[x] += <span class="number">1</span></span><br><span class="line">print(d)</span><br><span class="line">d1 = sorted(d.items())</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>字符串重复统计<ul>
-<li>字符表’abcdefghijklmnopqrstuvwxyz’</li>
-<li>随机挑选2个字母组成字符串，共挑选100个</li>
-<li>降序输出所有不同的字符串及重复的次数</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">alphabet = <span class="string">'abcdefghijklmnopqrstuvwxyz'</span></span><br><span class="line"></span><br><span class="line">words = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    <span class="comment"># words.append(random.choice(alphabet)+random.choice(alphabet))</span></span><br><span class="line">    <span class="comment"># words.append(''.join(random.sample(alphabet,2)))   随机采样</span></span><br><span class="line">    words.append(<span class="string">''</span>.join(random.choice(alphabet) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2</span>))) <span class="comment"># 生成器</span></span><br><span class="line">    </span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> words:</span><br><span class="line">    d[x] = d.get(x,<span class="number">0</span>) + <span class="number">1</span></span><br><span class="line"><span class="comment"># 这个方法比之前的if not d.get(c)和if c not in d.keys更加方便，这里直接判断，如果在d[x]有值，就用其值加1，否则就用d[x] = 0 + 1</span></span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># 这个从26个字母中取随机取两个字母组合的例子很像是双色球等福彩的概率，预测之说纯是扯谈</span></span><br><span class="line">d1 = sorted(d.items(),reverse=<span class="keyword">True</span>)</span><br><span class="line">print(d1)</span><br></pre></td></tr></table></figure>
-<h4 id="将字符串格式设置功能用于字典"><a href="#将字符串格式设置功能用于字典" class="headerlink" title="将字符串格式设置功能用于字典"></a>将字符串格式设置功能用于字典</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; phonebook</span><br><span class="line">&#123;<span class="string">'Beth'</span>: <span class="string">'9102'</span>, <span class="string">'Alice'</span>: <span class="string">'2341'</span>, <span class="string">'Cecil'</span>: <span class="string">'3258'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">"Cecil's phone number is &#123;Cecil&#125;."</span>.format_map(phonebook)</span><br><span class="line"><span class="string">"Cecil's phone number is 3258."</span></span><br><span class="line"><span class="comment"># 可在字典中包含各种信息，这样只需在格式字符串中提取所需的信息即可。使用format_map来指出你</span></span><br><span class="line"><span class="comment"># 将通过一个映射来提供所需的信息。可使用字符串格式设置功能来设置值的格式，这些值是作为命名或</span></span><br><span class="line"><span class="comment"># 非命名参数提供给方法format的。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>template = <span class="string">'''&lt;html&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;head&gt;&lt;title&gt;&#123;title&#125;&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;body&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;h1&gt;&#123;title&#125;&lt;/h1&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;p&gt;&#123;text&#125;&lt;/p&gt;</span></span><br><span class="line"><span class="string"><span class="meta">... </span>&lt;/body&gt;'''</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>data = &#123;<span class="string">'title'</span>: <span class="string">'My Home Page'</span>, <span class="string">'text'</span>: <span class="string">'Welcome to my home page!'</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(template.format_map(data))</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;My Home Page&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;h1&gt;My Home Page&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;Welcome to my home page!&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line"><span class="comment"># 将data字典的值代入template中。像这样使用字典时，可指定任意数量的转换说明符，条件是所有</span></span><br><span class="line"><span class="comment"># 的字段名都是包含在字典中的键。</span></span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/29/创建无线热点/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/10/29/创建无线热点/" itemprop="url">
-                  创建无线热点
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2019-10-29 09:00:54" itemprop="dateCreated datePublished" datetime="2019-10-29T09:00:54+08:00">2019-10-29</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ubuntu/" itemprop="url" rel="index"><span itemprop="name">ubuntu</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. nm-connection-editor</span><br><span class="line">2. 点击左下角的加号，选择Wi-Fi，点击Create...</span><br><span class="line">3. 在Wi-Fi栏中，SSID是自定义的热点名称，Mode选择Hotspot，Device选择无线网卡。</span><br><span class="line">4. 在Wi-Fi Security栏中，选择WPA &amp; WPA2 Personal，输入密码</span><br><span class="line">5. 在ubuntu19.10中，打开设置中的Wi-Fi，选择最上方打开关闭wifi按键右侧的三个竖点，选择Connect to Hidden Network ...，这是连接到隐藏网络中，在Connection中选择上面创建的热点</span><br><span class="line">名称，选择后，下面的信息会自动填入，如密码等，直接点击Connect即可打开热点</span><br><span class="line">6. 首先，有线网络需要连接，这时已经打开了热点，但测试发现无法看到热点名称，也要选择连接隐藏网络，输入热点名称和密码才能连接。</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -2838,7 +3000,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">247</span>
+                    <span class="site-state-item-count">251</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3280,7 +3442,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">176</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">179</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
