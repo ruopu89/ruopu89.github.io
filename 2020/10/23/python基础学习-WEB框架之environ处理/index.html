@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="类Flask框架实现从现在开始，我们将一步步完成一个WSGI的WEB框架，从而了解WEB框架的内部机制 WSGIy请求environ处理WSGI服务器程序会帮我们处理HTTP请求报文，但是提供的environ还是一个用起来不方便的字典 123456789101112http://127.0.0.1:9999/python/index.html?id=1234&amp;amp;name=tom(&apos;SERVE">
+<meta name="keywords" content="python网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-WEB框架之environ处理">
+<meta property="og:url" content="http://yoursite.com/2020/10/23/python基础学习-WEB框架之environ处理/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="类Flask框架实现从现在开始，我们将一步步完成一个WSGI的WEB框架，从而了解WEB框架的内部机制 WSGIy请求environ处理WSGI服务器程序会帮我们处理HTTP请求报文，但是提供的environ还是一个用起来不方便的字典 123456789101112http://127.0.0.1:9999/python/index.html?id=1234&amp;amp;name=tom(&apos;SERVE">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/python-WEB开发/WEB开发6.png">
+<meta property="og:updated_time" content="2020-10-29T07:01:24.816Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-WEB框架之environ处理">
+<meta name="twitter:description" content="类Flask框架实现从现在开始，我们将一步步完成一个WSGI的WEB框架，从而了解WEB框架的内部机制 WSGIy请求environ处理WSGI服务器程序会帮我们处理HTTP请求报文，但是提供的environ还是一个用起来不方便的字典 123456789101112http://127.0.0.1:9999/python/index.html?id=1234&amp;amp;name=tom(&apos;SERVE">
+<meta name="twitter:image" content="http://yoursite.com/images/python-WEB开发/WEB开发6.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/23/python基础学习-WEB框架之environ处理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-WEB框架之environ处理 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/23/python基础学习-WEB框架之environ处理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-WEB框架之environ处理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-10-23 10:53:05" itemprop="dateCreated datePublished" datetime="2020-10-23T10:53:05+08:00">2020-10-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-10-29 15:01:24" itemprop="dateModified" datetime="2020-10-29T15:01:24+08:00">2020-10-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="类Flask框架实现"><a href="#类Flask框架实现" class="headerlink" title="类Flask框架实现"></a>类Flask框架实现</h1><p>从现在开始，我们将一步步完成一个WSGI的WEB框架，从而了解WEB框架的内部机制</p>
+<h2 id="WSGIy请求environ处理"><a href="#WSGIy请求environ处理" class="headerlink" title="WSGIy请求environ处理"></a>WSGIy请求environ处理</h2><p>WSGI服务器程序会帮我们处理HTTP请求报文，但是提供的environ还是一个用起来不方便的字典</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:9999/python/index.html?id=1234&amp;name=tom</span><br><span class="line">(<span class="string">'SERVER_PROTOCOL'</span>, <span class="string">'HTTP/1.1'</span>)</span><br><span class="line">(<span class="string">'wsgi.url_scheme'</span>, <span class="string">'http'</span>)</span><br><span class="line">(<span class="string">'HTTP_HOST'</span>, <span class="string">'127.0.0.1:9999'</span>)</span><br><span class="line">(<span class="string">'SERVER_PORT'</span>, <span class="string">'9999'</span>)</span><br><span class="line">(<span class="string">'REMOTE_ADDR'</span>, <span class="string">'127.0.0.1'</span>)</span><br><span class="line"></span><br><span class="line">(<span class="string">'REQUEST_METHOD'</span>, <span class="string">'GET'</span>)</span><br><span class="line">(<span class="string">'CONTENT_TYPE'</span>, <span class="string">'text/plain'</span>)</span><br><span class="line">(<span class="string">'PATH_INFO'</span>, <span class="string">'/python/index.html'</span>)</span><br><span class="line">(<span class="string">'QUERY_STRING'</span>, <span class="string">'id=1234&amp;name=tom'</span>)</span><br><span class="line">(<span class="string">'HTTP_USER_AGENT'</span>, <span class="string">'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Maxthon/5.0 Chrome/55.0.2883.75 Safari/537.36'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="QUERY-STRING-查询字符串的解析"><a href="#QUERY-STRING-查询字符串的解析" class="headerlink" title="QUERY_STRING 查询字符串的解析"></a>QUERY_STRING 查询字符串的解析</h2><p>WSGI服务器程序处理过HTTP报文后，返回一个字典，可以得到查询字符串<code>(&#39;QUERY_STRING&#39;, &#39;id=1234&amp;name=tom&#39;)</code>。这个键值对用起来不方便。</p>
+<p>1、编程序解析</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># id=5&amp;name=wayne</span></span><br><span class="line">qstr = environ.get(<span class="string">'QUERY_STRING'</span>)</span><br><span class="line">print(qstr)</span><br><span class="line"><span class="keyword">if</span> qstr:</span><br><span class="line">    <span class="keyword">for</span> pair <span class="keyword">in</span> qstr.split(<span class="string">'&amp;'</span>):</span><br><span class="line">        k, _, v = pair.partition(<span class="string">'='</span>)</span><br><span class="line">        print(<span class="string">"k=&#123;&#125;, v=&#123;&#125;"</span>.format(k,v))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># id=5&amp;name=wayne</span></span><br><span class="line">querstr = environ.get(<span class="string">'QUERY_STRING'</span>)</span><br><span class="line"><span class="keyword">if</span> querystr:</span><br><span class="line">    querdict = &#123;k:v <span class="keyword">for</span> k,_,v <span class="keyword">in</span> map(<span class="keyword">lambda</span> item: item.partition(<span class="string">'='</span>), querystr.split(<span class="string">'&amp;'</span>))&#125;</span><br><span class="line">print(querydict)</span><br></pre></td></tr></table></figure>
+<p>2、使用cgi模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># id=5&amp;name=wayne</span></span><br><span class="line">qstr = environ.get(<span class="string">'QUERY_STRING'</span>)</span><br><span class="line">print(qstr)</span><br><span class="line">print(parse_qs(qstr))</span><br><span class="line"><span class="comment"># &#123;'name': ['wayne'], 'id': ['5']&#125;</span></span><br></pre></td></tr></table></figure>
+<p>可以看到使用这个库，可以解析查询字符串，请注意value是列表，为什么？</p>
+<p>这是因为同一个key可以有多个值</p>
+<p>cgi模块过期了，建议使用urllib</p>
+<p>3、使用urllib库</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># http://127.0.0.1:9999/?id=5&amp;name=wayne&amp;age=&amp;comment=1,a,c&amp;age=19&amp;age=20</span></span><br><span class="line">qstr = environ.get(<span class="string">'QUERY_STRING'</span>)</span><br><span class="line">print(qstr)</span><br><span class="line">print(parse.parse_qs(qstr))  <span class="comment"># 字典</span></span><br><span class="line">print(parse.parse_qs1(qstr))  <span class="comment"># 二元组列表</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">id=<span class="number">5</span>&amp;name=wayne&amp;age=&amp;comment=<span class="number">1</span>,a,c&amp;age=<span class="number">19</span>&amp;age=<span class="number">20</span></span><br><span class="line">&#123;<span class="string">'name'</span>: [<span class="string">'wayne'</span>], <span class="string">'age'</span>: [<span class="string">'19'</span>, <span class="string">'20'</span>], <span class="string">'id'</span>: [<span class="string">'5'</span>], <span class="string">'comment'</span>: [<span class="string">'1,a,c'</span>]&#125;</span><br><span class="line">[(<span class="string">'id'</span>, <span class="string">'5'</span>), (<span class="string">'name'</span>, <span class="string">'wayne'</span>), (<span class="string">'comment'</span>, <span class="string">'1,a,c'</span>), (<span class="string">'age'</span>, <span class="string">'19'</span>), (<span class="string">'age'</span>, <span class="string">'20'</span>)]</span><br></pre></td></tr></table></figure>
+<p>parse_qs函数，将同一个名称的多值，保存在字典中，使用了列表保存。<br><code>comment=1,a,c</code> 这不是多值，这是一个值。<br><code>age</code> 是多值。</p>
+<h4 id="environ的解析–webob库"><a href="#environ的解析–webob库" class="headerlink" title="environ的解析–webob库"></a>environ的解析–webob库</h4><p>环境数据有很多，都是存在字典中的，字典的存取方式没有对象的属性访问方便。使用第三方库webob，可以把环境数据的解析、封装成对象。</p>
+<h5 id="webob简介"><a href="#webob简介" class="headerlink" title="webob简介"></a>webob简介</h5><p>Python下，可以对WSGI请求进行解析，并提供对响应进行高级封装的库。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip install webob</span><br></pre></td></tr></table></figure>
+<p>官网文档 <code>docs.webob.org</code></p>
+<h5 id="webob-Request对象"><a href="#webob-Request对象" class="headerlink" title="webob.Request对象"></a>webob.Request对象</h5><p>将环境参数解析并封装成request对象</p>
+<p>GET方法，发送的数据是URL中Query string，在Request Header中。<br>request.GET就是一个字典MultiDict，里面就封装着查询字符串。<br>POST方法，”提交”的数据是放在Request Body里面，但是也可以同时使用Query String。<br>request.POST可以获取Request Body中的数据，也是个字典MultiDict。</p>
+<p>不关心什么方法提交，只关心数据，可以使用request.params，它里面是所有提交数据的封装。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">request = webob.Request(environ)</span><br><span class="line">print(request.headers) <span class="comment"># 类字典容器</span></span><br><span class="line">print(request.method)</span><br><span class="line">print(request.path)</span><br><span class="line">print(request.query_string) <span class="comment"># 查询字符串</span></span><br><span class="line">print(request.GET) <span class="comment"># GET方法的所有数据</span></span><br><span class="line">print(request.POST) <span class="comment"># POST方法的所有数据</span></span><br><span class="line">print(<span class="string">'params = &#123;&#125;'</span>.format(request.params)) <span class="comment"># 所有数据,参数</span></span><br></pre></td></tr></table></figure>
+<h5 id="MultiDict"><a href="#MultiDict" class="headerlink" title="MultiDict"></a>MultiDict</h5><p>MultiDict允许一个key存了好几个值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob.multidict <span class="keyword">import</span> MultiDict</span><br><span class="line">md = MultiDict()</span><br><span class="line">md.add(<span class="number">1</span>, <span class="string">'magedu'</span>)</span><br><span class="line">md.add(<span class="number">1</span>, <span class="string">'.com'</span>)</span><br><span class="line">md.add(<span class="string">'a'</span>, <span class="number">1</span>)</span><br><span class="line">md.add(<span class="string">'a'</span>, <span class="number">2</span>)</span><br><span class="line">md.add(<span class="string">'b'</span>, <span class="string">'3'</span>)</span><br><span class="line">md[<span class="string">'b'</span>] = <span class="string">'4'</span></span><br><span class="line"><span class="keyword">for</span> pair <span class="keyword">in</span> md.items():</span><br><span class="line">print(pair)</span><br><span class="line">print(md.getall(<span class="number">1</span>))</span><br><span class="line"><span class="comment">#print(md.getone('a')) # 只能有一个值</span></span><br><span class="line">print(md.get(<span class="string">'a'</span>)) <span class="comment"># 返回一个值</span></span><br><span class="line">print(md.get(<span class="string">'c'</span>)) <span class="comment"># 不会抛异常KeyError,返回None</span></span><br></pre></td></tr></table></figure>
+<h5 id="webob-Response对象"><a href="#webob-Response对象" class="headerlink" title="webob.Response对象"></a>webob.Response对象</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">res = webob.Response()</span><br><span class="line">print(res.status)</span><br><span class="line">print(res.headerlist)</span><br><span class="line">start_response(res.status, res.headerlist)</span><br><span class="line"><span class="comment"># 返回可迭代对象</span></span><br><span class="line">html = <span class="string">'&lt;h1&gt;马哥教育欢迎你&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)</span><br><span class="line"><span class="keyword">return</span> [html]</span><br></pre></td></tr></table></figure>
+<p>如果一个Application是一个类的实例，可以实现 <code>__call__</code> 方法。<br>我们来看看webob.Response类的源代码</p>
+<p><img src="/images/python-WEB开发/WEB开发6.png" alt=""></p>
+<p>由此可以得到下面代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ:dict, start_response)</span>:</span></span><br><span class="line"><span class="comment"># 请求处理</span></span><br><span class="line">request = webob.Request(environ)</span><br><span class="line">print(request.method)</span><br><span class="line">print(request.path)</span><br><span class="line">print(request.query_string)</span><br><span class="line">print(request.GET)</span><br><span class="line">print(request.POST)</span><br><span class="line">print(<span class="string">'params = &#123;&#125;'</span>.format(request.params))</span><br><span class="line"><span class="comment"># 响应处理</span></span><br><span class="line">res = webob.Response() <span class="comment"># [('Content-Type', 'text/html; charset=UTF-8'), ('Content-Length',</span></span><br><span class="line"><span class="string">'0'</span>)]</span><br><span class="line">res.status_code = <span class="number">200</span> <span class="comment"># 默认200</span></span><br><span class="line">print(res.content_type)</span><br><span class="line">html = <span class="string">'&lt;h1&gt;马哥教育欢迎你&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)</span><br><span class="line">res.body = html</span><br><span class="line"><span class="keyword">return</span> res(environ, start_response)</span><br></pre></td></tr></table></figure>
+<h5 id="webob-dec装饰器"><a href="#webob-dec装饰器" class="headerlink" title="webob.dec装饰器"></a>webob.dec装饰器</h5><p>wsgify装饰器<br>文档<br><a href="https://docs.pylonsproject.org/projects/webob/en/stable/api/dec.html" target="_blank" rel="noopener">https://docs.pylonsproject.org/projects/webob/en/stable/api/dec.html</a></p>
+<p><code>class webob.dec.wsgify(func=None, RequestClass=None, args=(), kwargs=None, middleware_wraps=None)</code></p>
+<p>要求提供类似下面的可调用对象，以函数举例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="meta">@wsgify</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span><span class="params">(request:webob.Request)</span> -&gt; webob.Response:</span></span><br><span class="line">res = webob.Response(<span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span>)</span><br><span class="line"><span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  wsgify装饰器装饰的函数应该具有一个参数，这个参数是webob.Request类型，是对字典environ的对象化后的实例。<br>  返回值<br>  可以是一个webob.Response类型实例<br>  可以是一个bytes类型实例，它会被封装成webob.Response类型实例的body属性<br>  可以是一个字符串类型实例，它会被转换成bytes类型实例，然后会被封装成webob.Response类型实例的body属性<br>  总之，返回值会被封装成webob.Response类型实例返回</p>
+</blockquote>
+<p>由此修改测试代码，如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">import</span> webob</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="comment"># application函数不用了,用来和app函数对比</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ:dict, start_response)</span>:</span></span><br><span class="line"><span class="comment"># 请求处理</span></span><br><span class="line">request = webob.Request(environ)</span><br><span class="line">print(request.method)</span><br><span class="line">print(request.path)</span><br><span class="line">print(request.query_string)</span><br><span class="line">print(request.GET)</span><br><span class="line">print(request.POST)</span><br><span class="line">print(<span class="string">'params = &#123;&#125;'</span>.format(request.params))</span><br><span class="line"><span class="comment"># 响应处理</span></span><br><span class="line">res = webob.Response() <span class="comment"># [('Content-Type', 'text/html; charset=UTF-8'), ('Content-Length',</span></span><br><span class="line"><span class="string">'0'</span>)]</span><br><span class="line">res.status_code = <span class="number">200</span> <span class="comment"># 默认200</span></span><br><span class="line">print(res.content_type)</span><br><span class="line">html = <span class="string">'&lt;h1&gt;马哥教育欢迎你&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)</span><br><span class="line">res.body = html</span><br><span class="line"><span class="keyword">return</span> res(environ, start_response)</span><br><span class="line"><span class="meta">@wsgify</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span><span class="params">(request:webob.Request)</span> -&gt; webob.Response:</span></span><br><span class="line">print(request.method)</span><br><span class="line">print(request.path)</span><br><span class="line">print(request.query_string)</span><br><span class="line">print(request.GET)</span><br><span class="line">print(request.POST)</span><br><span class="line">print(<span class="string">'params = &#123;&#125;'</span>.format(request.params))res = webob.Response(<span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span>)</span><br><span class="line"><span class="keyword">return</span> res</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">server = make_server(ip, port, app)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line"><span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">server.shutdown()</span><br><span class="line">server.server_close()</span><br></pre></td></tr></table></figure>
+<p>将上面的app函数封装成类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line"><span class="meta">@wsgify</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line"><span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">server = make_server(ip, port, App())</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line"><span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">server.shutdown()</span><br><span class="line">server.server_close()</span><br></pre></td></tr></table></figure>
+<p>上面的代码中，所有的请求，都有这个App类的实例处理，需要对它进行改造。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python网络编程/" rel="tag"># python网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/23/python基础学习-WEB开发及请求响应的处理/" rel="next" title="python基础学习-WEB开发及请求响应的处理">
+                <i class="fa fa-chevron-left"></i> python基础学习-WEB开发及请求响应的处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/29/python基础学习-WEB框架之路由实现/" rel="prev" title="python基础学习-WEB框架之路由实现">
+                python基础学习-WEB框架之路由实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">256</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">179</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#类Flask框架实现"><span class="nav-number">1.</span> <span class="nav-text">类Flask框架实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#WSGIy请求environ处理"><span class="nav-number">1.1.</span> <span class="nav-text">WSGIy请求environ处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QUERY-STRING-查询字符串的解析"><span class="nav-number">1.2.</span> <span class="nav-text">QUERY_STRING 查询字符串的解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#environ的解析–webob库"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">environ的解析–webob库</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#webob简介"><span class="nav-number">1.2.0.1.1.</span> <span class="nav-text">webob简介</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#webob-Request对象"><span class="nav-number">1.2.0.1.2.</span> <span class="nav-text">webob.Request对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#MultiDict"><span class="nav-number">1.2.0.1.3.</span> <span class="nav-text">MultiDict</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#webob-Response对象"><span class="nav-number">1.2.0.1.4.</span> <span class="nav-text">webob.Response对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#webob-dec装饰器"><span class="nav-number">1.2.0.1.5.</span> <span class="nav-text">webob.dec装饰器</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

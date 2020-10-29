@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="类Flask框架实现路由route什么是路由?简单说，就是路怎么走。就是按照不同的路径分发数据。URL代表对不同资源的地址的访问，可以认为请求不同路径对应的数据。对动态网页技术来说，不同的路径应该对应不同的应用程序来处理，返回数据，用户以为还是访问的静态的网页。所以，代码中要增加对URL路径的分析处理。不管是静态WEB服务器，还是动态WEB服务器，都需要路径和资源或处理程序的映射，最终返回HTML">
+<meta name="keywords" content="python网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-WEB框架之路由实现">
+<meta property="og:url" content="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由实现/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="类Flask框架实现路由route什么是路由?简单说，就是路怎么走。就是按照不同的路径分发数据。URL代表对不同资源的地址的访问，可以认为请求不同路径对应的数据。对动态网页技术来说，不同的路径应该对应不同的应用程序来处理，返回数据，用户以为还是访问的静态的网页。所以，代码中要增加对URL路径的分析处理。不管是静态WEB服务器，还是动态WEB服务器，都需要路径和资源或处理程序的映射，最终返回HTML">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-10-29T07:36:37.505Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-WEB框架之路由实现">
+<meta name="twitter:description" content="类Flask框架实现路由route什么是路由?简单说，就是路怎么走。就是按照不同的路径分发数据。URL代表对不同资源的地址的访问，可以认为请求不同路径对应的数据。对动态网页技术来说，不同的路径应该对应不同的应用程序来处理，返回数据，用户以为还是访问的静态的网页。所以，代码中要增加对URL路径的分析处理。不管是静态WEB服务器，还是动态WEB服务器，都需要路径和资源或处理程序的映射，最终返回HTML">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由实现/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-WEB框架之路由实现 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由实现/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-WEB框架之路由实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-10-29 15:02:40 / 修改時間：15:36:37" itemprop="dateCreated datePublished" datetime="2020-10-29T15:02:40+08:00">2020-10-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="类Flask框架实现"><a href="#类Flask框架实现" class="headerlink" title="类Flask框架实现"></a>类Flask框架实现</h1><h2 id="路由route"><a href="#路由route" class="headerlink" title="路由route"></a>路由route</h2><p>什么是路由?<br>简单说，就是路怎么走。就是按照不同的路径分发数据。<br>URL代表对不同资源的地址的访问，可以认为请求不同路径对应的数据。对动态网页技术来说，不同的路径应该对应不同的应用程序来处理，返回数据，用户以为还是访问的静态的网页。<br>所以，代码中要增加对URL路径的分析处理。<br>不管是静态WEB服务器，还是动态WEB服务器，都需要路径和资源或处理程序的映射，最终返回HTML的文本。<br>静态WEB服务器，解决路径和文件之间的映射。<br>动态WEB服务器，解决路径和应用程序之间的映射。<br>所有的WEB框架都是如此，都有路由配置。</p>
+<h2 id="路由功能实现"><a href="#路由功能实现" class="headerlink" title="路由功能实现"></a>路由功能实现</h2><h3 id="路由类实现"><a href="#路由类实现" class="headerlink" title="路由类实现"></a>路由类实现</h3><p>路由功能，使用路由类实现。<br>路由类实现的功能主要就是完成path到handler函数的映射，使用字典保存最适合。<br>路由映射的建立需要提供一个方法注册register，它需要提供2个参数path和handler。<br>有以下的路由需求</p>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/</td>
+<td>返回欢迎内容</td>
+</tr>
+<tr>
+<td>/python</td>
+<td>返回Hello Python</td>
+</tr>
+<tr>
+<td>其它路径</td>
+<td>返回404</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 路由</span></span><br><span class="line"><span class="comment"># url = 'http://127.0.0.1:9999/python/index.html?id=5&amp;name=wayne&amp;age=19&amp;age=20'</span></span><br><span class="line"><span class="comment"># path = '/python/index.html'</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = &#123;&#125;</span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(self, path, handler)</span>:</span></span><br><span class="line">		self.ROUTETABLE[path] = handler</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line">router = Router()</span><br><span class="line">router.register(<span class="string">'/'</span>, indexhandler)</span><br><span class="line">router.register(<span class="string">'/python'</span>, pythonhandler)</span><br></pre></td></tr></table></figure>
+<h3 id="404处理"><a href="#404处理" class="headerlink" title="404处理"></a>404处理</h3><p>webob.exc提供了异常模块<br><a href="https://docs.pylonsproject.org/projects/webob/en/stable/api/exceptions.html" target="_blank" rel="noopener">https://docs.pylonsproject.org/projects/webob/en/stable/api/exceptions.html</a><br>使用webob.exc.HTTPNotFound表示路由表找不到对应的处理函数。</p>
+<h3 id="注册函数的改造"><a href="#注册函数的改造" class="headerlink" title="注册函数的改造"></a>注册函数的改造</h3><p>将注册函数改造装饰器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 路由</span></span><br><span class="line"><span class="comment"># url = 'http://127.0.0.1:9999/python/index.html?id=5&amp;name=wayne&amp;age=19&amp;age=20'</span></span><br><span class="line"><span class="comment"># path = '/python/index.html'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod # 注册路由,装饰器</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, path)</span>:</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">			cls.ROUTETABLE[path] = handler</span><br><span class="line">			<span class="keyword">return</span> handler</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">@Router.register('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.register('/python')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span></span><br></pre></td></tr></table></figure>
+<p>将路由功能合并到App类中去。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = &#123;&#125;</span><br><span class="line">    </span><br><span class="line"><span class="meta">	@classmethod # 注册路由,装饰器</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, path)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">			cls.ROUTETABLE[path] = handler</span><br><span class="line">			<span class="keyword">return</span> handler</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">@Router.register('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.register('/python')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">	_Router = Router</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wsgify</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">		<span class="keyword">try</span>:</span><br><span class="line">			<span class="keyword">return</span> self._Router.ROUTETABLE[request.path](request)</span><br><span class="line">		<span class="keyword">except</span>:</span><br><span class="line">			<span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">            </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">		server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">	<span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<p>到目前为止，一个框架的雏形基本完成了。<br>App是WSGI中的应用程序，但是这个应用程序已经变成了一个路由程序，处理逻辑已经移到了应用程序外了，而这部分就是以后留给程序员完成的部分。</p>
+<h3 id="路由正则匹配"><a href="#路由正则匹配" class="headerlink" title="路由正则匹配"></a>路由正则匹配</h3><p>目前实现的路由匹配，路径匹配非常死板，使用正则表达式，可以更好的匹配路径。导入re模块。<br>注册的时候，存入不再是路径字符串，而是模式pattern。<br>App的<code>__call__</code>方法中实现模式和传入路径的匹配</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">compile</span> 方法,编译正则表达式</span><br><span class="line">match 方法,必须从头开始匹配,只匹配一次</span><br><span class="line">search 方法,只匹配一次</span><br><span class="line">fullmatch 方法,要完全匹配</span><br><span class="line">findall 方法,从头开始找,找到所有匹配</span><br><span class="line"></span><br><span class="line">分组捕获</span><br><span class="line"><span class="string">'/(?P&lt;biz&gt;.*)/(?P&lt;url&gt;.*)'</span> 贪婪</span><br><span class="line"><span class="string">'/(?P&lt;biz&gt;.*?)/(?P&lt;url&gt;.*)'</span> 非贪婪</span><br><span class="line"></span><br><span class="line"><span class="variable">@Application</span>.register(<span class="string">'^/$'</span>) <span class="comment"># 只匹配根</span></span><br><span class="line"><span class="variable">@Application</span>.register(<span class="string">'/python$'</span>) <span class="comment"># 只匹配/python</span></span><br></pre></td></tr></table></figure>
+<p>字典的问题<br>如果使用字典，key保存的是路径，普通字典遍历匹配的时候，是不能保证路径匹配的顺序的。<br>但是匹配过程应该是有顺序的。<br>正则表达式预编译<br>何时预编译正则表达式呢？<br>第一次使用的时候会影响用户体验，所以还是要在注册的时候编译。<br>综上，改用列表，元素使用二元组(编译后的正则对象，handler)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = [] <span class="comment"># 列表,有序的</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod # 注册路由,装饰器</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">            cls.ROUTETABLE.append((re.compile(pattern), handler)) <span class="comment"># (预编译正则对象,处理函数)</span></span><br><span class="line">            <span class="keyword">return</span> handler</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">@Router.register('^/$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.register('^/python$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">	_Router = Router</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wsgify</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> pattern, handler <span class="keyword">in</span> self._Router.ROUTETABLE:</span><br><span class="line">        	<span class="keyword">if</span> pattern.match(request.path): <span class="comment"># 正则匹配</span></span><br><span class="line">        		<span class="keyword">return</span> handler(request)</span><br><span class="line">        <span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<h3 id="正则表达式分组捕获"><a href="#正则表达式分组捕获" class="headerlink" title="正则表达式分组捕获"></a>正则表达式分组捕获</h3><p>假设URL为 <a href="http://127.0.0.1:9999/11808，路径为" target="_blank" rel="noopener">http://127.0.0.1:9999/11808，路径为</a> /11808 ，如何编写路径匹配的正则表达式？<br><code>^/(?P&lt;id&gt;\d+)$</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Router.register(r'^/$')</span></span><br><span class="line"><span class="meta">@Router.register(r'^/(?P&lt;id&gt;\d+)$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">    _Router = Router</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @wsgify</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> pattern, handler <span class="keyword">in</span> self._Router.ROUTETABLE:</span><br><span class="line">            matcher = pattern.match(request.path)</span><br><span class="line">            <span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                request.groupdict = matcher.groupdict() <span class="comment"># 命名分组组成的字典</span></span><br><span class="line">                <span class="keyword">return</span> handler(request)</span><br><span class="line">        <span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Request-Method过滤"><a href="#Request-Method过滤" class="headerlink" title="Request Method过滤"></a>Request Method过滤</h3><p>请求方法，一般来说即使是同一个URL，因为请求方法不同，处理方式也不同。<br>假设有一个URL，GET方法表示希望返回网页内容；POST方法表示浏览器提交数据过来需要处理并存入数据库，最终返回客户端存储成功或失败的信息。<br>换句话说，需要请求方法、正则同时匹配才能决定执行 什么处理函数。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>请求指定的页面信息，并返回报头和正文</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td>类似于get请求，只不过返回的响应中没有具体的内容，用于获取报头</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>向指定资源提交数据进行处理请求（例如提交表单或者上传文件），数据被包含在请求正文。POST请求可能会导致新的资源的建立或已有资源的修改</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>从客户端向服务器传送的数据取代指定的文档的内容</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>请求服务器删除指定的内容</td>
+</tr>
+</tbody>
+</table>
+<p>请求方法还有很多，这里不再赘述。<br>实现请求方法判断的方式有:<br>1、在register装饰器中增加参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@classmethod # 注册路由,装饰器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, method, pattern)</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">		cls.ROUTETABLE.append((method.upper(), re.compile(pattern), handler)) </span><br><span class="line">        <span class="comment"># (预编译正则对象，处理函数)</span></span><br><span class="line">		<span class="keyword">return</span> handler</span><br><span class="line">	<span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="meta">@Application.register('GET', '^/$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handler</span><span class="params">(request)</span>:</span></span><br><span class="line">	<span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>2、将register分解成不同方法的装饰器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@classmethod</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> cls.register(<span class="string">'GET'</span>, pattern)</span><br></pre></td></tr></table></figure>
+<p>将register注册方法改名为route路由方法。<br>改造代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = [] <span class="comment"># 列表,有序的</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod # 注册路由,装饰器</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(cls, method, pattern)</span>:</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">            cls.ROUTETABLE.append((method.upper(), re.compile(pattern), handler)) <span class="comment"># (预编译正则对象，处理函数)</span></span><br><span class="line">            <span class="keyword">return</span> handler</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(<span class="string">'GET'</span>, pattern)</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(<span class="string">'POST'</span>, pattern)</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">head</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(<span class="string">'HEAD'</span>, pattern)</span><br><span class="line">    </span><br><span class="line"><span class="meta">@Router.get(r'^/$')</span></span><br><span class="line"><span class="meta">@Router.route('GET', r'^/(?P&lt;id&gt;\d+)$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.get('^/python$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    res = Response()</span><br><span class="line">    res.charset = <span class="string">'utf-8'</span></span><br><span class="line">    res.body = <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span>.encode()</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">	_Router = Router</span><br><span class="line">    </span><br><span class="line"><span class="meta">	@wsgify</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">		<span class="keyword">for</span> method, pattern, handler <span class="keyword">in</span> self._Router.ROUTETABLE:</span><br><span class="line">			<span class="keyword">if</span> request.method.upper() != method:</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			matcher = pattern.match(request.path)</span><br><span class="line">			<span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                request.groupdict = matcher.groupdict() <span class="comment"># 命名分组组成的字典</span></span><br><span class="line">                <span class="keyword">return</span> handler(request)</span><br><span class="line">		<span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<p>改进</p>
+<p>一个URL可以设定多种请求方法，怎么解决？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">思路一</span><br><span class="line">如果什么方法都不写，相当于所有方法都支持。</span><br><span class="line"><span class="meta">@Application.route('^/$') # 隐含一个默认值method=None</span></span><br><span class="line">等价于@Application.route(<span class="keyword">None</span>, <span class="string">'^/$'</span>)</span><br><span class="line">如果一个处理函数handler需要关联多个请求方法method,如下:</span><br><span class="line"><span class="meta">@Router.route(('GET','PUT','DELETE'), '^/$')</span></span><br><span class="line"><span class="meta">@Router.route(['GET','PUT','POST'], '^/$')</span></span><br><span class="line"><span class="meta">@Router.route(&#123;'POST','PUT','DELETE'&#125;, '^/$')</span></span><br><span class="line"></span><br><span class="line">思路二</span><br><span class="line">调整参数位置,把method放到后面变成可变参数</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(cls, pattern, *methods)</span>:</span></span><br><span class="line">	<span class="keyword">pass</span></span><br><span class="line">那么methods有可能是一个空元组,表示匹配所有方法;非空表示,匹配指定方法。</span><br><span class="line"><span class="meta">@Router.route('^/$', 'POST','PUT','DELETE')</span></span><br><span class="line"><span class="meta">@Router.route('^/$')</span></span><br><span class="line"></span><br><span class="line">选择思路二</span><br></pre></td></tr></table></figure>
+<p>完整代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	ROUTETABLE = [] <span class="comment"># 列表,有序的</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod # 注册路由,装饰器</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(cls, pattern, *methods)</span>:</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">			cls.ROUTETABLE.append((tuple(map(<span class="keyword">lambda</span> x: x.upper(), methods)),re.compile(pattern), handler)) <span class="comment"># (方法元组,预编译正则对象,处理函数)</span></span><br><span class="line">			<span class="keyword">return</span> handler</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(pattern, <span class="string">'GET'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(pattern, <span class="string">'POST'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">head</span><span class="params">(cls, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> cls.route(pattern, <span class="string">'HEAD'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="meta">@Router.get(r'^/$')</span></span><br><span class="line"><span class="meta">@Router.route(r'^/(?P&lt;id&gt;\d+)$') # 支持所有方法访问</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.get('^/python$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    res = Response()</span><br><span class="line">    res.charset = <span class="string">'utf-8'</span></span><br><span class="line">    res.body = <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span>.encode()</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">	_Router = Router</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wsgify</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">		<span class="keyword">for</span> methods, pattern, handler <span class="keyword">in</span> self._Router.ROUTETABLE:</span><br><span class="line">            <span class="comment"># not methods表示一个方法都没有定义,就是支持全部方法</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> methods <span class="keyword">or</span> request.method.upper() <span class="keyword">in</span> methods:</span><br><span class="line">                matcher = pattern.match(request.path)</span><br><span class="line">                <span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                    <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                    request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                    request.groupdict = matcher.groupdict() <span class="comment"># 命名分组组成的字典</span></span><br><span class="line">                    <span class="keyword">return</span> handler(request)</span><br><span class="line">		<span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<p>路由匹配从 URL =&gt; handler 变成了 method + URL =&gt; handler</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python网络编程/" rel="tag"># python网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/23/python基础学习-WEB框架之environ处理/" rel="next" title="python基础学习-WEB框架之environ处理">
+                <i class="fa fa-chevron-left"></i> python基础学习-WEB框架之environ处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/29/python基础学习-WEB框架之路由进阶/" rel="prev" title="python基础学习-WEB框架之路由进阶">
+                python基础学习-WEB框架之路由进阶 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">256</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">179</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#类Flask框架实现"><span class="nav-number">1.</span> <span class="nav-text">类Flask框架实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#路由route"><span class="nav-number">1.1.</span> <span class="nav-text">路由route</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由功能实现"><span class="nav-number">1.2.</span> <span class="nav-text">路由功能实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#路由类实现"><span class="nav-number">1.2.1.</span> <span class="nav-text">路由类实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#404处理"><span class="nav-number">1.2.2.</span> <span class="nav-text">404处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册函数的改造"><span class="nav-number">1.2.3.</span> <span class="nav-text">注册函数的改造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由正则匹配"><span class="nav-number">1.2.4.</span> <span class="nav-text">路由正则匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正则表达式分组捕获"><span class="nav-number">1.2.5.</span> <span class="nav-text">正则表达式分组捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Request-Method过滤"><span class="nav-number">1.2.6.</span> <span class="nav-text">Request Method过滤</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

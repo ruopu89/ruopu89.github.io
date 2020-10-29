@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="类Flask框架实现路由分组**所谓路由分组，就是按照前缀分别映射。需求URL为/product/123456需要将产品ID提取出来分析这个URL可以看做是一级分组路由，生成环境中够用了。例如 12product = Router(&apos;/product&apos;) # 匹配前缀/product，每一个路由实例保存一个前缀product.get(&apos;/(?P&amp;lt;id&amp;gt;\d+)&apos;) # 匹配路径为/pr">
+<meta name="keywords" content="python网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-WEB框架之路由进阶">
+<meta property="og:url" content="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由进阶/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="类Flask框架实现路由分组**所谓路由分组，就是按照前缀分别映射。需求URL为/product/123456需要将产品ID提取出来分析这个URL可以看做是一级分组路由，生成环境中够用了。例如 12product = Router(&apos;/product&apos;) # 匹配前缀/product，每一个路由实例保存一个前缀product.get(&apos;/(?P&amp;lt;id&amp;gt;\d+)&apos;) # 匹配路径为/pr">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-10-29T08:23:07.793Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-WEB框架之路由进阶">
+<meta name="twitter:description" content="类Flask框架实现路由分组**所谓路由分组，就是按照前缀分别映射。需求URL为/product/123456需要将产品ID提取出来分析这个URL可以看做是一级分组路由，生成环境中够用了。例如 12product = Router(&apos;/product&apos;) # 匹配前缀/product，每一个路由实例保存一个前缀product.get(&apos;/(?P&amp;lt;id&amp;gt;\d+)&apos;) # 匹配路径为/pr">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由进阶/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-WEB框架之路由进阶 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/29/python基础学习-WEB框架之路由进阶/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-WEB框架之路由进阶
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-10-29 15:37:23 / 修改時間：16:23:07" itemprop="dateCreated datePublished" datetime="2020-10-29T15:37:23+08:00">2020-10-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="类Flask框架实现"><a href="#类Flask框架实现" class="headerlink" title="类Flask框架实现"></a>类Flask框架实现</h1><h2 id="路由分组"><a href="#路由分组" class="headerlink" title="路由分组**"></a>路由分组**</h2><p>所谓路由分组，就是按照前缀分别映射。<br>需求<br>URL为/product/123456<br>需要将产品ID提取出来<br>分析<br>这个URL可以看做是一级分组路由，生成环境中够用了。<br>例如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">product = Router(<span class="string">'/product'</span>) <span class="comment"># 匹配前缀/product，每一个路由实例保存一个前缀</span></span><br><span class="line">product.get(<span class="string">'/(?P&lt;id&gt;\d+)'</span>) <span class="comment"># 匹配路径为/product/123456，路由实例再管理第二级匹配</span></span><br></pre></td></tr></table></figure>
+<p>常见的一级目录<br>/admin 后台管理<br>/product 产品<br>这些目录都是 / 根目录下的第一级，暂且称为前缀prefix</p>
+<blockquote>
+<p>  前缀要求必须以 / 开头，但不能以分隔符结尾</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下面的定义方法已经不能描述prefix和URL之间的隶属关系</span></span><br><span class="line"><span class="meta">@Router.get(r'^/$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">(request: Request)</span>:</span></span><br><span class="line">	<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Router.route('^/python$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">showpython</span><span class="params">(request: Request)</span>:</span></span><br><span class="line">	<span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>如何建立prefix和URL之间的隶属关系?<br>一个Prefix下可以有若干个URL，这些URL都是属于这个Prefix的。<br>不同前缀对应不同的Router实例管理，所有路由注册方法，都成了实例的方法，路由表实例自己管理。<br>App中需要保存不同前缀的Router实例，提供注册方法，把Router对象被管理起来。<br><code>__call__</code>方法依然是WSGI回调入口，在其中遍历所有Router实例，将路径匹配代码全部挪到Router中并新建一个match方法。<br>match方法匹配就返回Response对象，否则返回None。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, prefix:str=<span class="string">''</span>)</span>:</span></span><br><span class="line">        self.__prefix = prefix.rstrip(<span class="string">'/\\'</span>) <span class="comment"># 前缀,例如/product</span></span><br><span class="line">        self.__routetable = [] <span class="comment"># 存三元组,列表,有序的</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(self, pattern, *methods)</span>:</span> <span class="comment"># 注册路由,装饰器</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">            self.__routetable.append((tuple(map(<span class="keyword">lambda</span> x: x.upper(), methods)),re.compile(pattern), handler)) <span class="comment"># (方法元组，预编译正则对象，处理函数)</span></span><br><span class="line">            <span class="keyword">return</span> handler</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> self.route(pattern, <span class="string">'GET'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> self.route(pattern, <span class="string">'POST'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">head</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> self.route(pattern, <span class="string">'HEAD'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">match</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">    	<span class="comment"># 必须先匹配前缀</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> request.path.startswith(self.__prefix):</span><br><span class="line">        	<span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    	<span class="comment"># 前缀匹配,说明就必须这个Router实例处理，后续匹配不上，依然返回None</span></span><br><span class="line">    	<span class="keyword">for</span> methods, pattern, handler <span class="keyword">in</span> self.__routetable:</span><br><span class="line">            <span class="comment"># not methods表示一个方法都没有定义,就是支持全部方法</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> methods <span class="keyword">or</span> request.method.upper() <span class="keyword">in</span> methods:</span><br><span class="line">            <span class="comment"># 前提已经是以__prefix开头了，可以replace，去掉prefix剩下的才是正则表达式需要匹配的路径</span></span><br><span class="line">                matcher = pattern.match(request.path.replace(self.__prefix, <span class="string">''</span>, <span class="number">1</span>))</span><br><span class="line">                <span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                    <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                    request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                    request.groupdict = matcher.groupdict() <span class="comment"># 命名分组组成的字典</span></span><br><span class="line">                    <span class="keyword">return</span> handler(request)</span><br><span class="line">                </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">    _ROUTERS = [] <span class="comment"># 存储所有一级Router对象</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 注册</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, *routers:Router)</span>:</span></span><br><span class="line">		<span class="keyword">for</span> router <span class="keyword">in</span> routers:</span><br><span class="line">			cls._ROUTERS.append(router)</span><br><span class="line"></span><br><span class="line"><span class="meta">	@wsgify</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">	<span class="comment"># 遍历_ROTERS，调用Router实例的match方法，看谁匹配</span></span><br><span class="line">    	<span class="keyword">for</span> router <span class="keyword">in</span> self._ROUTERS:</span><br><span class="line">			response = router.match(request)</span><br><span class="line">			<span class="keyword">if</span> response: <span class="comment"># 匹配返回非None的Router对象</span></span><br><span class="line">				<span class="keyword">return</span> response <span class="comment"># 匹配则立即返回</span></span><br><span class="line">		<span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="comment"># 创建Router对象</span></span><br><span class="line">idx = Router()</span><br><span class="line">py = Router(<span class="string">'/python'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册</span></span><br><span class="line">App.register(idx, py)</span><br><span class="line"></span><br><span class="line"><span class="meta">@idx.get(r'^/$')</span></span><br><span class="line"><span class="meta">@idx.route(r'^/(?P&lt;id&gt;\d+)$') # 支持所有方法访问</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你. magedu.com&lt;/h1&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@py.get('^/(\w+)$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    res = Response()</span><br><span class="line">    res.charset = <span class="string">'utf-8'</span></span><br><span class="line">    res.body = <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span>.encode()</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<h2 id="字典访问属性化"><a href="#字典访问属性化" class="headerlink" title="字典访问属性化"></a>字典访问属性化</h2><p>这是一个技巧<br>让kwargs这个字典，不使用<code>[ ]</code>访问元素，使用<code>.</code>点号访问元素，如同属性一样访问。<br>字典转属性类，如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AttrDict</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d:dict)</span>:</span></span><br><span class="line">		self.__dict__.update(d <span class="keyword">if</span> isinstance(d, dict) <span class="keyword">else</span> &#123;&#125;)</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__setattr__</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="comment"># 不允许修改属性</span></span><br><span class="line">		<span class="keyword">raise</span> NotImplementedError</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"&lt;AttrDict &#123;&#125;&gt;"</span>.format(self.__dict__)</span><br><span class="line">    </span><br><span class="line">d = &#123;<span class="string">'a'</span>:<span class="number">1</span>, <span class="string">'b'</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">do = AttrDict(d)</span><br><span class="line">print(do.a, do.b)</span><br><span class="line">print(do.__dict__)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面语句抛异常</span></span><br><span class="line">do.c = <span class="number">1</span></span><br><span class="line">do.a = <span class="number">2</span></span><br><span class="line"><span class="comment"># 下面语句可以</span></span><br><span class="line">do.__dict__[<span class="string">'c'</span>] = <span class="number">1000</span></span><br><span class="line">print(do.__dict__)</span><br></pre></td></tr></table></figure>
+<p>修改Router的match方法如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AttrDict</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d:dict)</span>:</span></span><br><span class="line">		self.__dict__.update(d <span class="keyword">if</span> isinstance(d, dict) <span class="keyword">else</span> &#123;&#125;)</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__setattr__</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="comment"># 不允许修改属性</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"&lt;AttrDict &#123;&#125;&gt;"</span>.format(self.__dict__)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__len__</span><span class="params">(self)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> len(self.__dict__)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">match</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="comment"># 必须先匹配前缀</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> request.path.startswith(self.__prefix):</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">        <span class="comment"># 前缀匹配,说明就必须这个Router实例处理,后续匹配不上,依然返回None</span></span><br><span class="line">        <span class="keyword">for</span> methods, pattern, handler <span class="keyword">in</span> self.__routetable:</span><br><span class="line">            <span class="comment"># not methods表示一个方法都没有定义,就是支持全部方法</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> methods <span class="keyword">or</span> request.method.upper() <span class="keyword">in</span> methods:</span><br><span class="line">                <span class="comment"># 前提已经是以__prefix开头了,可以replace,去掉prefix剩下的才是正则表达式需要匹配的路径</span></span><br><span class="line">                matcher = pattern.match(request.path.replace(self.__prefix, <span class="string">''</span>, <span class="number">1</span>))</span><br><span class="line">                <span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                    <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                    request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                    request.groupdict = AttrDict(matcher.groupdict()) <span class="comment"># 命名分组组成的字典被属性化</span></span><br><span class="line">                    <span class="keyword">return</span> handler(request)</span><br><span class="line">                </span><br><span class="line"><span class="meta">@idx.get(r'^/$')</span></span><br><span class="line"><span class="meta">@idx.route(r'^/(?P&lt;id&gt;\d+)$') # 支持所有方法访问</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    id = <span class="string">''</span></span><br><span class="line">    <span class="keyword">if</span> request.groupdict:</span><br><span class="line">    	id = request.groupdict.id</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你&#123;&#125;. magedu.com&lt;/h1&gt;'</span>.format(id)</span><br></pre></td></tr></table></figure>
+<h2 id="正则表达式的简化"><a href="#正则表达式的简化" class="headerlink" title="正则表达式的简化***"></a>正则表达式的简化***</h2><p>问题<br>目前路由匹配使用正则表达式定义，不友好，很多用户不会使用正则表达式，能否简化?</p>
+<p>分析<br>生产环境中，URL是规范的，不能随便书写，路径是有意义的，尤其是对restful风格。<br>所以，要对URL规范。<br>例如/product/111023564，这就是一种规范，要求第一段是业务，第二段是ID。</p>
+<p>设计<br>路径规范化，如下定义<br><code>/student/{name:str}/{id:int}</code><br>类型设计，支持str、word、int、float、any类型。<br>还可以考虑一种raw类型，直接支持正则表达式，暂不考虑实现。<br>通过这样的定义，可以让用户定义简化了，也规范了，背后的转换由编程者实现。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+<th>对应正则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>str</td>
+<td>不包含<code>/</code>的任意字符。默认类型</td>
+<td><code>[^/]+</code></td>
+</tr>
+<tr>
+<td>word</td>
+<td>字母和数字</td>
+<td><code>\w+</code></td>
+</tr>
+<tr>
+<td>int</td>
+<td>纯粹数字，正负数</td>
+<td><code>[+-]?\d+</code></td>
+</tr>
+<tr>
+<td>float</td>
+<td>正负号，数字，包含<code>.</code></td>
+<td><code>[+-]?\d+.\d+</code></td>
+</tr>
+<tr>
+<td>any</td>
+<td>包含<code>/</code>的任意字符</td>
+<td><code>.+</code></td>
+</tr>
+</tbody>
+</table>
+<p>建立如下的映射关系</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 类型字符串映射到正则表达式</span></span><br><span class="line">TYPEPATTERNS = &#123;</span><br><span class="line">    <span class="string">'str'</span>  : <span class="string">r'[^/]+'</span>,</span><br><span class="line">    <span class="string">'word'</span> : <span class="string">r'\w+'</span>,</span><br><span class="line">    <span class="string">'int'</span> : <span class="string">r'[+-]?\d+'</span>,</span><br><span class="line">    <span class="string">'float'</span> : <span class="string">r'[+-]?\d+\.\d+'</span>, <span class="comment"># 严苛的要求必须是 15.6这样的形式</span></span><br><span class="line">    <span class="string">'any'</span>   : <span class="string">r'.+'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 类型字符串到Python类型的映射</span></span><br><span class="line">TYPECAST = &#123;</span><br><span class="line">    <span class="string">'str'</span>  : str,</span><br><span class="line">    <span class="string">'word'</span> : str,</span><br><span class="line">    <span class="string">'int'</span> : int,</span><br><span class="line">    <span class="string">'float'</span> : float,</span><br><span class="line">    <span class="string">'any'</span>   : str</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>/student/{name:str}/{id:int}</code>怎样转换?<br>使用<code>(\{([^\{\}]+):([^\{\}]+)\})</code> 来search整个字符串，分别找到<code>{name:str}</code>和<code>{id:int}</code>并替换成目标的正则表达式。<br>id转变为命名分组的名字，int转变为对应的正则表达式，如下<br><code>/student/{name:str}/xxx/{id:int}</code> =&gt; <code>/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[+-]?\d+)</code><br>对于 <code>/student/{name:str}</code>和 <code>/student/{name:}</code>正则表达式修改为 <code>/{([^{}:]+):?([^{}:]*)}</code><br>先看一个正则替换sub函数使用的例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">pattern = <span class="string">r'\d+'</span></span><br><span class="line">repl = <span class="string">''</span></span><br><span class="line">src = <span class="string">'welcome 123 to 456 magedu.com'</span></span><br><span class="line"></span><br><span class="line">regex = re.compile(pattern)</span><br><span class="line">dest = regex.sub(repl, src)</span><br><span class="line"></span><br><span class="line">print(dest, end=<span class="string">'----------------\n'</span>)</span><br><span class="line"></span><br><span class="line">pattern = <span class="string">r'/&#123;([^&#123;&#125;:]+):?([^&#123;&#125;:]*)&#125;'</span></span><br><span class="line">src = <span class="string">'/student/&#123;name&#125;/xxx/&#123;id:int&#125;'</span></span><br><span class="line">print(src)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">repl</span><span class="params">(matcher)</span>:</span></span><br><span class="line">    print(matcher.group(<span class="number">0</span>))</span><br><span class="line">    print(matcher.group(<span class="number">1</span>))</span><br><span class="line">    print(matcher.group(<span class="number">2</span>)) <span class="comment"># &#123;name&#125;或&#123;name:&#125;这个分组都匹配为''</span></span><br><span class="line">    <span class="comment"># (?P&lt;name&gt;...)</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'/(?P&lt;&#123;&#125;&gt;&#123;&#125;)'</span>.format(</span><br><span class="line">        matcher.group(<span class="number">1</span>),</span><br><span class="line">        <span class="string">'T'</span> <span class="keyword">if</span> matcher.group(<span class="number">2</span>) <span class="keyword">else</span> <span class="string">'F'</span></span><br><span class="line">    )</span><br><span class="line">regex = re.compile(pattern)</span><br><span class="line">dest = regex.sub(repl, src)</span><br><span class="line">print(dest)</span><br></pre></td></tr></table></figure>
+<p>编写一个转换例程</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line">regex = re.compile(<span class="string">'/&#123;([^&#123;&#125;:]+):?([^&#123;&#125;:]*)&#125;'</span>)</span><br><span class="line"></span><br><span class="line">s = [</span><br><span class="line">    <span class="string">'/student/&#123;name:str&#125;/xxx/&#123;id:int&#125;'</span>,</span><br><span class="line">    <span class="string">'/student/xxx/&#123;id:int&#125;/yyy'</span>,</span><br><span class="line">    <span class="string">'/student/xxx/5134324'</span>,</span><br><span class="line">    <span class="string">'/student/&#123;name:&#125;/xxx/&#123;id&#125;'</span>,</span><br><span class="line">    <span class="string">'/student/&#123;name:&#125;/xxx/&#123;id:aaa&#125;'</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># /&#123;id:int&#125; =&gt; /(?P&lt;id&gt;[+-]?\d+)</span></span><br><span class="line"><span class="comment"># '/(?&lt;&#123;&#125;&gt;&#123;&#125;)'.format('id', TYPEPATTERNS['int'])</span></span><br><span class="line"></span><br><span class="line">TYPEPATTERNS = &#123;</span><br><span class="line">    <span class="string">'str'</span>: <span class="string">r'[^/]+'</span>,</span><br><span class="line">    <span class="string">'word'</span>: <span class="string">r'\w+'</span>,</span><br><span class="line">    <span class="string">'int'</span>: <span class="string">r'[+-]?\d+'</span>,</span><br><span class="line">    <span class="string">'float'</span>: <span class="string">r'[+-]?\d+\.\d+'</span>,</span><br><span class="line">    <span class="comment"># 严苛的要求必须是 15.6这样的形式</span></span><br><span class="line">    <span class="string">'any'</span>: <span class="string">r'.+'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">repl</span><span class="params">(matcher)</span>:</span></span><br><span class="line">    <span class="comment"># print(matcher.group(0))</span></span><br><span class="line">    <span class="comment"># print(matcher.group(1))</span></span><br><span class="line">    <span class="comment"># print(matcher.group(2)) # &#123;name&#125;或&#123;name:&#125;这个分组都匹配为''</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'/(?P&lt;&#123;&#125;&gt;&#123;&#125;)'</span>.format(</span><br><span class="line">        matcher.group(<span class="number">1</span>),</span><br><span class="line">        TYPEPATTERNS.get(matcher.group(<span class="number">2</span>), TYPEPATTERNS[<span class="string">'str'</span>])</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(src:str)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> regex.sub(repl, src)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> s:</span><br><span class="line">	print(parse(x))</span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[+-]?\d+)</span><br><span class="line">/student/xxx/(?P&lt;id&gt;[+-]?\d+)/yyy</span><br><span class="line">/student/xxx/<span class="number">5134324</span></span><br><span class="line">/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[^/]+)</span><br><span class="line">/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[^/]+)</span><br></pre></td></tr></table></figure>
+<p>将上面的代码合入Router类中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AttrDict</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d:dict)</span>:</span></span><br><span class="line">		self.__dict__.update(d <span class="keyword">if</span> isinstance(d, dict) <span class="keyword">else</span> &#123;&#125;)</span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__setattr__</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="comment"># 不允许修改属性</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> <span class="string">"&lt;AttrDict &#123;&#125;&gt;"</span>.format(self.__dict__)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__len__</span><span class="params">(self)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> len(self.__dict__)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">	<span class="comment">############# 正则转换</span></span><br><span class="line">	__regex = re.compile(<span class="string">r'/&#123;([^&#123;&#125;:]+):?([^&#123;&#125;:]*)&#125;'</span>)</span><br><span class="line">    </span><br><span class="line">    TYPEPATTERNS = &#123;</span><br><span class="line">        <span class="string">'str'</span>: <span class="string">r'[^/]+'</span>,</span><br><span class="line">        <span class="string">'word'</span>: <span class="string">r'\w+'</span>,</span><br><span class="line">        <span class="string">'int'</span>: <span class="string">r'[+-]?\d+'</span>,</span><br><span class="line">        <span class="string">'float'</span>: <span class="string">r'[+-]?\d+\.\d+'</span>,</span><br><span class="line">        <span class="comment"># 严苛的要求必须是 15.6这样的形式</span></span><br><span class="line">        <span class="string">'any'</span>: <span class="string">r'.+'</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repl</span><span class="params">(self, matcher)</span>:</span></span><br><span class="line">        <span class="comment"># print(matcher.group(0))</span></span><br><span class="line">        <span class="comment"># print(matcher.group(1))</span></span><br><span class="line">        <span class="comment"># print(matcher.group(2)) # &#123;name&#125;或&#123;name:&#125;这个分组都匹配为''</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'/(?P&lt;&#123;&#125;&gt;&#123;&#125;)'</span>.format(</span><br><span class="line">            matcher.group(<span class="number">1</span>),</span><br><span class="line">            self.TYPEPATTERNS.get(matcher.group(<span class="number">2</span>), self.TYPEPATTERNS[<span class="string">'str'</span>])</span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__parse</span><span class="params">(self, src: str)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> self.__regex.sub(self.__repl, src)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">############ 实例</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, prefix:str=<span class="string">''</span>)</span>:</span></span><br><span class="line">        self.__prefix = prefix.rstrip(<span class="string">'/\\'</span>) <span class="comment"># 前缀,例如/product</span></span><br><span class="line">        self.__routetable = [] <span class="comment"># 存三元组,列表,有序的</span></span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(self, pattern, *methods)</span>:</span> <span class="comment"># 注册路由,装饰器</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">            <span class="comment"># /student/&#123;name:str&#125;/xxx/&#123;id:int&#125; =&gt;</span></span><br><span class="line">            <span class="comment"># '/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[+-]?\\d+)'</span></span><br><span class="line">			self.__routetable.append(</span><br><span class="line">                (tuple(map(<span class="keyword">lambda</span> x: x.upper(), methods)),</span><br><span class="line">                re.compile(self.__parse(pattern)), <span class="comment"># 用户输入规则转换为正则表达式并编译</span></span><br><span class="line">                handler)</span><br><span class="line">            ) <span class="comment"># (方法元组,预编译正则对象,处理函数)</span></span><br><span class="line">			<span class="keyword">return</span> handler</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> self.route(pattern, <span class="string">'GET'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.route(pattern, <span class="string">'POST'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">head</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.route(pattern, <span class="string">'HEAD'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">match</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="comment"># 必须先匹配前缀</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> request.path.startswith(self.__prefix):</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">        <span class="comment"># 前缀匹配,说明就必须这个Router实例处理,后续匹配不上,依然返回None</span></span><br><span class="line">        <span class="keyword">for</span> methods, pattern, handler <span class="keyword">in</span> self.__routetable:</span><br><span class="line">            <span class="comment"># not methods表示一个方法都没有定义,就是支持全部方法</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> methods <span class="keyword">or</span> request.method.upper() <span class="keyword">in</span> methods:</span><br><span class="line">                <span class="comment"># 前提已经是以__prefix开头了,可以replace,去掉prefix剩下的才是正则表达式需要匹配的路径</span></span><br><span class="line">                matcher = pattern.match(request.path.replace(self.__prefix, <span class="string">''</span>, <span class="number">1</span>))</span><br><span class="line">					<span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                        <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                        request.groups = matcher.groups() <span class="comment"># 所有分组组成的元组,包括命名分组</span></span><br><span class="line">                        request.groupdict = AttrDict(matcher.groupdict()) <span class="comment"># 命名分组组成的字典被属性化</span></span><br><span class="line">                        <span class="keyword">return</span> handler(request)</span><br><span class="line">                    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">	_ROUTERS = [] <span class="comment"># 存储所有一级Router对象</span></span><br><span class="line">    </span><br><span class="line">        <span class="comment"># 注册</span></span><br><span class="line"><span class="meta">        @classmethod</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, *routers:Router)</span>:</span></span><br><span class="line">			<span class="keyword">for</span> router <span class="keyword">in</span> routers:</span><br><span class="line">				cls._ROUTERS.append(router)</span><br><span class="line"></span><br><span class="line"><span class="meta">		@wsgify</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">            <span class="comment"># 遍历_ROTERS,调用Router实例的match方法,看谁匹配</span></span><br><span class="line">            <span class="keyword">for</span> router <span class="keyword">in</span> self._ROUTERS:</span><br><span class="line">                response = router.match(request)</span><br><span class="line">                <span class="keyword">if</span> response: <span class="comment"># 匹配返回非None的Router对象</span></span><br><span class="line">					<span class="keyword">return</span> response <span class="comment"># 匹配则立即返回</span></span><br><span class="line">			<span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">            </span><br><span class="line"><span class="comment"># 创建Router对象</span></span><br><span class="line">idx = Router()</span><br><span class="line">py = Router(<span class="string">'/python'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册</span></span><br><span class="line">App.register(idx, py)</span><br><span class="line"></span><br><span class="line"><span class="meta">@idx.get(r'^/$')</span></span><br><span class="line"><span class="meta">@idx.route(r'^/&#123;id:int&#125;$') # 支持所有方法访问</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(request.groups)</span><br><span class="line">    print(request.groupdict)</span><br><span class="line">    id = <span class="string">''</span></span><br><span class="line">	<span class="keyword">if</span> request.groupdict:</span><br><span class="line">		id = request.groupdict.id</span><br><span class="line">	<span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你&#123;&#125;. magedu.com&lt;/h1&gt;'</span>.format(id)</span><br><span class="line"></span><br><span class="line"><span class="meta">@py.get('^/&#123;id&#125;$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    res = Response()</span><br><span class="line">    res.charset = <span class="string">'utf-8'</span></span><br><span class="line">    res.body = <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span>.encode()</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<p>如果要增加对捕获数据的类型，使用re.sub()就不行了。重写prase函数，如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(src:str)</span>:</span></span><br><span class="line">    start = <span class="number">0</span></span><br><span class="line">    repl = <span class="string">''</span></span><br><span class="line">    types = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    matchers = regex.finditer(src)</span><br><span class="line">	<span class="keyword">for</span> i, matcher <span class="keyword">in</span> enumerate(matchers):</span><br><span class="line">        name = matcher.group(<span class="number">1</span>)</span><br><span class="line">        t = matcher.group(<span class="number">2</span>)</span><br><span class="line">        </span><br><span class="line">        types[name] = TYPECAST.get(matcher.group(<span class="number">2</span>), str)</span><br><span class="line">        </span><br><span class="line">        repl += src[start:matcher.start()] <span class="comment"># 拼接分组前</span></span><br><span class="line">        tmp = <span class="string">'/(?P&lt;&#123;&#125;&gt;&#123;&#125;)'</span>.format(</span><br><span class="line">            matcher.group(<span class="number">1</span>),</span><br><span class="line">            TYPEPATTERNS.get(matcher.group(<span class="number">2</span>), TYPEPATTERNS[<span class="string">'str'</span>])</span><br><span class="line">        )</span><br><span class="line">        repl += tmp <span class="comment"># 替换</span></span><br><span class="line">        start = matcher.end() <span class="comment"># 移动</span></span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		repl += src[start:] <span class="comment"># 拼接分组后的内容</span></span><br><span class="line">	<span class="keyword">return</span> repl, types</span><br></pre></td></tr></table></figure>
+<p>由此，重新修改源码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Response, Request</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob.exc <span class="keyword">import</span> HTTPNotFound</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AttrDict</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d:dict)</span>:</span></span><br><span class="line">    	self.__dict__.update(d <span class="keyword">if</span> isinstance(d, dict) <span class="keyword">else</span> &#123;&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__setattr__</span><span class="params">(self, key, value)</span>:</span></span><br><span class="line">        <span class="comment"># 不允许修改属性</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">    	<span class="keyword">return</span> <span class="string">"&lt;AttrDict &#123;&#125;&gt;"</span>.format(self.__dict__)</span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__len__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> len(self.__dict__)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Router</span>:</span></span><br><span class="line">    <span class="comment">############# 正则转换</span></span><br><span class="line">    __regex = re.compile(<span class="string">r'/&#123;([^&#123;&#125;:]+):?([^&#123;&#125;:]*)&#125;'</span>)</span><br><span class="line">    </span><br><span class="line">    TYPEPATTERNS = &#123;</span><br><span class="line">        <span class="string">'str'</span>: <span class="string">r'[^/]+'</span>,</span><br><span class="line">        <span class="string">'word'</span>: <span class="string">r'\w+'</span>,</span><br><span class="line">        <span class="string">'int'</span>: <span class="string">r'[+-]?\d+'</span>,</span><br><span class="line">        <span class="string">'float'</span>: <span class="string">r'[+-]?\d+\.\d+'</span>,  <span class="comment"># 严苛的要求必须是 15.6这样的形式</span></span><br><span class="line">        <span class="string">'any'</span>: <span class="string">r'.+'</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    TYPECAST = &#123;</span><br><span class="line">        <span class="string">'str'</span>: str,</span><br><span class="line">        <span class="string">'word'</span>: str,</span><br><span class="line">        <span class="string">'int'</span>: int,</span><br><span class="line">        <span class="string">'float'</span>: float,</span><br><span class="line">        <span class="string">'any'</span>: str</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__parse</span><span class="params">(self, src: str)</span>:</span></span><br><span class="line">        start = <span class="number">0</span></span><br><span class="line">        repl = <span class="string">''</span></span><br><span class="line">        types = &#123;&#125;</span><br><span class="line">        </span><br><span class="line">		matchers = self.__regex.finditer(src)</span><br><span class="line">		<span class="keyword">for</span> i, matcher <span class="keyword">in</span> enumerate(matchers):</span><br><span class="line">            name = matcher.group(<span class="number">1</span>)</span><br><span class="line">            t = matcher.group(<span class="number">2</span>)</span><br><span class="line">            </span><br><span class="line">            types[name] = self.TYPECAST.get(matcher.group(<span class="number">2</span>), str)</span><br><span class="line">            </span><br><span class="line">            repl += src[start:matcher.start()]    <span class="comment"># 拼接分组前</span></span><br><span class="line">            tmp = <span class="string">'/(?P&lt;&#123;&#125;&gt;&#123;&#125;)'</span>.format(</span><br><span class="line">                matcher.group(<span class="number">1</span>),</span><br><span class="line">                self.TYPEPATTERNS.get(matcher.group(<span class="number">2</span>), self.TYPEPATTERNS[<span class="string">'str'</span>])</span><br><span class="line">            )</span><br><span class="line">            repl += tmp     <span class="comment"># 替换</span></span><br><span class="line">            </span><br><span class="line">            start = matcher.end()    <span class="comment"># 移动</span></span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">            repl += src[start:]      <span class="comment"># 拼接分组后的内容</span></span><br><span class="line">            </span><br><span class="line">		<span class="keyword">return</span> repl, types</span><br><span class="line">    </span><br><span class="line">    <span class="comment">############ 实例</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, prefix:str=<span class="string">''</span>)</span>:</span></span><br><span class="line">        self.__prefix = prefix.rstrip(<span class="string">'/\\'</span>) <span class="comment"># 前缀,例如/product</span></span><br><span class="line">        self.__routetable = [] <span class="comment"># 存四元组,列表,有序的</span></span><br><span class="line">        </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">route</span><span class="params">(self, rule, *methods)</span>:</span> <span class="comment"># 注册路由,装饰器</span></span><br><span class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(handler)</span>:</span></span><br><span class="line">            <span class="comment"># /student/&#123;name:str&#125;/xxx/&#123;id:int&#125; =&gt;</span></span><br><span class="line">            <span class="comment"># '/student/(?P&lt;name&gt;[^/]+)/xxx/(?P&lt;id&gt;[+-]?\\d+)'</span></span><br><span class="line">            pattern, trans = self.__parse(rule) <span class="comment"># 用户输入规则转换为正则表达式</span></span><br><span class="line">            self.__routetable.append(</span><br><span class="line">                (tuple(map(<span class="keyword">lambda</span> x: x.upper(), methods)),</span><br><span class="line">                re.compile(pattern), <span class="comment"># 编译</span></span><br><span class="line">                trans,</span><br><span class="line">                handler)</span><br><span class="line">            ) <span class="comment"># (方法元组,预编译正则对象,类型转换,处理函数)</span></span><br><span class="line">			<span class="keyword">return</span> handler</span><br><span class="line">		<span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.route(pattern, <span class="string">'GET'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.route(pattern, <span class="string">'POST'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">head</span><span class="params">(self, pattern)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.route(pattern, <span class="string">'HEAD'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">match</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="comment"># 必须先匹配前缀</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> request.path.startswith(self.__prefix):</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">        <span class="comment"># 前缀匹配,说明就必须这个Router实例处理,后续匹配不上,依然返回None</span></span><br><span class="line">        <span class="keyword">for</span> methods, pattern, trans, handler <span class="keyword">in</span> self.__routetable:</span><br><span class="line">            <span class="comment"># not methods表示一个方法都没有定义,就是支持全部方法</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> methods <span class="keyword">or</span> request.method.upper() <span class="keyword">in</span> methods:</span><br><span class="line">                <span class="comment"># 前提已经是以__prefix开头了,可以replace,去掉prefix剩下的才是正则表达式需要匹配的路径</span></span><br><span class="line">                matcher = pattern.match(request.path.replace(self.__prefix, <span class="string">''</span>, <span class="number">1</span>))</span><br><span class="line">                <span class="keyword">if</span> matcher: <span class="comment"># 正则匹配</span></span><br><span class="line">                    newdict = &#123;&#125;</span><br><span class="line">                    <span class="keyword">for</span> k,v <span class="keyword">in</span> matcher.groupdict().items(): <span class="comment"># 命名分组组成的字典</span></span><br><span class="line">						newdict[k] = trans[k](v)</span><br><span class="line">                    <span class="comment"># 动态为request增加属性</span></span><br><span class="line">                    request.vars = AttrDict(newdict) <span class="comment"># 属性化</span></span><br><span class="line">                    <span class="keyword">return</span> handler(request)</span><br><span class="line">                </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span>:</span></span><br><span class="line">    _ROUTERS = [] <span class="comment"># 存储所有一级Router对象</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 注册</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">register</span><span class="params">(cls, *routers:Router)</span>:</span></span><br><span class="line">    	<span class="keyword">for</span> router <span class="keyword">in</span> routers:</span><br><span class="line">    		cls._ROUTERS.append(router)</span><br><span class="line">            </span><br><span class="line"><span class="meta">    @wsgify</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request:Request)</span>:</span></span><br><span class="line">        <span class="comment"># 遍历_ROTERS,调用Router实例的match方法,看谁匹配</span></span><br><span class="line">        <span class="keyword">for</span> router <span class="keyword">in</span> self._ROUTERS:</span><br><span class="line">            response = router.match(request)</span><br><span class="line">            <span class="keyword">if</span> response: <span class="comment"># 匹配返回非None的Router对象</span></span><br><span class="line">        		<span class="keyword">return</span> response <span class="comment"># 匹配则立即返回</span></span><br><span class="line">        <span class="keyword">raise</span> HTTPNotFound(<span class="string">'&lt;h1&gt;你访问的页面被外星人劫持了&lt;/h1&gt;'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="comment"># 创建Router对象</span></span><br><span class="line">idx = Router()</span><br><span class="line">py = Router(<span class="string">'/python'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册</span></span><br><span class="line">App.register(idx, py)</span><br><span class="line"></span><br><span class="line"><span class="meta">@idx.get(r'^/$')</span></span><br><span class="line"><span class="meta">@idx.route(r'^/&#123;id:int&#125;$') # 支持所有方法访问</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">indexhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    id = <span class="string">''</span></span><br><span class="line">    <span class="keyword">if</span> request.vars:</span><br><span class="line">        id = request.vars.id</span><br><span class="line">        print(type(id))</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;马哥教育欢迎你&#123;&#125;. magedu.com&lt;/h1&gt;'</span>.format(id)</span><br><span class="line"></span><br><span class="line"><span class="meta">@py.get('^/&#123;id&#125;$')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pythonhandler</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.vars:</span><br><span class="line">    	print(type(request.vars.id))</span><br><span class="line">    res = Response()</span><br><span class="line">    res.charset = <span class="string">'utf-8'</span></span><br><span class="line">    res.body = <span class="string">'&lt;h1&gt;Welcome to Magedu Python&lt;/h1&gt;'</span>.encode()</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">    port = <span class="number">9999</span></span><br><span class="line">    server = make_server(ip, port, App())</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	server.serve_forever() <span class="comment"># server.handle_request() 一次</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        server.shutdown()</span><br><span class="line">        server.server_close()</span><br></pre></td></tr></table></figure>
+<p>Application中，可以使用字典保存所有Router实例。因为每一个Router实例的前缀不同，完全可以使用前缀为key，Router实例为value组成字典。这样，以后在 <code>__call__</code> 方法中，就不需要遍历列表了，需要提取request的path的前缀就可以和字典的key匹配了，这样提高了效率。<br>目前这么做的原因是一级目录本身不是很多，就几个，所以不用字典也可以。</p>
+<h1 id="框架处理流程"><a href="#框架处理流程" class="headerlink" title="框架处理流程"></a>框架处理流程</h1><p>客户端发来HTTP请求，被WSGI服务器处理后传递给App的<code>__call__</code> 。<br>App中遍历已注册的Routers，Routers的match来判断是不是自己能处理，前缀匹配，就看注册的规则(当然规则被装饰器已经转换成了命名分组的正则表达式了)。<br>如果由某一个注册的正则表达式匹配，就把获取的参数放到request中，并调用注册时映射的handler给它传入request。<br>handler处理后，返回response。App中拿到这个response的数据，返回给最初的wsgi。<br>如果handler返回仅仅是数据,将这些数据填入一个HTML中，将新生成的HTML字符串返回客户端，这就是网页。<br>这种技术就是模板技术。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python网络编程/" rel="tag"># python网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/29/python基础学习-WEB框架之路由实现/" rel="next" title="python基础学习-WEB框架之路由实现">
+                <i class="fa fa-chevron-left"></i> python基础学习-WEB框架之路由实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/29/python基础学习-WEB框架高级功能之模板、拦截器、Json、打包/" rel="prev" title="python基础学习-WEB框架高级功能之模板、拦截器、Json、打包">
+                python基础学习-WEB框架高级功能之模板、拦截器、Json、打包 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">256</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">179</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#类Flask框架实现"><span class="nav-number">1.</span> <span class="nav-text">类Flask框架实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#路由分组"><span class="nav-number">1.1.</span> <span class="nav-text">路由分组**</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典访问属性化"><span class="nav-number">1.2.</span> <span class="nav-text">字典访问属性化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则表达式的简化"><span class="nav-number">1.3.</span> <span class="nav-text">正则表达式的简化***</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#框架处理流程"><span class="nav-number">2.</span> <span class="nav-text">框架处理流程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
