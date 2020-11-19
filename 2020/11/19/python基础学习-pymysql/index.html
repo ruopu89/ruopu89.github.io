@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="数据库开发驱动MySQL基于TCP协议之上开发，但是网络连接后，传输的数据必须遵循MySQL的协议。封装好MySQL协议的包，就是驱动程序。MySQL的驱动MySQLdb最有名的库。对MySQL的C Client封装实现,支持Python 2，不更新了，不支持Python3MySQL官方Connectorpymysql语法兼容MySQLdb，使用Python写的库，支持Python 3 pymys">
+<meta name="keywords" content="pymysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-pymysql">
+<meta property="og:url" content="http://yoursite.com/2020/11/19/python基础学习-pymysql/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="数据库开发驱动MySQL基于TCP协议之上开发，但是网络连接后，传输的数据必须遵循MySQL的协议。封装好MySQL协议的包，就是驱动程序。MySQL的驱动MySQLdb最有名的库。对MySQL的C Client封装实现,支持Python 2，不更新了，不支持Python3MySQL官方Connectorpymysql语法兼容MySQLdb，使用Python写的库，支持Python 3 pymys">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-11-19T03:13:21.517Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-pymysql">
+<meta name="twitter:description" content="数据库开发驱动MySQL基于TCP协议之上开发，但是网络连接后，传输的数据必须遵循MySQL的协议。封装好MySQL协议的包，就是驱动程序。MySQL的驱动MySQLdb最有名的库。对MySQL的C Client封装实现,支持Python 2，不更新了，不支持Python3MySQL官方Connectorpymysql语法兼容MySQLdb，使用Python写的库，支持Python 3 pymys">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/19/python基础学习-pymysql/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-pymysql | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/19/python基础学习-pymysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-pymysql
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-11-19 10:44:25 / 修改時間：11:13:21" itemprop="dateCreated datePublished" datetime="2020-11-19T10:44:25+08:00">2020-11-19</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="数据库开发"><a href="#数据库开发" class="headerlink" title="数据库开发"></a>数据库开发</h1><h2 id="驱动"><a href="#驱动" class="headerlink" title="驱动"></a>驱动</h2><p>MySQL基于TCP协议之上开发，但是网络连接后，传输的数据必须遵循MySQL的协议。<br>封装好MySQL协议的包，就是驱动程序。<br>MySQL的驱动<br>MySQLdb<br>最有名的库。对MySQL的C Client封装实现,支持Python 2，不更新了，不支持Python3<br>MySQL官方Connector<br>pymysql<br>语法兼容MySQLdb，使用Python写的库，支持Python 3</p>
+<h2 id="pymysql使用"><a href="#pymysql使用" class="headerlink" title="pymysql使用"></a>pymysql使用</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><code>pip install pymysql</code></p>
+<h3 id="创建数据库和表"><a href="#创建数据库和表" class="headerlink" title="创建数据库和表"></a>创建数据库和表</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE IF NOT EXISTS school;</span><br><span class="line">SHOW DATABASES;</span><br><span class="line">USE school;</span><br><span class="line"></span><br><span class="line">CREATE TABLE `student` (</span><br><span class="line">  `id` int(11) NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `name` varchar(255) NOT NULL,</span><br><span class="line">  `age` int(11) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<h3 id="连接Connect"><a href="#连接Connect" class="headerlink" title="连接Connect"></a>连接Connect</h3><p>首先，必须建立一个传输数据通道——连接。<br><code>pymysql.connect()</code>方法返回的是Connections模块下的Connection类实例。connect方法传参就是给Connection类的 <code>__init__</code> 提供参数</p>
+<table>
+<thead>
+<tr>
+<th>Connection初始化常用参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>host</td>
+<td>主机</td>
+</tr>
+<tr>
+<td>user</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td>password</td>
+<td>密码</td>
+</tr>
+<tr>
+<td>database</td>
+<td>数据库</td>
+</tr>
+<tr>
+<td>port</td>
+<td>端口</td>
+</tr>
+</tbody>
+</table>
+<p>Connection.ping()方法，测试数据库服务器是否活着。有一个参数reconnect表示断开与服务器连接是否重连。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">    print(conn.ping(<span class="keyword">False</span>))</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="keyword">if</span> conn:</span><br><span class="line">        conn.close()</span><br><span class="line">    print(conn.ping(<span class="keyword">False</span>))</span><br></pre></td></tr></table></figure>
+<h3 id="游标Cursor"><a href="#游标Cursor" class="headerlink" title="游标Cursor"></a>游标Cursor</h3><p>操作数据库，必须使用游标，需要先获取一个游标对象。<br><code>Connection.cursor(cursor=None)</code> 方法返回一个新的游标对象。<br>连接没有关闭前，游标对象可以反复使用。<br>cursor参数，可以指定一个Cursor类。如果为None，则使用默认Cursor类。</p>
+<h3 id="操作数据库"><a href="#操作数据库" class="headerlink" title="操作数据库"></a>操作数据库</h3><p>数据库操作需要使用Cursor类的实例，提供<code>execute()</code> 方法，执行SQL语句，成功返回影响的行数。</p>
+<h3 id="新增记录"><a href="#新增记录" class="headerlink" title="新增记录"></a>新增记录</h3><p>使用<code>insert into</code>语句插入数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">    print(conn.ping(<span class="keyword">False</span>))</span><br><span class="line">    cursor = conn.cursor()</span><br><span class="line">    insert_sql = <span class="string">"insert into student (name,age) values('tom',20)"</span></span><br><span class="line">    rows = cursor.execute(insert_sql)</span><br><span class="line">    print(rows)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="keyword">if</span> conn:</span><br><span class="line">        conn.close()</span><br></pre></td></tr></table></figure>
+<p>发现数据库中没有数据提交成功，为什么?<br>原因在于，在Connection类的<code>__init__</code> 方法的注释中有这么一句话<br>autocommit: Autocommit mode. None means use server default. (default: False)<br>那是否应该开启自动提交呢?<br>不用开启，一般我们需要手动管理事务。</p>
+<h3 id="事务管理"><a href="#事务管理" class="headerlink" title="事务管理"></a>事务管理</h3><p>Connection类有三个方法：<br>begin 开始事务<br>commit 将变更提交<br>rollback 回滚事务</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    insert_sql = <span class="string">"insert into student (name,age) values('tom',20)"</span></span><br><span class="line">    rows = cursor.execute(insert_sql)</span><br><span class="line">    print(rows)</span><br><span class="line">    conn.commit()</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    conn.rollback()</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="keyword">if</span> cursor:</span><br><span class="line">        cursor.close()</span><br><span class="line">    <span class="keyword">if</span> conn:</span><br><span class="line">        conn.close()</span><br></pre></td></tr></table></figure>
+<p>批量增加数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        insert_sql = <span class="string">"insert into student (name,age) values('tom&#123;0&#125;',20+&#123;0&#125;)"</span>.format(i)</span><br><span class="line">        rows = cursor.execute(insert_sql)</span><br><span class="line">    conn.commit()</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    conn.rollback()</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="keyword">if</span> cursor:</span><br><span class="line">        cursor.close()</span><br><span class="line">    <span class="keyword">if</span> conn:</span><br><span class="line">        conn.close()</span><br></pre></td></tr></table></figure>
+<h3 id="一般流程"><a href="#一般流程" class="headerlink" title="一般流程"></a>一般流程</h3><ul>
+<li>建立连接</li>
+<li>获取游标</li>
+<li>执行SQL</li>
+<li>提交事务</li>
+<li>释放资源</li>
+</ul>
+<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><p>Cursor类的获取查询结果集的方法有fetchone()、fetchmany(size=None)、fetchall()。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"></span><br><span class="line">sql = <span class="string">'select * from student'</span></span><br><span class="line">rows = cursor.execute(sql) <span class="comment"># 返回影响的行数</span></span><br><span class="line"></span><br><span class="line">print(cursor.fetchone())</span><br><span class="line">print(cursor.fetchone())</span><br><span class="line">print(<span class="string">'1 -----------'</span>)</span><br><span class="line">print(cursor.fetchmany(<span class="number">2</span>))</span><br><span class="line">print(<span class="string">'2 ~~~~~~~~~~~'</span>)</span><br><span class="line">print(cursor.fetchmany(<span class="number">2</span>))</span><br><span class="line">print(<span class="string">'3-----------'</span>)</span><br><span class="line">print(cursor.fetchall())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> cursor:</span><br><span class="line">    cursor.close()</span><br><span class="line"><span class="keyword">if</span> conn:</span><br><span class="line">    conn.close()</span><br></pre></td></tr></table></figure>
+<p><code>fetchone()</code>方法，获取结果集的下一行<br><code>fetchmany(size=None)</code>方法，size指定返回的行数的行，None则返回空元组。<br><code>fetchall()</code>方法，获取所有行。<br>返回多行，如果走到末尾，就返回空元组，否则返回一个元组，其元素就是每一行的记录。<br>每一行的记录也封装在一个元组中。<br><code>cursor.rownumber</code> 返回当前行号。可以修改，支持负数。<br><code>cursor.rowcount</code> 返回的总行数<br>注意：fetch操作的是结果集，结果集是保存在客户端的，也就是说fetch的时候，查询已经结束了。</p>
+<h3 id="带列名查询"><a href="#带列名查询" class="headerlink" title="带列名查询"></a>带列名查询</h3><p>Cursor类有一个Mixin的子类DictCursor。<br>只需要 <code>cursor = conn.cursor(DictCursor)</code>就可以了</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 返回结果</span></span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'tom'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'id'</span>: <span class="number">4</span>&#125;</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'tom0'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'id'</span>: <span class="number">5</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>返回一行，是一个字典。<br>返回多行，放在列表中，元素是字典，代表行。</p>
+<h3 id="SQL注入攻击"><a href="#SQL注入攻击" class="headerlink" title="SQL注入攻击"></a>SQL注入攻击</h3><p>找出用户id为6的用户信息的SQL语句如下<br><code>SELECT * from student WHERE id = 6</code><br>现在，要求可以找出某个id对应用户的信息，代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">userid = <span class="number">5</span> <span class="comment"># 用户id可以变</span></span><br><span class="line">sql = <span class="string">'SELECT * from student WHERE id = &#123;&#125;'</span>.format(userid)</span><br></pre></td></tr></table></figure>
+<p>userid可以变，例如从客户端request请求中获取，直接拼接到查询字符串中。<br>可是，如果userid = ‘5 or 1=1’呢?</p>
+<p><code>sql = &#39;SELECT * from student WHERE id = {}&#39;.format(&#39;5 or 1=1&#39;)</code><br>运行的结果竟然是返回了全部数据。<br>SQL注入攻击<br>猜测后台数据库的查询语句使用拼接字符串的方式，从而经过设计为服务端传参，令其拼接出特殊字符串，返回用户想要的结果。<br>永远不要相信客户端传来的数据是规范的及安全的！！！<br>如何解决注入攻击？<br>参数化查询，可以有效防止注入攻击，并提高查询的效率。<br><code>Cursor.execute(query, args=None)</code><br>args，必须是元组、列表或字典。如果查询字符串使用%(name)s，就必须使用字典。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">from</span> pymysql.cursors <span class="keyword">import</span> DictCursorconn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line">cursor = conn.cursor(DictCursor)</span><br><span class="line"></span><br><span class="line">userid = <span class="string">'5 or 1=1'</span></span><br><span class="line">sql = <span class="string">'SELECT * from student WHERE id = %s'</span></span><br><span class="line">cursor.execute(sql, (userid,)) <span class="comment"># 参数化查询</span></span><br><span class="line">print(cursor.fetchall())</span><br><span class="line">print(<span class="string">'~~~~~~~~~~~~~~~~~'</span>)</span><br><span class="line">sql = <span class="string">'SELECT * from student WHERE name like %(name)s and age &gt; %(age)s'</span></span><br><span class="line">cursor.execute(sql, &#123;<span class="string">'name'</span>:<span class="string">'tom%'</span>, <span class="string">'age'</span>:<span class="number">25</span>&#125;) <span class="comment"># 参数化查询</span></span><br><span class="line">print(cursor.fetchall())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> cursor:</span><br><span class="line">    cursor.close()</span><br><span class="line"><span class="keyword">if</span> conn:</span><br><span class="line">    conn.close()</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line">\Python35\lib\site-packages\pymysql\cursors.py:<span class="number">323</span>: Warning: (<span class="number">1292</span>, <span class="string">"Truncated incorrect DOUBLE value: '5 or 1=1'"</span>)</span><br><span class="line">self._do_get_result()</span><br><span class="line">[&#123;<span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'id'</span>: <span class="number">5</span>, <span class="string">'name'</span>: <span class="string">'tom0'</span>&#125;]</span><br></pre></td></tr></table></figure>
+<p>参数化查询为什么提高效率？<br>原因就是——SQL语句缓存。<br>数据库服务器一般会对SQL语句编译和缓存，编译只对SQL语句部分，所以参数中就算有SQL指令也不会被执行。<br>编译过程,需要词法分析、语法分析、生成AST、优化、生成执行计划等过程，比较耗费资源。<br>服务端会先查找是否对同一条查询语句进行了缓存，如果缓存未失效，则不需要再次编译，从而降低了编译的成本，降低了内存消耗。<br>可以认为SQL语句字符串就是一个key，如果使用拼接方案，每次发过去的SQL语句都不一样，都需要编译并缓存。<br>大量查询的时候，首选使用参数化查询，以节省资源。<br>开发时，应该使用参数化查询。<br>注意：这里说的是查询字符串的缓存，不是查询结果的缓存。</p>
+<h3 id="上下文支持"><a href="#上下文支持" class="headerlink" title="上下文支持"></a>上下文支持</h3><p>查看连接类和游标类的源码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 连接类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Connection</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""Context manager that returns a Cursor"""</span></span><br><span class="line">        <span class="keyword">return</span> self.cursor()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc, value, traceback)</span>:</span></span><br><span class="line">        <span class="string">"""On successful exit, commit. On exception, rollback"""</span></span><br><span class="line">        <span class="keyword">if</span> exc:</span><br><span class="line">            self.rollback()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.commit()</span><br><span class="line">            </span><br><span class="line"><span class="comment"># 游标类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cursor</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, *exc_info)</span>:</span></span><br><span class="line">        <span class="keyword">del</span> exc_info</span><br><span class="line">        self.close()</span><br></pre></td></tr></table></figure>
+<p>连接类进入上下文的时候会返回一个游标对象，退出时如果没有异常会提交更改。<br>游标类也使用上下文，在退出时关闭游标对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> conn.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">            insert_sql = <span class="string">"insert into student (name,age) values('tom&#123;0&#125;',20+&#123;0&#125;)"</span>.format(i)</span><br><span class="line">            rows = cursor.execute(insert_sql)</span><br><span class="line">    conn.commit()</span><br><span class="line">    <span class="comment"># 如果此时使用这个关闭的cursor,会抛异常</span></span><br><span class="line">    <span class="comment"># sql = "select * from student"</span></span><br><span class="line">    <span class="comment"># cursor.execute(sql)</span></span><br><span class="line">    <span class="comment"># print(cursor.fetchall())</span></span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(e)</span><br><span class="line">    conn.rollback()</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    conn.close()</span><br></pre></td></tr></table></figure>
+<p>换一种写法，使用连接的上下文</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> conn <span class="keyword">as</span> cursor:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        insert_sql = <span class="string">"insert into student (name,age) values('tom&#123;0&#125;',20+&#123;0&#125;)"</span>.format(i)</span><br><span class="line">        rows = cursor.execute(insert_sql)</span><br><span class="line">        </span><br><span class="line">sql = <span class="string">"select * from student"</span></span><br><span class="line">cursor.execute(sql)</span><br><span class="line">print(cursor.fetchall())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭</span></span><br><span class="line">cursor.close()</span><br><span class="line">conn.close()</span><br></pre></td></tr></table></figure>
+<p>conn的with进入是返回一个新的cursor对象，退出时，只是提交或者回滚了事务。并没有关闭cursor和conn。<br>不关闭cursor就可以接着用，省的反复创建它。<br>如果想关闭cursor对象，这样写</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">conn = pymysql.connect(<span class="string">'192.168.142.135'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>, <span class="string">'school'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> conn <span class="keyword">as</span> cursor:</span><br><span class="line">    <span class="keyword">with</span> cursor:</span><br><span class="line">        sql = <span class="string">"select * from student"</span></span><br><span class="line">        cursor.execute(sql)</span><br><span class="line">        print(cursor.fetchall())</span><br><span class="line">        </span><br><span class="line"><span class="comment"># 关闭</span></span><br><span class="line">conn.close()</span><br></pre></td></tr></table></figure>
+<p>通过上面的实验，我们应该知道，连接应该不需要反反复复创建销毁，应该是多个cursor共享一个conn。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pymysql/" rel="tag"># pymysql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/19/python基础学习-数据库概述/" rel="next" title="python基础学习-数据库概述">
+                <i class="fa fa-chevron-left"></i> python基础学习-数据库概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/19/python基础学习-元编程/" rel="prev" title="python基础学习-元编程">
+                python基础学习-元编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">260</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">183</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库开发"><span class="nav-number">1.</span> <span class="nav-text">数据库开发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#驱动"><span class="nav-number">1.1.</span> <span class="nav-text">驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pymysql使用"><span class="nav-number">1.2.</span> <span class="nav-text">pymysql使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据库和表"><span class="nav-number">1.2.2.</span> <span class="nav-text">创建数据库和表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接Connect"><span class="nav-number">1.2.3.</span> <span class="nav-text">连接Connect</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#游标Cursor"><span class="nav-number">1.2.4.</span> <span class="nav-text">游标Cursor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作数据库"><span class="nav-number">1.2.5.</span> <span class="nav-text">操作数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新增记录"><span class="nav-number">1.2.6.</span> <span class="nav-text">新增记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务管理"><span class="nav-number">1.2.7.</span> <span class="nav-text">事务管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一般流程"><span class="nav-number">1.2.8.</span> <span class="nav-text">一般流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询"><span class="nav-number">1.2.9.</span> <span class="nav-text">查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#带列名查询"><span class="nav-number">1.2.10.</span> <span class="nav-text">带列名查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL注入攻击"><span class="nav-number">1.2.11.</span> <span class="nav-text">SQL注入攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文支持"><span class="nav-number">1.2.12.</span> <span class="nav-text">上下文支持</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

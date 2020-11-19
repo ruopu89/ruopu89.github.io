@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SQLAlchemySQLAlchemy是一个ORM框架大量使用了元编程 安装pip install sqlalchemy 文档官方文档http://docs.sqlalchemy.org/en/latest/ 查看版本 12import sqlalchemyprint(sqlalchemy.__version__) 开发SQLAlchemy内部使用了连接池 创建连接数据库连接的事情，交给引擎 1">
+<meta name="keywords" content="SQLAlchemy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python基础学习-SQLAlchemy">
+<meta property="og:url" content="http://yoursite.com/2020/11/19/python基础学习-SQLAlchemy/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="SQLAlchemySQLAlchemy是一个ORM框架大量使用了元编程 安装pip install sqlalchemy 文档官方文档http://docs.sqlalchemy.org/en/latest/ 查看版本 12import sqlalchemyprint(sqlalchemy.__version__) 开发SQLAlchemy内部使用了连接池 创建连接数据库连接的事情，交给引擎 1">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/数据库/数据库6.png">
+<meta property="og:updated_time" content="2020-11-19T05:32:42.144Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python基础学习-SQLAlchemy">
+<meta name="twitter:description" content="SQLAlchemySQLAlchemy是一个ORM框架大量使用了元编程 安装pip install sqlalchemy 文档官方文档http://docs.sqlalchemy.org/en/latest/ 查看版本 12import sqlalchemyprint(sqlalchemy.__version__) 开发SQLAlchemy内部使用了连接池 创建连接数据库连接的事情，交给引擎 1">
+<meta name="twitter:image" content="http://yoursite.com/images/数据库/数据库6.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/19/python基础学习-SQLAlchemy/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python基础学习-SQLAlchemy | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/19/python基础学习-SQLAlchemy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python基础学习-SQLAlchemy
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-11-19 11:27:58 / 修改時間：13:32:42" itemprop="dateCreated datePublished" datetime="2020-11-19T11:27:58+08:00">2020-11-19</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="SQLAlchemy"><a href="#SQLAlchemy" class="headerlink" title="SQLAlchemy"></a>SQLAlchemy</h1><p>SQLAlchemy是一个ORM框架<br>大量使用了元编程</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><code>pip install sqlalchemy</code></p>
+<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>官方文档<br><a href="http://docs.sqlalchemy.org/en/latest/" target="_blank" rel="noopener">http://docs.sqlalchemy.org/en/latest/</a></p>
+<p>查看版本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sqlalchemy</span><br><span class="line">print(sqlalchemy.__version__)</span><br></pre></td></tr></table></figure>
+<h2 id="开发"><a href="#开发" class="headerlink" title="开发"></a>开发</h2><p>SQLAlchemy内部使用了连接池</p>
+<h3 id="创建连接"><a href="#创建连接" class="headerlink" title="创建连接"></a>创建连接</h3><p>数据库连接的事情，交给引擎</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mysqldb的连接</span><br><span class="line">mysql+mysqldb://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;[:&lt;port&gt;]/&lt;dbname&gt;</span><br><span class="line">engine = sqlalchemy.create_engine(<span class="string">"mysql+mysqldb://wayne:wayne@127.0.0.1:3306/magedu"</span>)</span><br><span class="line"></span><br><span class="line">pymysql的连接</span><br><span class="line">mysql+pymysql://&lt;username&gt;:&lt;password&gt;@&lt;host&gt;/&lt;dbname&gt;[?&lt;options&gt;]</span><br><span class="line">engine = sqlalchemy.create_engine(<span class="string">"mysql+pymysql://wayne:wayne@127.0.0.1:3306/magedu"</span>)</span><br><span class="line">engine = sqlalchemy.create_engine(<span class="string">"mysql+pymysql://wayne:wayne@127.0.0.1:3306/magedu"</span>,</span><br><span class="line">echo=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">echo=<span class="keyword">True</span></span><br><span class="line">引擎是否打印执行的语句,调试的时候打开很方便。</span><br></pre></td></tr></table></figure>
+<h3 id="Declare-a-Mapping-创建映射"><a href="#Declare-a-Mapping-创建映射" class="headerlink" title="Declare a Mapping 创建映射"></a>Declare a Mapping 创建映射</h3><h4 id="创建基类"><a href="#创建基类" class="headerlink" title="创建基类"></a>创建基类</h4><p>数据库连接的事情，交给引擎</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="comment"># 创建基类,便于实体类继承</span></span><br><span class="line">Base = declarative_base()</span><br></pre></td></tr></table></figure>
+<h4 id="创建实体类"><a href="#创建实体类" class="headerlink" title="创建实体类"></a>创建实体类</h4><p>student表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE student (</span><br><span class="line">    id INTEGER NOT NULL AUTO_INCREMENT,</span><br><span class="line">    name VARCHAR(64) NOT NULL,</span><br><span class="line">    age INTEGER,</span><br><span class="line">    PRIMARY KEY (id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'student'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    name = Column(String(<span class="number">64</span>))</span><br><span class="line">    age = Column(Integer)</span><br><span class="line">    <span class="comment"># 第一参数是字段名,如果和属性名不一致,一定要指定</span></span><br><span class="line">    <span class="comment"># age = Column('age', Integer)</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; id=&#123;&#125; name=&#123;&#125; age=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.id, self.name, self.age)</span><br></pre></td></tr></table></figure>
+<p><code>__tablename__</code> 指定表名<br>Column类指定对应的字段，必须指定</p>
+<h4 id="实例化"><a href="#实例化" class="headerlink" title="实例化"></a>实例化</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s = Student(name=<span class="string">'tom'</span>)</span><br><span class="line">print(s.name)</span><br><span class="line">s.age = <span class="number">20</span></span><br><span class="line">print(s.age)</span><br></pre></td></tr></table></figure>
+<h4 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h4><p>可以使用SQLAlchemy来创建、删除表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除继承自Base的所有表</span></span><br><span class="line">Base.metadata.drop_all(engine)</span><br><span class="line"><span class="comment"># 创建继承自Base的所有表</span></span><br><span class="line">Base.metadata.create_all(engine)</span><br></pre></td></tr></table></figure>
+<p>生产环境很少这样创建表，都是系统上线的时候由脚本生成。<br>生成环境很少删除表，宁可废弃都不能删除。</p>
+<h4 id="创建会话session"><a href="#创建会话session" class="headerlink" title="创建会话session"></a>创建会话session</h4><p>在一个会话中操作数据库，会话建立在连接上，连接被引擎管理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建session</span></span><br><span class="line">Session = sessionmaker(bind=engine) <span class="comment"># 返回类</span></span><br><span class="line">session = Session() <span class="comment"># 实例化</span></span><br></pre></td></tr></table></figure>
+<p>session对象线程不安全。所以不同线程使用不用的session对象。<br>Session类和engine都是线程安全的，有一个就行了。</p>
+<h4 id="CRUD操作"><a href="#CRUD操作" class="headerlink" title="CRUD操作"></a>CRUD操作</h4><h5 id="增"><a href="#增" class="headerlink" title="增"></a>增</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sqlalchemy</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> Column, Integer, String</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker</span><br><span class="line"></span><br><span class="line">host = <span class="string">'192.168.142.140'</span></span><br><span class="line">user = <span class="string">'wayne'</span></span><br><span class="line">password = <span class="string">'wayne'</span></span><br><span class="line">port = <span class="number">3306</span></span><br><span class="line">database = <span class="string">'test'</span></span><br><span class="line"></span><br><span class="line">conn_str = <span class="string">"mysql+pymysql://&#123;&#125;:&#123;&#125;@&#123;&#125;:&#123;&#125;/&#123;&#125;"</span>.format(</span><br><span class="line">    user, password, host, port, database</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">engine = sqlalchemy.create_engine(conn_str, echo=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建基类</span></span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'student'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    name = Column(String(<span class="number">64</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    age = Column(Integer)</span><br><span class="line">    <span class="comment"># 第一参数是字段名,如果和属性名不一致,一定要指定</span></span><br><span class="line">    <span class="comment"># age = Column('age', Integer)</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; id=&#123;&#125; name=&#123;&#125; age=&#123;&#125;"</span>.format(self.__class__.__name__, self.id, self.name, self.age)</span><br><span class="line">    </span><br><span class="line">s = Student(name=<span class="string">'tom'</span>) <span class="comment"># 构造的时候传入</span></span><br><span class="line">print(s.name)</span><br><span class="line">s.age = <span class="number">20</span> <span class="comment"># 属性赋值</span></span><br><span class="line">print(s.age)</span><br><span class="line"></span><br><span class="line"><span class="comment"># # 删除继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.drop_all(engine)</span></span><br><span class="line"><span class="comment"># # 创建继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.create_all(engine)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建session</span></span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line">session.add(s)</span><br><span class="line">print(s)</span><br><span class="line">session.commit()</span><br><span class="line">print(s)</span><br><span class="line">print(<span class="string">'~~~~~~~~~~~~~'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    session.add_all([s])</span><br><span class="line">    print(s)</span><br><span class="line">    session.commit() <span class="comment"># 提交能够成功吗</span></span><br><span class="line">    print(s)</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    session.rollback()</span><br><span class="line">    <span class="keyword">raise</span></span><br></pre></td></tr></table></figure>
+<p><code>add_all()</code>方法不会提交成功的，不是因为它不对，而是s，s成功提交后，s的主键就有了值，所以，只要s没有修改过，就认为没有改动。如下，s变化了，就可以提交修改了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s.name = <span class="string">'jerry'</span> <span class="comment"># 修改</span></span><br><span class="line">session.add_all([s])</span><br></pre></td></tr></table></figure>
+<p>s主键没有值，就是新增；主键有值，就是找到主键对应的记录修改。</p>
+<h5 id="简单查询"><a href="#简单查询" class="headerlink" title="简单查询"></a>简单查询</h5><p>使用<code>query()</code>方法，返回一个Query对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">students = session.query(Student) <span class="comment"># 无条件</span></span><br><span class="line"><span class="keyword">for</span> student <span class="keyword">in</span> students:</span><br><span class="line">    print(student)</span><br><span class="line">print(<span class="string">'~~~~~~~~~~~~~'</span>)</span><br><span class="line"></span><br><span class="line">student = session.query(Student).get(<span class="number">2</span>) <span class="comment"># 通过主键查询</span></span><br><span class="line">print(student)</span><br></pre></td></tr></table></figure>
+<p>query方法将实体类传入，返回类的对象可迭代对象，这时候并不查询。迭代它就执行SQL来查询数据库，封装数据到指定类的实例。<br>get方法使用主键查询，返回一条传入类的一个实例。</p>
+<h5 id="改"><a href="#改" class="headerlink" title="改"></a>改</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">student = session.query(Student).get(<span class="number">2</span>)</span><br><span class="line">print(student)</span><br><span class="line">student.name = <span class="string">'sam'</span></span><br><span class="line">student.age = <span class="number">30</span></span><br><span class="line">print(student)</span><br><span class="line">session.add(student)</span><br><span class="line">session.commit()</span><br></pre></td></tr></table></figure>
+<p>先查回来，修改后，再提交更改。</p>
+<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p>先看下数据库，表中有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1 tom 20</span><br><span class="line">2 sam 30</span><br><span class="line">3 jerry 20</span><br><span class="line">4 ben 20</span><br><span class="line">5 ben 20</span><br></pre></td></tr></table></figure>
+<p>编写如下程序来删除数据，会发生什么?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    student = Student(id=<span class="number">2</span>, name=<span class="string">"sam"</span>, age=<span class="number">30</span>)</span><br><span class="line">    session.delete(student)</span><br><span class="line">    session.commit()</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    session.rollback()</span><br><span class="line">    print(<span class="string">'~~~~~~~~'</span>)</span><br><span class="line">    print(e)</span><br></pre></td></tr></table></figure>
+<p>会产生一个异常</p>
+<p><code>Instance &#39;&lt;Student at 0x3e654e0&gt;&#39; is not persisted</code> 未持久的异常！</p>
+<h5 id="状态"><a href="#状态" class="headerlink" title="状态 **"></a>状态 **</h5><p>每一个实体，都有一个状态属性<code>_sa_instance_state</code>，其类型是<code>sqlalchemy.orm.state.InstanceState</code>，可以使用<br><code>sqlalchemy.inspect(entity)</code>函数查看状态。<br>常见的状态值有transient、pending、persistent、deleted、detached。</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>transient</td>
+<td>实体类尚未加入到session中，同时并没有保存到数据库中</td>
+</tr>
+<tr>
+<td>pending</td>
+<td>transient的实体被add()到session中，状态切换到pending，但它还没有flush到数据库中</td>
+</tr>
+<tr>
+<td>persistent</td>
+<td>session中的实体对象对应着数据库中的真实记录。pending状态在提交成功后可以变成persistent状态，或者查询成功返回的实体也是persistent状态</td>
+</tr>
+<tr>
+<td>deleted</td>
+<td>实体被删除且已经flush但未commit完成。事务提交成功了，实体变成detached,事务失败，返回persistent状态</td>
+</tr>
+<tr>
+<td>detached</td>
+<td>删除成功的实体进入这个状态</td>
+</tr>
+</tbody>
+</table>
+<p>新建一个实体，状态是transient临时的。<br>一旦add()后从transient变成pending状态。<br>成功commit()后从pending变成persistent状态。<br>成功查询返回的实体对象，也是persistent状态。<br>persistent状态的实体，修改依然是persistent状态。<br>persistent状态的实体，删除后，flush后但没有commit，就变成deteled状态，成功提交，变为detached状态，提交失败，还原到persistent状态。flush方法，主动把改变应用到数据库中去。<br>删除、修改操作，需要对应一个真实的记录，所以要求实体对象是persistent状态。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sqlalchemy</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> create_engine, Column, Integer, String</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker</span><br><span class="line"></span><br><span class="line">connstr = <span class="string">"&#123;&#125;://&#123;&#125;:&#123;&#125;@&#123;&#125;:&#123;&#125;/&#123;&#125;"</span>.format(</span><br><span class="line">    <span class="string">'mysql+pymysql'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>,</span><br><span class="line">    <span class="string">'192.168.142.140'</span>, <span class="number">3306</span>, <span class="string">'test'</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">engine = create_engine(connstr, echo=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'student'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="keyword">True</span>, autoincrement=<span class="keyword">True</span>)</span><br><span class="line">    name = Column(String(<span class="number">64</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    age = Column(Integer)</span><br><span class="line">    <span class="comment"># 第一参数是字段名,如果和属性名不一致,则一定要指定</span></span><br><span class="line">    <span class="comment"># age = Column('age', Integer)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; id=&#123;&#125; name=&#123;&#125; age=&#123;&#125;"</span>.format(self.__class__.__name__, self.id, self.name,self.age)</span><br><span class="line">    </span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm.state <span class="keyword">import</span> InstanceState</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getstate</span><span class="params">(entity, i)</span>:</span></span><br><span class="line">    insp = sqlalchemy.inspect(entity)</span><br><span class="line">    state = <span class="string">"sessionid=&#123;&#125;, attached=&#123;&#125;\ntransient=&#123;&#125;, persistent=&#123;&#125;\npending=&#123;&#125;, deleted=&#123;&#125;,</span></span><br><span class="line"><span class="string">detached=&#123;&#125;"</span>.format(</span><br><span class="line">        insp.session_id,</span><br><span class="line">        insp._attached,</span><br><span class="line">        insp.transient,</span><br><span class="line">        insp.persistent,</span><br><span class="line">        insp.pending,</span><br><span class="line">        insp.deleted,</span><br><span class="line">        insp.detached</span><br><span class="line">    )</span><br><span class="line">    print(i, state)</span><br><span class="line">    print(insp.key)</span><br><span class="line">    print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">student = session.query(Student).get(<span class="number">2</span>)</span><br><span class="line">getstate(student, <span class="number">1</span>) <span class="comment"># persistent</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    student = Student(id=<span class="number">2</span>, name=<span class="string">"sam"</span>, age=<span class="number">30</span>)</span><br><span class="line">    getstate(student, <span class="number">2</span>) <span class="comment"># transit</span></span><br><span class="line">    student = Student(name=<span class="string">"sammy"</span>, age=<span class="number">30</span>)</span><br><span class="line">    getstate(student, <span class="number">3</span>) <span class="comment"># transit</span></span><br><span class="line">    session.add(student) <span class="comment"># add后变成pending</span></span><br><span class="line">    getstate(student, <span class="number">4</span>) <span class="comment"># pending</span></span><br><span class="line">    <span class="comment"># session.delete(student) # 删除的前提是persistent,否则抛异常</span></span><br><span class="line">    <span class="comment"># getstate(student, 5)</span></span><br><span class="line">    session.commit()</span><br><span class="line">    getstate(student, <span class="number">6</span>) <span class="comment"># persistent</span></span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    session.rollback()</span><br><span class="line">    print(<span class="string">'~~~~~~~~'</span>)</span><br><span class="line">    print(e)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line"><span class="number">1</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">True</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (2,))</span><br><span class="line">------------------------------</span><br><span class="line"><span class="number">2</span> sessionid=<span class="keyword">None</span>, attached=<span class="keyword">False</span></span><br><span class="line">transient=<span class="keyword">True</span>, persistent=<span class="keyword">False</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line"><span class="keyword">None</span></span><br><span class="line">-----------------------------<span class="number">-3</span> sessionid=<span class="keyword">None</span>, attached=<span class="keyword">False</span></span><br><span class="line">transient=<span class="keyword">True</span>, persistent=<span class="keyword">False</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line"><span class="keyword">None</span></span><br><span class="line">------------------------------</span><br><span class="line"><span class="number">4</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">False</span></span><br><span class="line">pending=<span class="keyword">True</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line"><span class="keyword">None</span></span><br><span class="line">------------------------------</span><br><span class="line">sqlalchemy.engine.base.Engine COMMIT</span><br><span class="line"><span class="number">6</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">True</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (3,))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">student = session.query(Student).get(<span class="number">2</span>)</span><br><span class="line">getstate(student, <span class="number">10</span>) <span class="comment"># persistent</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    session.delete(student) <span class="comment"># 删除的前提是persistent</span></span><br><span class="line">    getstate(student, <span class="number">11</span>) <span class="comment"># persistent</span></span><br><span class="line">    session.flush()</span><br><span class="line">    getstate(student, <span class="number">12</span>) <span class="comment"># deleted</span></span><br><span class="line">    session.commit()</span><br><span class="line">    getstate(student, <span class="number">13</span>) <span class="comment"># persistent</span></span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    session.rollback()</span><br><span class="line">    print(<span class="string">'~~~~~~~~'</span>)</span><br><span class="line">    print(e)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line"><span class="number">10</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">True</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (2,))</span><br><span class="line">------------------------------</span><br><span class="line"><span class="number">11</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">True</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">False</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (2,))</span><br><span class="line">------------------------------</span><br><span class="line">sqlalchemy.engine.base.Engine DELETE FROM student WHERE student.id = %(id)s</span><br><span class="line">sqlalchemy.engine.base.Engine &#123;<span class="string">'id'</span>: <span class="number">2</span>&#125;</span><br><span class="line"><span class="number">12</span> sessionid=<span class="number">1</span>, attached=<span class="keyword">True</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=<span class="keyword">False</span></span><br><span class="line">pending=<span class="keyword">False</span>, deleted=<span class="keyword">True</span>, detached=<span class="keyword">False</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (2,))</span><br><span class="line">------------------------------</span><br><span class="line">sqlalchemy.engine.base.Engine COMMIT</span><br><span class="line"><span class="number">13</span> sessionid=<span class="keyword">None</span>, attached=<span class="keyword">False</span></span><br><span class="line">transient=<span class="keyword">False</span>, persistent=Falsepending=<span class="keyword">False</span>, deleted=<span class="keyword">False</span>, detached=<span class="keyword">True</span></span><br><span class="line">(&lt;class '__main__.Student'&gt;, (2,))</span><br><span class="line">------------------------------</span><br></pre></td></tr></table></figure>
+<h5 id="复杂查询"><a href="#复杂查询" class="headerlink" title="复杂查询"></a>复杂查询</h5><p>实体类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> Column, Integer, String, Date, Enum, ForeignKey, create_engine</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker</span><br><span class="line"><span class="keyword">import</span> enum</span><br><span class="line"></span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line">connstr = <span class="string">"&#123;&#125;://&#123;&#125;:&#123;&#125;@&#123;&#125;:&#123;&#125;/&#123;&#125;"</span>.format(</span><br><span class="line">    <span class="string">'mysql+pymysql'</span>, <span class="string">'wayne'</span>, <span class="string">'wayne'</span>,</span><br><span class="line">    <span class="string">'192.168.142.140'</span>, <span class="number">3306</span>, <span class="string">'test'</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">engine = create_engine(connstr, echo=<span class="keyword">True</span>)</span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyEnum</span><span class="params">(enum.Enum)</span>:</span></span><br><span class="line">    M = <span class="string">'M'</span></span><br><span class="line">    F = <span class="string">'F'</span></span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125;"</span>.format(</span><br><span class="line">        self.__class__.__name__, self.emp_no, self.first_name, self.last_name,</span><br><span class="line">        self.gender.value</span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 打印函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(emps)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> emps:</span><br><span class="line">        print(x)</span><br><span class="line">    print(<span class="string">'~~~~~~~~~~~~~~~'</span>,end=<span class="string">'\n\n'</span>)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 简单条件查询</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10015</span>)</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 与或非</span></span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> or_, and_, not_</span><br><span class="line"><span class="comment"># AND 条件</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10015</span>).filter(Employee.gender ==</span><br><span class="line">MyEnum.F)</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line">emps = session.query(Employee).filter(and_(Employee.emp_no &gt; <span class="number">10015</span>, Employee.gender ==</span><br><span class="line">MyEnum.M))</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># &amp; 一定要注意&amp;符号两边表达式都要加括号</span></span><br><span class="line">emps = session.query(Employee).filter((Employee.emp_no &gt; <span class="number">10015</span>) &amp; (Employee.gender == MyEnum.M))</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># OR 条件</span></span><br><span class="line">emps = session.query(Employee).filter((Employee.emp_no &gt; <span class="number">10018</span>) | (Employee.emp_no &lt; <span class="number">10003</span>))</span><br><span class="line">show(emps)</span><br><span class="line">emps = session.query(Employee).filter(or_(Employee.emp_no &gt; <span class="number">10018</span>, Employee.emp_no &lt; <span class="number">10003</span>))</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Not</span></span><br><span class="line">emps = session.query(Employee).filter(not_(Employee.emp_no &lt; <span class="number">10018</span>))</span><br><span class="line">show(emps)</span><br><span class="line"><span class="comment"># 一定注意要加括号</span></span><br><span class="line">emps = session.query(Employee).filter(~(Employee.emp_no &lt; <span class="number">10018</span>))</span><br><span class="line">show(emps)</span><br><span class="line"><span class="comment"># 总之,与或非的运算符&amp;、|、~,一定要在表达式上加上括号</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># in</span></span><br><span class="line">emplist = [<span class="number">10010</span>, <span class="number">10015</span>, <span class="number">10018</span>]</span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no.in_(emplist))</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># not in</span></span><br><span class="line">emps = session.query(Employee).filter(~Employee.emp_no.in_(emplist))</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># like</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.last_name.like(<span class="string">'P%'</span>))</span><br><span class="line">show(emps)</span><br></pre></td></tr></table></figure>
+<p>ilike可以忽略大小写匹配</p>
+<h5 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 排序</span></span><br><span class="line"><span class="comment"># 升序</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10010</span>).order_by(Employee.emp_no)</span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10010</span>).order_by(Employee.emp_no.asc())</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 降序</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10010</span>).order_by(Employee.emp_no.desc())</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 多列排序</span></span><br><span class="line">emps = session.query(Employee).filter(Employee.emp_no &gt;</span><br><span class="line"><span class="number">10010</span>).order_by(Employee.last_name).order_by(Employee.emp_no.desc())</span><br><span class="line">show(emps)</span><br></pre></td></tr></table></figure>
+<h5 id="分页"><a href="#分页" class="headerlink" title="分页"></a>分页</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分页</span></span><br><span class="line">emps = session.query(Employee).limit(<span class="number">4</span>)</span><br><span class="line">show(emps)</span><br><span class="line"></span><br><span class="line">emps = session.query(Employee).limit(<span class="number">4</span>).offset(<span class="number">18</span>)</span><br><span class="line">show(emps)</span><br></pre></td></tr></table></figure>
+<h5 id="消费者方法"><a href="#消费者方法" class="headerlink" title="消费者方法"></a>消费者方法</h5><p>消费者方法调用后，Query对象(可迭代)就转换成了一个容器。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 总行数</span></span><br><span class="line">emps = session.query(Employee)</span><br><span class="line">print(len(list(emps))) <span class="comment"># 返回大量的结果集,然后转换list</span></span><br><span class="line">print(emps.count()) <span class="comment"># 聚合函数count(*)的查询</span></span><br><span class="line"><span class="comment"># 取所有数据</span></span><br><span class="line">print(emps.all()) <span class="comment"># 返回列表,查不到返回空列表</span></span><br><span class="line"><span class="comment"># 取首行</span></span><br><span class="line">print(emps.first()) <span class="comment"># 返回首行,查不到返回None</span></span><br><span class="line"><span class="comment"># 有且只能有一行</span></span><br><span class="line"><span class="comment">#print(emps.one()) #如果查询结果是多行抛异常</span></span><br><span class="line">print(emps.limit(<span class="number">1</span>).one())</span><br><span class="line"><span class="comment"># 删除 delete by query</span></span><br><span class="line">session.query(Employee).filter(Employee.emp_no &gt; <span class="number">10018</span>).delete()</span><br><span class="line"><span class="comment">#session.commit() # 提交则删除</span></span><br></pre></td></tr></table></figure>
+<h5 id="聚合、分组"><a href="#聚合、分组" class="headerlink" title="聚合、分组"></a>聚合、分组</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 聚合函数# count</span></span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> func</span><br><span class="line">query = session.query(func.count(Employee.emp_no))</span><br><span class="line">print(query.one()) <span class="comment"># 只能有一行结果</span></span><br><span class="line">print(query.scalar()) <span class="comment"># 取one()返回元组的第一个元素</span></span><br><span class="line"><span class="comment"># max/min/avg</span></span><br><span class="line">print(session.query(func.max(Employee.emp_no)).scalar())</span><br><span class="line">print(session.query(func.min(Employee.emp_no)).scalar())</span><br><span class="line">print(session.query(func.avg(Employee.emp_no)).scalar())</span><br><span class="line"><span class="comment"># 分组</span></span><br><span class="line">print(session.query(Employee.gender,</span><br><span class="line">func.count(Employee.emp_no)).group_by(Employee.gender).all())</span><br></pre></td></tr></table></figure>
+<h5 id="关联查询"><a href="#关联查询" class="headerlink" title="关联查询"></a>关联查询</h5><p><img src="/images/数据库/数据库6.png" alt=""></p>
+<p>从语句看出员工、部门之间的关系是多对多关系。<br>先把这些表的Model类和字段属性建立起来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    <span class="comment"># 第一参数是字段名,如果和属性名不一致,一定要指定</span></span><br><span class="line">    <span class="comment"># age = Column('age', Integer)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.emp_no, self.first_name, self.last_name,</span><br><span class="line">            self.gender.value</span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Department</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'departments'</span></span><br><span class="line"></span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_name = Column(String(<span class="number">40</span>), nullable=<span class="keyword">False</span>, unique=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.dept_no, self.dept_name)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dept_emp</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">"dept_emp"</span></span><br><span class="line">    demp_no = Column(Integer, ForeignKey(<span class="string">'employees.emp_no'</span>,ondelete=<span class="string">'CASCADE'</span>),primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), ForeignKey(<span class="string">'departments.dept_no'</span>, ondelete=<span class="string">'CASCADE'</span>), primary_key=<span class="keyword">True</span>)</span><br><span class="line">    from_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    to_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; empno=&#123;&#125; deptno=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.emp_no, self.dept_no)</span><br></pre></td></tr></table></figure>
+<p><code>ForeignKey(&#39;employees.emp_no&#39;, ondelete=&#39;CASCADE&#39;)</code> 定义外键约束</p>
+<p>需求<br>查询10010员工的所在的部门编号<br>1、使用隐式内连接</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询10010员工所在的部门编号</span></span><br><span class="line">results = session.query(Employee, Dept_emp).filter(Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>).all()</span><br><span class="line">show(results)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询结果</span></span><br><span class="line">(Employee no=<span class="number">10010</span> name=Duangkaew Piveteau gender=F, Dept_emp empno=<span class="number">10010</span> deptno=d004)</span><br><span class="line">(Employee no=<span class="number">10010</span> name=Duangkaew Piveteau gender=F, Dept_emp empno=<span class="number">10010</span> deptno=d006)</span><br></pre></td></tr></table></figure>
+<p>这种方式产生隐式连接的语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT *</span><br><span class="line">FROM employees, dept_emp</span><br><span class="line">WHERE employees.emp_no = dept_emp.emp_no AND employees.emp_no = %(emp_no_1)s</span><br></pre></td></tr></table></figure>
+<p>2、使用join</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询10010员工所在的部门编号</span></span><br><span class="line"><span class="comment"># 第一种写法</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp).filter(Employee.emp_no == <span class="number">10010</span>).all()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二种写法</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp, Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>).all()</span><br><span class="line"></span><br><span class="line">print(results)</span><br></pre></td></tr></table></figure>
+<p>这两种写法，返回都只有一行数据，为什么?<br>原因在于 <code>query(Employee)</code> 这个只能返回一个实体对象中去，为了解决这个问题，需要修改实体类Employee，增加属性用来存放部门信息<br><code>sqlalchemy.orm.relationship(实体类名字符串)</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    </span><br><span class="line">    dept_emps = relationship(<span class="string">'Dept_emp'</span>) <span class="comment">#</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125; no=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.emp_no, self.first_name, self.last_name,self.gender.value, self.dept_emps</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+<p>查询信息</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询10010员工所在的部门编号</span></span><br><span class="line"><span class="comment"># 第一种</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp).filter(Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二种</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp, Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第三种</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp, (Employee.emp_no == Dept_emp.emp_no) &amp;</span><br><span class="line">(Employee.emp_no == <span class="number">10010</span>))</span><br><span class="line"></span><br><span class="line">show(results.all())</span><br></pre></td></tr></table></figure>
+<p>第一种方法<code>join(Dept_emp)</code>中没有等值条件,会自动生成一个等值条件，如果后面有filter，哪怕是<br><code>filter(Employee.emp_no == Dept_emp.emp_no)</code>这个条件会在where中出现。第一种这种自动增加join的等值条件的方式不好，不要这么写<br>第二种方法在join中增加等值条件，阻止了自动的等值条件的生成。这种方式推荐<br>第三种方法就是第二种，这种方式也可以。<br>再看一个现象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    </span><br><span class="line">    dept_emps = relationship(<span class="string">'Dept_emp'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125; no=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.emp_no, self.first_name, self.last_name,</span><br><span class="line">self.gender.value, self.dept_emps <span class="comment"># 修改self.dept_emps为self.emp_no,再看运行结果</span></span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+<p>产生的SQL语句可以看出，不会有查询dept_emp表的语句产生</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>在开发中，一般都会采用ORM框架，这样就可以使用对象操作表了。<br>定义表映射的类，使用Column的描述器定义类属性，使用ForeignKey来定义外键约束。<br>如果在一个对象中，想查看其它表对应的对象的内容，就要使用relationship来定义关系。<br>是否使用外键?<br>1、力挺派<br>能使数据保证完整性一致性<br>2、嫌弃派<br>开发难度增加，大数据的时候影响插入、修改、删除的效率。<br>在业务层保证数据的一致性。</p>
+<p>完整代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sqlalchemy</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> Column, Integer, String, Date, Enum, ForeignKey</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker, relationship</span><br><span class="line"></span><br><span class="line">host = <span class="string">'192.168.142.135'</span></span><br><span class="line">user = <span class="string">'wayne'</span></span><br><span class="line">password = <span class="string">'wayne'</span></span><br><span class="line">port = <span class="number">3306</span></span><br><span class="line">database = <span class="string">'test'</span></span><br><span class="line"></span><br><span class="line">conn_str = <span class="string">"mysql+pymysql://&#123;&#125;:&#123;&#125;@&#123;&#125;:&#123;&#125;/&#123;&#125;"</span>.format(</span><br><span class="line">    user, password, host, port, database</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">engine = sqlalchemy.create_engine(conn_str, echo=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建基类</span></span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> enum</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyEnum</span><span class="params">(enum.Enum)</span>:</span></span><br><span class="line">    M = <span class="string">'M'</span></span><br><span class="line">    F = <span class="string">'F'</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    dept_emps = relationship(<span class="string">'Dept_emp'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125; no=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.emp_no, self.first_name, self.last_name, self.gender.value, self.dept_emps <span class="comment"># 修改self.dept_emps为self.emp_no,再看运行结果</span></span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Department</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'departments'</span></span><br><span class="line"></span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_name = Column(String(<span class="number">40</span>), nullable=<span class="keyword">False</span>, unique=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.dept_no, self.dept_name)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dept_emp</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">"dept_emp"</span></span><br><span class="line">    emp_no = Column(Integer, ForeignKey(<span class="string">'employees.emp_no'</span>,</span><br><span class="line">    ondelete=<span class="string">'CASCADE'</span>),primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), ForeignKey(<span class="string">'departments.dept_no'</span>, ondelete=<span class="string">'CASCADE'</span>),</span><br><span class="line">primary_key=<span class="keyword">True</span>)</span><br><span class="line">    from_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    to_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; empno=&#123;&#125; deptno=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.emp_no, self.dept_no)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># # 删除继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.drop_all(engine)</span></span><br><span class="line"><span class="comment"># # 创建继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.create_all(engine)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建session</span></span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(emps)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> emps:</span><br><span class="line">        print(x)</span><br><span class="line">    print(<span class="string">'~~~~~~~~~~~~~~~'</span>,end=<span class="string">'\n\n'</span>)</span><br><span class="line"><span class="comment"># 查询10010员工所在的部门编号</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp, Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>)</span><br><span class="line">show(results.all())</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SQLAlchemy/" rel="tag"># SQLAlchemy</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/19/python基础学习-元编程/" rel="next" title="python基础学习-元编程">
+                <i class="fa fa-chevron-left"></i> python基础学习-元编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">260</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">183</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SQLAlchemy"><span class="nav-number">1.</span> <span class="nav-text">SQLAlchemy</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档"><span class="nav-number">1.2.</span> <span class="nav-text">文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发"><span class="nav-number">1.3.</span> <span class="nav-text">开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建连接"><span class="nav-number">1.3.1.</span> <span class="nav-text">创建连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Declare-a-Mapping-创建映射"><span class="nav-number">1.3.2.</span> <span class="nav-text">Declare a Mapping 创建映射</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建基类"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">创建基类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建实体类"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">创建实体类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实例化"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">实例化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建表"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">创建表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建会话session"><span class="nav-number">1.3.2.5.</span> <span class="nav-text">创建会话session</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CRUD操作"><span class="nav-number">1.3.2.6.</span> <span class="nav-text">CRUD操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#增"><span class="nav-number">1.3.2.6.1.</span> <span class="nav-text">增</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#简单查询"><span class="nav-number">1.3.2.6.2.</span> <span class="nav-text">简单查询</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#改"><span class="nav-number">1.3.2.6.3.</span> <span class="nav-text">改</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#删除"><span class="nav-number">1.3.2.6.4.</span> <span class="nav-text">删除</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#状态"><span class="nav-number">1.3.2.6.5.</span> <span class="nav-text">状态 **</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#复杂查询"><span class="nav-number">1.3.2.6.6.</span> <span class="nav-text">复杂查询</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#排序"><span class="nav-number">1.3.2.6.7.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#分页"><span class="nav-number">1.3.2.6.8.</span> <span class="nav-text">分页</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#消费者方法"><span class="nav-number">1.3.2.6.9.</span> <span class="nav-text">消费者方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#聚合、分组"><span class="nav-number">1.3.2.6.10.</span> <span class="nav-text">聚合、分组</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#关联查询"><span class="nav-number">1.3.2.6.11.</span> <span class="nav-text">关联查询</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">1.3.2.7.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

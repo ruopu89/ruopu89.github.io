@@ -350,6 +350,1245 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/09/python基础学习-转：Python之路-第十七篇-logging模块/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/09/python基础学习-转：Python之路-第十七篇-logging模块/" itemprop="url">
+                  python基础学习-转：Python之路(第十七篇)logging模块
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-09-09 14:32:18 / 修改時間：15:47:52" itemprop="dateCreated datePublished" datetime="2020-09-09T14:32:18+08:00">2020-09-09</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>转自：<a href="https://www.cnblogs.com/Nicholas0707/p/9021672.html" target="_blank" rel="noopener">https://www.cnblogs.com/Nicholas0707/p/9021672.html</a></p>
+<h1 id="一、logging模块"><a href="#一、logging模块" class="headerlink" title="一、logging模块"></a>一、logging模块</h1><h2 id="（一）、日志相关概念"><a href="#（一）、日志相关概念" class="headerlink" title="（一）、日志相关概念"></a>（一）、日志相关概念</h2><p>日志是一种可以追踪某些软件运行时所发生事件的方法。软件开发人员可以向他们的代码中调用日志记录相关的方法来表明发生了某些事情。一个事件可以用一个可包含可选变量数据的消息来描述。此外，事件也有重要性的概念，这个重要性也可以被称为严重性级别（level）。</p>
+<h3 id="1、日志的作用"><a href="#1、日志的作用" class="headerlink" title="1、日志的作用"></a>1、日志的作用</h3><p>通过log的分析，可以方便用户了解系统或软件、应用的运行情况；如果你的应用log足够丰富，也可以分析以往用户的操作行为、类型喜好、地域分布或其他更多信息；如果一个应用的log同时也分了多个级别，那么可以很轻易地分析得到该应用的健康状况，及时发现问题并快速定位、解决问题，补救损失。</p>
+<p>简单来讲就是，我们通过记录和分析日志可以了解一个系统或软件程序运行情况是否正常，也可以在应用程序出现故障时快速定位问题。比如，做运维的同学，在接收到报警或各种问题反馈后，进行问题排查时通常都会先去看各种日志，大部分问题都可以在日志中找到答案。再比如，做开发的同学，可以通过IDE控制台上输出的各种日志进行程序调试。对于运维老司机或者有经验的开发人员，可以快速的通过日志定位到问题的根源。可见，日志的重要性不可小觑。日志的作用可以简单总结为以下3点：</p>
+<ul>
+<li>程序调试</li>
+<li>了解软件程序运行情况，是否正常</li>
+<li>软件程序运行故障分析与问题定位</li>
+</ul>
+<p>如果应用的日志信息足够详细和丰富，还可以用来做用户行为分析，如：分析用户的操作行为、类型喜好、地域分布以及其它更多的信息，由此可以实现改进业务、提高商业利益。</p>
+<h3 id="2、日志的等级"><a href="#2、日志的等级" class="headerlink" title="2、日志的等级"></a>2、日志的等级</h3><p>我们先来思考下下面的两个问题：</p>
+<p>作为开发人员，在开发一个应用程序时需要什么日志信息？在应用程序正式上线后需要什么日志信息？</p>
+<p>作为应用运维人员，在部署开发环境时需要什么日志信息？在部署生产环境时需要什么日志信息？</p>
+<p>在软件开发阶段或部署开发环境时，为了尽可能详细的查看应用程序的运行状态来保证上线后的稳定性，我们可能需要把该应用程序所有的运行日志全部记录下来进行分析，这是非常耗费机器性能的。当应用程序正式发布或在生产环境部署应用程序时，我们通常只需要记录应用程序的异常信息、错误信息等，这样既可以减小服务器的I/O压力，也可以避免我们在排查故障时被淹没在日志的海洋里。那么，怎样才能在不改动应用程序代码的情况下实现在不同的环境记录不同详细程度的日志呢？这就是日志等级的作用了，我们通过配置文件指定我们需要的日志等级就可以了。</p>
+<p>不同的应用程序所定义的日志等级可能会有所差别，分的详细点的会包含以下几个等级：</p>
+<ul>
+<li>DEBUG</li>
+<li>INFO</li>
+<li>NOTICE</li>
+<li>WARNING</li>
+<li>ERROR</li>
+<li>CRITICAL</li>
+<li>ALERT</li>
+<li>EMERGENCY</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>何时使用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEBUG</td>
+<td>详细信息，典型地调试问题时会感兴趣。 详细的debug信息。</td>
+</tr>
+<tr>
+<td>INFO</td>
+<td>证明事情按预期工作。 关键事件。</td>
+</tr>
+<tr>
+<td>WARNING</td>
+<td>表明发生了一些意外，或者不久的将来会发生问题（如‘磁盘满了’）。软件还是在正常工作。</td>
+</tr>
+<tr>
+<td>ERROR</td>
+<td>由于更严重的问题，软件已不能执行一些功能了。 一般错误消息。</td>
+</tr>
+<tr>
+<td>CRITICAL</td>
+<td>严重错误，表明软件已不能继续运行了。</td>
+</tr>
+<tr>
+<td>NOTICE</td>
+<td>不是错误，但是可能需要处理。普通但是重要的事件。</td>
+</tr>
+<tr>
+<td>ALERT</td>
+<td>需要立即修复，例如系统数据库损坏。</td>
+</tr>
+<tr>
+<td>EMERGENCY</td>
+<td>紧急情况，系统不可用（例如系统崩溃），一般会通知所有用户。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3、日志字段信息与日志格式"><a href="#3、日志字段信息与日志格式" class="headerlink" title="3、日志字段信息与日志格式"></a>3、日志字段信息与日志格式</h3><p>一条日志信息对应的是一个事件的发生，而一个事件通常需要包括以下几个内容：</p>
+<ul>
+<li>事件发生时间</li>
+<li>事件发生位置</li>
+<li>事件的严重程度–日志级别</li>
+<li>事件内容</li>
+</ul>
+<p>上面这些都是一条日志记录中可能包含的字段信息，当然还可以包括一些其他信息，如进程ID、进程名称、线程ID、线程名称等。日志格式就是用来定义一条日志记录中包含那些字段的，且日志格式通常都是可以自定义的。</p>
+<h3 id="4、日志功能的实现"><a href="#4、日志功能的实现" class="headerlink" title="4、日志功能的实现"></a>4、日志功能的实现</h3><p>几乎所有开发语言都会内置日志相关功能，或者会有比较优秀的第三方库来提供日志操作功能，比如：log4j，log4php等。它们功能强大、使用简单。Python自身也提供了一个用于记录日志的标准库模块–logging。</p>
+<h2 id="（二）logging模块"><a href="#（二）logging模块" class="headerlink" title="（二）logging模块"></a>（二）logging模块</h2><p>logging模块是Python内置的标准模块，主要用于输出运行日志，可以设置输出日志的等级、日志保存路径、日志文件回滚等；相比print，具备如下优点：</p>
+<ul>
+<li>可以通过设置不同的日志等级，在release版本中只输出重要信息，而不必显示大量的调试信息；</li>
+<li>print将所有信息都输出到标准输出中，严重影响开发者从标准输出中查看其它数据；logging则可以由开发者决定将信息输出到什么地方，以及怎么输出。</li>
+</ul>
+<h3 id="1、-logging模块的日志级别"><a href="#1、-logging模块的日志级别" class="headerlink" title="1、 logging模块的日志级别"></a>1、 logging模块的日志级别</h3><p>logging模块默认定义了以下几个日志等级，它允许开发人员自定义其他日志级别，但是这是不被推荐的，尤其是在开发供别人使用的库时，因为这会导致日志级别的混乱。</p>
+<table>
+<thead>
+<tr>
+<th>日志等级（level）</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEBUG</td>
+<td>最详细的日志信息，典型应用场景是 问题诊断</td>
+</tr>
+<tr>
+<td>INFO</td>
+<td>信息详细程度仅次于DEBUG，通常只记录关键节点信息，用于确认一切都是按照我们预期的那样进行工作</td>
+</tr>
+<tr>
+<td>WARNING</td>
+<td>当某些不期望的事情发生时记录的信息（如，磁盘可用空间较低），但是此时应用程序还是正常运行的</td>
+</tr>
+<tr>
+<td>ERROR</td>
+<td>由于一个更严重的问题导致某些功能不能正常运行时记录的信息</td>
+</tr>
+<tr>
+<td>CRITICAL</td>
+<td>当发生严重错误，导致应用程序不能继续运行时记录的信息</td>
+</tr>
+</tbody>
+</table>
+<p>开发应用程序或部署开发环境时，可以使用DEBUG或INFO级别的日志获取尽可能详细的日志信息来进行开发或部署调试；</p>
+<p>应用上线或部署生产环境时，应该使用WARNING或ERROR或CRITICAL级别的日志来降低机器的I/O压力和提高获取错误日志信息的效率。日志级别的指定通常都是在应用程序的配置文件中进行指定的。</p>
+<blockquote>
+<p>  说明：</p>
+<ul>
+<li>上面列表中的日志等级是从上到下依次升高的，即：DEBUG &lt; INFO &lt; WARNING &lt; ERROR &lt; CRITICAL，而日志的信息量是依次减少的；</li>
+<li>当为某个应用程序指定一个日志级别后，应用程序会记录所有日志级别大于或等于指定日志级别的日志信息，而不是仅仅记录指定级别的日志信息，nginx、php等应用程序以及这里的python的logging模块都是这样的。同样，logging模块也可以指定日志记录器的日志级别，只有级别大于或等于该指定日志级别的日志记录才会被输出，小于该等级的日志记录将会被丢弃。</li>
+</ul>
+</blockquote>
+<h3 id="2、logging模块的使用方式介绍"><a href="#2、logging模块的使用方式介绍" class="headerlink" title="2、logging模块的使用方式介绍"></a>2、logging模块的使用方式介绍</h3><p>logging模块提供了两种记录日志的方式：</p>
+<ul>
+<li>第一种方式是使用logging提供的模块级别的函数</li>
+<li>第二种方式是使用Logging日志系统的四大组件</li>
+</ul>
+<p>其实，logging所提供的模块级别的日志记录函数也是对logging日志系统相关类的封装而已。</p>
+<p>logging模块定义的模块级别的常用函数</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logging.debug(msg, *args, **kwargs)</code></td>
+<td>创建一条严重级别为DEBUG的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.info(msg, *args, **kwargs)</code></td>
+<td>创建一条严重级别为INFO的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.warning(msg, *args, **kwargs)</code></td>
+<td>创建一条严重级别为WARNING的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.error(msg, *args, **kwargs)</code></td>
+<td>创建一条严重级别为ERROR的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.critical(msg, *args, **kwargs)</code></td>
+<td>创建一条严重级别为CRITICAL的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.log(level, *args, **kwargs)</code></td>
+<td>创建一条严重级别为level的日志记录</td>
+</tr>
+<tr>
+<td><code>logging.basicConfig(**kwargs)</code></td>
+<td>对root logger进行一次性配置</td>
+</tr>
+</tbody>
+</table>
+<p>其中logging.basicConfig(**kwargs)函数用于指定“要记录的日志级别”、“日志格式”、“日志输出位置”、“日志文件的打开模式”等信息，其他几个都是用于记录各个级别日志的函数。</p>
+<h3 id="3、第一种使用方式：简单配置"><a href="#3、第一种使用方式：简单配置" class="headerlink" title="3、第一种使用方式：简单配置"></a>3、第一种使用方式：简单配置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line">logging.debug(<span class="string">"debug_msg"</span>)</span><br><span class="line">logging.info(<span class="string">"info_msg"</span>)</span><br><span class="line">logging.warning(<span class="string">"warning_msg"</span>)</span><br><span class="line">logging.error(<span class="string">"error_msg"</span>)</span><br><span class="line">logging.critical(<span class="string">"critical_msg"</span>)</span><br><span class="line"></span><br><span class="line">输出结果</span><br><span class="line">WARNING:root:warning_msg</span><br><span class="line">ERROR:root:error_msg</span><br><span class="line">CRITICAL:root:critical_msg</span><br></pre></td></tr></table></figure>
+<p>默认情况下Python的logging模块将日志打印到了标准输出中，且只显示了大于等于WARNING级别的日志，这说明默认的日志级别设置为WARNING（日志级别等级CRITICAL &gt; ERROR &gt; WARNING &gt; INFO &gt; DEBUG）</p>
+<p>默认输出格式为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">默认的日志格式为日志级别：Logger名称：用户输出消息</span><br></pre></td></tr></table></figure>
+<p>这里可以用 logging.basicConfig()函数调整日志级别、输出格式等<br>简单的例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line">logging.basicConfig(level=logging.DEBUG,</span><br><span class="line">                    format=<span class="string">"%(asctime)s %(name)s %(levelname)s %(message)s"</span>,</span><br><span class="line">                    datefmt = <span class="string">'%Y-%m-%d  %H:%M:%S %a'</span>    <span class="comment">#注意月份和天数不要搞乱了，这里的格式化符与time模块相同</span></span><br><span class="line">                    )</span><br><span class="line">logging.debug(<span class="string">"msg1"</span>)</span><br><span class="line">logging.info(<span class="string">"msg2"</span>)</span><br><span class="line">logging.warning(<span class="string">"msg3"</span>)</span><br><span class="line">logging.error(<span class="string">"msg4"</span>)</span><br><span class="line">logging.critical(<span class="string">"msg5"</span>)</span><br><span class="line">　　</span><br><span class="line"></span><br><span class="line">输出结果</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-09</span>  <span class="number">23</span>:<span class="number">37</span>:<span class="number">49</span> Wed root DEBUG msg1</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-09</span>  <span class="number">23</span>:<span class="number">37</span>:<span class="number">49</span> Wed root INFO msg2</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-09</span>  <span class="number">23</span>:<span class="number">37</span>:<span class="number">49</span> Wed root WARNING msg3</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-09</span>  <span class="number">23</span>:<span class="number">37</span>:<span class="number">49</span> Wed root ERROR msg4</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-09</span>  <span class="number">23</span>:<span class="number">37</span>:<span class="number">49</span> Wed root CRITICAL msg5</span><br></pre></td></tr></table></figure>
+<p>logging.basicConfig()函数包含参数说明</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>filename</td>
+<td>指定日志输出目标文件的文件名（可以写文件名也可以写文件的完整的绝对路径，写文件名日志放执行文件目录下，写完整路径按照完整路径生成日志文件），指定该设置项后日志信心就不会被输出到控制台了</td>
+</tr>
+<tr>
+<td>filemode</td>
+<td>指定日志文件的打开模式，默认为’a’。需要注意的是，该选项要在filename指定时才有效</td>
+</tr>
+<tr>
+<td>format</td>
+<td>指定日志格式字符串，即指定日志输出时所包含的字段信息以及它们的顺序。logging模块定义的格式字段下面会列出。</td>
+</tr>
+<tr>
+<td>datefmt</td>
+<td>指定日期/时间格式。需要注意的是，该选项要在format中包含时间字段%(asctime)s时才有效</td>
+</tr>
+<tr>
+<td>level</td>
+<td>指定日志器的日志级别</td>
+</tr>
+<tr>
+<td>stream</td>
+<td>指定日志输出目标stream，如sys.stdout、sys.stderr以及网络stream。需要说明的是，stream和filename不能同时提供，否则会引发 ValueError异常</td>
+</tr>
+<tr>
+<td>style</td>
+<td>Python 3.2中新添加的配置项。指定format格式字符串的风格，可取值为’%’、’{‘和’$’，默认为’%’</td>
+</tr>
+<tr>
+<td>handlers</td>
+<td>Python 3.3中新添加的配置项。该选项如果被指定，它应该是一个创建了多个Handler的可迭代对象，这些handler将会被添加到root logger。需要说明的是：filename、stream和handlers这三个配置项只能有一个存在，不能同时出现2个或3个，否则会引发ValueError异常。</td>
+</tr>
+</tbody>
+</table>
+<p>logging模块中定义好的可以用于format格式字符串说明</p>
+<table>
+<thead>
+<tr>
+<th>字段/属性名称</th>
+<th>使用格式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>asctime</td>
+<td>%(asctime)s</td>
+<td>将日志的时间构造成可读的形式，默认情况下是‘2016-02-08 12:00:00,123’精确到毫秒</td>
+</tr>
+<tr>
+<td>name</td>
+<td>%(name)s</td>
+<td>所使用的日志器名称，默认是’root’，因为默认使用的是 rootLogger</td>
+</tr>
+<tr>
+<td>filename</td>
+<td>%(filename)s</td>
+<td>调用日志输出函数的模块的文件名； pathname的文件名部分，包含文件后缀</td>
+</tr>
+<tr>
+<td>funcName</td>
+<td>%(funcName)s</td>
+<td>由哪个function发出的log， 调用日志输出函数的函数名</td>
+</tr>
+<tr>
+<td>levelname</td>
+<td>%(levelname)s</td>
+<td>日志的最终等级（被filter修改后的）</td>
+</tr>
+<tr>
+<td>message</td>
+<td>%(message)s</td>
+<td>日志信息， 日志记录的文本内容</td>
+</tr>
+<tr>
+<td>lineno</td>
+<td>%(lineno)d</td>
+<td>当前日志的行号， 调用日志输出函数的语句所在的代码行</td>
+</tr>
+<tr>
+<td>levelno</td>
+<td>%(levelno)s</td>
+<td>该日志记录的数字形式的日志级别（10, 20, 30, 40, 50）</td>
+</tr>
+<tr>
+<td>pathname</td>
+<td>%(pathname)s</td>
+<td>完整路径 ，调用日志输出函数的模块的完整路径名，可能没有</td>
+</tr>
+<tr>
+<td>process</td>
+<td>%(process)s</td>
+<td>当前进程， 进程ID。可能没有</td>
+</tr>
+<tr>
+<td>processName</td>
+<td>%(processName)s</td>
+<td>进程名称，Python 3.1新增</td>
+</tr>
+<tr>
+<td>thread</td>
+<td>%(thread)s</td>
+<td>当前线程， 线程ID。可能没有</td>
+</tr>
+<tr>
+<td>threadName</td>
+<td>%(thread)s</td>
+<td>线程名称</td>
+</tr>
+<tr>
+<td>module</td>
+<td>%(module)s</td>
+<td>调用日志输出函数的模块名， filename的名称部分，不包含后缀即不包含文件后缀的文件名</td>
+</tr>
+<tr>
+<td>created</td>
+<td>%(created)f</td>
+<td>当前时间，用UNIX标准的表示时间的浮点数表示； 日志事件发生的时间–时间戳，就是当时调用time.time()函数返回的值</td>
+</tr>
+<tr>
+<td>relativeCreated</td>
+<td>%(relativeCreated)d</td>
+<td>输出日志信息时的，自Logger创建以 来的毫秒数； 日志事件发生的时间相对于logging模块加载时间的相对毫秒数</td>
+</tr>
+<tr>
+<td>msecs</td>
+<td>%(msecs)d</td>
+<td>日志事件发生事件的毫秒部分。logging.basicConfig()中用了参数datefmt，将会去掉asctime中产生的毫秒部分，可以用这个加上</td>
+</tr>
+</tbody>
+</table>
+<p>升级版日志例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line">LOG_FORMAT = <span class="string">"%(asctime)s %(name)s %(levelname)s %(pathname)s %(message)s "</span><span class="comment">#配置输出日志格式</span></span><br><span class="line">DATE_FORMAT = <span class="string">'%Y-%m-%d  %H:%M:%S %a '</span> <span class="comment">#配置输出时间的格式，注意月份和天数不要搞乱了</span></span><br><span class="line">logging.basicConfig(level=logging.DEBUG,</span><br><span class="line">                    format=LOG_FORMAT,</span><br><span class="line">                    datefmt = DATE_FORMAT ,</span><br><span class="line">                    filename=<span class="string">r"d:\test\test.log"</span> <span class="comment">#有了filename参数就不会直接输出显示到控制台，而是直接写入文件</span></span><br><span class="line">                    )</span><br><span class="line">logging.debug(<span class="string">"msg1"</span>)</span><br><span class="line">logging.info(<span class="string">"msg2"</span>)</span><br><span class="line">logging.warning(<span class="string">"msg3"</span>)</span><br><span class="line">logging.error(<span class="string">"msg4"</span>)</span><br><span class="line">logging.critical(<span class="string">"msg5"</span>)</span><br><span class="line">　　</span><br><span class="line"></span><br><span class="line">输出结果</span><br><span class="line">日志在d:\test目录下，日志具体内容</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-10</span>  <span class="number">02</span>:<span class="number">13</span>:<span class="number">46</span> Thu AM  root DEBUG D:/<span class="number">06</span>python/exercise/test_package/test.py msg1</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-10</span>  <span class="number">02</span>:<span class="number">13</span>:<span class="number">46</span> Thu AM  root INFO D:/<span class="number">06</span>python/exercise/test_package/test.py msg2</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-10</span>  <span class="number">02</span>:<span class="number">13</span>:<span class="number">46</span> Thu AM  root WARNING D:/<span class="number">06</span>python/exercise/test_package/test.py msg3</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-10</span>  <span class="number">02</span>:<span class="number">13</span>:<span class="number">46</span> Thu AM  root ERROR D:/<span class="number">06</span>python/exercise/test_package/test.py msg4</span><br><span class="line"><span class="number">2018</span><span class="number">-05</span><span class="number">-10</span>  <span class="number">02</span>:<span class="number">13</span>:<span class="number">46</span> Thu AM  root CRITICAL D:/<span class="number">06</span>python/exercise/test_package/test.py msg5</span><br></pre></td></tr></table></figure>
+<p>说明</p>
+<ul>
+<li>logging.basicConfig()函数是一个一次性的简单配置工具，也就是说只有在第一次调用该函数时会起作用，后续再次调用该函数时完全不会产生任何操作的，多次调用的设置并不是累加操作。</li>
+<li>日志器（Logger）是有层级关系的，上面调用的logging模块级别的函数所使用的日志器是RootLogger类的实例，其名称为’root’，它是处于日志器层级关系最顶层的日志器，且该实例是以单例模式存在的。</li>
+<li>如果要记录的日志中包含变量数据，可使用一个格式字符串作为这个事件的描述消息（logging.debug、logging.info等函数的第一个参数），然后将变量数据作为第二个参数<code>*args</code>的值进行传递</li>
+</ul>
+<p>如:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">logging.warning(<span class="string">'%s is %d years old.'</span>, <span class="string">'Tom'</span>, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">输出内容为</span><br><span class="line">WARNING:root:Tom <span class="keyword">is</span> <span class="number">10</span> years old.</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>logging.debug()</code>，<code>logging.info()</code>等方法的定义中，除了<code>msg</code>和<code>args</code>参数外，还有一个<code>**kwargs</code>参数。它们支持3个关键字参数: <code>exc_info</code>，<code>stack_info</code>，<code>extra</code>，下面对这几个关键字参数作个说明。关于<code>exc_info</code>，<code>stack_info</code>，<code>extra</code>关键词参数的说明：见参考资料1。（了解）</li>
+</ul>
+<h3 id="4、第二种使用方式：日志流处理流程"><a href="#4、第二种使用方式：日志流处理流程" class="headerlink" title="4、第二种使用方式：日志流处理流程"></a>4、第二种使用方式：日志流处理流程</h3><p>上面简单配置的方法例子中我们了解到了<code>logging.debug()</code>、<code>logging.info()</code>、<code>logging.warning()</code>、<code>logging.error()</code>、<code>logging.critical()</code>（分别用以记录不同级别的日志信息），<code>logging.basicConfig()</code>（用默认日志格式（Formatter）为日志系统建立一个默认的流处理器（StreamHandler），设置基础配置（如日志级别等）并加到root logger（根Logger）中）这几个logging模块级别的函数。</p>
+<p>第二种是一个模块级别的函数<code>logging.getLogger([name])</code>（返回一个logger对象，如果没有指定名字将返回root logger）。</p>
+<p>logging日志模块四大组件<br>在介绍logging模块的日志流处理流程之前，我们先来介绍下logging模块的四大组件：</p>
+<table>
+<thead>
+<tr>
+<th>组件名称</th>
+<th>对应类名</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>日志器</td>
+<td>Logger</td>
+<td>提供了应用程序可一直使用的接口</td>
+</tr>
+<tr>
+<td>处理器</td>
+<td>Handler</td>
+<td>将logger创建的日志记录发送到合适的目标输出</td>
+</tr>
+<tr>
+<td>过滤器</td>
+<td>Filter</td>
+<td>提供了更细粒度的控制工具来决定输出哪条日志记录，丢弃哪条日志记录</td>
+</tr>
+<tr>
+<td>格式器</td>
+<td>Formatter</td>
+<td>决定日志记录的最终输出格式</td>
+</tr>
+</tbody>
+</table>
+<p>logging模块就是通过这些组件来完成日志处理的，上面所使用的logging模块级别的函数也是通过这些组件对应的类来实现的。</p>
+<p>这些组件之间的关系描述：</p>
+<ul>
+<li>日志器（logger）需要通过处理器（handler）将日志信息输出到目标位置，如：文件、sys.stdout、网络等；</li>
+<li>不同的处理器（handler）可以将日志输出到不同的位置；</li>
+<li>日志器（logger）可以设置多个处理器（handler）将同一条日志记录输出到不同的位置；</li>
+<li>每个处理器（handler）都可以设置自己的过滤器（filter）实现日志过滤，从而只保留感兴趣的日志；</li>
+<li>每个处理器（handler）都可以设置自己的格式器（formatter）实现同一条日志以不同的格式输出到不同的地方。</li>
+</ul>
+<p>简单点说就是：日志器（logger）是入口，真正干活儿的是处理器（handler），处理器（handler）还可以通过过滤器（filter）和格式器（formatter）对要输出的日志内容做过滤和格式化等处理操作。</p>
+<p>logging日志模块相关类及其常用方法介绍<br>与logging四大组件相关的类：Logger, Handler, Filter, Formatter。</p>
+<h4 id="Logger类"><a href="#Logger类" class="headerlink" title="Logger类"></a>Logger类</h4><p>Logger对象有3个任务要做：</p>
+<ul>
+<li>1）向应用程序代码暴露几个方法，使应用程序可以在运行时记录日志消息；</li>
+<li>2）基于日志严重等级（默认的过滤设施）或filter对象来决定要对哪些日志进行后续处理；</li>
+<li>3）将日志消息传送给所有感兴趣的日志handlers。</li>
+</ul>
+<p>Logger对象最常用的方法分为两类：配置方法和消息发送方法</p>
+<p>最常用的配置方法如下：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logger.setLevel()</td>
+<td>设置日志器将会处理的日志消息的最低严重级别</td>
+</tr>
+<tr>
+<td>Logger.addHandler() 和 Logger.removeHandler()</td>
+<td>为该logger对象添加 和 移除一个handler对象</td>
+</tr>
+<tr>
+<td>Logger.addFilter() 和 Logger.removeFilter()</td>
+<td>为该logger对象添加和移除一个filter对象</td>
+</tr>
+</tbody>
+</table>
+<p>logger对象配置完成后，可以使用下面的方法来创建日志记录：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logger.debug(), Logger.info(), Logger.warning(), Logger.error(), Logger.critical()</td>
+<td>创建一个与它们的方法名对应等级的日志记录</td>
+</tr>
+<tr>
+<td>Logger.exception()</td>
+<td>创建一个类似于Logger.error()的日志消息</td>
+</tr>
+<tr>
+<td>Logger.log()</td>
+<td>需要获取一个明确的日志level参数来创建一个日志记录</td>
+</tr>
+</tbody>
+</table>
+<p>一个Logger对象呢？一种方式是通过Logger类的实例化方法创建一个Logger类的实例，但是我们通常都是用第二种方式–<code>logging.getLogger()</code>方法。</p>
+<p><code>logging.getLogger()</code>方法有一个可选参数<code>name</code>，该参数表示将要返回的日志器的名称标识，如果不提供该参数，则其值为’root’。若以相同的<code>name</code>参数值多次调用<code>getLogger()</code>方法，将会返回指向同一个logger对象的引用。</p>
+<p>多次使用注意不能创建多个logger，否则会出现重复输出日志现象。</p>
+<p>关于logger的层级结构与有效等级的说明：</p>
+<ul>
+<li>logger的名称是一个以’.’分割的层级结构，每个’.’后面的logger都是’.’前面的logger的children，例如，有一个名称为 foo 的logger，其它名称分别为 foo.bar, foo.bar.baz 和 foo.bam都是 foo 的后代。</li>
+<li>logger有一个”有效等级（effective level）”的概念。如果一个logger上没有被明确设置一个level，那么该logger就是使用它parent的level；如果它的parent也没有明确设置level则继续向上查找parent的parent的有效level，依次类推，直到找到个一个明确设置了level的祖先为止。需要说明的是，root logger总是会有一个明确的level设置（默认为 WARNING）。当决定是否去处理一个已发生的事件时，logger的有效等级将会被用来决定是否将该事件传递给该logger的handlers进行处理。</li>
+<li>child loggers在完成对日志消息的处理后，默认会将日志消息传递给与它们的祖先loggers相关的handlers。因此，我们不必为一个应用程序中所使用的所有loggers定义和配置handlers，只需要为一个顶层的logger配置handlers，然后按照需要创建child loggers就可足够了。我们也可以通过将一个logger的propagate属性设置为False来关闭这种传递机制。</li>
+</ul>
+<h4 id="Handler类"><a href="#Handler类" class="headerlink" title="Handler类"></a>Handler类</h4><p>Handler对象的作用是（基于日志消息的level）将消息分发到handler指定的位置（文件、网络、邮件等）。Logger对象可以通过<code>addHandler()</code>方法为自己添加0个或者更多个handler对象。比如，一个应用程序可能想要实现以下几个日志需求：</p>
+<ul>
+<li>1）把所有日志都发送到一个日志文件中；</li>
+<li>2）把所有严重级别大于等于error的日志发送到stdout（标准输出）；</li>
+<li>3）把所有严重级别为critical的日志发送到一个email邮件地址。这种场景就需要3个不同的handlers，每个handler负责发送一个特定严重级别的日志到一个特定的位置。</li>
+</ul>
+<p><code>Handler.setLevel(lel)</code>：指定被处理的信息级别，低于lel级别的信息将被忽略<br><code>Handler.setFormatter()</code>：给这个handler选择一个格式<br><code>Handler.addFilter(filt)</code>、<code>Handler.removeFilter(filt)</code>：新增或删除一个filter对象</p>
+<p>需要说明的是，应用程序代码不应该直接实例化和使用Handler实例。因为Handler是一个基类，它只定义了素有handlers都应该有的接口，同时提供了一些子类可以直接使用或覆盖的默认行为。下面是一些常用的Handler：</p>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>logging.StreamHandler</td>
+<td>将日志消息发送到输出到Stream，如std.out, std.err或任何file-like对象。</td>
+</tr>
+<tr>
+<td>logging.FileHandler</td>
+<td>将日志消息发送到磁盘文件，默认情况下文件大小会无限增长</td>
+</tr>
+<tr>
+<td>logging.handlers.RotatingFileHandler</td>
+<td>将日志消息发送到磁盘文件，并支持日志文件按大小切割</td>
+</tr>
+<tr>
+<td>logging.hanlders.TimedRotatingFileHandler</td>
+<td>将日志消息发送到磁盘文件，并支持日志文件按时间切割</td>
+</tr>
+<tr>
+<td>logging.handlers.HTTPHandler</td>
+<td>将日志消息以GET或POST的方式发送给一个HTTP服务器</td>
+</tr>
+<tr>
+<td>logging.handlers.SMTPHandler</td>
+<td>将日志消息发送给一个指定的email地址</td>
+</tr>
+<tr>
+<td>logging.NullHandler</td>
+<td>该Handler实例会忽略error messages，通常被想使用logging的library开发者使用来避免’No handlers could be found for logger XXX’信息的出现。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="Formater类"><a href="#Formater类" class="headerlink" title="Formater类"></a>Formater类</h4><p>Formater对象用于配置日志信息的最终顺序、结构和内容。与<code>logging.Handler</code>基类不同的是，应用代码可以直接实例化Formatter类。另外，如果你的应用程序需要一些特殊的处理行为，也可以实现一个Formatter的子类来完成。</p>
+<p>Formatter类的构造方法定义如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logging.Formatter.__init__(fmt=<span class="keyword">None</span>, datefmt=<span class="keyword">None</span>, style=<span class="string">'%'</span>)</span><br></pre></td></tr></table></figure>
+<p>可见，该构造方法接收3个可选参数：</p>
+<ul>
+<li>fmt：指定消息格式化字符串，如果不指定该参数则默认使用message的原始值</li>
+<li>datefmt：指定日期格式字符串，如果不指定该参数则默认使用”%Y-%m-%d %H:%M:%S”</li>
+<li>style：Python 3.2新增的参数，可取值为 ‘%’, ‘{‘和 ‘$’，如果不指定该参数则默认使用’%’</li>
+</ul>
+<p>一般直接用<code>logging.Formatter（fmt, datefmt）</code></p>
+<h4 id="Filter类（暂时了解）"><a href="#Filter类（暂时了解）" class="headerlink" title="Filter类（暂时了解）"></a>Filter类（暂时了解）</h4><p>Filter可以被Handler和Logger用来做比level更细粒度的、更复杂的过滤功能。Filter是一个过滤器基类，它只允许某个logger层级下的日志事件通过过滤。该类定义如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">logging</span>.<span class="title">Filter</span><span class="params">(name=<span class="string">''</span>)</span></span></span><br><span class="line"><span class="class">    <span class="title">filter</span><span class="params">(record)</span></span></span><br></pre></td></tr></table></figure>
+<p>比如，一个filter实例化时传递的name参数值为’A.B’，那么该filter实例将只允许名称为类似如下规则的loggers产生的日志记录通过过滤：’A.B’，’A.B,C’，’A.B.C.D’，’A.B.D’，而名称为’A.BB’, ‘B.A.B’的loggers产生的日志则会被过滤掉。如果name的值为空字符串，则允许所有的日志事件通过过滤。</p>
+<p>filter方法用于具体控制传递的record记录是否能通过过滤，如果该方法返回值为0表示不能通过过滤，返回值为非0表示可以通过过滤。</p>
+<blockquote>
+<p>  说明：</p>
+<ul>
+<li>如果有需要，也可以在filter(record)方法内部改变该record，比如添加、删除或修改一些属性。</li>
+<li>我们还可以通过filter做一些统计工作，比如可以计算下被一个特殊的logger或handler所处理的record数量等。</li>
+</ul>
+</blockquote>
+<p>日志流处理简要流程<br>1、创建一个logger</p>
+<p>2、设置logger的日志的等级</p>
+<p>3、创建合适的Handler(FileHandler要有路径)</p>
+<p>4、设置每个Handler的日志等级</p>
+<p>5、创建日志的格式</p>
+<p>6、向Handler中添加上面创建的格式</p>
+<p>7、将上面创建的Handler添加到logger中</p>
+<p>8、打印输出logger.debug\logger.info\logger.warning\logger.error\logger.critical</p>
+<p>例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line"><span class="comment">#创建logger，如果参数为空则返回root logger</span></span><br><span class="line">logger = logging.getLogger(<span class="string">"nick"</span>)</span><br><span class="line">logger.setLevel(logging.DEBUG)  <span class="comment">#设置logger日志等级</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#创建handler</span></span><br><span class="line">fh = logging.FileHandler(<span class="string">"test.log"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">ch = logging.StreamHandler()</span><br><span class="line"></span><br><span class="line"><span class="comment">#设置输出日志格式</span></span><br><span class="line">formatter = logging.Formatter(</span><br><span class="line">    fmt=<span class="string">"%(asctime)s %(name)s %(filename)s %(message)s"</span>,</span><br><span class="line">    datefmt=<span class="string">"%Y/%m/%d %X"</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="comment">#注意 logging.Formatter的大小写</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#为handler指定输出格式，注意大小写</span></span><br><span class="line">fh.setFormatter(formatter)</span><br><span class="line">ch.setFormatter(formatter)</span><br><span class="line"></span><br><span class="line"><span class="comment">#为logger添加的日志处理器</span></span><br><span class="line">logger.addHandler(fh)</span><br><span class="line">logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line"><span class="comment">#输出不同级别的log</span></span><br><span class="line">logger.warning(<span class="string">"泰拳警告"</span>)</span><br><span class="line">logger.info(<span class="string">"提示"</span>)</span><br><span class="line">logger.error(<span class="string">"错误"</span>)</span><br></pre></td></tr></table></figure>
+<p>python logging 重复写日志问题<br>用Python的logging模块记录日志时，可能会遇到重复记录日志的问题，第一条记录写一次，第二条记录写两次，第三条记录写三次</p>
+<p>原因：没有移除handler 解决：在日志记录完之后removeHandler</p>
+<p>例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log</span><span class="params">(msg)</span>:</span></span><br><span class="line">    <span class="comment">#创建logger，如果参数为空则返回root logger</span></span><br><span class="line">    logger = logging.getLogger(<span class="string">"nick"</span>)</span><br><span class="line">    logger.setLevel(logging.DEBUG)  <span class="comment">#设置logger日志等级</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建handler</span></span><br><span class="line">    fh = logging.FileHandler(<span class="string">"test.log"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">    ch = logging.StreamHandler()</span><br><span class="line"></span><br><span class="line">    <span class="comment">#设置输出日志格式</span></span><br><span class="line">    formatter = logging.Formatter(</span><br><span class="line">        fmt=<span class="string">"%(asctime)s %(name)s %(filename)s %(message)s"</span>,</span><br><span class="line">        datefmt=<span class="string">"%Y/%m/%d %X"</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="comment">#为handler指定输出格式</span></span><br><span class="line">    fh.setFormatter(formatter)</span><br><span class="line">    ch.setFormatter(formatter)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#为logger添加的日志处理器</span></span><br><span class="line">    logger.addHandler(fh)</span><br><span class="line">    logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 输出不同级别的log</span></span><br><span class="line">    logger.info(msg)</span><br><span class="line">    </span><br><span class="line">log(<span class="string">"泰拳警告"</span>)</span><br><span class="line">log(<span class="string">"提示"</span>)</span><br><span class="line">log(<span class="string">"错误"</span>)</span><br><span class="line"></span><br><span class="line">输出结果</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 泰拳警告</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 提示</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 提示</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 错误</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 错误</span><br><span class="line"><span class="number">2018</span>/<span class="number">05</span>/<span class="number">10</span> <span class="number">20</span>:<span class="number">06</span>:<span class="number">18</span> nick test.py 错误</span><br></pre></td></tr></table></figure>
+<p>分析：可以看到输出结果有重复打印</p>
+<p>原因：第二次调用log的时候，根据getLogger(name)里的name获取同一个logger，而这个logger里已经有了第一次你添加的handler，第二次调用又添加了一个handler，所以，这个logger里有了两个同样的handler，以此类推，调用几次就会有几个handler。</p>
+<p>解决方案1</p>
+<p>添加removeHandler语句</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log</span><span class="params">(msg)</span>:</span></span><br><span class="line">    <span class="comment">#创建logger，如果参数为空则返回root logger</span></span><br><span class="line">    logger = logging.getLogger(<span class="string">"nick"</span>)</span><br><span class="line">    logger.setLevel(logging.DEBUG)  <span class="comment">#设置logger日志等级</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建handler</span></span><br><span class="line">    fh = logging.FileHandler(<span class="string">"test.log"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">    ch = logging.StreamHandler()</span><br><span class="line"></span><br><span class="line">    <span class="comment">#设置输出日志格式</span></span><br><span class="line">    formatter = logging.Formatter(</span><br><span class="line">        fmt=<span class="string">"%(asctime)s %(name)s %(filename)s %(message)s"</span>,</span><br><span class="line">        datefmt=<span class="string">"%Y/%m/%d %X"</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="comment">#为handler指定输出格式</span></span><br><span class="line">    fh.setFormatter(formatter)</span><br><span class="line">    ch.setFormatter(formatter)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#为logger添加的日志处理器</span></span><br><span class="line">    logger.addHandler(fh)</span><br><span class="line">    logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 输出不同级别的log</span></span><br><span class="line">    logger.info(msg)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#解决方案1，添加removeHandler语句，每次用完之后移除Handler</span></span><br><span class="line">    logger.removeHandler(fh)</span><br><span class="line">    logger.removeHandler(ch)</span><br><span class="line">    </span><br><span class="line">log(<span class="string">"泰拳警告"</span>)</span><br><span class="line">log(<span class="string">"提示"</span>)</span><br><span class="line">log(<span class="string">"错误"</span>)</span><br></pre></td></tr></table></figure>
+<p>解决方案2<br>在log方法里做判断，如果这个logger已有handler，则不再添加handler。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log</span><span class="params">(msg)</span>:</span></span><br><span class="line">    <span class="comment">#创建logger，如果参数为空则返回root logger</span></span><br><span class="line">    logger = logging.getLogger(<span class="string">"nick"</span>)</span><br><span class="line">    logger.setLevel(logging.DEBUG)  <span class="comment">#设置logger日志等级</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#解决方案2：这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> logger.handlers:</span><br><span class="line">        <span class="comment">#创建handler</span></span><br><span class="line">        fh = logging.FileHandler(<span class="string">"test.log"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">        ch = logging.StreamHandler()</span><br><span class="line"></span><br><span class="line">        <span class="comment">#设置输出日志格式</span></span><br><span class="line">        formatter = logging.Formatter(</span><br><span class="line">            fmt=<span class="string">"%(asctime)s %(name)s %(filename)s %(message)s"</span>,</span><br><span class="line">            datefmt=<span class="string">"%Y/%m/%d %X"</span></span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">        <span class="comment">#为handler指定输出格式</span></span><br><span class="line">        fh.setFormatter(formatter)</span><br><span class="line">        ch.setFormatter(formatter)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#为logger添加的日志处理器</span></span><br><span class="line">        logger.addHandler(fh)</span><br><span class="line">        logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 输出不同级别的log</span></span><br><span class="line">    logger.info(msg)</span><br><span class="line">    </span><br><span class="line">log(<span class="string">"泰拳警告"</span>)</span><br><span class="line">log(<span class="string">"提示"</span>)</span><br><span class="line">log(<span class="string">"错误"</span>)</span><br></pre></td></tr></table></figure>
+<p>logger调用方式例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment">#创建logger，如果参数为空则返回root logger</span></span><br><span class="line">    logger = logging.getLogger(<span class="string">"nick"</span>)</span><br><span class="line">    logger.setLevel(logging.DEBUG)  <span class="comment">#设置logger日志等级</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> logger.handlers:</span><br><span class="line">        <span class="comment">#创建handler</span></span><br><span class="line">        fh = logging.FileHandler(<span class="string">"test.log"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">        ch = logging.StreamHandler()</span><br><span class="line"></span><br><span class="line">        <span class="comment">#设置输出日志格式</span></span><br><span class="line">        formatter = logging.Formatter(</span><br><span class="line">            fmt=<span class="string">"%(asctime)s %(name)s %(filename)s %(message)s"</span>,</span><br><span class="line">            datefmt=<span class="string">"%Y/%m/%d %X"</span></span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">        <span class="comment">#为handler指定输出格式</span></span><br><span class="line">        fh.setFormatter(formatter)</span><br><span class="line">        ch.setFormatter(formatter)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#为logger添加的日志处理器</span></span><br><span class="line">        logger.addHandler(fh)</span><br><span class="line">        logger.addHandler(ch)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> logger <span class="comment">#直接返回logger</span></span><br><span class="line">    </span><br><span class="line">logger = log()</span><br><span class="line">logger.warning(<span class="string">"泰拳警告"</span>)</span><br><span class="line">logger.info(<span class="string">"提示"</span>)</span><br><span class="line">logger.error(<span class="string">"错误"</span>)</span><br><span class="line">logger.debug(<span class="string">"查错"</span>)</span><br></pre></td></tr></table></figure>
+<p>参考链接</p>
+<p>[1]<a href="https://www.cnblogs.com/yyds/p/6901864.html" target="_blank" rel="noopener">https://www.cnblogs.com/yyds/p/6901864.html</a></p>
+<p>[2]<a href="https://blog.csdn.net/huilan_same/article/details/51858817" target="_blank" rel="noopener">https://blog.csdn.net/huilan_same/article/details/51858817</a></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/09/python使用记录-发送邮件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/09/python使用记录-发送邮件/" itemprop="url">
+                  python使用记录-发送邮件
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-09-09 14:11:49 / 修改時間：17:27:29" itemprop="dateCreated datePublished" datetime="2020-09-09T14:11:49+08:00">2020-09-09</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 发送附件，函数</span></span><br><span class="line"><span class="keyword">from</span> email.mime.multipart <span class="keyword">import</span> MIMEMultipart</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> request</span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> parse</span><br><span class="line"><span class="comment"># 不这样使用，在下面使用urllib.parse时就看不到提示。why？</span></span><br><span class="line"><span class="keyword">import</span> pathlib</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面使用的本地路径定义是在windows中的方法</span></span><br><span class="line"><span class="comment"># 获取昨天的日期，这是文件名的一部分</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getYesterday</span><span class="params">()</span>:</span></span><br><span class="line">    today = datetime.date.today()</span><br><span class="line">    yesterday = (today - datetime.timedelta(days=<span class="number">1</span>)).strftime(<span class="string">'%Y-%m-%d'</span>)</span><br><span class="line">    <span class="comment"># print(yesterday)</span></span><br><span class="line">    <span class="keyword">return</span> yesterday</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">downloadFile</span><span class="params">()</span>:</span></span><br><span class="line">    url1 = <span class="string">'http://172.16.174.55:8088/hourdata/gehuavhmlp/send_report/'</span>+getYesterday()+<span class="string">'歌华三款盒子开机人次统计.csv'</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 下面是下载中文文件的方法一</span></span><br><span class="line">    <span class="comment">#urlbefore = url1.split("//")[0]</span></span><br><span class="line">    <span class="comment">#urlafter = url1.split("//")[1]</span></span><br><span class="line">    <span class="comment">#url = urlbefore + "//" + parse.quote(urlafter)</span></span><br><span class="line"><span class="comment"># 上面四行可以解决下载文件为中文名称的问题。第一行定义路径，第二行到第三行将路径以//分隔为两段，因为使用</span></span><br><span class="line"><span class="comment"># quote将路径转码时，会将冒号也转码，所以这样做。最后再将两段合并成一段url</span></span><br><span class="line">    <span class="comment"># s = request.urlopen(url).read()</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 下面是下载中文文件的方法二</span></span><br><span class="line">    url = parse.quote(url1, safe=<span class="string">":/=?#"</span>)</span><br><span class="line">    <span class="comment"># 链接转义，防止链接中有中文或空格而报错</span></span><br><span class="line">    LocalPath = pathlib.Path(<span class="string">'D:\\no_delete_task_data\\BigSampleData\\'</span>+getYesterday()+<span class="string">'歌华三款盒子开机人次统计.csv'</span>)</span><br><span class="line">    request.urlretrieve(url,filename=LocalPath,reporthook=loading)</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loading</span><span class="params">(blocknum,blocksize,totalsize)</span>:</span></span><br><span class="line">    percent = <span class="number">100</span>*blocknum*blocksize/totalsize</span><br><span class="line">    <span class="keyword">if</span> percent &gt; <span class="number">100</span>:</span><br><span class="line">        percent = <span class="number">100</span></span><br><span class="line">    print(<span class="string">"正在下载&gt;&gt;&gt;%0.2f%%"</span>%percent)</span><br><span class="line"></span><br><span class="line">========================================================================================</span><br><span class="line">函数参数说明</span><br><span class="line">urllib.request.urlretrieve(url, filename=<span class="keyword">None</span>, reporthook=<span class="keyword">None</span>, data=<span class="keyword">None</span>)</span><br><span class="line">url: 文件下载链接</span><br><span class="line">filename: 文件下载路径（如果参数未指定，urllib 会生成一个临时文件保存数据）</span><br><span class="line">reporthook: 回调函数，当连接上服务器、以及相应的数据块传输完毕时会触发该回调，我们可以利用这个回调函数来显示当前的下载进度</span><br><span class="line">data: 指 post 到服务器的数据。该方法返回一个包含两个元素的元组 (filename, headers)，filename 表示保存到本地的路径，header 表示服务器的响应头</span><br><span class="line">========================================================================================</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_mail</span><span class="params">(sender = <span class="string">'ziwei.zhang@xor-media.tv'</span>,receivers = [<span class="string">'1411002380@qq.com'</span>],sender_password = <span class="string">'ICE0JCIJBdP5qvtD'</span>,smtp_sender = <span class="string">'mail.xor-media.tv'</span>, subject = <span class="string">'开机人次数据汇总：'</span>+getYesterday<span class="params">()</span>)</span>:</span></span><br><span class="line">    msg = MIMEMultipart()  <span class="comment">#  实例化email对象</span></span><br><span class="line">    msg[<span class="string">'From'</span>] = sender  <span class="comment">#</span></span><br><span class="line">    msg[<span class="string">'To'</span>] = <span class="string">','</span>.join(receivers)</span><br><span class="line">    <span class="comment"># msg['To'] = str(receivers)</span></span><br><span class="line">    <span class="comment"># subject = 'Python SMTP 邮件测试...'</span></span><br><span class="line"></span><br><span class="line">    msg[<span class="string">'Subject'</span>] = subject</span><br><span class="line"></span><br><span class="line"><span class="comment"># 邮件正文内容</span></span><br><span class="line">    msg.attach(MIMEText(<span class="string">'开机人次数据汇总'</span>,<span class="string">'plain'</span>,<span class="string">'utf-8'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造附件1,传送当前目录下的test.txt文件</span></span><br><span class="line">    att1 = MIMEText(open(<span class="string">'D:\\no_delete_task_data\\BigSampleData\\'</span> + getYesterday() + <span class="string">'歌华三款盒子开机人次统计.csv'</span>,<span class="string">'rb'</span>).read(),<span class="string">'base64'</span>,<span class="string">'utf8'</span>)</span><br><span class="line">    att1[<span class="string">"Content-Type"</span>] = <span class="string">'application/octet-stream'</span></span><br><span class="line"><span class="comment"># 这里的filename可以任意写，写什么名字，邮件中显示什么名字</span></span><br><span class="line"><span class="comment">#     att1["Content-Disposition"] = 'attachment; filename="密云时段开机数据.zip"'  # 这种方法无法修改附件的名称</span></span><br><span class="line">    att1.add_header(<span class="string">'Content-Disposition'</span>,<span class="string">'attachment'</span>,filename=getYesterday()+<span class="string">'歌华三款盒子开机人次统计.csv'</span>)</span><br><span class="line">    msg.attach(att1)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        server = smtplib.SMTP(smtp_sender,<span class="number">25</span>)</span><br><span class="line">        <span class="comment">###server.set_debuglevel(1)</span></span><br><span class="line">        server.ehlo()  <span class="comment"># 用户认证</span></span><br><span class="line">        server.starttls()</span><br><span class="line">        server.login(sender,sender_password)</span><br><span class="line">        server.sendmail(sender,msg[<span class="string">'To'</span>].split(<span class="string">','</span>),str(msg))</span><br><span class="line">        server.quit()</span><br><span class="line">        print(<span class="string">"邮件发送成功"</span>)</span><br><span class="line">    <span class="keyword">except</span> smtplib.SMTPException:</span><br><span class="line">        print(<span class="string">"Error: 无法发送邮件"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载文件</span></span><br><span class="line">downloadFile()</span><br><span class="line">send_mail()</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/01/利用ssh动态端口转发代理上网/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/01/利用ssh动态端口转发代理上网/" itemprop="url">
+                  利用ssh动态端口转发代理上网
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-09-01 14:34:07 / 修改時間：14:57:32" itemprop="dateCreated datePublished" datetime="2020-09-01T14:34:07+08:00">2020-09-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>本机只有内网地址，无法连接互联网。通过ssh连接到一台服务器联网。这时本机与服务器间建立了隧道，通过隧道将数据流发送到服务器，服务器到发送到互联网。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">VMware登录一台windows虚拟机，使用Host-only网络。宿主机为ubuntu20.04系统。</span><br><span class="line">windows主机地址：192.168.176.128。ubuntu20.04上vmnet1地址：192.168.176.1</span><br><span class="line">1. windows主机</span><br><span class="line">ssh -D 8090 shouyu@192.168.176.1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以连接上ubuntu主机。这是在本地打开8090端口，连接到192.168.176.1。本地端口也可以使用IP:port。如下</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ssh -D 127.0.0.1:8090 shouyu@192.168.176.1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果不写地址，只写端口。本机就会监听所有地址。</span></span><br><span class="line">2. 在windows主机使用chrome浏览器的switchyomega插件添加一个代理，使用SOCK5方式，代理地址为127.0.0.1:8090。配置好之后就可以访问baidu.com等网页了</span><br><span class="line">3. curl --socks 5 127.0.0.1:8080 http://需要访问的网站</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这种方法也可以测试</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/17/python基础学习-asyncio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/17/python基础学习-asyncio/" itemprop="url">
+                  python基础学习-asyncio
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-06-17 11:53:36" itemprop="dateCreated datePublished" datetime="2020-06-17T11:53:36+08:00">2020-06-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-06-18 11:09:02" itemprop="dateModified" datetime="2020-06-18T11:09:02+08:00">2020-06-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="asyncio"><a href="#asyncio" class="headerlink" title="asyncio"></a>asyncio</h3><p>3.4版本加入标准库。<br>asyncio底层基于selectors实现，看似库，其实就是个框架，包含异步IO、事件循环、协程、任务等内容。</p>
+<h3 id="问题的引出"><a href="#问题的引出" class="headerlink" title="问题的引出"></a>问题的引出</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">		print(x)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">"abc"</span>:</span><br><span class="line">		print(x)</span><br><span class="line">        </span><br><span class="line">a()</span><br><span class="line">b()</span><br><span class="line"><span class="comment"># 运行结果一定是</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br></pre></td></tr></table></figure>
+<p>这是一个串行的程序，单线程中根本没有做任何<br>能否并行?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        time.sleep(<span class="number">0.001</span>) <span class="comment">#</span></span><br><span class="line">        print(x)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">"abc"</span>:</span><br><span class="line">        time.sleep(<span class="number">0.001</span>)</span><br><span class="line">        print(x)</span><br><span class="line">        </span><br><span class="line">threading.Thread(target=a, name=<span class="string">'a'</span>).start()</span><br><span class="line">threading.Thread(target=b, name=<span class="string">'b'</span>).start()</span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">a</span><br><span class="line"><span class="number">1</span></span><br><span class="line">b</span><br><span class="line"><span class="number">2</span></span><br><span class="line">c</span><br></pre></td></tr></table></figure>
+<p>多进程版本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">		time.sleep(<span class="number">0.001</span>)</span><br><span class="line">		print(x)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">"abc"</span>:</span><br><span class="line">        time.sleep(<span class="number">0.001</span>)</span><br><span class="line">        print(x)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    multiprocessing.Process(target=a, name=<span class="string">'a'</span>).start()</span><br><span class="line">    multiprocessing.Process(target=b, name=<span class="string">'b'</span>).start()</span><br><span class="line"><span class="comment"># 运行结果</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line">a</span><br><span class="line"><span class="number">1</span></span><br><span class="line">b</span><br><span class="line"><span class="number">2</span></span><br><span class="line">c</span><br></pre></td></tr></table></figure>
+<p>生成器版本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(x)</span><br><span class="line">        <span class="keyword">yield</span></span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">"abc"</span>:</span><br><span class="line">		print(x)</span><br><span class="line">		<span class="keyword">yield</span></span><br><span class="line">        </span><br><span class="line">x = a()</span><br><span class="line">y = b()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">	next(x)</span><br><span class="line">    next(y)</span><br></pre></td></tr></table></figure>
+<p>上例在一个线程内通过生成器完成了调度，让两个函数都有机会执行，这样的调度不是操作系统的进程、线程完成的，而是用户自己设计的。<br>这个程序编写:<br>需要使用yield来让出控制权<br>需要循环帮助交替执行</p>
+<h3 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h3><p>事件循环是asyncio提供的核心运行机制。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>asyncio.get_event_loop()</td>
+<td>返回一个事件循环对象，是asyncio.BaseEventLoop的实例</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.stop()</td>
+<td>停止运行事件循环</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.run_forever()</td>
+<td>一直运行，直到stop()</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.run_until_complete(future)</td>
+<td>运行直至Future对象运行完</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.close()</td>
+<td>关闭事件循环</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.is_running()</td>
+<td>返回事件循环是否运行</td>
+</tr>
+<tr>
+<td>AbstractEventLoop.close()</td>
+<td>关闭事件循环</td>
+</tr>
+</tbody>
+</table>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><ul>
+<li>协程不是进程、也不是线程，它是用户空间调度的完成并发处理的方式。</li>
+<li>进程、线程由操作系统完成调度，而协程是线程内完成调度。它不需要更多的线程，自然也没有多线程切换带来的开销。</li>
+<li>协程是非抢占式调度，只有一个协程主动让出控制权，另一个协程才会被调度。</li>
+<li>协程也不需要使用锁机制，因为是在同一个线程中执行。</li>
+<li>多CPU下，可以使用多进程和协程配合，既能进程并发又能发挥协程在单线程中的优势。</li>
+<li>Python中协程是基于生成器的。</li>
+</ul>
+<h4 id="协程的使用"><a href="#协程的使用" class="headerlink" title="协程的使用"></a>协程的使用</h4><p>3.4引入asyncio，使用装饰器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="meta">@asyncio.coroutine</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sleep</span><span class="params">(x)</span>:</span> <span class="comment"># 协程函数</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(<span class="string">'sleep &#123;&#125;'</span>.format(i))</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">from</span> asyncio.sleep(x)</span><br><span class="line">        </span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(sleep(<span class="number">3</span>))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+<p>将生成器函数转换成协程函数，就可以在事件循环中执行了。<br>3.5版本开始，Python提供关键字async、await，在语言上原生支持协程。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">sleep</span><span class="params">(x)</span>:</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(<span class="string">'sleep &#123;&#125;'</span>.format(i))</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(x)</span><br><span class="line">        </span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(sleep(<span class="number">3</span>))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+<p>async def用来定义协程函数，iscoroutinefunction()返回True。协程函数中可以不包含await、async关键字，但不能使用yield关键字。<br>如同生成器函数调用返回生成器对象一样，协程函数调用也会返回一个对象称为协程对象，iscoroutine()返回True。<br>再来做个例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">sleep</span><span class="params">(x)</span>:</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(<span class="string">'sleep &#123;&#125;'</span>.format(i))</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(x)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">showthread</span><span class="params">(x)</span>:</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(threading.enumerate())</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">2</span>)</span><br><span class="line">        </span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">tasks = [sleep(<span class="number">3</span>), showthread(<span class="number">3</span>)]</span><br><span class="line">loop.run_until_complete(asyncio.wait(tasks))</span><br><span class="line">loop.close()</span><br><span class="line">============================================================================================</span><br><span class="line"><span class="comment"># 协程版本</span></span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="meta">@asyncio.coroutine</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        print(<span class="string">'a.x'</span>, x)</span><br><span class="line">        <span class="keyword">yield</span></span><br><span class="line">        </span><br><span class="line"><span class="meta">@asyncio.coroutine</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">'abc'</span>:</span><br><span class="line">        print(<span class="string">'b.x'</span>, x)</span><br><span class="line">        <span class="keyword">yield</span></span><br><span class="line">        </span><br><span class="line">print(asyncio.iscoroutinefunction(a))</span><br><span class="line">print(asyncio.iscoroutinefunction(b))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 大循环</span></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">tasks = [a(), b()]</span><br><span class="line">loop.run_until_complete(asyncio.wait(tasks))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+<h4 id="TCP-Echo-Server举例"><a href="#TCP-Echo-Server举例" class="headerlink" title="TCP Echo Server举例"></a>TCP Echo Server举例</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="comment"># TCP Echo Server 举例</span></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(reader, writer)</span>:</span></span><br><span class="line">	<span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        data = <span class="keyword">await</span> reader.read(<span class="number">1024</span>)</span><br><span class="line">        print(dir(reader))</span><br><span class="line">        print(dir(writer))</span><br><span class="line">        client = writer.get_extra_info(<span class="string">'peername'</span>)</span><br><span class="line">        message = <span class="string">"&#123;&#125; Your msg &#123;&#125;"</span>.format(client, data.decode()).encode()</span><br><span class="line">        writer.write(message)</span><br><span class="line">        <span class="keyword">await</span> writer.drain()</span><br><span class="line">        </span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">crt = asyncio.start_server(handle, ip, port, loop=loop)</span><br><span class="line">server = loop.run_until_complete(crt)</span><br><span class="line">print(server) <span class="comment"># server是监听的socket对象</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">	loop.run_forever()</span><br><span class="line"><span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">	<span class="keyword">pass</span></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    server.close()</span><br><span class="line">    loop.close()</span><br></pre></td></tr></table></figure>
+<h4 id="aiohttp库"><a href="#aiohttp库" class="headerlink" title="aiohttp库"></a>aiohttp库</h4><p>安装</p>
+<p><code>pip install aiohttp</code></p>
+<p>开发</p>
+<p>HTTP Server</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> aiohttp <span class="keyword">import</span> web</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">indexhandle</span><span class="params">(request:web.Request)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> web.Response(text=request.path, status=<span class="number">201</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(request:web.Request)</span>:</span></span><br><span class="line">    print(request.match_info)</span><br><span class="line">    print(request.query_string) <span class="comment"># http://127.0.0.1:8080/1?name=12301</span></span><br><span class="line">    <span class="keyword">return</span> web.Response(text=request.match_info.get(<span class="string">'id'</span>, <span class="string">'0000'</span>), status=<span class="number">200</span>)</span><br><span class="line"></span><br><span class="line">app = web.Application()</span><br><span class="line">app.router.add_get(<span class="string">"/"</span>, indexhandle) <span class="comment"># http://127.0.0.1:8080/</span></span><br><span class="line">app.router.add_get(<span class="string">"/&#123;id&#125;"</span>, handle) <span class="comment"># http://127.0.0.1:8080/12301</span></span><br><span class="line"></span><br><span class="line">web.run_app(app, host=<span class="string">'0.0.0.0'</span>, port=<span class="number">9977</span>)</span><br></pre></td></tr></table></figure>
+<p>HTTP Client</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">from</span> aiohttp <span class="keyword">import</span> ClientSession</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">get_html</span><span class="params">(url:str)</span>:</span></span><br><span class="line">	<span class="keyword">async</span> <span class="keyword">with</span> ClientSession() <span class="keyword">as</span> session:</span><br><span class="line">		<span class="keyword">async</span> <span class="keyword">with</span> session.get(url) <span class="keyword">as</span> res:</span><br><span class="line">            print(res.status)</span><br><span class="line">            print(<span class="keyword">await</span> res.text())</span><br><span class="line">            </span><br><span class="line">url = <span class="string">'http://127.0.0.1/ziroom-web/'</span></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(get_html(url))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/17/python基础学习-IO各种概念及多路复用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1778,675 +3017,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/05/阿里云问题解决-配置SLB转发策略/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/06/05/阿里云问题解决-配置SLB转发策略/" itemprop="url">
-                  阿里云问题解决-配置SLB转发策略
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-06-05 10:01:06 / 修改時間：10:16:37" itemprop="dateCreated datePublished" datetime="2020-06-05T10:01:06+08:00">2020-06-05</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>在阿里云的web防火墙上配置了一个域名，后端服务器地址是一个SLB的地址，这个域名已经提供服务。现在需要添加一个wedo项目，监听在81端口。我们希望web防火墙上的域名还是转到SLB的80端口，使用访问：域名/wedo/时，由SLB转发到后端两台ECS的81端口上。</p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ul>
-<li>进入SLB控制台，选择实例，添加一个转发到后端81端口的虚拟服务器组</li>
-<li>转到监听窗口，找到之前的监听80端口的配置项，选择其后面的配置转发策略，添加转发策略，第一条添加域名为web防火墙上配置的域名，URL输入<code>wedo/</code>，虚拟服务器组选择上面登录的81端口的虚拟服务器组，点击添加转发策略。这时可以在下面的转发策略列表中看到一条策略，再按此方法添加一条策略，域名还是web防火墙上配置的域名，URL不填，虚拟服务器组选择80端口的虚拟服务器组，点击添加转发策略。因为域名相同，所以这两条策略会合并为一条，当用户访问：域名/wedo/时，转到81端口虚拟服务器组处理。其他的都用80端口虚拟服务器组处理</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/01/阿里云问题解决-SSL安全证书续费/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/06/01/阿里云问题解决-SSL安全证书续费/" itemprop="url">
-                  阿里云问题解决-SSL安全证书续费
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-06-01 11:13:27 / 修改時間：11:18:55" itemprop="dateCreated datePublished" datetime="2020-06-01T11:13:27+08:00">2020-06-01</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>说是续费，实际是重新采购，安全证书的续费就是新购。</p>
-<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><ul>
-<li>本次选择通配符域名，DV SSL证书，基础版pro，DigCert品牌证书，价格1000元，五折</li>
-<li>采购后在阿里SSL证书控制台可以看到新购的证书，填写申请，输入域名，申请人信息，手动DNS验证，其他默认</li>
-<li>之后按提示添加DNS解析</li>
-<li>添加解析后，点击SSL证书控制台上的验证，验证通过后点击提交审核</li>
-<li>审核通过后下载证书</li>
-<li>在之前使用过证书的服务上重新绑定证书</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/27/阿里云问题解决-堡垒机无法连接ECS-20200527/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/27/阿里云问题解决-堡垒机无法连接ECS-20200527/" itemprop="url">
-                  阿里云问题解决-堡垒机无法连接ECS_20200527
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-05-27 17:16:11" itemprop="dateCreated datePublished" datetime="2020-05-27T17:16:11+08:00">2020-05-27</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-05-28 10:23:21" itemprop="dateModified" datetime="2020-05-28T10:23:21+08:00">2020-05-28</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里云/" itemprop="url" rel="index"><span itemprop="name">阿里云</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h3><p>使用阿里堡垒机机突然无法连接ECS，联系阿里人员后了解到堡垒机与ECS应在同一VPC下，如果在不同VPC下，要使用云企业网将两个VPC打通。目前情况是，堡垒机与ECS在不同VPC下，VPC虽然都加入到了云企业网中，但在云企业网中也配置了路由策略，拒绝两个VPC通讯，因为是不同项目使用一条专线，所以将VPC分开了，无法找到之前可以连接的原因。</p>
-<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><ul>
-<li>首先申请阿里专有网络中的网络ACL功能，需要创建阿里工单</li>
-<li>将云企业网中的路由策略删除。测试发现将此策略改为允许是不可以的，因为添加网络ACL的绑定交换机后会使用与这个交换机通讯的所有地址中断。如果删除云企业网的路由策略再使用网络ACL添加就不会出现这种问题</li>
-<li>创建网络ACL，选择在哪个VPC上创建<ul>
-<li>绑定资源中选择指定的交换机</li>
-<li>入方向规则创建两条，一条只允许堡垒机IP访问，协议为all，端口为全部。另一条为拒绝某网段访问，协议为all，端口为全部。生效顺序是1. 允许，2. 拒绝</li>
-<li>出方向规则创建一条，允许访问堡垒机IP，协议为all，端口为全部。</li>
-</ul>
-</li>
-</ul>
-<p>这样配置后，就可以满足只允许堡垒机IP访问这个VPC中的交换机，与堡垒机同网段的其他ECS无法与这个VPC中的主机通讯</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/12/docker部署gogs服务器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/12/docker部署gogs服务器/" itemprop="url">
-                  docker部署gogs服务器
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-05-12 17:14:36 / 修改時間：17:26:50" itemprop="dateCreated datePublished" datetime="2020-05-12T17:14:36+08:00">2020-05-12</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="部署mysql"><a href="#部署mysql" class="headerlink" title="部署mysql"></a>部署mysql</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/docker/mysql/&#123;data,conf&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> data是数据目录，conf是配置目录</span></span><br><span class="line">vim ~/docker/mysql/conf/docker.cnf</span><br><span class="line">[mysqld]</span><br><span class="line"> skip-host-cache</span><br><span class="line"> skip-name-resolve</span><br><span class="line"> </span><br><span class="line">vim ~/docker/mysql/conf/mysql.cnf</span><br><span class="line">[mysql]</span><br><span class="line"> default-character-set = utf8</span><br><span class="line"> </span><br><span class="line"> [mysql_safe]</span><br><span class="line"> default-character-set = utf8</span><br><span class="line"> </span><br><span class="line"> [client]</span><br><span class="line"> default-character-set = utf8</span><br><span class="line"> </span><br><span class="line"> [mysqld]</span><br><span class="line"> pid-file      = /var/run/mysqld/mysqld.pid</span><br><span class="line"> socket        = /var/run/mysqld/mysqld.sock</span><br><span class="line"> datadir       = /var/lib/mysql</span><br><span class="line"><span class="meta"> #</span><span class="bash"><span class="built_in">log</span>-error    = /var/<span class="built_in">log</span>/mysql/error.log</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> By default we only accept connections from localhost</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"><span class="built_in">bind</span>-address = 127.0.0.1</span></span><br><span class="line"><span class="meta"> #</span><span class="bash"> Disabling symbolic-links is recommended to prevent assorted security risks</span></span><br><span class="line"> symbolic-links=0</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 修改mysql默认字符集</span></span><br><span class="line"> init_connect  = 'SET NAMES utf8'</span><br><span class="line"> character-set-server = utf8</span><br><span class="line"> collation-server = utf8_unicode_ci</span><br><span class="line"> </span><br><span class="line">vim ~/docker/mysql/conf/mysqldump.cnf</span><br><span class="line">[mysqldump]</span><br><span class="line"> quick</span><br><span class="line"> quote-names</span><br><span class="line"> max_allowed_packet  = 16M</span><br><span class="line"> </span><br><span class="line">docker run -d --name gogs-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=ruopu8964 -v /home/shouyu/docker/mysql/data:/var/lib/mysql -v /home/shouyu/docker/mysql/conf:/etc/mysql/conf.d mysql:latest</span><br></pre></td></tr></table></figure>
-<h3 id="部署gogs"><a href="#部署gogs" class="headerlink" title="部署gogs"></a>部署gogs</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/docker/gogs</span><br><span class="line">docker run -d --name=gogs -p 10022:22 -p 10080:3000 -v /home/shouyu/docker/gogs:/data gogs/gogs</span><br><span class="line">访问IP:10080，输入信息</span><br><span class="line">数据库主机地址输入本机地址，使用127地址无法通过，另外需要先连接到数据库中创建一下gogs数据库，并在数据库名称中输入gogs</span><br><span class="line">数据库用户名用root，创建数据库容器时指定的密码</span><br><span class="line">应用基本设置中的域名输入http://IP:10080，SSH端口号用10022，HTTP端口号是希望应用在容器内监听的端口，所以使</span><br><span class="line">用默认的3000不要动，应用URL也用http://IP:10080，在可先设置中的第二项中禁用头像GRAVATAR的设置。这里需要注</span><br><span class="line">意两点，一是输入域名和应用URL时都要加上http://，不然无法通过安装，第二，HTTP端口最好不要动，不然即使通过安</span><br><span class="line">装，重启容器后也打不开应用页面了。</span><br></pre></td></tr></table></figure>
-<p>参考：<a href="https://github.com/gogs/gogs/tree/master/docker" target="_blank" rel="noopener">https://github.com/gogs/gogs/tree/master/docker</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2494,7 +3064,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">256</span>
+                    <span class="site-state-item-count">260</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -2942,7 +3512,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">179</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">183</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
