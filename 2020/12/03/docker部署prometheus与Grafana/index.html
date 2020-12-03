@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="介绍Prometheus Server：Prometheus Sever是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Sever需要对采集到的数据进行存储，Prometheus">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker部署prometheus与Grafana">
+<meta property="og:url" content="http://yoursite.com/2020/12/03/docker部署prometheus与Grafana/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="介绍Prometheus Server：Prometheus Sever是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Sever需要对采集到的数据进行存储，Prometheus">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/prometheus.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana1.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana2.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana3.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana4.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana5.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana6.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana7.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana8.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana9.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/Grafana10.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/prometheus2.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/prometheus3.png">
+<meta property="og:image" content="http://yoursite.com/images/prometheus/prometheus4.png">
+<meta property="og:updated_time" content="2020-12-03T08:00:03.169Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker部署prometheus与Grafana">
+<meta name="twitter:description" content="介绍Prometheus Server：Prometheus Sever是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Sever需要对采集到的数据进行存储，Prometheus">
+<meta name="twitter:image" content="http://yoursite.com/images/prometheus/prometheus.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/12/03/docker部署prometheus与Grafana/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>docker部署prometheus与Grafana | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/03/docker部署prometheus与Grafana/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">docker部署prometheus与Grafana
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-12-03 14:19:30 / 修改時間：16:00:03" itemprop="dateCreated datePublished" datetime="2020-12-03T14:19:30+08:00">2020-12-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p><strong>Prometheus Server</strong>：Prometheus Sever是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Sever需要对采集到的数据进行存储，Prometheus Server本身就是一个实时数据库，将采集到的监控数据按照时间序列的方式存储在本地磁盘当中。Prometheus Server对外提供了自定义的PromQL，实现对数据的查询以及分析。另外Prometheus Server的联邦集群能力可以使其从其他的Prometheus Server实例中获取数据。</p>
+<p><strong>Exporters</strong>：Exporter将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可以获取到需要采集的监控数据。可以将Exporter分为2类：<br>直接采集：这一类Exporter直接内置了对Prometheus监控的支持，比如cAdvisor，Kubernetes，Etcd，Gokit等，都直接内置了用于向Prometheus暴露监控数据的端点。<br>间接采集：原有监控目标并不直接支持Prometheus，因此需要通过Prometheus提供的Client Library编写该监控目标的监控采集程序。例如：Mysql Exporter，JMX Exporter，Consul Exporter等。</p>
+<p><strong>AlertManager</strong>：在Prometheus Server中支持基于Prom QL创建告警规则，如果满足Prom QL定义的规则，则会产生一条告警。在AlertManager从 Prometheus server 端接收到 alerts后，会进行去除重复数据，分组，并路由到对收的接受方式，发出报警。常见的接收方式有：电子邮件，pagerduty，webhook 等。</p>
+<p><strong>PushGateway</strong>:Prometheus数据采集基于Prometheus Server从Exporter pull数据，因此当网络环境不允许Prometheus Server和Exporter进行通信时，可以使用PushGateway来进行中转。通过PushGateway将内部网络的监控数据主动Push到Gateway中，Prometheus Server采用针对Exporter同样的方式，将监控数据从PushGateway pull到Prometheus Server。</p>
+<p><img src="/images/prometheus/prometheus.png" alt=""></p>
+<h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p>因为是容器部署，所以提前把要使用的目录都创建出来</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -pv /home/shouyu/docker/prometheus/&#123;prometheus/data,alertmanager/&#123;storage,template&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Prometheus-Server"><a href="#Prometheus-Server" class="headerlink" title="Prometheus Server"></a>Prometheus Server</h2><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 服务器配置</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 大小写敏感</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用缩进表示层级关系</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 缩进时不允许使用Tab键，只允许使用空格。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/prometheus.yml</span><br><span class="line"><span class="meta">#</span><span class="bash"> my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s # 设定抓取数据的周期，默认为1min</span><br><span class="line">  evaluation_interval: 15s # 设定更新rules文件的周期，默认为1min</span><br><span class="line"><span class="meta">  #</span><span class="bash"> scrape_timeout: 15s <span class="comment"># 设定抓取数据的超时时间，默认为10s</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> external_labels: <span class="comment"># 额外的属性，会添加到拉取得数据并存到数据库中</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash">   monitor: <span class="string">'codelab_monitor'</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: ['10.0.30.51:9093'] # 设定alertmanager和prometheus交互的接口，即alertmanager监听的ip地址和端口，这里最好写IP地址，不要用localhost</span><br><span class="line">      # - alertmanager:9093</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> rule配置，首次读取默认加载，之后根据evaluation_interval设定的周期加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - "alertmanager_rules.yml"</span><br><span class="line"><span class="meta">  #</span><span class="bash"> - <span class="string">"first_rules.yml"</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> - <span class="string">"second_rules.yml"</span></span></span><br><span class="line">  - "memory_over.yml"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Here it<span class="string">'s Prometheus itself.</span></span></span><br><span class="line">scrape_configs:</span><br><span class="line"><span class="meta">  #</span><span class="bash"> The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  - job_name: 'prometheus'  # job_name默认写入timeseries的labels中，可以用于查询使用</span><br><span class="line">    static_configs:  # 静态配置</span><br><span class="line">    - targets: ['localhost:9090']   # prometheus所要抓取数据的地址，即instance实例项</span><br><span class="line">  - job_name: 'node'  # Node Exporters的配置</span><br><span class="line">    scrape_interval: 8s  # 抓取周期，默认采用global配置</span><br><span class="line">    static_configs:</span><br><span class="line">    - targets: ['10.0.30.51:9100']  # 这里最好写IP地址，不要用localhost</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 告警模板定义</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试发现，要把模板文件和配置文件放在一层并挂载到容器的/etc/prometheus目录下，如果将模板放在rules目录中，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 挂载后在容器的/etc/prometheus/rules目录中，会找不到模板文件</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/alertmanager_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: test-rules</span><br><span class="line">    rules:</span><br><span class="line">    - alert: InstanceDown # 告警名称</span><br><span class="line">      expr: up == 0 # 告警的判定条件，参考Prometheus高级查询来设定</span><br><span class="line">      for: 2m # 满足告警条件持续时间多久后，才会发送告警</span><br><span class="line">      labels: #标签项</span><br><span class="line">        team: node</span><br><span class="line">      annotations: # 解析项，详细解释告警信息</span><br><span class="line">        summary: "&#123;&#123;$labels.instance&#125;&#125;: has been down"</span><br><span class="line">        description: "&#123;&#123;$labels.instance&#125;&#125;: job &#123;&#123;$labels.job&#125;&#125; has been down "</span><br><span class="line">        #        value: &#123;&#123;$value&#125;&#125;</span><br><span class="line"></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/memory_over.yml</span><br><span class="line">groups:</span><br><span class="line">- name: example</span><br><span class="line">  rules:</span><br><span class="line">  - alert: NodeMemoryUsage</span><br><span class="line">    expr: (1 - (node_memory_MemAvailable_bytes / (node_memory_MemTotal_bytes))) * 100 &gt; 80</span><br><span class="line"><span class="meta">#</span><span class="bash"> expr 是计算公式，(1 - (node_memory_MemAvailable_bytes / (node_memory_MemTotal_bytes))) * 100 表示获取内存使用率</span></span><br><span class="line">    for: 1m</span><br><span class="line">    labels:</span><br><span class="line">      severity: warning</span><br><span class="line">    annotations:</span><br><span class="line">      summary: "&#123;&#123;$labels.instance&#125;&#125;: High Memory usage detected"</span><br><span class="line">      description: "&#123;&#123;$labels.instance&#125;&#125;: Memory usage is above 80% (current value is:&#123;&#123; $value &#125;&#125;)"</span><br></pre></td></tr></table></figure>
+<h3 id="动态更新prometheus的配置项"><a href="#动态更新prometheus的配置项" class="headerlink" title="动态更新prometheus的配置项"></a>动态更新prometheus的配置项</h3><p> 动态更新Prometheus的配置，即热更新加载，一共有两种方式：</p>
+<p>1）向prometheus进程发送SIGHUP信号</p>
+<p>2）<code>curl -X POST http://localdns:9090/-/reload</code></p>
+<p>参考链接：<a href="https://songjiayang.gitbooks.io/prometheus/content/qa/hotreload.html" target="_blank" rel="noopener">https://songjiayang.gitbooks.io/prometheus/content/qa/hotreload.html</a></p>
+<h3 id="部署-1"><a href="#部署-1" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run  -d -p 9090:9090 --restart=always \</span><br><span class="line">-v home/shouyu/prometheus/prometheus/data:/prometheus \</span><br><span class="line">-v /home/shouyu/prometheus/prometheus:/etc/prometheus \</span><br><span class="line">--name pro prom/prometheus</span><br></pre></td></tr></table></figure>
+<h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//localdns:9090/graph</span></span><br></pre></td></tr></table></figure>
+<h2 id="Grafana"><a href="#Grafana" class="headerlink" title="Grafana"></a>Grafana</h2><h3 id="部署-2"><a href="#部署-2" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p -d  3000:3000 --name grafana grafana/grafana</span><br></pre></td></tr></table></figure>
+<h3 id="访问与配置"><a href="#访问与配置" class="headerlink" title="访问与配置"></a>访问与配置</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//localhost:3000/</span></span><br><span class="line">默认用户名密码都是admin</span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/Grafana1.png" alt=""></p>
+<p>添加prometheus数据源</p>
+<ul>
+<li>点击主界面”Add your first data source”</li>
+</ul>
+<p><img src="/images/prometheus/Grafana2.png" alt=""></p>
+<ul>
+<li>选择Prometheus</li>
+</ul>
+<p><img src="/images/prometheus/Grafana3.png" alt=""></p>
+<ul>
+<li>填写数据源设置项</li>
+</ul>
+<p>URL处填写Prometheus服务所在的IP地址，如果填写localhost:9090会报错</p>
+<p><img src="/images/prometheus/Grafana4.png" alt=""></p>
+<p>点击下方 Save &amp; Test按钮，保存设置</p>
+<p><img src="/images/prometheus/Grafana5.png" alt=""></p>
+<ul>
+<li>Dashboards页面选择“Prometheus 2.0 Stats”</li>
+</ul>
+<p>点击Dashboards选项卡，选择Prometheus 2.0 Stats</p>
+<p><img src="/images/prometheus/Grafana6.png" alt=""></p>
+<ul>
+<li>查看监控</li>
+</ul>
+<p>点击Grafana图标，切换到Grafana主页面，然后点击Home，选择我们刚才添加的Prometheus 2.0 Stats，即可看到监控数据</p>
+<p><img src="/images/prometheus/Grafana7.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana8.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana9.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana10.png" alt=""></p>
+<h2 id="Node-Exporter"><a href="#Node-Exporter" class="headerlink" title="Node Exporter"></a>Node Exporter</h2><h3 id="部署-3"><a href="#部署-3" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">下载node-exporter地址：https://github.com/prometheus/node_exporter/releases</span><br><span class="line">tar xzf node_exporter-0.18.1.linux-amd64.tar.gz</span><br><span class="line">mv node_exporter-0.18.1.linux-amd64 /opt/node_exporter</span><br><span class="line">cd /opt/node_exporter</span><br><span class="line">./node_exporter</span><br></pre></td></tr></table></figure>
+<h3 id="访问Node-Exporter"><a href="#访问Node-Exporter" class="headerlink" title="访问Node Exporter"></a>访问Node Exporter</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">localhost:9100/metrics</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到采集到的主机硬件信息</span></span><br></pre></td></tr></table></figure>
+<h3 id="访问Prometheus"><a href="#访问Prometheus" class="headerlink" title="访问Prometheus"></a>访问Prometheus</h3><p>在status -&gt; Targets中可以看到加入的Node Exporter，这是在prometheus.yml中定义好的</p>
+<p><img src="/images/prometheus/prometheus2.png" alt=""></p>
+<h2 id="Alertmanager"><a href="#Alertmanager" class="headerlink" title="Alertmanager"></a>Alertmanager</h2><h3 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 服务配置</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/alertmanager.yml</span><br><span class="line">global:</span><br><span class="line">  resolve_timeout: 5m  # 处理超时时间，默认为5min</span><br><span class="line">  smtp_smarthost: 'smtp.office365.com:587'  # 发件邮箱的smtp地址，这里必须加上端口</span><br><span class="line">  smtp_from: 'xxxxxxx@hotmail.com'          # 发送邮件的邮箱地址</span><br><span class="line">  smtp_auth_username: 'xxxxxxxx@hotmail.com' # 发送邮件的邮箱地址，这个地址和上面的地址是一样的</span><br><span class="line">  smtp_auth_password: 'xxxxxxxxxxx'           # 邮箱密码或授权码，qq邮箱要用授权码</span><br><span class="line">  smtp_require_tls: true  # 这一行要标明，如果有安全传输，用true，否则用false</span><br><span class="line"></span><br><span class="line">templates:  #定义模板</span><br><span class="line">  - 'template/*.tmpl'</span><br><span class="line">  </span><br><span class="line">route:  # 定义路由信息</span><br><span class="line">  group_by: ['alertname'] # 报警分组依据</span><br><span class="line">  group_wait: 10s         # 最初即第一次等待多久时间发送一组警报的通知</span><br><span class="line">  group_interval: 10s      # 在发送新警报前的等待时间</span><br><span class="line">  repeat_interval: 30m     # 发送重复警报的周期 对于email配置中，此项不可以设置过低，否则将会由于邮件发送太多频繁，被smtp服务器拒绝</span><br><span class="line">  receiver: 'mail'          # 发送警报的接收者的名称，这个参数是必选的，和下面receivers-&gt;name名要相同</span><br><span class="line"></span><br><span class="line">receivers:</span><br><span class="line">- name: 'mail'            # 报警组名</span><br><span class="line">  email_configs: # 邮箱配置</span><br><span class="line">  - to: '1102998123@qq.com' # 发送给谁，接收警报的email配置</span><br><span class="line">    html: '&#123;&#123; template "test.html" . &#125;&#125;'  # 设定邮箱的内容模板，只需要改引号中的名称</span><br><span class="line">    send_resolved: true</span><br><span class="line">  webhook_configs: # webhook配置</span><br><span class="line">  - url: 'http://127.0.0.1:5001'</span><br><span class="line">    send_resolved: true</span><br><span class="line">  wechat_configs: # 企业微信报警配置</span><br><span class="line">  - send_resolved: true</span><br><span class="line">    to_party: '1' # 接收组的id</span><br><span class="line">    agent_id: '1000002' # (企业微信--&gt;自定应用--&gt;AgentId)</span><br><span class="line">    corp_id: '******' # 企业信息(我的企业--&gt;CorpId[在底部])</span><br><span class="line">    api_secret: '******' # 企业微信(企业微信--&gt;自定应用--&gt;Secret)</span><br><span class="line">    message: '&#123;&#123; template "test_wechat.html" . &#125;&#125;' # 发送消息模板的设定</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一个inhibition规则是在与另一组匹配器匹配的警报存在的条件下，使匹配一组匹配器的警报失效的规则。两个警报必须具有一组相同的标签。  </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">告警抑制</span></span><br><span class="line">inhibit_rules:</span><br><span class="line">  - source_match:</span><br><span class="line">      severity: 'critical'</span><br><span class="line">    target_match:</span><br><span class="line">      severity: 'warning'</span><br><span class="line">    equal: ['alertname', 'dev', 'instance']</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 模板配置</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/template/test.tmpl</span><br><span class="line">&#123;&#123; define "test.html" &#125;&#125; # 这个名称与上面配置文件中的receivers:里的html: '&#123;&#123; template "test.html" . &#125;&#125;' 是对应的，如果名称不一样，alertmanager的日志会提示没有这个模板文件</span><br><span class="line">&lt;table border="1"&gt;</span><br><span class="line">        &lt;tr&gt;</span><br><span class="line">                &lt;td&gt;报警项&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;实例&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;报警阀值&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;开始时间&lt;/td&gt;</span><br><span class="line">        &lt;/tr&gt;</span><br><span class="line">        &#123;&#123; range $i, $alert := .Alerts &#125;&#125;</span><br><span class="line">                &lt;tr&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Labels "alertname" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Labels "instance" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Annotations "value" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; $alert.StartsAt &#125;&#125;&lt;/td&gt;</span><br><span class="line">                &lt;/tr&gt;</span><br><span class="line">        &#123;&#123; end &#125;&#125;</span><br><span class="line">&lt;/table&gt;</span><br><span class="line">&#123;&#123; end &#125;&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上述Labels项，表示prometheus里面的可选label项。Annotation项表示报警规则中定义的annotation项的内容。</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/template/test_wechat.tmpl</span><br><span class="line">&#123;&#123; define "test.html" &#125;&#125; </span><br><span class="line">  &#123;&#123; range $i, $alert := .Alerts.Firing &#125;&#125;</span><br><span class="line">    [报警项]:&#123;&#123; index $alert.Labels "alertname" &#125;&#125;</span><br><span class="line">    [实例]:&#123;&#123; index $alert.Labels "instance" &#125;&#125;</span><br><span class="line">    [报警阀值]:&#123;&#123; index $alert.Annotations "value" &#125;&#125;</span><br><span class="line">    [开始时间]:&#123;&#123; $alert.StartsAt &#125;&#125;</span><br><span class="line">  &#123;&#123; end &#125;&#125;</span><br><span class="line">&#123;&#123; end &#125;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="访问Alertmanager"><a href="#访问Alertmanager" class="headerlink" title="访问Alertmanager"></a>访问Alertmanager</h3><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span>//localdns:<span class="number">9093</span>/<span class="meta">#/alerts</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/prometheus3.png" alt=""></p>
+<p>可以通过重启prometheus服务触发邮件报警</p>
+<h3 id="访问Prometheus-1"><a href="#访问Prometheus-1" class="headerlink" title="访问Prometheus"></a>访问Prometheus</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//192.168.253.42:9090/alerts</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/prometheus4.png" alt=""></p>
+<p>发送报警时，会在Pending中显示，发送完会在Firing中显示，如果没有收到邮件，可以到alertmanager日志中查看原因</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/12/01/docker部署portainer/" rel="next" title="docker部署portainer">
+                <i class="fa fa-chevron-left"></i> docker部署portainer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">262</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">183</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署"><span class="nav-number">2.</span> <span class="nav-text">部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Prometheus-Server"><span class="nav-number">2.1.</span> <span class="nav-text">Prometheus Server</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">2.1.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态更新prometheus的配置项"><span class="nav-number">2.1.2.</span> <span class="nav-text">动态更新prometheus的配置项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-1"><span class="nav-number">2.1.3.</span> <span class="nav-text">部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问"><span class="nav-number">2.1.4.</span> <span class="nav-text">访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Grafana"><span class="nav-number">2.2.</span> <span class="nav-text">Grafana</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-2"><span class="nav-number">2.2.1.</span> <span class="nav-text">部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问与配置"><span class="nav-number">2.2.2.</span> <span class="nav-text">访问与配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-Exporter"><span class="nav-number">2.3.</span> <span class="nav-text">Node Exporter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部署-3"><span class="nav-number">2.3.1.</span> <span class="nav-text">部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问Node-Exporter"><span class="nav-number">2.3.2.</span> <span class="nav-text">访问Node Exporter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问Prometheus"><span class="nav-number">2.3.3.</span> <span class="nav-text">访问Prometheus</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Alertmanager"><span class="nav-number">2.4.</span> <span class="nav-text">Alertmanager</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问Alertmanager"><span class="nav-number">2.4.2.</span> <span class="nav-text">访问Alertmanager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问Prometheus-1"><span class="nav-number">2.4.3.</span> <span class="nav-text">访问Prometheus</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

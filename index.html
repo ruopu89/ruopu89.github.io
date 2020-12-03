@@ -350,6 +350,379 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/03/docker部署prometheus与Grafana/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/12/03/docker部署prometheus与Grafana/" itemprop="url">
+                  docker部署prometheus与Grafana
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-12-03 14:19:30 / 修改時間：16:00:03" itemprop="dateCreated datePublished" datetime="2020-12-03T14:19:30+08:00">2020-12-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p><strong>Prometheus Server</strong>：Prometheus Sever是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Sever需要对采集到的数据进行存储，Prometheus Server本身就是一个实时数据库，将采集到的监控数据按照时间序列的方式存储在本地磁盘当中。Prometheus Server对外提供了自定义的PromQL，实现对数据的查询以及分析。另外Prometheus Server的联邦集群能力可以使其从其他的Prometheus Server实例中获取数据。</p>
+<p><strong>Exporters</strong>：Exporter将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可以获取到需要采集的监控数据。可以将Exporter分为2类：<br>直接采集：这一类Exporter直接内置了对Prometheus监控的支持，比如cAdvisor，Kubernetes，Etcd，Gokit等，都直接内置了用于向Prometheus暴露监控数据的端点。<br>间接采集：原有监控目标并不直接支持Prometheus，因此需要通过Prometheus提供的Client Library编写该监控目标的监控采集程序。例如：Mysql Exporter，JMX Exporter，Consul Exporter等。</p>
+<p><strong>AlertManager</strong>：在Prometheus Server中支持基于Prom QL创建告警规则，如果满足Prom QL定义的规则，则会产生一条告警。在AlertManager从 Prometheus server 端接收到 alerts后，会进行去除重复数据，分组，并路由到对收的接受方式，发出报警。常见的接收方式有：电子邮件，pagerduty，webhook 等。</p>
+<p><strong>PushGateway</strong>:Prometheus数据采集基于Prometheus Server从Exporter pull数据，因此当网络环境不允许Prometheus Server和Exporter进行通信时，可以使用PushGateway来进行中转。通过PushGateway将内部网络的监控数据主动Push到Gateway中，Prometheus Server采用针对Exporter同样的方式，将监控数据从PushGateway pull到Prometheus Server。</p>
+<p><img src="/images/prometheus/prometheus.png" alt=""></p>
+<h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p>因为是容器部署，所以提前把要使用的目录都创建出来</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -pv /home/shouyu/docker/prometheus/&#123;prometheus/data,alertmanager/&#123;storage,template&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Prometheus-Server"><a href="#Prometheus-Server" class="headerlink" title="Prometheus Server"></a>Prometheus Server</h2><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 服务器配置</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 大小写敏感</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用缩进表示层级关系</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 缩进时不允许使用Tab键，只允许使用空格。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/prometheus.yml</span><br><span class="line"><span class="meta">#</span><span class="bash"> my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s # 设定抓取数据的周期，默认为1min</span><br><span class="line">  evaluation_interval: 15s # 设定更新rules文件的周期，默认为1min</span><br><span class="line"><span class="meta">  #</span><span class="bash"> scrape_timeout: 15s <span class="comment"># 设定抓取数据的超时时间，默认为10s</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> external_labels: <span class="comment"># 额外的属性，会添加到拉取得数据并存到数据库中</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash">   monitor: <span class="string">'codelab_monitor'</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets: ['10.0.30.51:9093'] # 设定alertmanager和prometheus交互的接口，即alertmanager监听的ip地址和端口，这里最好写IP地址，不要用localhost</span><br><span class="line">      # - alertmanager:9093</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> rule配置，首次读取默认加载，之后根据evaluation_interval设定的周期加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - "alertmanager_rules.yml"</span><br><span class="line"><span class="meta">  #</span><span class="bash"> - <span class="string">"first_rules.yml"</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> - <span class="string">"second_rules.yml"</span></span></span><br><span class="line">  - "memory_over.yml"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Here it<span class="string">'s Prometheus itself.</span></span></span><br><span class="line">scrape_configs:</span><br><span class="line"><span class="meta">  #</span><span class="bash"> The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  - job_name: 'prometheus'  # job_name默认写入timeseries的labels中，可以用于查询使用</span><br><span class="line">    static_configs:  # 静态配置</span><br><span class="line">    - targets: ['localhost:9090']   # prometheus所要抓取数据的地址，即instance实例项</span><br><span class="line">  - job_name: 'node'  # Node Exporters的配置</span><br><span class="line">    scrape_interval: 8s  # 抓取周期，默认采用global配置</span><br><span class="line">    static_configs:</span><br><span class="line">    - targets: ['10.0.30.51:9100']  # 这里最好写IP地址，不要用localhost</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 告警模板定义</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试发现，要把模板文件和配置文件放在一层并挂载到容器的/etc/prometheus目录下，如果将模板放在rules目录中，</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 挂载后在容器的/etc/prometheus/rules目录中，会找不到模板文件</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/alertmanager_rules.yml</span><br><span class="line">groups:</span><br><span class="line">  - name: test-rules</span><br><span class="line">    rules:</span><br><span class="line">    - alert: InstanceDown # 告警名称</span><br><span class="line">      expr: up == 0 # 告警的判定条件，参考Prometheus高级查询来设定</span><br><span class="line">      for: 2m # 满足告警条件持续时间多久后，才会发送告警</span><br><span class="line">      labels: #标签项</span><br><span class="line">        team: node</span><br><span class="line">      annotations: # 解析项，详细解释告警信息</span><br><span class="line">        summary: "&#123;&#123;$labels.instance&#125;&#125;: has been down"</span><br><span class="line">        description: "&#123;&#123;$labels.instance&#125;&#125;: job &#123;&#123;$labels.job&#125;&#125; has been down "</span><br><span class="line">        #        value: &#123;&#123;$value&#125;&#125;</span><br><span class="line"></span><br><span class="line">vim /home/shouyu/docker/prometheus/prometheus/memory_over.yml</span><br><span class="line">groups:</span><br><span class="line">- name: example</span><br><span class="line">  rules:</span><br><span class="line">  - alert: NodeMemoryUsage</span><br><span class="line">    expr: (1 - (node_memory_MemAvailable_bytes / (node_memory_MemTotal_bytes))) * 100 &gt; 80</span><br><span class="line"><span class="meta">#</span><span class="bash"> expr 是计算公式，(1 - (node_memory_MemAvailable_bytes / (node_memory_MemTotal_bytes))) * 100 表示获取内存使用率</span></span><br><span class="line">    for: 1m</span><br><span class="line">    labels:</span><br><span class="line">      severity: warning</span><br><span class="line">    annotations:</span><br><span class="line">      summary: "&#123;&#123;$labels.instance&#125;&#125;: High Memory usage detected"</span><br><span class="line">      description: "&#123;&#123;$labels.instance&#125;&#125;: Memory usage is above 80% (current value is:&#123;&#123; $value &#125;&#125;)"</span><br></pre></td></tr></table></figure>
+<h3 id="动态更新prometheus的配置项"><a href="#动态更新prometheus的配置项" class="headerlink" title="动态更新prometheus的配置项"></a>动态更新prometheus的配置项</h3><p> 动态更新Prometheus的配置，即热更新加载，一共有两种方式：</p>
+<p>1）向prometheus进程发送SIGHUP信号</p>
+<p>2）<code>curl -X POST http://localdns:9090/-/reload</code></p>
+<p>参考链接：<a href="https://songjiayang.gitbooks.io/prometheus/content/qa/hotreload.html" target="_blank" rel="noopener">https://songjiayang.gitbooks.io/prometheus/content/qa/hotreload.html</a></p>
+<h3 id="部署-1"><a href="#部署-1" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run  -d -p 9090:9090 --restart=always \</span><br><span class="line">-v home/shouyu/prometheus/prometheus/data:/prometheus \</span><br><span class="line">-v /home/shouyu/prometheus/prometheus:/etc/prometheus \</span><br><span class="line">--name pro prom/prometheus</span><br></pre></td></tr></table></figure>
+<h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//localdns:9090/graph</span></span><br></pre></td></tr></table></figure>
+<h2 id="Grafana"><a href="#Grafana" class="headerlink" title="Grafana"></a>Grafana</h2><h3 id="部署-2"><a href="#部署-2" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p -d  3000:3000 --name grafana grafana/grafana</span><br></pre></td></tr></table></figure>
+<h3 id="访问与配置"><a href="#访问与配置" class="headerlink" title="访问与配置"></a>访问与配置</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//localhost:3000/</span></span><br><span class="line">默认用户名密码都是admin</span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/Grafana1.png" alt=""></p>
+<p>添加prometheus数据源</p>
+<ul>
+<li>点击主界面”Add your first data source”</li>
+</ul>
+<p><img src="/images/prometheus/Grafana2.png" alt=""></p>
+<ul>
+<li>选择Prometheus</li>
+</ul>
+<p><img src="/images/prometheus/Grafana3.png" alt=""></p>
+<ul>
+<li>填写数据源设置项</li>
+</ul>
+<p>URL处填写Prometheus服务所在的IP地址，如果填写localhost:9090会报错</p>
+<p><img src="/images/prometheus/Grafana4.png" alt=""></p>
+<p>点击下方 Save &amp; Test按钮，保存设置</p>
+<p><img src="/images/prometheus/Grafana5.png" alt=""></p>
+<ul>
+<li>Dashboards页面选择“Prometheus 2.0 Stats”</li>
+</ul>
+<p>点击Dashboards选项卡，选择Prometheus 2.0 Stats</p>
+<p><img src="/images/prometheus/Grafana6.png" alt=""></p>
+<ul>
+<li>查看监控</li>
+</ul>
+<p>点击Grafana图标，切换到Grafana主页面，然后点击Home，选择我们刚才添加的Prometheus 2.0 Stats，即可看到监控数据</p>
+<p><img src="/images/prometheus/Grafana7.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana8.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana9.png" alt=""></p>
+<p><img src="/images/prometheus/Grafana10.png" alt=""></p>
+<h2 id="Node-Exporter"><a href="#Node-Exporter" class="headerlink" title="Node Exporter"></a>Node Exporter</h2><h3 id="部署-3"><a href="#部署-3" class="headerlink" title="部署"></a>部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">下载node-exporter地址：https://github.com/prometheus/node_exporter/releases</span><br><span class="line">tar xzf node_exporter-0.18.1.linux-amd64.tar.gz</span><br><span class="line">mv node_exporter-0.18.1.linux-amd64 /opt/node_exporter</span><br><span class="line">cd /opt/node_exporter</span><br><span class="line">./node_exporter</span><br></pre></td></tr></table></figure>
+<h3 id="访问Node-Exporter"><a href="#访问Node-Exporter" class="headerlink" title="访问Node Exporter"></a>访问Node Exporter</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">localhost:9100/metrics</span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到采集到的主机硬件信息</span></span><br></pre></td></tr></table></figure>
+<h3 id="访问Prometheus"><a href="#访问Prometheus" class="headerlink" title="访问Prometheus"></a>访问Prometheus</h3><p>在status -&gt; Targets中可以看到加入的Node Exporter，这是在prometheus.yml中定义好的</p>
+<p><img src="/images/prometheus/prometheus2.png" alt=""></p>
+<h2 id="Alertmanager"><a href="#Alertmanager" class="headerlink" title="Alertmanager"></a>Alertmanager</h2><h3 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 服务配置</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/alertmanager.yml</span><br><span class="line">global:</span><br><span class="line">  resolve_timeout: 5m  # 处理超时时间，默认为5min</span><br><span class="line">  smtp_smarthost: 'smtp.office365.com:587'  # 发件邮箱的smtp地址，这里必须加上端口</span><br><span class="line">  smtp_from: 'xxxxxxx@hotmail.com'          # 发送邮件的邮箱地址</span><br><span class="line">  smtp_auth_username: 'xxxxxxxx@hotmail.com' # 发送邮件的邮箱地址，这个地址和上面的地址是一样的</span><br><span class="line">  smtp_auth_password: 'xxxxxxxxxxx'           # 邮箱密码或授权码，qq邮箱要用授权码</span><br><span class="line">  smtp_require_tls: true  # 这一行要标明，如果有安全传输，用true，否则用false</span><br><span class="line"></span><br><span class="line">templates:  #定义模板</span><br><span class="line">  - 'template/*.tmpl'</span><br><span class="line">  </span><br><span class="line">route:  # 定义路由信息</span><br><span class="line">  group_by: ['alertname'] # 报警分组依据</span><br><span class="line">  group_wait: 10s         # 最初即第一次等待多久时间发送一组警报的通知</span><br><span class="line">  group_interval: 10s      # 在发送新警报前的等待时间</span><br><span class="line">  repeat_interval: 30m     # 发送重复警报的周期 对于email配置中，此项不可以设置过低，否则将会由于邮件发送太多频繁，被smtp服务器拒绝</span><br><span class="line">  receiver: 'mail'          # 发送警报的接收者的名称，这个参数是必选的，和下面receivers-&gt;name名要相同</span><br><span class="line"></span><br><span class="line">receivers:</span><br><span class="line">- name: 'mail'            # 报警组名</span><br><span class="line">  email_configs: # 邮箱配置</span><br><span class="line">  - to: '1102998123@qq.com' # 发送给谁，接收警报的email配置</span><br><span class="line">    html: '&#123;&#123; template "test.html" . &#125;&#125;'  # 设定邮箱的内容模板，只需要改引号中的名称</span><br><span class="line">    send_resolved: true</span><br><span class="line">  webhook_configs: # webhook配置</span><br><span class="line">  - url: 'http://127.0.0.1:5001'</span><br><span class="line">    send_resolved: true</span><br><span class="line">  wechat_configs: # 企业微信报警配置</span><br><span class="line">  - send_resolved: true</span><br><span class="line">    to_party: '1' # 接收组的id</span><br><span class="line">    agent_id: '1000002' # (企业微信--&gt;自定应用--&gt;AgentId)</span><br><span class="line">    corp_id: '******' # 企业信息(我的企业--&gt;CorpId[在底部])</span><br><span class="line">    api_secret: '******' # 企业微信(企业微信--&gt;自定应用--&gt;Secret)</span><br><span class="line">    message: '&#123;&#123; template "test_wechat.html" . &#125;&#125;' # 发送消息模板的设定</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一个inhibition规则是在与另一组匹配器匹配的警报存在的条件下，使匹配一组匹配器的警报失效的规则。两个警报必须具有一组相同的标签。  </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">告警抑制</span></span><br><span class="line">inhibit_rules:</span><br><span class="line">  - source_match:</span><br><span class="line">      severity: 'critical'</span><br><span class="line">    target_match:</span><br><span class="line">      severity: 'warning'</span><br><span class="line">    equal: ['alertname', 'dev', 'instance']</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 模板配置</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/template/test.tmpl</span><br><span class="line">&#123;&#123; define "test.html" &#125;&#125; # 这个名称与上面配置文件中的receivers:里的html: '&#123;&#123; template "test.html" . &#125;&#125;' 是对应的，如果名称不一样，alertmanager的日志会提示没有这个模板文件</span><br><span class="line">&lt;table border="1"&gt;</span><br><span class="line">        &lt;tr&gt;</span><br><span class="line">                &lt;td&gt;报警项&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;实例&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;报警阀值&lt;/td&gt;</span><br><span class="line">                &lt;td&gt;开始时间&lt;/td&gt;</span><br><span class="line">        &lt;/tr&gt;</span><br><span class="line">        &#123;&#123; range $i, $alert := .Alerts &#125;&#125;</span><br><span class="line">                &lt;tr&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Labels "alertname" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Labels "instance" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; index $alert.Annotations "value" &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; $alert.StartsAt &#125;&#125;&lt;/td&gt;</span><br><span class="line">                &lt;/tr&gt;</span><br><span class="line">        &#123;&#123; end &#125;&#125;</span><br><span class="line">&lt;/table&gt;</span><br><span class="line">&#123;&#123; end &#125;&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 上述Labels项，表示prometheus里面的可选label项。Annotation项表示报警规则中定义的annotation项的内容。</span></span><br><span class="line">vim /home/shouyu/docker/prometheus/alertmanager/template/test_wechat.tmpl</span><br><span class="line">&#123;&#123; define "test.html" &#125;&#125; </span><br><span class="line">  &#123;&#123; range $i, $alert := .Alerts.Firing &#125;&#125;</span><br><span class="line">    [报警项]:&#123;&#123; index $alert.Labels "alertname" &#125;&#125;</span><br><span class="line">    [实例]:&#123;&#123; index $alert.Labels "instance" &#125;&#125;</span><br><span class="line">    [报警阀值]:&#123;&#123; index $alert.Annotations "value" &#125;&#125;</span><br><span class="line">    [开始时间]:&#123;&#123; $alert.StartsAt &#125;&#125;</span><br><span class="line">  &#123;&#123; end &#125;&#125;</span><br><span class="line">&#123;&#123; end &#125;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="访问Alertmanager"><a href="#访问Alertmanager" class="headerlink" title="访问Alertmanager"></a>访问Alertmanager</h3><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span>//localdns:<span class="number">9093</span>/<span class="meta">#/alerts</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/prometheus3.png" alt=""></p>
+<p>可以通过重启prometheus服务触发邮件报警</p>
+<h3 id="访问Prometheus-1"><a href="#访问Prometheus-1" class="headerlink" title="访问Prometheus"></a>访问Prometheus</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">http:</span><span class="comment">//192.168.253.42:9090/alerts</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/prometheus/prometheus4.png" alt=""></p>
+<p>发送报警时，会在Pending中显示，发送完会在Firing中显示，如果没有收到邮件，可以到alertmanager日志中查看原因</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/01/docker部署portainer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/12/01/docker部署portainer/" itemprop="url">
+                  docker部署portainer
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-12-01 13:49:03 / 修改時間：16:05:45" itemprop="dateCreated datePublished" datetime="2020-12-01T13:49:03+08:00">2020-12-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 搜索镜像</span></span><br><span class="line">docker search portainer/portainer</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拉取镜像</span></span><br><span class="line">docker pull portainer/portainer</span><br><span class="line"><span class="meta">#</span><span class="bash"> 运行镜像</span></span><br><span class="line">docker run -d -p 9000:9000 -v /root/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name dev-portainer portainer/portainer</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> -d <span class="comment">#容器在后台运行</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -p 9000:9000 <span class="comment"># 宿主机9000端口映射容器中的9000端口</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v /var/run/docker.sock:/var/run/docker.sock </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 挂载这个文件是因为启动后要连接本地的docker服务，portainer要求这样挂载</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v /root/portainer:/data <span class="comment"># 这是一个数据目录</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> –name dev-portainer <span class="comment"># 指定运行容器的名称</span></span></span><br></pre></td></tr></table></figure>
+<p>创建容器后，登录localhost:9000，设置密码，选择localhost -&gt; Create即可</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/19/python基础学习-SQLAlchemy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -396,12 +769,24 @@
                 
               
 
-              <time title="創建時間：2020-11-19 11:27:58 / 修改時間：13:32:42" itemprop="dateCreated datePublished" datetime="2020-11-19T11:27:58+08:00">2020-11-19</time>
+              <time title="創建時間：2020-11-19 11:27:58" itemprop="dateCreated datePublished" datetime="2020-11-19T11:27:58+08:00">2020-11-19</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-12-01 16:11:20" itemprop="dateModified" datetime="2020-12-01T16:11:20+08:00">2020-12-01</time>
               
             
           </span>
@@ -552,6 +937,7 @@
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>在开发中，一般都会采用ORM框架，这样就可以使用对象操作表了。<br>定义表映射的类，使用Column的描述器定义类属性，使用ForeignKey来定义外键约束。<br>如果在一个对象中，想查看其它表对应的对象的内容，就要使用relationship来定义关系。<br>是否使用外键?<br>1、力挺派<br>能使数据保证完整性一致性<br>2、嫌弃派<br>开发难度增加，大数据的时候影响插入、修改、删除的效率。<br>在业务层保证数据的一致性。</p>
 <p>完整代码</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sqlalchemy</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> Column, Integer, String, Date, Enum, ForeignKey</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker, relationship</span><br><span class="line"></span><br><span class="line">host = <span class="string">'192.168.142.135'</span></span><br><span class="line">user = <span class="string">'wayne'</span></span><br><span class="line">password = <span class="string">'wayne'</span></span><br><span class="line">port = <span class="number">3306</span></span><br><span class="line">database = <span class="string">'test'</span></span><br><span class="line"></span><br><span class="line">conn_str = <span class="string">"mysql+pymysql://&#123;&#125;:&#123;&#125;@&#123;&#125;:&#123;&#125;/&#123;&#125;"</span>.format(</span><br><span class="line">    user, password, host, port, database</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">engine = sqlalchemy.create_engine(conn_str, echo=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建基类</span></span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> enum</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyEnum</span><span class="params">(enum.Enum)</span>:</span></span><br><span class="line">    M = <span class="string">'M'</span></span><br><span class="line">    F = <span class="string">'F'</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 创建实体类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span><span class="params">(Base)</span>:</span></span><br><span class="line">    <span class="comment"># 指定表名</span></span><br><span class="line">    __tablename__ = <span class="string">'employees'</span></span><br><span class="line">    <span class="comment"># 定义属性对应字段</span></span><br><span class="line">    emp_no = Column(Integer, primary_key=<span class="keyword">True</span>)</span><br><span class="line">    birth_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    first_name = Column(String(<span class="number">14</span>), nullable=<span class="keyword">False</span>)last_name = Column(String(<span class="number">16</span>), nullable=<span class="keyword">False</span>)</span><br><span class="line">    gender = Column(Enum(MyEnum), nullable=<span class="keyword">False</span>)</span><br><span class="line">    hire_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    dept_emps = relationship(<span class="string">'Dept_emp'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125; &#123;&#125; gender=&#123;&#125; no=&#123;&#125;"</span>.format(</span><br><span class="line">            self.__class__.__name__, self.emp_no, self.first_name, self.last_name, self.gender.value, self.dept_emps <span class="comment"># 修改self.dept_emps为self.emp_no,再看运行结果</span></span><br><span class="line">        )</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Department</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'departments'</span></span><br><span class="line"></span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_name = Column(String(<span class="number">40</span>), nullable=<span class="keyword">False</span>, unique=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; no=&#123;&#125; name=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.dept_no, self.dept_name)</span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dept_emp</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">"dept_emp"</span></span><br><span class="line">    emp_no = Column(Integer, ForeignKey(<span class="string">'employees.emp_no'</span>,</span><br><span class="line">    ondelete=<span class="string">'CASCADE'</span>),primary_key=<span class="keyword">True</span>)</span><br><span class="line">    dept_no = Column(String(<span class="number">4</span>), ForeignKey(<span class="string">'departments.dept_no'</span>, ondelete=<span class="string">'CASCADE'</span>),</span><br><span class="line">primary_key=<span class="keyword">True</span>)</span><br><span class="line">    from_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line">    to_date = Column(Date, nullable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; empno=&#123;&#125; deptno=&#123;&#125;"</span>.format(</span><br><span class="line">            type(self).__name__, self.emp_no, self.dept_no)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># # 删除继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.drop_all(engine)</span></span><br><span class="line"><span class="comment"># # 创建继承自Base的所有表</span></span><br><span class="line"><span class="comment"># Base.metadata.create_all(engine)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建session</span></span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(emps)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> emps:</span><br><span class="line">        print(x)</span><br><span class="line">    print(<span class="string">'~~~~~~~~~~~~~~~'</span>,end=<span class="string">'\n\n'</span>)</span><br><span class="line"><span class="comment"># 查询10010员工所在的部门编号</span></span><br><span class="line">results = session.query(Employee).join(Dept_emp, Employee.emp_no ==</span><br><span class="line">Dept_emp.emp_no).filter(Employee.emp_no == <span class="number">10010</span>)</span><br><span class="line">show(results.all())</span><br></pre></td></tr></table></figure>
+<h3 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h3><p>实例类：实实在在地放着数据</p>
 
           
         
@@ -2380,507 +2766,11 @@ UPDATE reg SET name=&#39;张三&#39; WHERE id=5;</code></p>
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/23/python基础学习-WEB开发及请求响应的处理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/10/23/python基础学习-WEB开发及请求响应的处理/" itemprop="url">
-                  python基础学习-WEB开发及请求响应的处理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-10-23 09:37:33" itemprop="dateCreated datePublished" datetime="2020-10-23T09:37:33+08:00">2020-10-23</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-11-03 15:49:04" itemprop="dateModified" datetime="2020-11-03T15:49:04+08:00">2020-11-03</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="WEB开发"><a href="#WEB开发" class="headerlink" title="WEB开发"></a>WEB开发</h1><p><img src="/images/python-WEB开发/WEB开发1.png" alt=""></p>
-<p>CS即客户端、服务器编程。</p>
-<p>客户端、服务端之间需要使用Socket，约定协议、版本（往往使用的协议是TCP或者UDP），指定地址和端口，就可以通信了。</p>
-<p>客户端、服务端传输数据，数据可以有一定的格式，双方必须先约定好。</p>
-<p><img src="/images/python-WEB开发/WEB开发2.png" alt=""></p>
-<p>BS编程，即Browser、Server开发。</p>
-<p>Browser浏览器，一种特殊的客户端，支持HTTP(S)协议，能够通过URL向服务端发起请求，等待服务端返回HTML等数据，并在浏览器内可视化展示的程序。</p>
-<p>Server，支持HTTP(s)协议，能够接受众多客户端发起的HTTP协议请求，经过处理，将HTML等数据返回给浏览器。</p>
-<p>本质上说，BS是一种特殊的CS，即客户端必须是一种支持HTTP协议且能解析并渲染HTML的软件，服务端必须是能够接受多客户端HTTP访问的服务器软件。</p>
-<p>HTTP协议底层基于TCP协议实现。</p>
-<ul>
-<li>BS开发分为两端开发<ul>
-<li>客户端开发，或称前端开发。HTML、CSS、JavaScript等</li>
-<li>服务端开发，Python有WSGI、Django、Flask、Tornado等</li>
-</ul>
-</li>
-</ul>
-<h1 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h1><h2 id="安装httpd"><a href="#安装httpd" class="headerlink" title="安装httpd"></a>安装httpd</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install httpd</span><br></pre></td></tr></table></figure>
-<p>使用httpd服务，观察http协议</p>
-<h2 id="协议"><a href="#协议" class="headerlink" title="协议"></a>协议</h2><p>http协议是无状态协议</p>
-<p>同一个客户端的两次请求之间没有任何关系，从服务器端角度来说，它不知道这两个请求来自同一个客户端。</p>
-<h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>键值对信息。</p>
-<p>浏览器发起每一次请求时，都会把cookie信息发给服务器端。</p>
-<p>是一种客户端、服务器端传递数据的技术。</p>
-<p>服务端可以通过判断这些信息，来确定这次请求是否和之前的请求有关联。</p>
-<p>一般来说cookie信息是在服务器端生成，返回给客户端的。</p>
-<p>客户端可以自己设置cookie信息。</p>
-<h2 id="URL组成"><a href="#URL组成" class="headerlink" title="URL组成"></a>URL组成</h2><p>URL可以说就是地址，uniform resource locator 统一资源定位符，每一个链接指向一个资源供客户端访问。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">schema://host[:port#]/path/.../[;url-params][?query-string][#anchor]</span><br><span class="line"># 这里主要关心schema://host[:port#]/path/，[?query-string]</span><br></pre></td></tr></table></figure>
-<p>例如，通过下面的URL访问网页</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.magedu.com/pathon/index.html?id=5&amp;name=python</span><br></pre></td></tr></table></figure>
-<p>访问静态资源时，通过上面这个URL访问的是网站的某路径下的index.html文件，而这个文件对应磁盘上的真实的文件 。就会从磁盘上读取这个文件，并把文件的内容发回浏览器端。</p>
-<p>scheme模式、协议：</p>
-<p>http、ftp、https、file、mailto等等。mysql等都是类似这样写。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">host:port</span><br><span class="line"># www.magedu.com:80，80端口是默认端口可以不写。域名会使用DNS解析，域名会解析成IP才能使用。实际上会对解析后返回的IP的TCP的80端口发起访问。</span><br><span class="line"></span><br><span class="line">/path/to/resource</span><br><span class="line"># path，指向资源的路径。</span><br><span class="line"></span><br><span class="line">?key1=value1&amp;key2=value2</span><br><span class="line"># query string，查询字符串，问号分割，后面key=value形式，且使用&amp;符号分割。</span><br></pre></td></tr></table></figure>
-<h2 id="HTTP消息"><a href="#HTTP消息" class="headerlink" title="HTTP消息"></a>HTTP消息</h2><p>消息分为Request、Response。</p>
-<p>Request：浏览器向服务器发起请求</p>
-<p>Response：服务器对客户端请求的响应</p>
-<p>请求和响应消息都是由请求行、Header消息报头、Body消息正文组成。</p>
-<h3 id="请求"><a href="#请求" class="headerlink" title="请求"></a>请求</h3><p>请求消息行：请求方法Method 请求路径 协议版本CRLF</p>
-<p><img src="/images/python-WEB开发/WEB开发3.png" alt=""></p>
-<p>请求方法Method</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">GET</span>    请求获取URL对应的资源</span><br><span class="line">POST   提交数据至服务器端</span><br><span class="line">HEAD   和GET类似，不过不返回消息正文</span><br></pre></td></tr></table></figure>
-<p>常见传递信息的方式</p>
-<p>1、GET方法使用Query String</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.magedu.com/pathon/index.html?id=5&amp;name=python</span><br></pre></td></tr></table></figure>
-<p>通过查询字符串在URL中传递参数</p>
-<p>2、POST方法提交数据</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:9999/xxx/yyy?id=5&amp;name=magedu</span><br><span class="line">使用表单提交数据，文本框input的name属性分别为age、weight、height</span><br><span class="line"></span><br><span class="line">请求消息如下</span><br><span class="line">POST /xxx/yyy?id=5&amp;name=magedu HTTP/1.1</span><br><span class="line">HOST: 127.0.0.1:9999</span><br><span class="line">content-length: 26</span><br><span class="line">content-type: application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line">age=5&amp;weight=80&amp;height=170</span><br></pre></td></tr></table></figure>
-<p>3、URL中本身就包含着信息</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.magedu.com/python/student/001</span><br></pre></td></tr></table></figure>
-<h3 id="响应"><a href="#响应" class="headerlink" title="响应"></a>响应</h3><p>响应消息行：协议版本 状态码 消息描述CRLF</p>
-<p><img src="/images/python-WEB开发/WEB开发4.png" alt=""></p>
-<p>status code状态码</p>
-<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">状态码在响应头第一行</span><br><span class="line">    <span class="number">1</span>XX    提示信息，表示请求已被成功接收，继续处理</span><br><span class="line">    <span class="number">2</span>XX    表示正常响应</span><br><span class="line">           <span class="number">200</span>    正常返回了网页内容</span><br><span class="line">    <span class="number">3</span>XX    重定向</span><br><span class="line">           <span class="number">301</span>    页面永久性移走，永久重定向。返回新的URL，浏览器会根据返回的url发起新的request请求</span><br><span class="line">           <span class="number">302</span>    临时重定向</span><br><span class="line">           <span class="number">304</span>    资源未修改，浏览器使用本地缓存</span><br><span class="line">    <span class="number">4</span>XX    客户端请求错误</span><br><span class="line">           <span class="number">404</span>    Not Found，网页找不到，客户端请求的资源有错</span><br><span class="line">           <span class="number">400</span>    请求语法错误</span><br><span class="line">           <span class="number">401</span>    请求要求身份验证</span><br><span class="line">           <span class="number">403</span>    服务器拒绝请求</span><br><span class="line">    <span class="number">5</span>XX    服务器端错误</span><br><span class="line">           <span class="number">500</span>    服务器内部错误</span><br><span class="line">           <span class="number">502</span>    上游服务器错误，例如nginx反向代理的时候</span><br></pre></td></tr></table></figure>
-<h3 id="无状态，有连接和短连接"><a href="#无状态，有连接和短连接" class="headerlink" title="无状态，有连接和短连接"></a>无状态，有连接和短连接</h3><p>无状态，指的是服务器无法知道2次请求之间的联系，即使是前后2次同一个浏览器也没有任何数据能够判断出是同一个浏览器的请求。后来可以通过cookie、session来判断。</p>
-<p>有连接，是因为它基于TCP协议，是面向连接的，需要3次握手、4次断开</p>
-<p>短连接，Http1.1之前，都是一个请求一个连接，而TCP的连接创建销毁成本高，对服务器有很大的影响。所以，自HTTP1.1开始，支持keep-alive，默认也开启，一个连接打开后，会保持一段时间（可设置），浏览器再访问该服务器就使用这个TCP连接，减轻了服务器压力，提高了效率。</p>
-<p>推荐图书《HTTP权威指南》</p>
-<h1 id="WSGI"><a href="#WSGI" class="headerlink" title="WSGI"></a>WSGI</h1><p><img src="/images/python-WEB开发/WEB开发5.png" alt=""></p>
-<p>浏览器使用http协议发起请求，请求到达服务器后进行解包，之后封装成environ，再调用application，将environ和start_response传给application，application对请求进行逻辑处理，之后返回状态码和报头通过server端给到浏览器，再将处理后的正文给server端，server端将html文本封装成http协议的包返回给浏览器。</p>
-<p>WSGI主要规定了服务器端和应用程序间的接口。</p>
-<h2 id="WSGI服务器——wsgiref"><a href="#WSGI服务器——wsgiref" class="headerlink" title="WSGI服务器——wsgiref"></a>WSGI服务器——wsgiref</h2><p>wsgiref是一个WSGI参考实现库</p>
-<p><code>wsgiref.simple_server</code>模块实现一个简单的WSGI HTTP服务器。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wsgiref.simple_server.make_server(host, port, app, server_class=WSGIServer, handler_class=WSGIRequestHandler)  <span class="comment"># 启动一个WSGI服务器</span></span><br><span class="line">wsgiref.simple_server.demo_app(environ, start_response)  <span class="comment"># 一个函数，小巧完整的WSGI的应用程序的实现</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回文本的例子</span></span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server, demo_app</span><br><span class="line"></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">server = make_server(ip, port, demo_app)  <span class="comment"># demo_app应用程序，可调用</span></span><br><span class="line"><span class="comment"># make_server就是登录server端的，demo_app就是处理请求的application，只要把application的名字传给</span></span><br><span class="line"><span class="comment"># make_server即可，之后application会被调用，这是底层的工作，我们不用关心</span></span><br><span class="line">server.serve_forever()  <span class="comment"># server.handle_request() 执行一次</span></span><br></pre></td></tr></table></figure>
-<p>WSGI服务器作用</p>
-<ul>
-<li>监听HTTP服务端口（TCPServer，默认端口80）</li>
-<li>接收浏览器端的HTTP请求并解析封装成environ环境数据</li>
-<li>负责调用应用程序，将environ和start_response方法传入</li>
-<li>将应用程序响应的正文封装成HTTP响应报文返回浏览器端</li>
-</ul>
-<h2 id="WSGI-APP应用程序端"><a href="#WSGI-APP应用程序端" class="headerlink" title="WSGI APP应用程序端"></a>WSGI APP应用程序端</h2><p>1、应用程序应该是一个可调用对象</p>
-<p>Python中应该是函数、类、实现了<code>__call__</code>方法的类的实例</p>
-<p>2、这个可调用对象应该接收两个参数</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1 函数实现</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2 类实现</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, environ, start_response)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 3 类实现</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
-<p>3、以上的可调用对象实现，都必须返回一个可迭代对象</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">res_str = <span class="string">b'magedu.com\n'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 函数实现</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> [res_str]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 类实现</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, environ, start_response)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span>  <span class="comment">#实现此方法，对象即可迭代</span></span><br><span class="line">        </span><br><span class="line"><span class="comment"># 类实现</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> [res_str]</span><br></pre></td></tr></table></figure>
-<p>environ和start_response这两个参数名可以是任何合法名，但是一般默认都是这2个名字。</p>
-<p>应用程序端还有些其他的规定，暂不用关心</p>
-<h3 id="environ"><a href="#environ" class="headerlink" title="environ"></a>environ</h3><p>environ是包含Http请求信息的dict对象</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>REQUEST_METHOD</td>
-<td>请求方法，GET、POST等</td>
-</tr>
-<tr>
-<td>PATH_INFO</td>
-<td>URL中的路径部分</td>
-</tr>
-<tr>
-<td>QUERY_STRING</td>
-<td>查询字符串</td>
-</tr>
-<tr>
-<td>SERVER_NAME, SERVER_PORT</td>
-<td>服务器名、端口</td>
-</tr>
-<tr>
-<td>HTTP_HOST</td>
-<td>地址和端口</td>
-</tr>
-<tr>
-<td>SERVER_PROTOCOL</td>
-<td>协议</td>
-</tr>
-<tr>
-<td>HTTP_USER_AGENT</td>
-<td>UserAgent信息</td>
-</tr>
-</tbody>
-</table>
-<h3 id="start-response"><a href="#start-response" class="headerlink" title="start_response"></a>start_response</h3><p>它是一个可调用对象。有3个参数，定义如下</p>
-<p><code>start_response(status, response_headers, exc_info=None)</code></p>
-<p>status是状态码，例如<code>200 OK</code></p>
-<p>response_header是一个元素为二元组的列表，例如<code>[(&#39;Content-Type&#39;, &#39;text/plain;charset=utf-8&#39;)]</code></p>
-<p>exc_info在错误处理的时候使用</p>
-<p>start_response应该在返回可迭代对象之前调用，因为它返回的是Response Header（这里的意思是先返回状态码和报头）。返回的可迭代对象是Response Body（这里返回的是正文）。</p>
-<h2 id="服务器端"><a href="#服务器端" class="headerlink" title="服务器端"></a>服务器端</h2><p>服务器程序需要调用符合上述定义的可调用对象APP，传入environ、start_response，APP处理后，返回响应头和可迭代对象的正文，由服务器封装返回浏览器端</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回网页的例子</span></span><br><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></span><br><span class="line">    status = <span class="string">'200 ok'</span></span><br><span class="line">    headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html;charset=utf-8'</span>)]</span><br><span class="line">    start_response(status, headers)</span><br><span class="line">    <span class="comment"># 返回可迭代对象</span></span><br><span class="line">    html = <span class="string">'&lt;h1&gt;马哥教育欢迎你&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)</span><br><span class="line">    <span class="keyword">return</span> [html]</span><br><span class="line"></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">server = make_server(ip, port, application)</span><br><span class="line">server.serve_forever()  <span class="comment"># server.handle_request() 一次</span></span><br></pre></td></tr></table></figure>
-<p>simple_server只是参考用，不能用于生产。</p>
-<p>测试用命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -I http://192.168.142.1:9999/xxx?id=5</span><br><span class="line">curl -X POST http://192.168.142.1:9999/yyy -d '&#123;"x":2&#125;'</span><br></pre></td></tr></table></figure>
-<p>-I：使用HEAD方法</p>
-<p>-X：指定方法，-d传输数据</p>
-<p>到这里就完成了一个简单的WEB程序开发。</p>
-<p>WEB服务器</p>
-<ul>
-<li>本质上就是一个TCP服务器，监听在特定的端口上</li>
-<li>支持HTTP协议，能够将HTTP请求报文进行解析，能够把响应数据进行HTTP协议的报文封装并返回浏览器端</li>
-<li>实现了WSGI协议，该协议约定了和应用程序之间的接口（参看PEP333，<a href="https://www.python.org/dev/peps/pep-0333/）" target="_blank" rel="noopener">https://www.python.org/dev/peps/pep-0333/）</a></li>
-</ul>
-<p>APP应用程序</p>
-<ul>
-<li>遵从WSGI协议</li>
-<li>本身是一个可调用对象</li>
-<li>调用start_response，返回响应头部</li>
-<li>返回包含正文的可迭代对象</li>
-</ul>
-<p>为了更好的理解WSGI框架的工作原理，现在开始动手自己写一个WEB框架。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/10/vim-脚本/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/09/10/vim-脚本/" itemprop="url">
-                  vim-脚本
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-09-10 11:15:06" itemprop="dateCreated datePublished" datetime="2020-09-10T11:15:06+08:00">2020-09-10</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-09-16 16:39:32" itemprop="dateModified" datetime="2020-09-16T16:39:32+08:00">2020-09-16</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/vscode/" itemprop="url" rel="index"><span itemprop="name">vscode</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>使用脚本语言，可以更灵活地定制编辑器以完成复杂的任务。</p>
-<p>例：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.vimrc</span><br><span class="line">let i = 1                                                                                                               </span><br><span class="line">while i &lt; 5 </span><br><span class="line">    echo "count is" i</span><br><span class="line">    let i += 1</span><br><span class="line">endwhile</span><br><span class="line">当再次使用vim打开文件时就会执行这个脚本。</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一行的 <span class="string">":let"</span> 命令给一个变量赋值。通常的用法是: </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">let</span> &#123;变量&#125; = &#123;表达式&#125;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"while"</span> 命令开始一个循环。通常的用法是:</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">while</span> &#123;条件&#125;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> &#123;语句&#125;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> endwhile</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 只要条件为真，<span class="string">"while"</span> 和 <span class="string">"endwhile"</span> 包围的语句就会被执行。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果你碰巧写了一个死循环语句，你可以用 CTRL-C 来终止 (在 MS-Windows上使用 CTRL-Break)。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"echo"</span> 命令显示它的参数。</span></span><br><span class="line"></span><br><span class="line">for i in range(1, 4)</span><br><span class="line">    echo "count is" i</span><br><span class="line">endfor</span><br></pre></td></tr></table></figure>
-<p>数值可以是十进制，十六进制，八进制或者二进制的。</p>
-<p>“echo” 命令总以十进制格式显示数值。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">echo 0x7f 036</span><br><span class="line">127 30</span><br><span class="line"></span><br><span class="line">在一个数值前加上减号会将其变为负值。十六进制数、八进制数和二进制数亦然。减号也</span><br><span class="line">用于减法操作。</span><br><span class="line"></span><br><span class="line">echo 0x7f -036</span><br><span class="line">97 </span><br><span class="line"></span><br><span class="line">表达式中的空白字符将被忽略。然而，为了增加表达式的易读性，建议用来分隔不同的项</span><br><span class="line">目。例如，为了不和上面的负号混淆，在减号和之后的数字前加入一个空格: </span><br><span class="line">echo 0x7f - 036</span><br></pre></td></tr></table></figure>
-<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><p>一个变量名可以由 ASCII 字符、数字和下划线组成。但是变量名不能以数字开始。</p>
-<p>这些变量都是全局的。要列出当前定义的所有变量可以用这个命令:  <code>:let</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">你可以在任何地方使用全局变量。这同时也意味着: 当一个脚本文件使用 "count" 变量时，可能另一个脚本文件也使用了</span><br><span class="line">这个变量。这至少会引起混乱，严重时会导致脚本无法正常工作。为避免这种情况发生，你可以在变量名前加上 "s:" 使其</span><br><span class="line">变成脚本文件的局部变量。例如，一脚本包含以下代码: </span><br><span class="line"></span><br><span class="line">let s:count = 1</span><br><span class="line">while s:count &lt; 5</span><br><span class="line">    source other.vim</span><br><span class="line">    let s:count += 1</span><br><span class="line">endwhile</span><br><span class="line"></span><br><span class="line">由于 "s:count" 是局部变量，你可以确信调用 (source) "other.vim" 脚本时不会改变它的值。如果 </span><br><span class="line">"other.vim" 也使用一个 "s:count" 变量，该变量将会是仅在脚本内有效的局部变量。</span><br><span class="line"></span><br><span class="line">还有很多其它类型的变量，最常用的几类有:</span><br><span class="line"></span><br><span class="line">        b:name          缓冲区的局部变量</span><br><span class="line">        w:name          窗口的局部变量</span><br><span class="line">        g:name          全局变量 (也用于函数中)</span><br><span class="line">        v:name          Vim 预定义的变量</span><br></pre></td></tr></table></figure>
-<h3 id="打开-py文件时自动添加几行"><a href="#打开-py文件时自动添加几行" class="headerlink" title="打开.py文件时自动添加几行"></a>打开<code>.py</code>文件时自动添加几行</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.vimrc</span><br><span class="line">function PythonHeader()</span><br><span class="line">    call setline(1, "#!/usr/bin/python")</span><br><span class="line">    call setline(2, "# -*- coding: utf-8 -*-")</span><br><span class="line">    call setline(3, "#Author:Kevin")</span><br><span class="line">    call setline(4, "#Subject:xx")</span><br><span class="line">    call setline(5, "import sys")</span><br><span class="line">    call setline(6, "load(sys)")</span><br><span class="line">    call setline(7, "sys.setdefaultencoding('utf8')")</span><br><span class="line">    normal G</span><br><span class="line">    normal o</span><br><span class="line">    normal o</span><br><span class="line">endfunc</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> call命令用来调用函数</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> setline() 函数将第一个参数表示的行的文本置为第二个参数表示的字符串。要将文本添加到当前行，可以使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">function</span> setline。在当前行的末尾添加文本<span class="string">' hello'</span>：call setline(line(<span class="string">'.'</span>), getline(<span class="string">'.'</span>) . <span class="string">' hello'</span>)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> normal  被用来使用新的缩写。normal命令可以用来执行普通模式命令。上面函数中的三个意思应该是跳转到最后一行，再往下两行开始输入</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一頁"></i></a>
   </nav>
 
 
@@ -2923,7 +2813,7 @@ UPDATE reg SET name=&#39;张三&#39; WHERE id=5;</code></p>
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">260</span>
+                    <span class="site-state-item-count">262</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
