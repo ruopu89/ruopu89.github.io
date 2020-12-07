@@ -350,6 +350,370 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/12/python基础学习-TCP编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/12/python基础学习-TCP编程/" itemprop="url">
+                  python基础学习-TCP编程
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-06-12 16:30:33" itemprop="dateCreated datePublished" datetime="2020-06-12T16:30:33+08:00">2020-06-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-09-29 13:43:34" itemprop="dateModified" datetime="2020-09-29T13:43:34+08:00">2020-09-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Socket介绍"><a href="#Socket介绍" class="headerlink" title="Socket介绍"></a>Socket介绍</h3><h4 id="Socket套接字"><a href="#Socket套接字" class="headerlink" title="Socket套接字"></a>Socket套接字</h4><p>Python中提供socket.py标准库，非常底层的接口库</p>
+<p>Socket是一种通用的网络编程接口，和网络层次没有一一对应的关系。</p>
+<h4 id="协议族"><a href="#协议族" class="headerlink" title="协议族"></a>协议族</h4><p>AF表示Address Family，用于socket()第一个参数</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AF_INET</td>
+<td>IPV4</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>IPV6</td>
+</tr>
+<tr>
+<td>AF_UNIX</td>
+<td>Unix Domain Socket，windows没有</td>
+</tr>
+</tbody>
+</table>
+<p>Socket类型</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOCK_STREAM</td>
+<td>面向连接的流套接字，默认值，TCP协议</td>
+</tr>
+<tr>
+<td>SOCK_DGRAM</td>
+<td>无连接的数据报文套接字。UDP协议</td>
+</tr>
+</tbody>
+</table>
+<h3 id="TCP编程"><a href="#TCP编程" class="headerlink" title="TCP编程"></a>TCP编程</h3><p>Socket编程，需要两端，一般来说需要一个服务端、一个客户端，服务端称为Server，客户端称为Client</p>
+<h3 id="TCP服务端编程"><a href="#TCP服务端编程" class="headerlink" title="TCP服务端编程"></a>TCP服务端编程</h3><h4 id="服务器端编程步骤"><a href="#服务器端编程步骤" class="headerlink" title="服务器端编程步骤"></a>服务器端编程步骤</h4><ul>
+<li><p>创建Socket对象</p>
+</li>
+<li><p>绑定IP地址Address和端口Port。bind()方法</p>
+<p>IPv4地址为一个二元组<code>(&#39;IP地址字符串&#39;, Port)</code></p>
+</li>
+<li><p>开始监听，将在指定的IP的端口上监听。listen()方法</p>
+</li>
+<li><p>获取用于传送数据的Socket对象</p>
+<p><code>socket.accept()</code> -&gt; <code>(socket object, address info)</code></p>
+<p>accept方法阻塞等待客户端建立新的连接，返回一个新的Socket对象和客户端地址端口的二元组</p>
+<p>地址是远程客户端的地址，IPv4中它是一个二元组<code>(clientaddr, port)</code></p>
+<ul>
+<li><p>接收数据</p>
+<p><code>recv(bufsize[, flags])</code>使用缓冲区接收数据</p>
+</li>
+<li><p>发送数据</p>
+<p><code>send(bytes)</code>发送数据</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/python网络编程tcp编程/tcpsocket.png" alt=""></p>
+<p>问题</p>
+<p>两次绑定同一个监听端口会怎么样？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">s = socket.socket()  <span class="comment"># 创建socket对象</span></span><br><span class="line">s.bind((<span class="string">'127.0.0.1'</span>, <span class="number">9999</span>))  <span class="comment"># 一个二元组</span></span><br><span class="line"><span class="comment"># 测试如果写成s.bind('127.0.0.1', 9999)，会报错：bind方法只接受一个参数</span></span><br><span class="line">s.listen()  <span class="comment"># 开始监听</span></span><br><span class="line"><span class="comment"># 开启一个连接</span></span><br><span class="line">s1, info = s.accept()  <span class="comment"># 阻塞直到和客户端成功建立连接，返回一个socket对象和客户端地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用缓冲区获取数据</span></span><br><span class="line">data = s1.recv(<span class="number">1024</span>)</span><br><span class="line">print(data, info)</span><br><span class="line">s1.send(<span class="string">b'magedu.com ack'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启另外一个连接</span></span><br><span class="line">s2, _ = s.accept()</span><br><span class="line"></span><br><span class="line">data = s2.recv(<span class="number">1024</span>)</span><br><span class="line">s2.send(<span class="string">b'hello python'</span>)</span><br><span class="line"></span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure>
+<p>上例accept和recv是阻塞的，主线程经常被阻塞住而不能工作。怎么办</p>
+<h4 id="练习-–-写一个群聊程序"><a href="#练习-–-写一个群聊程序" class="headerlink" title="练习 – 写一个群聊程序"></a>练习 – 写一个群聊程序</h4><p>需求分析</p>
+<p>聊天工具是CS程序，C是每一个客户端，S是服务器端</p>
+<p>服务器应该具有的功能：</p>
+<p>启动服务，包括绑定地址和端口，监听</p>
+<p>建立连接，能和多个客户端建立连接</p>
+<p>接收不同用户的信息</p>
+<p>分发，将接收的某个用户的信息转发到已连接的所有客户端</p>
+<p>停止服务</p>
+<p>记录连接的客户端</p>
+<p>代码实现</p>
+<p>服务端应该对应一个类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">chatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip, port)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    	</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">       </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>在此基础上，扩展完成</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line"><span class="comment"># self.clients: &#123;('10.42.0.88', 23627): &lt;socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.0.30.50', 9999), raddr=('10.42.0.88', 23627)&gt;&#125;，这是self.clients中的内容，client是地址和端口，后面是sock的内容</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y/%m/%d %H:%M:%S&#125; &#123;&#125;:&#123;&#125;\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br></pre></td></tr></table></figure>
+<p>基本功能完成，但是有问题。使用Event改进。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+<p>这一版基本能用了，测试通过。但是还有要完善的地方。例如各种异常的判断，客户端断开连接后字典中的移除客户端数据等 。</p>
+<p>客户端主动断开带来的问题</p>
+<p>服务端知道自己何时断开，如果客户端断开，服务器不知道。</p>
+<p>所以，好的做法是，客户端开发出特殊消息通知服务器端断开连接。但是，如果客户端主动断开，服务端主动发送一个空消息，超时返回异常，捕获异常并清理连接。</p>
+<p>即使为客户端提供了断开命令，也不能保证客户端会使用它断开连接。但是还是要增加这个退出功能。</p>
+<p>增加客户端退出命令</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            self.clients[client] = sock  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(sock, client)).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, sock:socket.socket, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = data.decode().strip()</span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                sock.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data.decode())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            msg = msg.encode()</span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.send(msg)</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">	logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br></pre></td></tr></table></figure>
+<p>程序还有瑕疵，但是业务功能基本完成了</p>
+<h4 id="socket常用方法"><a href="#socket常用方法" class="headerlink" title="socket常用方法"></a>socket常用方法</h4><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>socket.recv(bufsize[, flags])</td>
+<td>获取数据。默认是阻塞的方式</td>
+</tr>
+<tr>
+<td>socket.recvfrom(bufsize[, flags])</td>
+<td>获取数据，返回一个二元组(bytes, address)</td>
+</tr>
+<tr>
+<td>socket.recv_into(buffer[, nbytes[, flags]])</td>
+<td>获取到nbytes的数据后，存储到buffer中。如果nbytes没有指定或为0,将buffer大小的数据存入buffer中。返回接收到的字节数</td>
+</tr>
+<tr>
+<td>socket.recvfrom_into(buffer[, nbytes[, flags]])</td>
+<td>获取数据，返回一个二元组(bytes, address)到buffer中</td>
+</tr>
+<tr>
+<td>socket.send(bytes[, flags])</td>
+<td>TCP发送数据</td>
+</tr>
+<tr>
+<td>socket.sendall(bytes[, flags])</td>
+<td>TCP发送全部数据，成功返回None</td>
+</tr>
+<tr>
+<td>socket.sendto(string[, flag], address)</td>
+<td>UDP发送数据</td>
+</tr>
+<tr>
+<td>socket.sendfile(file, offset=0, count=None)</td>
+<td>发送一个文件直到EOF，使用高性能的os.sendfile机制，返回发送的字节数。如果win下不支持sendfile，或者不是普通文件，使用send()发送文件。offset告诉起始位置。3.5版本开始</td>
+</tr>
+<tr>
+<td>socket.getpeername()</td>
+<td>返回连接套接字的远程地址。返回值通常是元组(ipaddr, port)</td>
+</tr>
+<tr>
+<td>socket.getsockname()</td>
+<td>返回套接字自己的地址。通常是一个元组(ipaddr, port)</td>
+</tr>
+<tr>
+<td>socket.setblocking(flag)</td>
+<td>如果flag为0,则将套接字设为非阻塞模式，否则将套接字设为阻塞模式（默认值）。非阻塞模式下，如果调用recv()没有发现任何数据，或send()调用无法立即发送数据，那么将引起socket.error异常</td>
+</tr>
+<tr>
+<td>socket.settimeout(value)</td>
+<td>设置套接字操作的超时期，timeout是一个浮点数，单位是秒。值为None表示没有超时期。一般，超时期应该在刚创建套接字时设置，因为它们可能用于连接的操作（如connect()）</td>
+</tr>
+<tr>
+<td>socket.setsockopt(level, optname, value)</td>
+<td>设置套接字选项的值。比如缓冲区大小。太多了，去看文档。不同系统，不同版本都不尽相同</td>
+</tr>
+</tbody>
+</table>
+<h4 id="MakeFile"><a href="#MakeFile" class="headerlink" title="MakeFile"></a>MakeFile</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.makefile(mode=<span class="string">'r'</span>, buffering=<span class="keyword">None</span>, *, encoding=<span class="keyword">None</span>, errors=<span class="keyword">None</span>, newline=<span class="keyword">None</span>)</span><br></pre></td></tr></table></figure>
+<p>创建一个与该套接字相关连的文件对象，将recv方法看做读方法，将send方法看做写方法。MakeFile可以将socket对象当成文本对象一样直接进行读写</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用makefile的简单例子</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">sockserver = socket.socket()</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sockserver.bind(addr)</span><br><span class="line">sockserver.listen()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">s, _ = sockserver.accept()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">f = s.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line"></span><br><span class="line">line = f.read(<span class="number">10</span>)  <span class="comment"># 阻塞等</span></span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line">print(line)</span><br><span class="line">f.write(<span class="string">'Return your msg: &#123;&#125;'</span>.format(line))</span><br><span class="line">f.flush()</span><br></pre></td></tr></table></figure>
+<p>上例不能循环接收消息，修改一下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line">sockserver = socket.socket()</span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sockserver.bind(addr)</span><br><span class="line">sockserver.listen()</span><br><span class="line">print(<span class="string">'-'</span>*<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">event = threading.Event()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(sock:socket.socket, e:threading.Event)</span>:</span></span><br><span class="line">    s, _ = sock.accept()</span><br><span class="line">    f = s.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        line = f.readline()</span><br><span class="line">        print(line)</span><br><span class="line">        <span class="keyword">if</span> line.strip()  == <span class="string">'quit'</span>:  <span class="comment"># 注意要发quit\n</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        f.write(<span class="string">'Return your msg: &#123;&#125;'</span>.format(line))</span><br><span class="line">        f.flush()</span><br><span class="line">    f.close()</span><br><span class="line">    sock.close()</span><br><span class="line">    e.wait(<span class="number">3</span>)</span><br><span class="line">    </span><br><span class="line">t = threading.Thread(target=accept, args=(sockserver, event))</span><br><span class="line">t.start()</span><br><span class="line">t.join()</span><br><span class="line"></span><br><span class="line">print(sockserver)</span><br></pre></td></tr></table></figure>
+<h4 id="makefile练习"><a href="#makefile练习" class="headerlink" title="makefile练习"></a>makefile练习</h4><p>使用makefile改写群聊类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            f = sock.makefile(<span class="string">'rw'</span>)  <span class="comment"># 支持读写</span></span><br><span class="line">            self.clients[client] = f  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(f, client), name=<span class="string">'recv'</span>).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, f, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            data = f.readline()  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            msg = data.strip()</span><br><span class="line">            <span class="comment"># 客户端退出命令</span></span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                f.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data)</span><br><span class="line">            logging.info(msg)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.write(msg)</span><br><span class="line">                s.flush()</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">        cs.stop()</span><br><span class="line">        threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">	logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br></pre></td></tr></table></figure>
+<p>上例完成了基本功能，但是，如果客户端主动断开，或者readline出现异常，就不会从clients中移除作废的socket。可以使用异常处理解决这个问题。</p>
+<h4 id="ChatServer实验用完整代码"><a href="#ChatServer实验用完整代码" class="headerlink" title="ChatServer实验用完整代码"></a>ChatServer实验用完整代码</h4><p>注意，这个代码为实验用，代码中的瑕疵还有很多。Socket太底层了，实际开发中很少使用这么底层的接口。增加一些异常处理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">logging.basicConfig(level=logging.INFO, format=<span class="string">"%(asctime)s %(thread)d %(message)s"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span>  <span class="comment"># 启动服务</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 客户端</span></span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动监听</span></span><br><span class="line">        self.sock.bind(self.addr)  <span class="comment"># 绑定</span></span><br><span class="line">        self.sock.listen()  <span class="comment"># 监听</span></span><br><span class="line">        <span class="comment"># accept会阻塞主线程，所以开一个新线程</span></span><br><span class="line">        threading.Thread(target=self.accept).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(self)</span>:</span>  <span class="comment"># 多人连接</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            sock, client = self.sock.accept()  <span class="comment"># 阻塞</span></span><br><span class="line">            <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">            f = sock.makefile(<span class="string">'rw'</span>)  <span class="comment"># 支持读写</span></span><br><span class="line">            self.clients[client] = f  <span class="comment"># 添加到客户端字典</span></span><br><span class="line">            threading.Thread(target=self.recv, args=(f, client), name=<span class="string">'recv'</span>).start()</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self, f, client)</span>:</span>  <span class="comment"># 接收客户端数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">            	data = f.readline()  <span class="comment"># 阻塞到数据到来</span></span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.error(e)  <span class="comment"># 有任何异常，退出</span></span><br><span class="line">                data = <span class="string">'quit'</span></span><br><span class="line">            msg = data.strip()</span><br><span class="line">            <span class="comment"># 客户端退出命令</span></span><br><span class="line">            <span class="keyword">if</span> msg == <span class="string">'quit'</span>:</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line">                f.close()</span><br><span class="line">                logging.info(<span class="string">'&#123;&#125; quits'</span>.format(client))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *client, data)</span><br><span class="line">            logging.info(msg)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">                s.write(msg)</span><br><span class="line">                s.flush()</span><br><span class="line">                </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>  <span class="comment"># 停止服务</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            s.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.set()</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cs = ChatServer()</span><br><span class="line">    cs.start()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">'&gt;&gt;&gt;'</span>).strip()</span><br><span class="line">        <span class="keyword">if</span> cmd == <span class="string">'quit'</span>:</span><br><span class="line">            cs.stop()</span><br><span class="line">            threading.Event().wait(<span class="number">3</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        logging.info(threading.enumerate())  <span class="comment"># 用来观察断开后线程的变化</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<h3 id="TCP客户端编程"><a href="#TCP客户端编程" class="headerlink" title="TCP客户端编程"></a>TCP客户端编程</h3><h4 id="客户端编程步骤"><a href="#客户端编程步骤" class="headerlink" title="客户端编程步骤"></a>客户端编程步骤</h4><ul>
+<li>创建Socket对象</li>
+<li>连接到远端服务端的ip和port，connect()方法</li>
+<li>传输数据<ul>
+<li>使用send、recv方法发送、接收数据</li>
+</ul>
+</li>
+<li>关闭连接，释放资源</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">client = socket.socket()</span><br><span class="line">ipaddr = (<span class="string">'127.0.0.1'</span>, <span class="number">9999</span>)</span><br><span class="line">client.connect(ipaddr)  <span class="comment"># 直接连接服务器</span></span><br><span class="line"></span><br><span class="line">client.send(<span class="string">b'abcd\n'</span>)</span><br><span class="line">data = client.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞等待</span></span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line">client.close()</span><br></pre></td></tr></table></figure>
+<p>开始编写客户端类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">"%(asctime)s %(thread)d %(message)s"</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatClient</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>  <span class="comment"># 启动对远端服务器的连接</span></span><br><span class="line">        self.sock.connect(self.addr)</span><br><span class="line">        self.send(<span class="string">"I'm ready."</span>)</span><br><span class="line">        <span class="comment"># 准备接收数据，recv是阻塞的，开启新的线程</span></span><br><span class="line">        threading.Thread(target=self.recv, name=<span class="string">"recv"</span>).start()</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">(self)</span>:</span>  <span class="comment"># 接收客户端的数据</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                data = self.sock.recv(<span class="number">1024</span>)  <span class="comment"># 阻塞 </span></span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.error(e)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"&#123;:%Y%m%d %H:%M:%S&#125; &#123;&#125;:\n&#123;&#125;\n"</span>.format(datetime.datetime.now(), *self.addr, data.strip())</span><br><span class="line">            logging.info(msg)</span><br><span class="line">            </span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self, msg:str)</span>:</span></span><br><span class="line">        data = <span class="string">"&#123;&#125;\n"</span>.format(msg.strip()).encode()  <span class="comment"># 服务端需要一个换行符</span></span><br><span class="line">        self.sock.send(data)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.wait(<span class="number">3</span>)</span><br><span class="line">        self.event.set()</span><br><span class="line">        logging.info(<span class="string">'Client stops.'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    cc = ChatClient()</span><br><span class="line">    cc.start()</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        cmd = input(<span class="string">'&gt;&gt;&gt;'</span>)</span><br><span class="line">        <span class="keyword">if</span> cmd.strip() == <span class="string">'quit'</span>:</span><br><span class="line">            cc.stop()</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        cc.send(cmd)  <span class="comment"># 发送消息</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>同样，这样的客户端还是有些问题的，仅用于测试。</p>
+<h3 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h3><p>sock文件就是缓冲队列文件，sock文件是一个队列，如mysql.sock，也就是buffer</p>
+<p>socket的本意就是插座，插孔。C/S两端的插孔就是socket，两个插孔用网络连接起来</p>
+<p>B/S本质上就是C/S，是一种特殊的C/S，如浏览器，要实现的功能比较多。</p>
+<p>记住服务器端编程步骤，很重要</p>
+<p>listen方法创建一个socket，用于监听端口。accept创建一个新的socket，用于客户端与服务器通信</p>
+<p>send方法是发送给客户端的，recv方法也是接收客户端消息的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="comment"># TCP Server</span></span><br><span class="line">sock = socket.socket() <span class="comment">#1</span></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sock.bind(addr)  <span class="comment"># 2</span></span><br><span class="line">sock.listen()  <span class="comment">#3</span></span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">10</span>)  <span class="comment"># 不等待就直接关闭了</span></span><br><span class="line">logging.info(sock)</span><br><span class="line"></span><br><span class="line"><span class="comment"># conn, _ = sock.accept()  # 允许别人连接，如果不使用accept，就只是监听，没法连接，程序也会马上结束</span></span><br><span class="line">sock.close()  <span class="comment"># 关闭释放资源</span></span><br><span class="line"></span><br><span class="line">在windows上查看端口监听状态，netstat -anp|find <span class="string">"9999"</span>，这时可以看到端口被监听了</span><br><span class="line">=================================================================================</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="comment"># TCP Server</span></span><br><span class="line">sock = socket.socket() <span class="comment">#1</span></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sock.bind(addr)  <span class="comment"># 2</span></span><br><span class="line">sock.listen()  <span class="comment">#3</span></span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 不等待就直接关闭了</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'------------------------------'</span>)</span><br><span class="line">s1 = socket.socket()</span><br><span class="line">s1.bind(addr)</span><br><span class="line">s1.listen()</span><br><span class="line"><span class="comment"># 再监听一次，这样是不行的，会报错，提示通常每个套接字地址只允许使用一次。</span></span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">10</span>)</span><br><span class="line">logging.info(sock)</span><br><span class="line"></span><br><span class="line"><span class="comment"># conn, _ = sock.accept()  # 允许别人连接，如果不使用accept，就只是监听，没法连接</span></span><br><span class="line">sock.close()  <span class="comment"># 关闭释放资源</span></span><br><span class="line">=================================================================================</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="comment"># TCP Server</span></span><br><span class="line">sock = socket.socket() <span class="comment">#1</span></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">addr = (ip, port)</span><br><span class="line">sock.bind(addr)  <span class="comment"># 2</span></span><br><span class="line">sock.listen()  <span class="comment">#3</span></span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 不等待就直接关闭了</span></span><br><span class="line"></span><br><span class="line">conn, addrinfo = sock.accept()  <span class="comment"># 4 默认阻塞的，连接后就不阻塞了</span></span><br><span class="line"><span class="comment"># 不能在这里直接用循环，因为这里会阻塞，这是主线程，阻塞就都动不了了，所以要用多线程</span></span><br><span class="line">logging.info(conn)</span><br><span class="line">logging.info(addrinfo)</span><br><span class="line"></span><br><span class="line">data = conn.recv(<span class="number">1024</span>)  <span class="comment"># 获取数据，这里获取的数据是bytes类型</span></span><br><span class="line"><span class="comment"># 可以在这里用循环，每次都是recv阻塞等待用户发数据，下面的send方法再回应</span></span><br><span class="line">logging.info(data.decode)</span><br><span class="line">msg = <span class="string">"ack &#123;&#125;"</span>.format(data.decode())</span><br><span class="line"><span class="comment">#conn.send(data)</span></span><br><span class="line">conn.send(msg.encode())  <span class="comment"># 加入send就可以在Socket工具上看到收到的数据了</span></span><br><span class="line">logging.info(sock)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">conn.close()</span><br><span class="line">sock.close()  <span class="comment"># 关闭释放资源</span></span><br><span class="line"></span><br><span class="line">使用TCP/UDP Socket 调试工具连接，windows上可以看到有两个ESTABLISHED，这就是新的socket创建的连接</span><br><span class="line"></span><br><span class="line">输出：</span><br><span class="line"><span class="number">139988166485824</span> MainThread &lt;socket.socket fd=<span class="number">4</span>, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=<span class="number">0</span>, laddr=(<span class="string">'10.0.30.50'</span>, <span class="number">9999</span>), raddr=(<span class="string">'10.42.0.88'</span>, <span class="number">53771</span>)&gt;</span><br><span class="line"><span class="number">139988166485824</span> MainThread (<span class="string">'10.42.0.88'</span>, <span class="number">53771</span>)</span><br><span class="line"><span class="number">139988166485824</span> MainThread data.decode &lt;built-<span class="keyword">in</span> method decode of bytes object at <span class="number">0x55622d022270</span>&gt;</span><br><span class="line"><span class="number">139988166485824</span> MainThread &lt;socket.socket fd=<span class="number">3</span>, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=<span class="number">0</span>, laddr=(<span class="string">'10.0.30.50'</span>, <span class="number">9999</span>)&gt;</span><br></pre></td></tr></table></figure>
+<p>阻塞的就是IO的请求，等连接也是，这就要用到多线程</p>
+<p>群聊软件，一个人发出，所有人都能看到</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 存储不同的客户端socket</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.bind(self.addr)</span><br><span class="line">        self.sock.listen()</span><br><span class="line">        </span><br><span class="line">        threading.Thread(target=self._accept, name=<span class="string">'accept'</span>).start()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            c.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.wait(<span class="number">3</span>)  <span class="comment"># 关闭时要花费一些时间，所以这里等一会儿，因为是关闭所以无所谓</span></span><br><span class="line">        self.event.set()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_accept</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            conn, client = self.sock.accept()</span><br><span class="line">            self.clients[client] = conn</span><br><span class="line"></span><br><span class="line">            threading.Thread(target=self._recv, args=(conn,client), name=<span class="string">"recv"</span>).start()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_recv</span><span class="params">(self, conn, client)</span>:</span></span><br><span class="line">        <span class="comment"># 接收到了数据，然后分发</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">       <span class="comment">#     data = conn.recv(1024).decode()</span></span><br><span class="line">        <span class="comment">#    logging.info(data)</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                data = conn.recv(<span class="number">1024</span>)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.info(e)</span><br><span class="line">                data = <span class="string">b"quit"</span></span><br><span class="line"><span class="comment"># try...except一段可以有效地把recv产生的各种问题拦截下来，保证以正常流程退出。当客户端断开时会抛出错误，这</span></span><br><span class="line"><span class="comment"># 里会伪造成服务端主动断开，也就是data = b"quit"一句，再通过下面的if语句退出</span></span><br><span class="line">            data = data.decode()</span><br><span class="line">            logging.info(data)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 客户端通知的退出机制</span></span><br><span class="line">            <span class="keyword">if</span> data == <span class="string">"quit"</span>:</span><br><span class="line">                logging.info(<span class="string">'quit````````````````````````'</span>)</span><br><span class="line"><span class="comment"># 当客户端发出quit时，recv线程就退出了。这里只是客户端与服务器端断开了连接，服务器端并没有停止，还可以使用客</span></span><br><span class="line"><span class="comment"># 户端再次连接发送消息</span></span><br><span class="line">                self.clients.pop(client)</span><br><span class="line"><span class="comment"># 断开时会报错，这里是不是应该写成conn = self.clients.pop(client)</span></span><br><span class="line">                conn.close()  <span class="comment"># 这句表示服务端主动与客户端断开</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"ack &#123;&#125;"</span>.format(data)</span><br><span class="line">            <span class="keyword">for</span> c <span class="keyword">in</span> self.clients.values():  <span class="comment"># 因为是群发，所以用不到字典的key</span></span><br><span class="line"><span class="comment"># 这里不能再用conn变量，因为上面已经定义过了，如果这里用for循环再重新赋值，再次进入循环后，在使用stop方法断</span></span><br><span class="line"><span class="comment"># 开conn时就会出现问题，系统不知道是哪个conn，所以这里用c。</span></span><br><span class="line"><span class="comment"># 另外，这里的self.clients列表是需要关闭的，使用这个列表保存的客户端的IP与端口也不太好，因为客户端断开后再</span></span><br><span class="line"><span class="comment"># 次连接时就可能会使用另一个随机端口，socket也变了，与这里保存的就没关系了。如果要保证是同一个用户，需要使用# 登录的方法给客户一个ID之类的固定值来判断是否为同一个用户</span></span><br><span class="line">            	c.send(msg.encode()) </span><br><span class="line"><span class="comment"># 当初始化时就把基本信息输入了，start时就绑定socket并监听了端口，接着用accept方法，这时就可以获取到一个新</span></span><br><span class="line"><span class="comment"># 的socket，也就是conn，还有连接的对端client，对端的地址和端口就可以获取到了，可以用这个信息区分不同的客户</span></span><br><span class="line"><span class="comment"># 端。start方法中起线程是因为accept会阻塞，不阻塞主线程就不能动了，所以这些要在子线程中做。连接后就会产生一</span></span><br><span class="line"><span class="comment"># 个新的conn，这时到conn方法中，conn.recv就会阻塞，所以在accept中再启动一个线程获取conn.recv，这等于在</span></span><br><span class="line"><span class="comment"># accept线程中再启动recv线程，所conn当做参数传入，因为每建立一个连接socket都不一样，最后到_recv方法中，要</span></span><br><span class="line"><span class="comment"># 用循环，不然处理完一个socket就断开了</span></span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line">e = threading.Event()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">showthreads</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> e.wait(<span class="number">3</span>):</span><br><span class="line">        logging.info(threading.enumerate())</span><br><span class="line">        </span><br><span class="line"><span class="comment"># showthreads()</span></span><br><span class="line">threading.Thread(target=showthreads, daemon=<span class="keyword">True</span>).start()  <span class="comment"># 因为随时可以结束，所以设置成daemon的</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">"&gt;&gt;&gt;"</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">"quit"</span>:</span><br><span class="line">		cs.stop()</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">使用Socket工具连接，创建多个客户端连接，一个客户端发送消息后，多个客户端都可以收到信息。</span><br></pre></td></tr></table></figure>
+<p>makefile，想办法创建出来一个文件对象，把socket变成一个file文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line">ip = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">sock = socket.socket()</span><br><span class="line">addr = (ip, port)</span><br><span class="line">event = threading.Event()</span><br><span class="line"></span><br><span class="line">sock.bind(addr)</span><br><span class="line">sock.listen()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">accept</span><span class="params">(sock:socket.socket)</span>:</span></span><br><span class="line">    s, addrinfo = sock.accept()</span><br><span class="line">    f = s.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        line = f.readline()   <span class="comment"># 一行的文本</span></span><br><span class="line"><span class="comment"># 如果写成line = f.read(10)表示有10个字节就可以了，如果是文本操作就用readline，如果是二进制就用read</span></span><br><span class="line">        logging.info(line)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> line.strip() == <span class="string">"quit"</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">            </span><br><span class="line">        msg = <span class="string">"Your msg = &#123;&#125; ack"</span>.format(line)</span><br><span class="line">        f.write(msg)</span><br><span class="line">        f.flush()  <span class="comment"># 立即发送</span></span><br><span class="line">    f.close()</span><br><span class="line">    sock.close()</span><br><span class="line">    </span><br><span class="line">threading.Thread(target = _accept, args=(sock,)).start()</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">not</span> event.wait(<span class="number">2</span>):</span><br><span class="line">    print(sock)</span><br><span class="line">    </span><br><span class="line">用socket工具连接，因为上面写的是readline，所以在工具上输入信息后还要加一个回车，然后再发送</span><br></pre></td></tr></table></figure>
+<p>将上面的群聊代码改用makefile</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"></span><br><span class="line">logging.basicConfig(format=<span class="string">'%(thread)s %(threadName)s %(message)s'</span>, level=logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ip=<span class="string">'127.0.0.1'</span>, port=<span class="number">9999</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket()  <span class="comment"># 这是监听的socket</span></span><br><span class="line">        self.addr = (ip, port)</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">        self.clients = &#123;&#125;  <span class="comment"># 存储不同的客户端socket</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.sock.bind(self.addr)</span><br><span class="line">        self.sock.listen()</span><br><span class="line">        </span><br><span class="line">        threading.Thread(target=self._accept, name=<span class="string">'accept'</span>).start()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> c <span class="keyword">in</span> self.clients.values():</span><br><span class="line">            c.close()</span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.event.wait(<span class="number">3</span>)  <span class="comment"># 关闭时要花费一些时间，所以这里等一会儿，因为是关闭所以无所谓</span></span><br><span class="line">        self.event.set()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_accept</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            conn, client = self.sock.accept()</span><br><span class="line">       <span class="comment">#     conn = socket.socket()  # 写这句是为了下面用conn时有方法的提示，写完以后要删除这句代码</span></span><br><span class="line">            f = conn.makefile(mode=<span class="string">'rw'</span>)</span><br><span class="line"><span class="comment"># 使用makefile比不使用时多了这个环节，之前是直接把conn放到了clients字典中，这里要先将conn转成makefile，再放入字典</span></span><br><span class="line">            self.clients[client] = f</span><br><span class="line"></span><br><span class="line">            threading.Thread(target=self._recv, args=(f,client), name=<span class="string">"recv"</span>).start()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_recv</span><span class="params">(self, f, client)</span>:</span></span><br><span class="line">        <span class="comment"># 接收到了数据，然后分发</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                data = f.readline()</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                logging.info(e)</span><br><span class="line">                data = <span class="string">b"quit"</span></span><br><span class="line"><span class="comment"># try...except一段可以有效地把recv产生的各种问题拦截下来，保证以正常流程退出。当客户端断开时会抛出错误，这</span></span><br><span class="line"><span class="comment"># 里会伪造成服务端主动断开，也就是data = b"quit"一句，再通过下面的if语句退出</span></span><br><span class="line">            <span class="comment"># data = data.decode()  # 用makefile就不需要解码了</span></span><br><span class="line">            logging.info(data)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 客户端通知的退出机制</span></span><br><span class="line">            <span class="keyword">if</span> data == <span class="string">"quit"</span>:</span><br><span class="line">                logging.info(<span class="string">'quit!'</span>)</span><br><span class="line">                self.clients.pop(client)</span><br><span class="line"><span class="comment"># 断开时会报错，这里是不是应该写成conn = self.clients.pop(client)</span></span><br><span class="line">                f.close()  <span class="comment"># 这句表示服务端主动与客户端断开</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            msg = <span class="string">"ack &#123;&#125;"</span>.format(data)</span><br><span class="line">            <span class="keyword">for</span> c <span class="keyword">in</span> self.clients.values():  <span class="comment"># 因为是群发，所以用不到字典的key</span></span><br><span class="line">            	c.write(msg) </span><br><span class="line">                c.flush()</span><br><span class="line">cs = ChatServer()</span><br><span class="line">cs.start()</span><br><span class="line"></span><br><span class="line">e = threading.Event()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">showthreads</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> e.wait(<span class="number">3</span>):</span><br><span class="line">        logging.info(threading.enumerate())</span><br><span class="line">        </span><br><span class="line"><span class="comment"># showthreads()</span></span><br><span class="line">threading.Thread(target=showthreads, daemon=<span class="keyword">True</span>).start()  <span class="comment"># 因为随时可以结束，所以设置成daemon的</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    cmd = input(<span class="string">"&gt;&gt;&gt;"</span>).strip()</span><br><span class="line">    <span class="keyword">if</span> cmd == <span class="string">"quit"</span>:</span><br><span class="line">		cs.stop()</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">使用Socket工具连接，创建多个客户端连接</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/10/阿里云问题解决-ECS挂载OSS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2890,208 +3254,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/08/转：在-Linux-上压缩文件的-5-种方法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/08/转：在-Linux-上压缩文件的-5-种方法/" itemprop="url">
-                  转：在 Linux 上压缩文件的 5 种方法
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-05-08 09:14:45 / 修改時間：09:20:56" itemprop="dateCreated datePublished" datetime="2020-05-08T09:14:45+08:00">2020-05-08</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础/" itemprop="url" rel="index"><span itemprop="name">基础</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>  在 Linux 系统上有很多可以用于压缩文件的工具，但它们的表现并不都是一样的，也不是所有的压缩效果都是一样的。在这篇文章中，我们比较其中的五个工具。</p>
-</blockquote>
-<p>在 Linux 上有不少用于压缩文件的命令。最新最有效的一个方法是 <code>xz</code>，但是所有的方法都有节省磁盘空间和维护备份文件供以后使用的优点。在这篇文章中，我们将比较这些压缩命令并指出显著的不同。</p>
-<h3 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h3><p><code>tar</code> 命令不是专门的压缩命令。它通常用于将多个文件拉入一个单个的文件中，以便容易地传输到另一个系统，或者将文件作为一个相关的组进行备份。它也提供压缩的功能，这就很有意义了，附加一个 <code>z</code> 压缩选项能够实现压缩文件。</p>
-<p>当使用 <code>z</code> 选项为 <code>tar</code> 命令附加压缩过程时，<code>tar</code> 使用 <code>gzip</code> 来进行压缩。</p>
-<p>就像压缩一组文件一样，你可以使用 <code>tar</code> 来压缩单个文件，尽管这种操作与直接使用 <code>gzip</code> 相比没有特别的优势。要使用 <code>tar</code> 这样做，只需要使用 <code>tar cfz newtarfile filename</code> 命令来标识要压缩的文件，就像标识一组文件一样，像这样：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar cfz bigfile.tgz bigfile           </span></span><br><span class="line">            ^            ^           </span><br><span class="line">            |            |           </span><br><span class="line">            +- 新的文件   +- 将被压缩的文件$ </span><br><span class="line">ls -l bigfile*</span><br><span class="line">-rw-rw-r-- 1 shs shs 103270400 Apr 16 16:09 bigfile</span><br><span class="line">-rw-rw-r-- 1 shs shs 21608325 Apr 16 16:08 bigfile.tgz</span><br></pre></td></tr></table></figure>
-<p>注意，文件的大小显著减少了。</p>
-<p>如果你愿意，你可以使用 <code>tar.gz</code> 扩展名，这可能会使文件的特征更加明显，但是大多数的 Linux 用户将很可能会意识到与 <code>tgz</code> 的意思是一样的 – <code>tar</code> 和 <code>gz</code> 的组合来显示文件是一个压缩的 tar 文件。在压缩完成后，你将同时得到原始文件和压缩文件。</p>
-<p>要将很多文件收集在一起并在一个命令中压缩出 “tar ball”，使用相同的语法，但要指定要包含的文件为一组，而不是单个文件。这里有一个示例：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar cfz bin.tgz bin/*          </span></span><br><span class="line">          ^         ^         </span><br><span class="line">          |         +-- 将被包含的文件         </span><br><span class="line">          + 新的文件</span><br></pre></td></tr></table></figure>
-<h3 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h3><p><code>zip</code> 命令创建一个压缩文件，与此同时保留原始文件的完整性。语法像使用 <code>tar</code> 一样简单，只是你必需记住，你的原始文件名称应该是命令行上的最后一个参数。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zip ./bigfile.zip bigfile</span></span><br><span class="line">updating: bigfile (deflated 79%)</span><br><span class="line"><span class="meta">$</span><span class="bash"> ls -l bigfile bigfile.zip</span></span><br><span class="line">-rw-rw-r-- 1 shs shs 103270400 Apr 16 11:18 bigfile</span><br><span class="line">-rw-rw-r-- 1 shs shs  21606889 Apr 16 11:19 bigfile.zip</span><br></pre></td></tr></table></figure>
-<h3 id="gzip"><a href="#gzip" class="headerlink" title="gzip"></a>gzip</h3><p><code>gzip</code> 命令非常容易使用。你只需要键入 <code>gzip</code>，紧随其后的是你想要压缩的文件名称。不像上述描述的命令，<code>gzip</code> 将“就地”加密文件。换句话说，原始文件将被加密文件替换。</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gzip <span class="keyword">bigfile$ </span>ls -l <span class="keyword">bigfile*-rw-rw-r-- </span><span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span> <span class="number">21606751</span> Apr <span class="number">15</span> <span class="number">17</span>:<span class="number">57</span> <span class="keyword">bigfile.gz</span></span><br></pre></td></tr></table></figure>
-<h3 id="bzip2"><a href="#bzip2" class="headerlink" title="bzip2"></a>bzip2</h3><p>像使用 <code>gzip</code> 命令一样，<code>bzip2</code> 将在你选择的文件“就地”压缩，不留下原始文件。</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">bzip </span><span class="keyword">bigfile</span></span><br><span class="line"><span class="keyword">$ </span>ls -l <span class="keyword">bigfile*</span></span><br><span class="line"><span class="keyword">-rw-rw-r-- </span><span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span> <span class="number">18115234</span> Apr <span class="number">15</span> <span class="number">17</span>:<span class="number">57</span> <span class="keyword">bigfile.bz2</span></span><br></pre></td></tr></table></figure>
-<h3 id="xz"><a href="#xz" class="headerlink" title="xz"></a>xz</h3><p><code>xz</code> 是压缩命令团队中的一个相对较新的成员，在压缩文件的能力方面，它是一个领跑者。像先前的两个命令一样，你只需要将文件名称提供给命令。再强调一次，原始文件被就地压缩。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> xz bigfile</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ls -l bigfile*</span></span><br><span class="line">-rw-rw-r-- 1 shs shs 13427236 Apr 15 17:30 bigfile.xz</span><br></pre></td></tr></table></figure>
-<p>对于大文件来说，你可能会注意到 <code>xz</code> 将比其它的压缩命令花费更多的运行时间，但是压缩的结果却是非常令人赞叹的。</p>
-<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><p>大多数人都听说过“大小不是一切”。所以，让我们比较一下文件大小以及一些当你计划如何压缩文件时的问题。</p>
-<p>下面显示的统计数据都与压缩单个文件相关，在上面显示的示例中使用 <code>bigfile</code>。这个文件是一个大的且相当随机的文本文件。压缩率在一定程度上取决于文件的内容。</p>
-<h4 id="大小减缩率"><a href="#大小减缩率" class="headerlink" title="大小减缩率"></a>大小减缩率</h4><p>当比较时，上面显示的各种压缩命产生下面的结果。百分比表示压缩文件与原始文件的比较效果。</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-rw-rw-r-- <span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">103270400</span> Apr <span class="number">16</span> <span class="number">14</span>:<span class="number">01</span> <span class="keyword">bigfile</span></span><br><span class="line"><span class="keyword">------------------------------------------------------</span></span><br><span class="line"><span class="keyword">-rw-rw-r-- </span><span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">18115234</span> Apr <span class="number">16</span> <span class="number">13</span>:<span class="number">59</span> <span class="keyword">bigfile.bz2 </span>   ~<span class="number">17</span>%</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">21606751</span> Apr <span class="number">16</span> <span class="number">14</span>:<span class="number">00</span> <span class="keyword">bigfile.gz </span>    ~<span class="number">21</span>%</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">21608322</span> Apr <span class="number">16</span> <span class="number">13</span>:<span class="number">59</span> <span class="keyword">bigfile.tgz </span>   ~<span class="number">21</span>%</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">13427236</span> Apr <span class="number">16</span> <span class="number">14</span>:<span class="number">00</span> <span class="keyword">bigfile.xz </span>    ~<span class="number">13</span>%</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> <span class="keyword">shs </span><span class="keyword">shs </span><span class="number">21606889</span> Apr <span class="number">16</span> <span class="number">13</span>:<span class="number">59</span> <span class="keyword">bigfile.zip </span>   ~<span class="number">21</span>%</span><br></pre></td></tr></table></figure>
-<p><code>xz</code> 命令获胜，最终只有压缩文件 13% 的大小，但是所有这些压缩命令都相当显著地减少原始文件的大小。</p>
-<h4 id="是否替换原始文件"><a href="#是否替换原始文件" class="headerlink" title="是否替换原始文件"></a>是否替换原始文件</h4><p><code>bzip2</code>、<code>gzip</code> 和 <code>xz</code> 命令都用压缩文件替换原始文件。<code>tar</code> 和 <code>zip</code> 命令不替换。</p>
-<h4 id="运行时间"><a href="#运行时间" class="headerlink" title="运行时间"></a>运行时间</h4><p><code>xz</code> 命令似乎比其它命令需要花费更多的时间来加密文件。对于 <code>bigfile</code> 来说，大概的时间是：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">命令      运行时间</span><br><span class="line"><span class="selector-tag">tar</span>       4<span class="selector-class">.9</span> 秒</span><br><span class="line"><span class="selector-tag">zip</span>       5<span class="selector-class">.2</span> 秒</span><br><span class="line"><span class="selector-tag">bzip2</span>    22<span class="selector-class">.8</span> 秒</span><br><span class="line"><span class="selector-tag">gzip</span>      4<span class="selector-class">.8</span> 秒</span><br><span class="line"><span class="selector-tag">xz</span>       50<span class="selector-class">.4</span> 秒</span><br></pre></td></tr></table></figure>
-<p>解压缩文件很可能比压缩时间要短得多。</p>
-<h4 id="文件权限"><a href="#文件权限" class="headerlink" title="文件权限"></a>文件权限</h4><p>不管你对压缩文件设置什么权限，压缩文件的权限将基于你的 <code>umask</code> 设置，但 <code>bzip2</code> 除外，它保留了原始文件的权限。</p>
-<h4 id="与-Windows-的兼容性"><a href="#与-Windows-的兼容性" class="headerlink" title="与 Windows 的兼容性"></a>与 Windows 的兼容性</h4><p><code>zip</code> 命令创建的文件可以在 Windows 系统以及 Linux 和其他 Unix 系统上使用（即解压），而无需安装其他工具，无论这些工具可能是可用还是不可用的。</p>
-<h3 id="解压缩文件"><a href="#解压缩文件" class="headerlink" title="解压缩文件"></a>解压缩文件</h3><p>解压文件的命令与压缩文件的命令类似。在我们运行上述压缩命令后，这些命令用于解压缩 <code>bigfile</code>：</p>
-<ul>
-<li>tar： <code>tar xf bigfile.tgz</code></li>
-<li>zip： <code>unzip bigfile.zip</code></li>
-<li>gzip： <code>gunzip bigfile.gz</code></li>
-<li>bzip2： <code>bunzip2 bigfile.gz2</code></li>
-<li>xz： <code>xz -d bigfile.xz</code> 或 <code>unxz bigfile.xz</code></li>
-</ul>
-<h3 id="自己运行压缩对比"><a href="#自己运行压缩对比" class="headerlink" title="自己运行压缩对比"></a>自己运行压缩对比</h3><p>如果你想自己运行一些测试，抓取一个大的且可以替换的文件，并使用上面显示的每个命令来压缩它 —— 最好使用一个新的子目录。你可能需要先安装 <code>xz</code>，如果你想在测试中包含它的话。这个脚本可能更容易地进行压缩，但是可能需要花费几分钟完成。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 询问用户文件名称</span></span><br><span class="line">echo -n "filename&gt; "</span><br><span class="line">read filename</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 你需要这个，因为一些命令将替换原始文件</span></span><br><span class="line">cp $filename $filename-2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 先清理(以免先前的结果仍然可用)</span></span><br><span class="line">rm $filename.*</span><br><span class="line"></span><br><span class="line">tar cvfz ./$filename.tgz $filename &gt; /dev/null</span><br><span class="line">zip $filename.zip $filename &gt; /dev/null</span><br><span class="line">bzip2 $filename</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复原始文件</span></span><br><span class="line">cp $filename-2 $filename</span><br><span class="line">gzip $filename</span><br><span class="line"><span class="meta">#</span><span class="bash"> 恢复原始文件</span></span><br><span class="line">cp $filename-2 $filename</span><br><span class="line">xz $filename</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示结果</span></span><br><span class="line">ls -l $filename.*</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 替换原始文件</span></span><br><span class="line">mv $filename-2 $filename</span><br></pre></td></tr></table></figure>
-<hr>
-<p>via: <a href="https://www.networkworld.com/article/3538471/how-to-compress-files-on-linux-5-ways.html" target="_blank" rel="noopener">https://www.networkworld.com/article/3538471/how-to-compress-files-on-linux-5-ways.html</a></p>
-<p>作者：<a href="https://www.networkworld.com/author/Sandra-Henry_Stocker/" target="_blank" rel="noopener">Sandra Henry-Stocker</a> 选题：<a href="https://github.com/lujun9972" target="_blank" rel="noopener">lujun9972</a> 译者：<a href="https://github.com/robsean" target="_blank" rel="noopener">robsean</a> 校对：<a href="https://github.com/wxy" target="_blank" rel="noopener">wxy</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -3139,7 +3301,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">262</span>
+                    <span class="site-state-item-count">263</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>
@@ -3595,7 +3757,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">183</span>
+                      
+                    
+                    <span class="site-state-item-count">184</span>
                     <span class="site-state-item-name">標籤</span>
                   </a>
                 </div>
