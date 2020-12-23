@@ -350,6 +350,245 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/09/转：Nginx日志配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/02/09/转：Nginx日志配置/" itemprop="url">
+                  转：Nginx日志配置
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-02-09 21:38:00" itemprop="dateCreated datePublished" datetime="2020-02-09T21:38:00+08:00">2020-02-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="超详细！Nginx-日志配置实践"><a href="#超详细！Nginx-日志配置实践" class="headerlink" title="超详细！Nginx 日志配置实践"></a>超详细！Nginx 日志配置实践</h2><p>地址：<a href="https://mp.weixin.qq.com/s/MzLHXwyl8Upt4eI9IjrNBw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/MzLHXwyl8Upt4eI9IjrNBw</a></p>
+<p><strong>前言</strong></p>
+<p>Nginx日志对于统计、系统服务排错很有用。</p>
+<p><strong>Nginx日志主要分为两种：</strong>access_log(访问日志)和error_log(错误日志)。通过访问日志我们可以得到用户的IP地址、浏览器的信息，请求的处理时间等信息。错误日志记录了访问出错的信息，可以帮助我们定位错误的原因。</p>
+<p><strong>本文将详细描述一下如何配置Nginx日志。</strong></p>
+<h2 id="设置access-log"><a href="#设置access-log" class="headerlink" title="设置access_log"></a><strong>设置access_log</strong></h2><p>访问日志主要记录客户端的请求。客户端向Nginx服务器发起的每一次请求都记录在这里。客户端IP，浏览器信息，referer，请求处理时间，请求URL等都可以在访问日志中得到。当然具体要记录哪些信息，你可以通过log_format指令定义。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">access_log path <span class="comment">[format <span class="comment">[buffer=size]</span> <span class="comment">[gzip<span class="comment">[=level]</span>]</span> <span class="comment">[flush=time]</span> <span class="comment">[if=condition]</span>]</span>; # 设置访问日志</span><br><span class="line">access_log off; # 关闭访问日志</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>path 指定日志的存放位置。</li>
+<li>format 指定日志的格式。默认使用预定义的combined。</li>
+<li>buffer 用来指定日志写入时的缓存大小。默认是64k。</li>
+<li>gzip 日志写入前先进行压缩。压缩率可以指定，从1到9数值越大压缩比越高，同时压缩的速度也越慢。默认是1。</li>
+<li>flush 设置缓存的有效时间。如果超过flush指定的时间，缓存中的内容将被清空。</li>
+<li>if 条件判断。如果指定的条件计算为0或空字符串，那么该请求不会写入日志。</li>
+</ul>
+</blockquote>
+<p>另外，还有一个特殊的值off。如果指定了该值，当前作用域下的所有的请求日志都被关闭。</p>
+<h3 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h3><p>可以应用access_log指令的作用域分别有http，server，location，limit_except。也就是说，在这几个作用域外使用该指令，Nginx会报错。</p>
+<p>以上是access_log指令的基本语法和参数的含义。下面我们看一几个例子加深一下理解。</p>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">access_log /var/logs/nginx-<span class="keyword">access</span>.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+<p>该例子指定日志的写入路径为/var/logs/nginx-access.log，日志格式使用默认的combined。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">access_log /var/logs/nginx-access.log <span class="attribute">buffer</span>=32k gzip <span class="attribute">flush</span>=1m</span><br></pre></td></tr></table></figure>
+<p>该例子指定日志的写入路径为/var/logs/nginx-access.log，日志格式使用默认的combined，指定日志的缓存大小为32k，日志写入前启用gzip进行压缩，压缩比使用默认值1，缓存数据有效时间为1分钟。</p>
+<h2 id="使用log-format自定义日志格式"><a href="#使用log-format自定义日志格式" class="headerlink" title="使用log_format自定义日志格式"></a><strong>使用log_format自定义日志格式</strong></h2><p>Nginx预定义了名为combined日志格式，如果没有明确指定日志格式默认使用该格式：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">log_format</span> combined <span class="string">'<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] '</span></span><br><span class="line">                    <span class="string">'"<span class="variable">$request</span>" <span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> '</span></span><br><span class="line">                    <span class="string">'"<span class="variable">$http_referer</span>" "<span class="variable">$http_user_agent</span>"'</span>;</span><br></pre></td></tr></table></figure>
+<p>如果不想使用Nginx预定义的格式，可以通过log_format指令来自定义。</p>
+<h3 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h3><figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log_format name [<span class="built_in">escape</span>=<span class="keyword">default</span>|json] <span class="built_in">string</span> ...;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>name 格式名称。在access_log指令中引用。</li>
+<li>escape 设置变量中的字符编码方式是json还是default，默认是default。</li>
+<li>string 要定义的日志格式内容。该参数可以有多个。参数中可以使用Nginx变量。</li>
+</ul>
+</blockquote>
+<p>下面是log_format指令中常用的一些变量：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">bytes_sent</span></span><br><span class="line">发送给客户端的总字节数</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">body_bytes_sent</span></span><br><span class="line">发送给客户端的字节数，不包括响应头的大小</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">connection</span></span><br><span class="line">连接序列号</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">connection_requests</span></span><br><span class="line">当前通过连接发出的请求数量</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">msec</span></span><br><span class="line">日志写入时间，单位为秒，精度是毫秒</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">pipe</span></span><br><span class="line">如果请求是通过http流水线发送，则其值为"p"，否则为“."</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">request_length</span></span><br><span class="line">请求长度（包括请求行，请求头和请求体）</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">request_time</span></span><br><span class="line">请求处理时长，单位为秒，精度为毫秒，从读入客户端的第一个字节开始，直到把最后一个字符发送张客户端进行日志写入为止</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">status</span></span><br><span class="line">响应状态码</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">time_iso8601</span></span><br><span class="line">标准格式的本地时间,形如“2017-05-24T18:31:27+08:00”</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">time_local</span></span><br><span class="line">通用日志格式下的本地时间，如"24/May/2017:18:31:27 +0800"</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">http_referer</span></span><br><span class="line">请求的referer地址。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">http_user_agent</span></span><br><span class="line">客户端浏览器信息。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">remote_addr</span></span><br><span class="line">客户端IP</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">http_x_forwarded_for</span></span><br><span class="line">当前端有代理服务器时，设置web节点记录客户端地址的配置，此参数生效的前提是代理服务器也要进行相关的x_forwarded_for设置。</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">request</span></span><br><span class="line">完整的原始请求行，如 "GET / HTTP/1.1"</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">remote_user</span></span><br><span class="line">客户端用户名称，针对启用了用户认证的请求</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash">request_uri</span></span><br><span class="line">完整的请求地址，如 "https://daojia.com/"</span><br></pre></td></tr></table></figure>
+<p>下面演示一下自定义日志格式的使用：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">access_log</span> /var/logs/nginx-access.log main</span><br><span class="line">log_format  main  <span class="string">'<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] "<span class="variable">$request</span>" '</span></span><br><span class="line">                  <span class="string">'<span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> "<span class="variable">$http_referer</span>" '</span></span><br><span class="line">                  <span class="string">'"<span class="variable">$http_user_agent</span>" "<span class="variable">$http_x_forwarded_for</span>"'</span>;</span><br></pre></td></tr></table></figure>
+<p>我们使用log_format指令定义了一个main的格式，并在access_log指令中引用了它。假如客户端有发起请求：<a href="https://suyunfe.com/，我们看一下我截取的一个请求的日志记录" target="_blank" rel="noopener">https://suyunfe.com/，我们看一下我截取的一个请求的日志记录</a>:</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">112.195</span>.<span class="number">209.90</span> - - [<span class="number">20</span>/Feb/<span class="number">2018</span>:<span class="number">12</span>:<span class="number">12</span>:<span class="number">14</span> +<span class="number">0800</span>] </span><br><span class="line"><span class="string">"GET / HTTP/1.1"</span> <span class="number">200</span> <span class="number">190</span> <span class="string">"-"</span> <span class="string">"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) </span></span><br><span class="line">AppleWebKit/<span class="number">537.36</span> (KHTML, like Gecko) Chrome/<span class="number">63.0</span>.<span class="number">3239.132</span> Mobile Safari/<span class="number">537.36</span><span class="string">" "</span>-<span class="string">"</span></span><br></pre></td></tr></table></figure>
+<p>我们看到最终的日志记录中<code>$remote_user</code>、<code>$http_referer</code>、<code>$http_x_forwarded_for</code>都对应了一个<code>-</code>，这是因为这几个变量为空。</p>
+<h2 id="设置error-log"><a href="#设置error-log" class="headerlink" title="设置error_log"></a><strong>设置error_log</strong></h2><p>错误日志在Nginx中是通过error_log指令实现的。该指令记录服务器和请求处理过程中的错误信息。</p>
+<h3 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h3><p>配置错误日志文件的路径和日志级别。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">error_log <span class="built_in">file</span> [level];</span><br><span class="line">Default:    </span><br><span class="line">error_log logs/<span class="keyword">error</span>.<span class="built_in">log</span> <span class="keyword">error</span>;</span><br></pre></td></tr></table></figure>
+<p>第一个参数指定日志的写入位置。</p>
+<p>第二个参数指定日志的级别。level可以是debug, info, notice, warn, error, crit, alert,emerg中的任意值。可以看到其取值范围是按紧急程度从低到高排列的。只有日志的错误级别等于或高于level指定的值才会写入错误日志中。默认值是error。</p>
+<h3 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">error_log /<span class="built_in">var</span>/logs/nginx/nginx-<span class="built_in">error</span>.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+<p>它可以配置在：main， http, mail, stream, server, location作用域。</p>
+<p>例子中指定了错误日志的路径为：<code>/var/logs/nginx/nginx-error.log</code>，日志级别使用默认的error。</p>
+<h2 id="open-log-file-cache"><a href="#open-log-file-cache" class="headerlink" title="open_log_file_cache"></a><strong>open_log_file_cache</strong></h2><p>每一条日志记录的写入都是先打开文件再写入记录，然后关闭日志文件。如果你的日志文件路径中使用了变量，如<code>access_log /var/logs/$host/nginx-access.log</code>，为提高性能，可以使用open_log_file_cache指令设置日志文件描述符的缓存。</p>
+<h3 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open_log_file_cache <span class="attribute">max</span>=N [<span class="attribute">inactive</span>=time] [<span class="attribute">min_uses</span>=N] [<span class="attribute">valid</span>=time];</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>max 设置缓存中最多容纳的文件描述符数量，如果被占满，采用LRU算法将描述符关闭。</li>
+<li>inactive 设置缓存存活时间，默认是10s。</li>
+<li>min_uses 在inactive时间段内，日志文件最少使用几次，该日志文件描述符记入缓存，默认是1次。</li>
+<li>valid：设置多久对日志文件名进行检查，看是否发生变化，默认是60s。</li>
+<li>off：不使用缓存。默认为off。</li>
+</ul>
+</blockquote>
+<h3 id="基本用法-2"><a href="#基本用法-2" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open_log_file_cache <span class="attribute">max</span>=1000 <span class="attribute">inactive</span>=20s <span class="attribute">valid</span>=1m <span class="attribute">min_uses</span>=2;</span><br></pre></td></tr></table></figure>
+<p>它可以配置在http、server、location作用域中。</p>
+<p>例子中，设置缓存最多缓存1000个日志文件描述符，20s内如果缓存中的日志文件描述符至少被被访问2次，才不会被缓存关闭。每隔1分钟检查缓存中的文件描述符的文件名是否还存在。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>Nginx中通过access_log和error_log指令配置访问日志和错误日志，通过log_format我们可以自定义日志格式。如果日志文件路径中使用了变量，我们可以通过open_log_file_cache指令来设置缓存，提升性能。</p>
+<p>另外，在access_log和log_format中使用了很多变量，这些变量没有一一列举出来，详细的变量信息可以参考Nginx官方文档：<a href="http://nginx.org/en/docs/varindex.html" target="_blank" rel="noopener">http://nginx.org/en/docs/varindex.html</a></p>
+<blockquote>
+<p>作者：antwang</p>
+<p>juejin.im/post/5aa09bb3f265da238f121b6c</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/09/转：HTTP请求方法：GET、HEAD、POST、PUT、DELETE、CONNECT、OPTIONS、TRACE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2492,360 +2731,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/使用ELK分析Nginx日志/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ruopu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ruopu's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/01/20/使用ELK分析Nginx日志/" itemprop="url">
-                  使用ELK分析Nginx日志
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">發表於</span>
-              
-
-              
-                
-              
-
-              <time title="創建時間：2020-01-20 16:57:19" itemprop="dateCreated datePublished" datetime="2020-01-20T16:57:19+08:00">2020-01-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新於</span>
-                
-                <time title="修改時間：2020-04-17 17:32:07" itemprop="dateModified" datetime="2020-04-17T17:32:07+08:00">2020-04-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分類於</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ELK/" itemprop="url" rel="index"><span itemprop="name">ELK</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>使用filebeat收集nginx日志，输出到kafka；logstash从kafka中消费日志，通过grok进行数据格式化，输出到elasticsearch中，kibana从elasticsearch中获取日志，进行过滤出图。</p>
-<h3 id="部署wordpress"><a href="#部署wordpress" class="headerlink" title="部署wordpress"></a>部署wordpress</h3><p>这里部署wordpress主要为了得到nginx的访问日志。</p>
-<table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14:80</td>
-<td>nginx/php/mariadb-server</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nginx php-fpm php mariadb-server php-mysqlnd</span><br><span class="line">systemctl start php-fpm nginx mariadb-server</span><br><span class="line">systemctl enable php-fpm nginx mariadb-server</span><br><span class="line">mysql_secure_installation</span><br><span class="line"><span class="meta">#</span><span class="bash"> 初始化mariadb</span></span><br><span class="line">mysql -uroot -pcentos</span><br><span class="line">create database wordpress;</span><br><span class="line">grant all on wordpress.* to 'wps'@'localhost' identified by 'centos';</span><br><span class="line">flush privileges;</span><br><span class="line">tar xf wordpress-5.2.2-zh_CN.tar.gz -C /usr/share/nginx/html</span><br><span class="line">cd /usr/share/nginx/html/wordpress</span><br><span class="line">cp wp-config-sample.php wp-config.php</span><br><span class="line">vim wp-config.php</span><br><span class="line">            /** WordPress数据库的名称 */</span><br><span class="line">            define('DB_NAME', 'wordpress');</span><br><span class="line"></span><br><span class="line">            /** MySQL数据库用户名 */</span><br><span class="line">            define('DB_USER', 'wps');</span><br><span class="line"></span><br><span class="line">            /** MySQL数据库密码 */</span><br><span class="line">            define('DB_PASSWORD', 'centos');</span><br><span class="line"></span><br><span class="line">            /** MySQL主机 */</span><br><span class="line">            define('DB_HOST', 'localhost');</span><br><span class="line"></span><br><span class="line">            /** 创建数据表时默认的文字编码 */</span><br><span class="line">            define('DB_CHARSET', 'utf8');</span><br><span class="line"></span><br><span class="line">            /** 数据库整理类型。如不确定请勿更改 */</span><br><span class="line">            define('DB_COLLATE', '');</span><br><span class="line">访问：http://172.16.103.130/wordpress进行安装</span><br></pre></td></tr></table></figure>
-<h3 id="部署zookeeper"><a href="#部署zookeeper" class="headerlink" title="部署zookeeper"></a>部署zookeeper</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.17</td>
-<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
-<td>kafka1/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.15</td>
-<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
-<td>kafka2/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.16</td>
-<td>zookeeper-3.4.14/java-1.8.0-openjdk-devel</td>
-<td>kafka3/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">------------</span><br><span class="line">   三台主机</span><br><span class="line">------------</span><br><span class="line">到http://zookeeper.apache.org/releases.html去下载zookeeper。这里需要注意，下载的3.5.5和3.5.6</span><br><span class="line">版本中没有zookeeper-***.jar包，所以启动zookeeper会提示:</span><br><span class="line">"Could not find or load main class org.apache.zookeeper.server.quorum.QuorumPeerMain"。</span><br><span class="line">测试下载的3.4.14版本没有问题。也许是不会使用的原因</span><br><span class="line"></span><br><span class="line">yum install java-1.8.0-openjdk-devel</span><br><span class="line"><span class="meta">#</span><span class="bash"> zookeeper依賴java</span></span><br><span class="line">tar -zxvf zookeeper-3.4.14.tar.gz -C /usr/local</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解壓安裝</span></span><br><span class="line">cd /usr/local</span><br><span class="line">ln -sv zookeeper-3.4.14 zookeeper</span><br><span class="line">cd zookeeper/conf</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line">vim zoo.cfg</span><br><span class="line">	tickTime=2000</span><br><span class="line">    initLimit=10</span><br><span class="line">    syncLimit=5</span><br><span class="line">    dataDir=/usr/local/zookeeper/data</span><br><span class="line">    dataLogDir=/usr/local/zookeeper/logs</span><br><span class="line">    clientPort=2181</span><br><span class="line">    server.1=192.168.1.17:2888:3888</span><br><span class="line">    server.2=192.168.1.15:2888:3888</span><br><span class="line">    server.3=192.168.1.16:2888:3888</span><br><span class="line"><span class="meta">#</span><span class="bash"> tickTime：这个时间是作为Zookeeper服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> dataDir：顾名思义就是 Zookeeper保存数据的目录，默认情况下，Zookeeper将写数据的日志文件也保存在这个目录里。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper 服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 5个心跳的时间（也就是 tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是 5*2000=10 秒</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> syncLimit：这个配置项标识 Leader 与Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是5*2000=10 秒</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> server.A=B：C：D：其中 A 是一个数字，表示这个是第几号服务器；B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意：dataDir,dataLogDir中的wwb是当前登录用户名，data，logs目录开始是不存在，需要使用mkdir命令创建相应的目录。并且在该目录下创建文件myid。serve1,server2,server3该文件内容分别为1,2,3。</span></span><br><span class="line">cd /usr/local/zookeeper</span><br><span class="line">mkdir &#123;data,logs&#125;</span><br><span class="line">cd data</span><br><span class="line">echo 1 &gt; myid</span><br><span class="line"><span class="meta">#</span><span class="bash"> kafka2、3分别在這裡改為<span class="built_in">echo</span> 2 &gt; myid或<span class="built_in">echo</span> 3 &gt; myid</span></span><br><span class="line">cd</span><br><span class="line">scp zookeeper-3.4.14.tar.gz 192.168.1.15:/root</span><br><span class="line">scp zookeeper-3.4.14.tar.gz 192.168.1.16:/root</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从第一台主机复制到另外两台主机上</span></span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">	export JAVA_HOME=/usr</span><br><span class="line">chmod +x /etc/profile.d/java.sh</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line">java -version</span><br><span class="line">scp /etc/profile.d/java.sh 192.168.1.15:/etc/profile.d</span><br><span class="line">scp /etc/profile.d/java.sh 192.168.1.16:/etc/profile.d</span><br><span class="line">scp /usr/local/zookeeper/conf/zoo.cfg root@192.168.1.15:/usr/local/zookeeper/conf/</span><br><span class="line">scp /usr/local/zookeeper/conf/zoo.cfg root@192.168.1.16:/usr/local/zookeeper/conf/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从第一台主机复制到另外两台主机上</span></span><br><span class="line">cd /usr/local/zookeeper/bin</span><br><span class="line">./zkServer.sh start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 啟動zookeeper</span></span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時只有leader節點會監聽2888端口，另外兩台是不監聽的。三台主機都會監聽2181和3888端口</span></span><br><span class="line">./zkCli.sh -server localhost:2181</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這裡如果連接的是本機的zookeeper可以不用參數和地址，連接集群中其他zookeeper需要。</span></span><br></pre></td></tr></table></figure>
-<h3 id="部署kafka"><a href="#部署kafka" class="headerlink" title="部署kafka"></a>部署kafka</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.17</td>
-<td>kafka_2.12-2.2.1</td>
-<td>kafka1/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.15</td>
-<td>kafka_2.12-2.2.1</td>
-<td>kafka2/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.16</td>
-<td>kafka_2.12-2.2.1</td>
-<td>kafka3/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">   三台主機</span><br><span class="line">-------------</span><br><span class="line">cd /root</span><br><span class="line">tar xf kafka_2.12-2.2.1.tgz -C /usr/local</span><br><span class="line">cd /usr/local</span><br><span class="line">ln -sv kafka_2.12-2.2.1 kafka</span><br><span class="line">cd kafka/config/</span><br><span class="line">vim server.properties</span><br><span class="line">	broker.id=1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主機這裡的id是不台一樣的，分別為1、2、3</span></span><br><span class="line">    num.network.threads=3</span><br><span class="line">    num.io.threads=8</span><br><span class="line">    socket.send.buffer.bytes=102400</span><br><span class="line">    socket.receive.buffer.bytes=102400</span><br><span class="line">    socket.request.max.bytes=104857600</span><br><span class="line">    log.dirs=/usr/local/kafka/logs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這裡改了日誌地址</span></span><br><span class="line">    num.partitions=1</span><br><span class="line">    num.recovery.threads.per.data.dir=1</span><br><span class="line">    log.retention.hours=168</span><br><span class="line">    log.segment.bytes=1073741824</span><br><span class="line">    log.retention.check.interval.ms=300000</span><br><span class="line">    zookeeper.connect=192.168.1.17:2181,192.168.1.15:2181,192.168.1.16:2181</span><br><span class="line"><span class="meta">#</span><span class="bash"> zookeeper集群內的所有地址都寫入</span></span><br><span class="line">    zookeeper.connection.timeout.ms=6000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置文件基本使用默認配置，之後會再查看配置文件詳細設置</span></span><br><span class="line">mkdir /usr/local/kafka/logs</span><br><span class="line">cd /usr/local/kafka/bin</span><br><span class="line">nohup ./kafka-server-start.sh ../config/server.properties &amp;</span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 這時應該監聽了默認端口9092</span></span><br><span class="line">vim /etc/hosts</span><br><span class="line">192.168.1.17   kafka1</span><br><span class="line">192.168.1.15	kafka2</span><br><span class="line">192.168.1.16	kafka3</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里添加可以让三台主机互相通过主机名解析</span></span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建topic</span></span><br><span class="line">[root@kafka1 bin]# ./kafka-topics.sh --create --topic nginxlog --replication-factor 3 --partitions 3 --zookeeper 192.168.1.16:2181</span><br><span class="line">Created topic nginxlog.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 因为kafka1启动失败了，所以192.168.1.16变成了主节点</span></span><br></pre></td></tr></table></figure>
-<h3 id="部署ElasticSearch"><a href="#部署ElasticSearch" class="headerlink" title="部署ElasticSearch"></a>部署ElasticSearch</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.19</td>
-<td></td>
-<td>elasticsearch1/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.20</td>
-<td></td>
-<td>elasticsearch2/CentOS8</td>
-</tr>
-<tr>
-<td>192.168.1.18</td>
-<td></td>
-<td>elasticsearch3/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">---------------</span><br><span class="line">    三台主机</span><br><span class="line">---------------</span><br><span class="line">systemctl start chronyd</span><br><span class="line">systemctl enable chronyd</span><br><span class="line">chronyc</span><br><span class="line"><span class="meta">chronyc&gt;</span><span class="bash"> waitsync</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 同步三台主机时间</span></span><br><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装阿里源</span></span><br><span class="line">yum makecache</span><br><span class="line">yum install -y java-1.8.0-openjdk-devel</span><br><span class="line">ssh-keygen -t rsa -P ''</span><br><span class="line"><span class="meta">#</span><span class="bash"> elasticsearch1创建密钥</span></span><br><span class="line">ssh-copy-id -i root@192.168.1.20</span><br><span class="line">ssh-copy-id -i root@192.168.1.18</span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">    export JAVA_HOME=/usr</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> elasticsearch1创建并发送到另外两台主机</span></span><br><span class="line">scp /etc/profile.d/java.sh root@192.168.1.20:/etc/profile.d/</span><br><span class="line">scp /etc/profile.d/java.sh root@192.168.1.18:/etc/profile.d/</span><br><span class="line">上传elasticsearch-6.5.4.rpm到三台主机</span><br><span class="line">yum install elasticsearch-6.5.4.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主机安装</span></span><br><span class="line">vim /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">	cluster.name: myelk</span><br><span class="line">    # 集群的名称，名称相同的主机就是处于同一个集群</span><br><span class="line">    node.name: node1</span><br><span class="line">    # 集群情况下，当前node的名字，每个node应该不一样。要将此文件复制到另两个节点</span><br><span class="line">    path.data: /elkdata/data</span><br><span class="line">    # 数据目录</span><br><span class="line">    path.logs: /elkdata/logs</span><br><span class="line">    # 日志目录</span><br><span class="line">    # bootstrap.memory_lock: true</span><br><span class="line">    # 服务启动时即锁定足够大的内存，提高效率。测试中如果打开此项，启动会失败，提示内存未锁定</span><br><span class="line">    network.host: 0.0.0.0</span><br><span class="line">    # 监听的地址</span><br><span class="line">    http.port: 9200</span><br><span class="line">    # 客户端访问端口</span><br><span class="line">    discovery.zen.ping.unicast.hosts: ["192.168.1.19", "192.168.1.20", "192.168.1.18"]</span><br><span class="line">    # 组播范围</span><br><span class="line">    discovery.zen.minimum_master_nodes: 2</span><br><span class="line">    # 设置此项为了必免脑裂，这里的数字是总节点数除以2加1算出来的。</span><br><span class="line">scp /etc/elasticsearch/elasticsearch.yml root@192.168.1.20:/etc/elasticsearch/</span><br><span class="line">scp /etc/elasticsearch/elasticsearch.yml root@192.168.1.18:/etc/elasticsearch/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将配置文件发送到另外两台主机</span></span><br><span class="line">vim /etc/elasticsearch/jvm.options</span><br><span class="line">    -Xms1g  # 初始化的堆内存</span><br><span class="line">    -Xmx1g  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 最大堆内存，可以改大此值。这两个值要保持一致。或将上面配置文件中的bootstrap.memory_lock的值改为<span class="literal">false</span></span></span><br><span class="line">mkdir /elkdata/&#123;data,logs&#125; -pv</span><br><span class="line"><span class="meta">#</span><span class="bash"> 三台主机创建数据和日志目录</span></span><br><span class="line">chown -R elasticsearch.elasticsearch /elkdata/</span><br><span class="line">systemctl start elasticsearch.service</span><br><span class="line">systemctl status elasticsearch.service</span><br><span class="line">ss -tln</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动会有一些慢，要等一会儿才能看到监听了9200和9300端口</span></span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">    elasticsearch1</span><br><span class="line">-----------------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装elasticsearch-head插件</span></span><br><span class="line">yum install -y git</span><br><span class="line">git clone git://github.com/mobz/elasticsearch-head.git</span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载elasticsearch-head插件，这个插件是为了实现简单的集群监控、主机信息显示和管理等功能</span></span><br><span class="line">yum install epel-release.noarch</span><br><span class="line">yum install -y npm</span><br><span class="line">cd elasticsearch-head/</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里一定要到这个目录下再启动插件才能启动，不然会报错</span></span><br><span class="line">npm install grunt -save</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这里可能会有报错<span class="string">"npm: relocation error: npm: symbol SSL_set_cert_cb, version libssl.so.10 not defined in file libssl.so.10 with link time reference"</span>，需要安装openssl即可解决。</span></span><br><span class="line">npm install</span><br><span class="line">npm run start &amp;</span><br><span class="line">vim /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">    #---------------------------------- http --------------------------------</span><br><span class="line">    http.cors.enabled: true     # 打开http功能</span><br><span class="line">    http.cors.allow-origin: "*"     # 允许谁访问</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置elasticsearch允许远程访问</span></span><br><span class="line">systemctl restart elasticsearch</span><br><span class="line">systemctl enable elasticsearch.service</span><br></pre></td></tr></table></figure>
-<h3 id="部署logstash"><a href="#部署logstash" class="headerlink" title="部署logstash"></a>部署logstash</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14:9600</td>
-<td>logstash-6.5.4.rpm</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传logstash-6.5.4.rpm到服务器上</span></span><br><span class="line">yum -y install java-1.8.0-openjdk-devel</span><br><span class="line">vim /etc/profile.d/java.sh</span><br><span class="line">export JAVA_HOME=/usr</span><br><span class="line">. /etc/profile.d/java.sh</span><br><span class="line">yum -y install logstash-6.5.4.rpm</span><br><span class="line">systemctl start logstash</span><br><span class="line">systemctl enable logstash</span><br><span class="line">/usr/share/logstash/bin/logstash -e "input&#123;stdin&#123;&#125;&#125; output&#123;stdout&#123; codec =&gt; "rydebug"&#125;&#125;"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试时会提示找不到rydebug模块，无法加载。这里是否应该为rubydebug，未测试。使用下面的配置文件是没有</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 问题的。启动后会监听9600端口</span></span><br><span class="line">vim /etc/logstash/conf.d/system.conf   # 这个配置文件只作为测试使用</span><br><span class="line">    input &#123;</span><br><span class="line">        file&#123;</span><br><span class="line">            type =&gt; "messagelog"</span><br><span class="line">            path =&gt; "/var/log/messages"</span><br><span class="line">            start_position =&gt; "beginning"   # 首次从头收集</span><br><span class="line">        &#125;</span><br><span class="line">        # 从文件输入，类型是messagelog，写明路径，最后指定从头收集</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    output &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">            path =&gt; "/tmp/123.txt"</span><br><span class="line">        &#125;</span><br><span class="line">        # 输出到一个文件，用file引导，下面写明路径。</span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">            hosts =&gt; ["192.168.1.20:9200"]    # 指定第一台elaticsearch地址即可。</span><br><span class="line">            index =&gt; "system-messages-%&#123;+YYYY.MM.dd&#125;"   # 索引的命名规则，后面加入日期</span><br><span class="line">        &#125;</span><br><span class="line">        # 输出到elasticsearch，写明地址，索引的名称</span><br><span class="line">    &#125;</span><br><span class="line">/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf -t</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-f指定配置文件，-t表示测试配置文件是否正确</span></span><br><span class="line">chmod 644 /var/log/messages</span><br><span class="line"><span class="meta">#</span><span class="bash"> 让普通用户可以读系统日志</span></span><br><span class="line">systemctl start logstash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动logstash。也可以使用/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/system.conf在前台启动</span></span><br><span class="line">tail -f /tmp/123.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时可以看到输出的日志文件了</span></span><br><span class="line">访问192.168.1.19:9100，在其中的数据浏览中修改上方的连接地址为第一台elasticsearch的地址，之后就可以看到一个叫system-messages-2019.01.24的索引了</span><br></pre></td></tr></table></figure>
-<h3 id="修改nginx配置"><a href="#修改nginx配置" class="headerlink" title="修改nginx配置"></a>修改nginx配置</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14</td>
-<td>nginx</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@nwps ~]# vim /etc/nginx/nginx.conf</span><br><span class="line">http &#123;</span><br><span class="line">    ...</span><br><span class="line">    log_format access1 '&#123;"@timestamp":"$time_iso8601",'</span><br><span class="line">                         '"host":"$server_addr",'</span><br><span class="line">                         '"clientip":"$remote_addr",'</span><br><span class="line">                         '"size":$body_bytes_sent,'</span><br><span class="line">                         '"responsetime":$request_time,'</span><br><span class="line">                         '"upstreamtime":"$upstream_response_time",'</span><br><span class="line">                         '"upstreamhost":"$upstream_addr",'</span><br><span class="line">                         '"http_host":"$host",'</span><br><span class="line">                         '"url":"$uri",'</span><br><span class="line">                         '"domain":"$host",'</span><br><span class="line">                         '"xff":"$http_x_forwarded_for",'</span><br><span class="line">                         '"referer":"$http_referer",'</span><br><span class="line">                         '"status":"$status"&#125;';</span><br><span class="line">	server &#123;</span><br><span class="line">		...</span><br><span class="line">        access_log  /var/log/nginx/host.access.log  access1;</span><br><span class="line">        # 在server中加入此条，记录访问wordpress的日志</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置日志格式为Json格式。相对普通日志格式,json易于识别,每个值都有与其相对于的key,易于提取日志内容及方便后续进一步对日志的分析。可以到http://www.kjson.com/上验证Json格式是否正确。</span></span><br><span class="line">[root@nginx1 ~]# nginx -t</span><br><span class="line">nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok</span><br><span class="line">nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful</span><br><span class="line">[root@nginx1 ~]# nginx -s reload</span><br></pre></td></tr></table></figure>
-<h3 id="安装配置filebeat"><a href="#安装配置filebeat" class="headerlink" title="安装配置filebeat"></a>安装配置filebeat</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14</td>
-<td>filebeat-6.5.4</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传filebeat-6.5.4.rpm到主机</span></span><br><span class="line">vim /etc/filebeat/filebeat.yml</span><br><span class="line">filebeat.prospectors:</span><br><span class="line">- input_type: log</span><br><span class="line">  enabled: true</span><br><span class="line">  paths:</span><br><span class="line">    - /var/log/nginx/host.access.log</span><br><span class="line">  fields:</span><br><span class="line">    log_topics: nginxlog</span><br><span class="line">    json.keys_under_root: true</span><br><span class="line">    json.overwrite_keys: true</span><br><span class="line"> </span><br><span class="line">output.kafka:</span><br><span class="line">  enabled: true</span><br><span class="line">  hosts: ["192.168.1.17:9092"]</span><br><span class="line">  topic: '%&#123;[fields][log_topics]&#125;'</span><br><span class="line">  partition.round_robin:</span><br><span class="line">  reachable_only: false</span><br><span class="line">  compression: gzip</span><br><span class="line">  max_message_bytes: 1000000</span><br><span class="line">  required_acks: 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置输出到kafka中</span></span><br><span class="line">/usr/share/filebeat/bin/filebeat -e -c /etc/filebeat/filebeat.yml</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在前台启动，查看效果</span></span><br><span class="line">systemctl start filebeat</span><br><span class="line">systemctl enable filebeat</span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到第一台kafka查看效果</span></span><br><span class="line">scp /etc/hosts root@192.168.1.14:/etc</span><br><span class="line"><span class="meta">#</span><span class="bash"> filebeat主机需要可以通过主机名解析kafka的地址，不然下面命令启动filebeat后虽然能收到信息，但会报错</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 解析不了kafka的地址。</span></span><br><span class="line">./kafka-console-consumer.sh --bootstrap-server 192.168.1.17:9092 --topic nginxlog --from-beginning</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这条命令可以在前台监控发送过来的消息</span></span><br><span class="line">找一台主机访问nginx主机的wordpress页面，可以用curl访问多次，这时应该可以看到kafka上有发过来的信息</span><br></pre></td></tr></table></figure>
-<h3 id="配置logstash"><a href="#配置logstash" class="headerlink" title="配置logstash"></a>配置logstash</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14:9600</td>
-<td>logstash-6.5.4.rpm</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 这台logstash的作用是消息kafka中的消息，创建了和topic一样名称的消费者组</span></span><br><span class="line">[root@nwps ~]# mv /etc/logstash/conf.d/system.conf&#123;,.bak&#125;</span><br><span class="line">[root@nwps ~]# vim /etc/logstash/conf.d/nginx.conf</span><br><span class="line">input &#123;</span><br><span class="line">    kafka &#123;</span><br><span class="line">         type =&gt; "nginxlog"</span><br><span class="line">         topics =&gt; ["nginxlog"]</span><br><span class="line">         bootstrap_servers =&gt; ["192.168.1.17:9092"]</span><br><span class="line">         group_id =&gt; "nginxlog"   # 在kafka中创建的组名</span><br><span class="line">         auto_offset_reset =&gt; latest</span><br><span class="line">         codec =&gt; "json"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">filter &#123;</span><br><span class="line">    if [type] == "nginxlog" &#123;</span><br><span class="line">         grok &#123;</span><br><span class="line">             match =&gt; &#123;"message" =&gt; "%&#123;COMBINEDAPACHELOG&#125;"&#125;</span><br><span class="line">             remove_field =&gt; "message"</span><br><span class="line">         &#125;</span><br><span class="line">         date &#123;</span><br><span class="line">             match =&gt; ["timestamp" , "dd/MMM/YYYY:HH:mm:ss Z"]</span><br><span class="line">         &#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">        geoip &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            <span class="built_in">source</span> =&gt; <span class="string">"clientip"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            target =&gt; <span class="string">"geoip"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            database =&gt; <span class="string">"/etc/logstash/conf.d/GeoLite2-City.mmdb"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">            add_field =&gt; [<span class="string">"[geoip][coordinates]"</span>, <span class="string">"%&#123;[geoip][longitude]&#125;"</span>]</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            add_field =&gt; [<span class="string">"[geoip][coordinates]"</span>, <span class="string">"%&#123;[geoip][latitude]&#125;"</span>]</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        &#125;   <span class="comment"># 注释这段有点问题，未查看具体原因</span></span></span><br><span class="line">         mutate &#123;</span><br><span class="line">             convert =&gt; ["[geoip][coordinates]", "float"]</span><br><span class="line">         &#125;</span><br><span class="line">         useragent &#123;</span><br><span class="line">             source =&gt; "agent"</span><br><span class="line">             target =&gt; "userAgent"</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">    if [type] == 'nginxlog' &#123;</span><br><span class="line">         elasticsearch &#123;</span><br><span class="line">             hosts =&gt; ["http://192.168.1.19:9200"]</span><br><span class="line">             index =&gt; "logstash-nginxlog-%&#123;+YYYY.MM.dd&#125;"</span><br><span class="line">         &#125;</span><br><span class="line">         stdout &#123;codec =&gt; rubydebug&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">[root@nwps ~]# /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/nginx.conf </span><br><span class="line"><span class="meta">#</span><span class="bash"> 在前台启动，查看效果。如果正常的话，应该可以看到被消费的信息在前台打印出来。类似下面这样：</span></span><br><span class="line">&#123;</span><br><span class="line">    "@timestamp" =&gt; 2020-01-27T16:41:36.459Z,</span><br><span class="line">       "message" =&gt; "&#123;\"@timestamp\":\"2020-01-28T00:41:36+08:00\",\"host\":\"192.168.1.14\",\"clientip\":\"192.168.1.109\",\"size\":\"185\",\"responsetime\":\"0.000\",\"upstreamtime\":\"-\",\"upstreamhost\":\"-\",\"http_host\":\"192.168.1.14\",\"url\":\"/wordpress\",\"domain\":\"192.168.1.14\",\"xff\":\"-\",\"referer\":\"-\",\"status\":\"301\"&#125;",</span><br><span class="line">        "source" =&gt; "/var/log/nginx/host.access.log",</span><br><span class="line">        "offset" =&gt; 2514148,</span><br><span class="line">        "fields" =&gt; &#123;</span><br><span class="line">        "log_topics" =&gt; "nginxlog",</span><br><span class="line">              "json" =&gt; &#123;</span><br><span class="line">             "overwrite_keys" =&gt; true,</span><br><span class="line">            "keys_under_root" =&gt; true</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">          "host" =&gt; &#123;</span><br><span class="line">        "name" =&gt; "nwps"</span><br><span class="line">    &#125;,</span><br><span class="line">      "@version" =&gt; "1",</span><br><span class="line">          "tags" =&gt; [</span><br><span class="line">        [0] "_grokparsefailure"</span><br><span class="line">    ],</span><br><span class="line">          "type" =&gt; "nginxlog",</span><br><span class="line">          "beat" =&gt; &#123;</span><br><span class="line">            "name" =&gt; "nwps",</span><br><span class="line">        "hostname" =&gt; "nwps",</span><br><span class="line">         "version" =&gt; "6.5.4"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">---------------</span><br><span class="line">    kafka1</span><br><span class="line">---------------</span><br><span class="line"><span class="meta">#</span><span class="bash"> 到第一台kafka查看效果</span></span><br><span class="line">[root@kafka1 bin]# ./kafka-consumer-groups.sh --bootstrap-server 192.168.1.17:9092 --group nginxlog --describe</span><br><span class="line"></span><br><span class="line">TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                     HOST            CLIENT-ID</span><br><span class="line">nginxlog        0          5407            5407            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line">nginxlog        1          5406            5406            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line">nginxlog        2          5405            5405            0               logstash-0-719c3537-8c50-472d-aa3b-ab0e6f3d8498 /192.168.1.14   logstash-0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看kafka的消息堆积情况，可以加上watch命令。不知是否与上面提到的hosts文件是否有关，最好加上可以解析</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kafka主机名。这里的kafka的组名是在logstash的配置文件中创建的。</span></span><br></pre></td></tr></table></figure>
-<h3 id="安装配置kibana"><a href="#安装配置kibana" class="headerlink" title="安装配置kibana"></a>安装配置kibana</h3><table>
-<thead>
-<tr>
-<th>地址</th>
-<th>服务</th>
-<th>主机名/系统</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>192.168.1.14:5601</td>
-<td>kibana-6.5.4.rpm</td>
-<td>nwps/CentOS8</td>
-</tr>
-</tbody>
-</table>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 上传kibana-6.5.4.rpm到主机</span></span><br><span class="line">yum install -y kibana-6.5.4-x86_64.rpm</span><br><span class="line">vim /etc/kibana/kibana.yml</span><br><span class="line">    server.port: 5601</span><br><span class="line">    server.host: "localhost"   # 这里是监听的地址</span><br><span class="line">    elasticsearch.url: "http://192.168.1.19:9200"   # 调用elasticsearch的接口，写一个就可以</span><br><span class="line">systemctl start kibana</span><br><span class="line">vim /etc/nginx/conf.d/kibana.conf</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name test.kibana.com;</span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass http://localhost:5601;</span><br><span class="line">         proxy_http_version 1.1;</span><br><span class="line">         proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">         proxy_set_header Connection 'upgrade';</span><br><span class="line">         proxy_set_header Host $host;</span><br><span class="line">         proxy_cache_bypass $http_upgrade;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">nginx -s reload</span><br><span class="line">本地添加hosts文件，可以解析test.kibana.com到192.168.1.14</span><br><span class="line">访问test.kibana.com</span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">   给nginx开启认证功能</span><br><span class="line">-----------------------</span><br><span class="line">yum install -y httpd-tools</span><br><span class="line">htpasswd -bc /etc/nginx/conf.d/htpasswd.users kibanauser centos</span><br><span class="line">vim /etc/nginx/conf.d/kibana.conf</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name test.kibana.com;</span><br><span class="line">    auth_basic "Restricted Access";</span><br><span class="line">    auth_basic_user_file /etc/nginx/conf.d/htpasswd.users;</span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass http://localhost:5601;</span><br><span class="line">         proxy_http_version 1.1;</span><br><span class="line">         proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">         proxy_set_header Connection 'upgrade';</span><br><span class="line">         proxy_set_header Host $host;</span><br><span class="line">         proxy_cache_bypass $http_upgrade;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2893,7 +2778,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">263</span>
+                    <span class="site-state-item-count">264</span>
                     <span class="site-state-item-name">文章</span>
                   </a>
                 </div>

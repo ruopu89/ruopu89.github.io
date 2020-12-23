@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="背景网络上操作S3类对象存储的文章并不多，一般都是操作AWS的S3对象存储，感谢nsloghe在https://blog.csdn.net/nslogheyang/article/details/100115336中所做的记录，帮助我解决了这个问题 方法1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python使用记录-操作S3对象存储">
+<meta property="og:url" content="http://yoursite.com/2020/12/22/python使用记录-操作S3对象存储/index.html">
+<meta property="og:site_name" content="ruopu&#39;s blog">
+<meta property="og:description" content="背景网络上操作S3类对象存储的文章并不多，一般都是操作AWS的S3对象存储，感谢nsloghe在https://blog.csdn.net/nslogheyang/article/details/100115336中所做的记录，帮助我解决了这个问题 方法1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2020-12-23T09:45:42.919Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python使用记录-操作S3对象存储">
+<meta name="twitter:description" content="背景网络上操作S3类对象存储的文章并不多，一般都是操作AWS的S3对象存储，感谢nsloghe在https://blog.csdn.net/nslogheyang/article/details/100115336中所做的记录，帮助我解决了这个问题 方法1234567891011121314151617181920212223242526272829303132333435363738394041">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/12/22/python使用记录-操作S3对象存储/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>python使用记录-操作S3对象存储 | ruopu's blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ruopu's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首頁</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />標籤</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分類</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />歸檔</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜尋</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/22/python使用记录-操作S3对象存储/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ruopu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ruopu's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python使用记录-操作S3对象存储
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2020-12-22 10:15:36" itemprop="dateCreated datePublished" datetime="2020-12-22T10:15:36+08:00">2020-12-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2020-12-23 17:45:42" itemprop="dateModified" datetime="2020-12-23T17:45:42+08:00">2020-12-23</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             閱讀次數： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>网络上操作S3类对象存储的文章并不多，一般都是操作AWS的S3对象存储，感谢nsloghe在<a href="https://blog.csdn.net/nslogheyang/article/details/100115336中所做的记录，帮助我解决了这个问题" target="_blank" rel="noopener">https://blog.csdn.net/nslogheyang/article/details/100115336中所做的记录，帮助我解决了这个问题</a></p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> boto3.session <span class="keyword">import</span> Session</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CephS3BOTO3</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        access_key = <span class="string">'xor12345678987654321'</span></span><br><span class="line">        secret_key = <span class="string">'xor12345678987654321xor12345678987654321'</span></span><br><span class="line">        self.session = Session(aws_access_key_id=access_key,aws_secret_access_key=secret_key)</span><br><span class="line">        self.url = <span class="string">'http://172.16.154.88:8060'</span></span><br><span class="line">        self.s3_client = self.session.client(<span class="string">'s3'</span>, endpoint_url=self.url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_bucket</span><span class="params">(self)</span>:</span></span><br><span class="line">        buckets = [bucket[<span class="string">'Name'</span>] <span class="keyword">for</span> bucket <span class="keyword">in</span> self.s3_client.list_buckets()[<span class="string">'Buckets'</span>]]</span><br><span class="line">        print(buckets)</span><br><span class="line">        <span class="keyword">return</span> buckets</span><br><span class="line"><span class="comment"># 这里的问题是使用实例的list_buckets方法是没有提示的。s3_client.list_buckets()[‘Buckets’]对象是一个可以遍历用户Bucket信息的迭代器</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create_bucket</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.s3_client.create_bucket(Bucket=<span class="string">'xor-media-3'</span>)</span><br><span class="line">        self.s3_client.create_bucket(Bucket=<span class="string">'xor-media-4'</span>,ACL=<span class="string">'public-read'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">(self)</span>:</span></span><br><span class="line">        resp = self.s3_client.put_object(Bucket=<span class="string">'xor-media-1'</span>,Key=<span class="string">'test'</span>,Body=open(<span class="string">"C:\\Users\\Administrator\\PycharmProjects\\pythonProject\\冷门节目_20201022\\text.py"</span>).read()</span><br><span class="line">        print(resp)</span><br><span class="line">        <span class="keyword">return</span> resp</span><br><span class="line"><span class="comment"># put_object方法是将Body参数指定的文件打开，并将其中的文件保存到Key参数指定的文件中，如果key参数指定的文件没有写路径，就是将key参数指定的文件保存在bucket的</span></span><br><span class="line"><span class="comment"># 根目录下</span></span><br><span class="line">                                         </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">(self)</span>:</span></span><br><span class="line">        resp = self.s3_client.upload_file(<span class="string">"C:\\Users\\Administrator\\PycharmProjects\\pythonProject\\冷门节目_20201022\\text.py"</span>,<span class="string">'xor-media-1'</span>,<span class="string">'/test/2020122201/text.py'</span>)</span><br><span class="line">        print(resp)</span><br><span class="line">        <span class="keyword">return</span> resp</span><br><span class="line"><span class="comment"># upload_file方法可以将文件上传到S3对象存储中，参数有三个，第一个是file_name，这是要上传的文件的名称，一定要写绝对路径；第二个是bucket，这是桶的名称；第三</span></span><br><span class="line"><span class="comment"># 个是object_name，这是要保存的路径，但也要写明保存时的名称，就像上面例子中的一样，都要写明是text.py</span></span><br><span class="line">                                         </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">download</span><span class="params">(self)</span>:</span></span><br><span class="line">        resp = self.s3_client.get_object(Bucket=<span class="string">'xor-media-1'</span>,Key=<span class="string">'key'</span>)</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">"C:\\Users\\shouyu\\Desktop\\text.py"</span>,<span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(resp[<span class="string">'Body'</span>].read())</span><br><span class="line"><span class="comment"># get_object方法应该也是写入到某个文件的，并非下载文件的方法</span></span><br><span class="line">                                         </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">download</span><span class="params">(self)</span>:</span></span><br><span class="line">		resp =self.s3_client.download_file(<span class="string">'xor-media-1'</span>,<span class="string">'test111.py'</span>,<span class="string">'C:\\Users\\Administrator\\Desktop\\test111.py'</span>)</span><br><span class="line"><span class="comment"># 下载文件需要使用download_file方法，与upload_file方法相同，需要指定bucket，要下载的文件的名称或绝对路径，最后是保存到本地的路径与名称</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ceph3_boto3 = CephS3BOTO3()</span><br><span class="line">    ceph3_boto3.get_bucket()</span><br><span class="line">    ceph3_boto3.upload()</span><br></pre></td></tr></table></figure>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br></pre></td><td class="code"><pre><span class="line">根据数据库中查找到的内容路径，将文件上传到S3OSS对象存储。脚本需要在linux系统中测试执行，因为windows系统挂载NFS文件系统有问题</span><br><span class="line"></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> psutil</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Event, Thread</span><br><span class="line"><span class="keyword">from</span> boto3.session <span class="keyword">import</span> Session</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">'%(asctime)s %(thread)d %(threadName)s %(message)s'</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO, filename=<span class="string">'/netdisk/znfjValue/offline_oss_update_database.log'</span>, filemode=<span class="string">'a'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CephS3BOTO3</span>:</span>   <span class="comment"># 初始化方法用于连接s3oss对象存储，upload方法用于上传文件</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        access_key = <span class="string">'xor12345678987654321'</span></span><br><span class="line">        secret_key = <span class="string">'xor12345678987654321xor12345678987654321'</span></span><br><span class="line">        self.session = Session(aws_access_key_id=access_key,aws_secret_access_key=secret_key)</span><br><span class="line">        self.url = <span class="string">'http://172.16.154.88:8060'</span></span><br><span class="line">        self.s3_client = self.session.client(<span class="string">'s3'</span>, endpoint_url=self.url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">(self,file_name,bucket_name,object_name)</span>:</span></span><br><span class="line">        self.s3_client.upload_file(file_name,bucket_name,object_name)</span><br><span class="line"></span><br><span class="line">ceph3_boto3 = CephS3BOTO3()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lengmen</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.db = pymysql.connect(<span class="string">"172.16.168.107"</span>, <span class="string">"soonet"</span>, <span class="string">"soonet"</span>, <span class="string">"soonetgh"</span>)</span><br><span class="line">        self.mysql = self.db.cursor()</span><br><span class="line">        self.handledID = set()   <span class="comment"># 保存已处理过的titleid</span></span><br><span class="line">        self.url = <span class="string">"http://172.16.189.27:9090/com.bgctv.sdp.platform.pubsub.pub"</span></span><br><span class="line">        self.data = &#123;&#125;</span><br><span class="line">        self.count = <span class="number">0</span></span><br><span class="line">        self.uploadData = set()</span><br><span class="line">        self.event = Event()</span><br><span class="line">        self.handledurl = set()   <span class="comment"># 在upload_data方法中记录已处理过的url的titleid，避免重复上传数据</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">readfile</span><span class="params">(self)</span>:</span>  <span class="comment"># 读取从mysql中导出的文件，返回一个生成器</span></span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'znfj_mysql_backup_sort_202005-202011_20201217.txt'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> f:</span><br><span class="line">                <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_reConn</span><span class="params">(self)</span>:</span>   <span class="comment"># 重连mysql</span></span><br><span class="line">        <span class="keyword">if</span> self.db.ping():</span><br><span class="line">            self.db = pymysql.connect(<span class="string">"172.16.168.107"</span>, <span class="string">"soonet"</span>, <span class="string">"soonet"</span>, <span class="string">"soonetgh"</span>)</span><br><span class="line">            self.mysql = self.db.cursor()  <span class="comment"># 获取游标</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将从数据库计算出来的冷门数据更新到172.16.168.107数据库</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update_database</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> self.readfile():  <span class="comment"># 从mysql导出文件中拿到每一条id</span></span><br><span class="line">            <span class="keyword">with</span> open(<span class="string">'offline_handleURL.txt'</span>,<span class="string">'r+'</span>) <span class="keyword">as</span> f:  <span class="comment"># offline_handleURL.txt文件是在upload_data函数中的f.write中写入的</span></span><br><span class="line">                <span class="keyword">if</span> i <span class="keyword">in</span> f.read():  <span class="comment"># 如果取出的pid_paid在handleURL.txt中，就不再处理了，跳过。这里要用read()方法</span></span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">            pid = i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">0</span>]  <span class="comment"># 切割id，去掉换行符，并以下划线为分割符</span></span><br><span class="line">            titleid = i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>]</span><br><span class="line">            <span class="comment"># 10014_GTIT0120150923200361  pid与titleid混在了一起，前面是pid，后面是titleid</span></span><br><span class="line">            <span class="keyword">if</span> titleid <span class="keyword">in</span> self.handledID:  <span class="comment"># 已处理过的titleid列表，如果titleid在列表中就跳过，说明已经处理了</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            self._reConn()  <span class="comment"># 避免mysql断开，重连机制</span></span><br><span class="line">            sql = <span class="string">"SELECT * from resource_transcode WHERE Title_ID='&#123;&#125;'"</span>.format(titleid)  <span class="comment"># 要执行的sql语句，一段会有四条结果，执行结果写在最后</span></span><br><span class="line"><span class="comment"># 这里只做查询，没有更新。下一步还要更新这个数据库，之后下发通知。查询是为了知道这个节目的内容名称，再按名称找到路径，上传到阿里OSS</span></span><br><span class="line">            result = self.mysql.execute(sql)  <span class="comment"># 执行sql语句</span></span><br><span class="line">            results = self.mysql.fetchall()  <span class="comment"># 获取mysql执行后所有记录的列表</span></span><br><span class="line">            <span class="keyword">for</span> row <span class="keyword">in</span> results:  <span class="comment"># 一条条打印出来</span></span><br><span class="line">                url = row[<span class="number">14</span>]  <span class="comment"># 获取结果中的url路径</span></span><br><span class="line">                <span class="keyword">if</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'trans'</span>:  <span class="comment"># 取第二段判断，因为第二段可能是trans，也可能是newtrans</span></span><br><span class="line">                    s3url = url.replace(<span class="string">'trans'</span>, <span class="string">'s3oss'</span>)  <span class="comment"># 生成s3url地址</span></span><br><span class="line">                <span class="keyword">elif</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans'</span>:</span><br><span class="line">                    s3url = url.replace(<span class="string">'newtrans'</span>, <span class="string">'s3oss'</span>)  <span class="comment"># 要更新的url</span></span><br><span class="line">                <span class="keyword">elif</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans2'</span>:</span><br><span class="line">                    s3url = url.replace(<span class="string">'newtrans2'</span>, <span class="string">'s3oss'</span>)  <span class="comment"># 要更新的url</span></span><br><span class="line"><span class="comment"># 原路径：/vod/newtrans2 /20200423/FMOV0120200423401905/FTIT0120200423401905_1200</span></span><br><span class="line"><span class="comment"># 更新路径：/vod/s3oss/20200423/FMOV0120200423401905/FTIT0120200423401905_1200</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    logging.info(<span class="string">"unknown url:&#123;&#125;"</span>.format(url))</span><br><span class="line">                    s3url = url</span><br><span class="line">                self.handledID.add(titleid)  <span class="comment"># 写在这里要重复加四次，self.handledID是set类型，个人感觉应该这样写，不然下面的yield又没法一次返回4条记录的结果，也就是一次只返回一个url，因为上面用self.mysql.fetchall()应该会查出来四条结果。似乎把这条语句放在这个循环的外面也可以，放在yield下面</span></span><br><span class="line">                logging.info(<span class="string">"handledID: &#123;&#125;"</span>.format(self.handledID))</span><br><span class="line">                <span class="keyword">yield</span> url, s3url, row[<span class="number">5</span>], row[<span class="number">4</span>], i  <span class="comment"># 返回url,aliurl,Asset_ID和MovieID，i是pid_titleid</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">filenamejoin</span><span class="params">(self, path)</span>:</span>  <span class="comment"># 生成每个文件的绝对路径</span></span><br><span class="line">        <span class="keyword">for</span> subdir, dirs, files <span class="keyword">in</span> os.walk(path):</span><br><span class="line"><span class="comment"># os.walk()方法可以遍历路径，subdir是所有的目录的绝对路径，file是文件的名称，dirs是每一层目录下还有哪些目录，这是一个列表。</span></span><br><span class="line"><span class="comment"># 详见：https://www.runoob.com/python3/python3-os-walk.html</span></span><br><span class="line">            <span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">                <span class="keyword">yield</span> subdir+<span class="string">'/'</span>+file</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload_data</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> url, s3url, assetid, movieid, i <span class="keyword">in</span> self.update_database():</span><br><span class="line">            <span class="keyword">if</span> i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>] <span class="keyword">in</span> self.handledurl:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">for</span> upload_Data <span class="keyword">in</span> self.filenamejoin(Path(url).parent):</span><br><span class="line">                <span class="keyword">if</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'trans'</span>:  <span class="comment"># 取第二段判断，因为第二段可能是trans，也可能是newtrans</span></span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'trans'</span>, <span class="string">'s3oss'</span>)  <span class="comment"># 要更新的url</span></span><br><span class="line">                <span class="keyword">elif</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans'</span>:</span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'newtrans'</span>, <span class="string">'s3oss'</span>)  <span class="comment"># 要更新的url</span></span><br><span class="line">                <span class="keyword">elif</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans2'</span>:</span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'newtrans2'</span>, <span class="string">'s3oss'</span>)</span><br><span class="line"><span class="comment"># \vod\trans\20140805\GMOV0120140805200535 &gt; \vod\s3oss\20140805\GMOV0120140805200535</span></span><br><span class="line">                <span class="keyword">with</span> open(<span class="string">'offline_handleURL.txt'</span>,<span class="string">'r+'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                    count = len(f.readlines())</span><br><span class="line">                    <span class="keyword">if</span> count &gt;= <span class="number">10000</span>:</span><br><span class="line">                        exit()</span><br><span class="line">                    <span class="keyword">if</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'s3oss'</span> <span class="keyword">or</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'aliyunoss'</span>:</span><br><span class="line">                        print(<span class="string">'s3oss_OR_aliyunoss: '</span>,upload_Data)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">elif</span> <span class="keyword">not</span> os.path.exists(upload_Data):</span><br><span class="line">                        print(<span class="string">'not exists: '</span>,upload_Data)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">elif</span> upload_Data <span class="keyword">in</span> f.read():</span><br><span class="line">                        print(<span class="string">'upload_Data in f'</span>)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        print(<span class="string">'handler: '</span>,url)</span><br><span class="line">                        start = datetime.datetime.now()</span><br><span class="line">                        s1 = psutil.net_io_counters(pernic=<span class="keyword">True</span>)[<span class="string">'ens160'</span>]</span><br><span class="line">                        ceph3_boto3.upload(upload_Data,<span class="string">'xor-media-1'</span>,s3upload_Data.lstrip(<span class="string">'/'</span>))</span><br><span class="line"><span class="comment"># s3oss对象存储的路径需要去除开头的/，不然上传后会多一层/</span></span><br><span class="line">                        print(<span class="string">'upload: &#123;&#125;, s3upload_Data: &#123;&#125;'</span>.format(url,s3url))</span><br><span class="line">                        s2 = psutil.net_io_counters(pernic=<span class="keyword">True</span>)[<span class="string">'ens160'</span>]</span><br><span class="line">                        second = (datetime.datetime.now()-start).total_seconds()</span><br><span class="line">                        result = str((s2.bytes_sent-s1.bytes_sent)/<span class="number">1024</span>/<span class="number">1024</span>/second) + <span class="string">'Mb/s'</span></span><br><span class="line"><span class="comment"># 通过上面s1和s2两个变量统计到的网络流量计算出传输的网速</span></span><br><span class="line">                        f.write(<span class="string">'&#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125;'</span>.format(datetime.datetime.now(),upload_Data,result,second,i))</span><br><span class="line"><span class="comment"># 记录已处理的信息，方便之后查询url是否被处理过</span></span><br><span class="line">                        print(<span class="string">'&#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125;'</span>.format(datetime.datetime.now(),upload_Data,result,second,i))</span><br><span class="line">                        logging.info(<span class="string">'upload complete: &#123;&#125;'</span>.format(movieid))</span><br><span class="line">                self.handledurl.add(i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>])   <span class="comment"># 将已处理的titleid记录下来</span></span><br><span class="line">                </span><br><span class="line">test = Lengmen()</span><br><span class="line">test.upload_data()</span><br><span class="line">=====================================================================================================================================</span><br><span class="line">调整上面的代码</span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> psutil</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Event, Thread</span><br><span class="line"><span class="keyword">from</span> boto3.session <span class="keyword">import</span> Session</span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">'%(asctime)s %(thread)d %(threadName)s %(message)s'</span></span><br><span class="line">logging.basicConfig(format=FORMAT, level=logging.INFO, filename=<span class="string">'/netdisk/znfjValue/offline_oss_update_database.log'</span>, filemode=<span class="string">'a'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CephS3BOTO3</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        access_key = <span class="string">'xor12345678987654321'</span></span><br><span class="line">        secret_key = <span class="string">'xor12345678987654321xor12345678987654321'</span></span><br><span class="line">        self.session = Session(aws_access_key_id=access_key,aws_secret_access_key=secret_key)</span><br><span class="line">        self.url = <span class="string">'http://172.16.154.88:8060'</span></span><br><span class="line">        self.s3_client = self.session.client(<span class="string">'s3'</span>, endpoint_url=self.url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">(self,file_name,bucket_name,object_name)</span>:</span></span><br><span class="line">        self.s3_client.upload_file(file_name,bucket_name,object_name)</span><br><span class="line"><span class="comment">#        print(resp)</span></span><br><span class="line"><span class="comment">#        return resp</span></span><br><span class="line"></span><br><span class="line">ceph3_boto3 = CephS3BOTO3()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lengmen</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.db = pymysql.connect(<span class="string">"172.16.168.107"</span>, <span class="string">"soonet"</span>, <span class="string">"soonet"</span>, <span class="string">"soonetgh"</span>)</span><br><span class="line">        self.mysql = self.db.cursor()</span><br><span class="line">        self.handledID = set()   <span class="comment"># 保存已处理过的titleid</span></span><br><span class="line">        self.url = <span class="string">"http://172.16.189.27:9090/com.bgctv.sdp.platform.pubsub.pub"</span></span><br><span class="line">        self.data = &#123;&#125;</span><br><span class="line">        self.count = <span class="number">0</span></span><br><span class="line">        self.uploadData = set()</span><br><span class="line">        self.event = Event()</span><br><span class="line">        self.handledurl = set()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">readfile</span><span class="params">(self)</span>:</span>  <span class="comment"># 读取从mysql中生成的文件</span></span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">'znfj_mysql_backup_sort_202005-202011_20201217.txt'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> f:</span><br><span class="line">                <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_reConn</span><span class="params">(self)</span>:</span>   <span class="comment"># 重连mysql</span></span><br><span class="line">        <span class="keyword">if</span> self.db.ping():</span><br><span class="line">            self.db = pymysql.connect(<span class="string">"172.16.168.107"</span>, <span class="string">"soonet"</span>, <span class="string">"soonet"</span>, <span class="string">"soonetgh"</span>)</span><br><span class="line">            self.mysql = self.db.cursor()  <span class="comment"># 获取游标</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update_database</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> self.readfile():</span><br><span class="line">            <span class="keyword">with</span> open(<span class="string">'offline_handleURL.txt'</span>,<span class="string">'r+'</span>) <span class="keyword">as</span> f: </span><br><span class="line">                <span class="keyword">if</span> i <span class="keyword">in</span> f.read():</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">            pid = i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">0</span>]  </span><br><span class="line">            titleid = i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>]</span><br><span class="line">            <span class="comment"># 10014_GTIT0120150923200361  pid与titleid混在了一起，前面是pid，后面是titleid</span></span><br><span class="line">            <span class="keyword">if</span> titleid <span class="keyword">in</span> self.handledID: </span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            self._reConn() </span><br><span class="line">            sql = <span class="string">"SELECT * from resource_transcode WHERE Title_ID='&#123;&#125;'"</span>.format(titleid)</span><br><span class="line">            result = self.mysql.execute(sql)</span><br><span class="line">            resultone = self.mysql.fetchone()</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                url = resultone[<span class="number">14</span>]</span><br><span class="line">                <span class="keyword">if</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'trans'</span>:  </span><br><span class="line">                    s3url = url.replace(<span class="string">'trans'</span>, <span class="string">'s3oss'</span>)</span><br><span class="line">                <span class="keyword">elif</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans'</span>:</span><br><span class="line">                    s3url = url.replace(<span class="string">'newtrans'</span>, <span class="string">'s3oss'</span>) </span><br><span class="line">                <span class="keyword">elif</span> url.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans2'</span>:</span><br><span class="line">                    s3url = url.replace(<span class="string">'newtrans2'</span>, <span class="string">'s3oss'</span>) </span><br><span class="line">                <span class="comment"># 原路径：/ vod / newtrans2 / 20200423 / FMOV0120200423401905 / FTIT0120200423401905_1200</span></span><br><span class="line">                <span class="comment"># 更新路径：/ vod / aliyunoss / 20200423 / FMOV0120200423401905 / FTIT0120200423401905_1200</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    logging.info(<span class="string">"unknown url:&#123;&#125;"</span>.format(url))</span><br><span class="line">                    print(<span class="string">'FailID: '</span>,url)</span><br><span class="line">                    s3url = url</span><br><span class="line">                self.handledID.add(titleid)</span><br><span class="line">                logging.info(<span class="string">"handledID: &#123;&#125;"</span>.format(i))</span><br><span class="line">                print(self.handledID, url, s3url, resultone[<span class="number">5</span>], resultone[<span class="number">4</span>], i)</span><br><span class="line">                <span class="keyword">return</span> url, s3url, resultone[<span class="number">5</span>], resultone[<span class="number">4</span>], i </span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">                logging.info(<span class="string">'problematicalID: '</span>.format(i))</span><br><span class="line"><span class="comment"># 因为下面的os.walk(path)方法会遍历目录中的所有文件，并生成绝对路径，所以这里调整为取一条sql语句执行结果，之前使用self.mysql.fetchall()方法时会把所</span></span><br><span class="line"><span class="comment"># 有的结果都取出来，因为每条sql语句会生成多个结果。现在通过这一条执行结果就可以取到全部的文件并上传了。另外，加入try...except语句，是因为sql执行的结果</span></span><br><span class="line"><span class="comment"># 可能是None，所以用except来处理这种情况，把有问题的pid_titleid记录下来</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">filenamejoin</span><span class="params">(self, path)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> subdir, dirs, files <span class="keyword">in</span> os.walk(path):</span><br><span class="line">            <span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">                <span class="keyword">yield</span> subdir+<span class="string">'/'</span>+file</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">upload_data</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            url, s3url, assetid, movieid, i = self.update_database()</span><br><span class="line">            <span class="keyword">if</span> i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>] <span class="keyword">in</span> self.handledurl:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">for</span> upload_Data <span class="keyword">in</span> self.filenamejoin(Path(url).parent): </span><br><span class="line">                <span class="keyword">if</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'trans'</span>:  </span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'trans'</span>, <span class="string">'s3oss'</span>)  </span><br><span class="line">                <span class="keyword">elif</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans'</span>:</span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'newtrans'</span>, <span class="string">'s3oss'</span>)</span><br><span class="line">                <span class="keyword">elif</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'newtrans2'</span>:</span><br><span class="line">                    s3upload_Data = upload_Data.replace(<span class="string">'newtrans2'</span>, <span class="string">'s3oss'</span>)</span><br><span class="line">                <span class="keyword">with</span> open(<span class="string">'offline_handleURL.txt'</span>,<span class="string">'r+'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                    count = len(f.readlines())</span><br><span class="line">                    <span class="keyword">if</span> count &gt;= <span class="number">300000</span>:</span><br><span class="line">                        sys.exit()</span><br><span class="line">                    <span class="keyword">if</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'s3oss'</span> <span class="keyword">or</span> upload_Data.split(<span class="string">'/'</span>)[<span class="number">2</span>] == <span class="string">'aliyunoss'</span>:</span><br><span class="line">                        print(<span class="string">'s3oss_OR_aliyunoss: '</span>,upload_Data)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">elif</span> <span class="keyword">not</span> os.path.exists(upload_Data):</span><br><span class="line">                        print(<span class="string">'not exists: '</span>,upload_Data)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">elif</span> upload_Data <span class="keyword">in</span> f.read():</span><br><span class="line">                        print(<span class="string">'handledUrl'</span>,upload_Data)</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        print(<span class="string">'handler: '</span>,url)</span><br><span class="line">                        start = datetime.datetime.now()</span><br><span class="line">                        s1 = psutil.net_io_counters(pernic=<span class="keyword">True</span>)[<span class="string">'ens160'</span>]</span><br><span class="line">                        ceph3_boto3.upload(upload_Data,<span class="string">'xor-media-1'</span>,s3upload_Data.lstrip(<span class="string">'/'</span>))</span><br><span class="line">                        print(<span class="string">'upload: &#123;&#125;, s3upload_Data: &#123;&#125;'</span>.format(url,s3url))</span><br><span class="line">                        s2 = psutil.net_io_counters(pernic=<span class="keyword">True</span>)[<span class="string">'ens160'</span>]</span><br><span class="line">                        second = (datetime.datetime.now()-start).total_seconds()</span><br><span class="line">                        result = str((s2.bytes_sent-s1.bytes_sent)/<span class="number">1024</span>/<span class="number">1024</span>/second) + <span class="string">'Mb/s'</span></span><br><span class="line">                        f.write(<span class="string">'&#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125;'</span>.format(datetime.datetime.now(),upload_Data,result,second,i))</span><br><span class="line">                        print(<span class="string">'&#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125; &#123;&#125;'</span>.format(datetime.datetime.now(),upload_Data,result,second,i))</span><br><span class="line">                        logging.info(<span class="string">'upload complete: &#123;&#125;'</span>.format(movieid))</span><br><span class="line">                self.handledurl.add(i.replace(<span class="string">"\n"</span>, <span class="string">""</span>).split(<span class="string">'_'</span>)[<span class="number">1</span>])       </span><br><span class="line"></span><br><span class="line">test = Lengmen()</span><br><span class="line">test.upload_data()</span><br><span class="line"><span class="comment">#test.update_database()</span></span><br><span class="line"></span><br><span class="line">====================================================================================================================================</span><br><span class="line">mysql执行结果</span><br><span class="line">*************************** <span class="number">1.</span> row ***************************</span><br><span class="line">                   ID: <span class="number">1249679</span></span><br><span class="line">               TaskID: <span class="number">1249678</span></span><br><span class="line">             Title_ID: GTIT0120150923200361</span><br><span class="line">          Provider_ID: <span class="number">10014</span></span><br><span class="line">               MOV_ID: GMOV0120150923200361</span><br><span class="line">             Asset_ID: GIPA0120150923200361</span><br><span class="line">           Asset_Name: 冰与火的青春<span class="number">03</span></span><br><span class="line">            AssetType: SYNC</span><br><span class="line">            TransType: <span class="number">1</span></span><br><span class="line">              Reso_ID: <span class="number">1</span></span><br><span class="line">                CT_ID: NULL</span><br><span class="line">              MovieID: <span class="number">624689</span></span><br><span class="line">              Chapter: <span class="number">3</span></span><br><span class="line">                 Path: /vod/media/<span class="number">20150923</span>/GMOV0120150923200361.ts</span><br><span class="line">                  URL: /vod/trans/<span class="number">20150923</span>/GMOV0120150923200361/GTIT0120150923200361.m3u8</span><br><span class="line">             Priority: <span class="number">6</span></span><br><span class="line">              Percent: <span class="number">100</span></span><br><span class="line">       VideoCodecInfo: H264;H264;H264</span><br><span class="line">       AudioCodecInfo: AAC;AAC;AAC</span><br><span class="line">              MuxInfo: hls;hls;hls;</span><br><span class="line">          RunTimeInfo: <span class="number">00</span>:<span class="number">46</span>:<span class="number">9</span></span><br><span class="line">       ResolutionInfo: <span class="number">1280</span>*<span class="number">720</span>;<span class="number">720</span>*<span class="number">576</span>;<span class="number">640</span>*<span class="number">480</span></span><br><span class="line">          BitRateInfo: <span class="number">1500</span>;<span class="number">1200</span>;<span class="number">800</span></span><br><span class="line">               Status: <span class="number">4</span></span><br><span class="line">              AddTime: <span class="number">2015</span><span class="number">-09</span><span class="number">-24</span> <span class="number">05</span>:<span class="number">31</span>:<span class="number">37</span></span><br><span class="line">            subset_id: NULL</span><br><span class="line">copyright_modify_time: NULL</span><br><span class="line">*************************** <span class="number">2.</span> row ***************************</span><br><span class="line">                   ID: <span class="number">1249681</span></span><br><span class="line">               TaskID: <span class="number">1249678</span></span><br><span class="line">             Title_ID: GTIT0120150923200361</span><br><span class="line">          Provider_ID: <span class="number">10014</span></span><br><span class="line">               MOV_ID: GMOV0120150923200361</span><br><span class="line">             Asset_ID: GIPB0120150923200361</span><br><span class="line">           Asset_Name: 冰与火的青春<span class="number">03</span></span><br><span class="line">            AssetType: SYNC</span><br><span class="line">            TransType: <span class="number">1</span></span><br><span class="line">              Reso_ID: <span class="number">1</span></span><br><span class="line">                CT_ID: NULL</span><br><span class="line">              MovieID: <span class="number">624689</span></span><br><span class="line">              Chapter: <span class="number">3</span></span><br><span class="line">                 Path: /vod/media/<span class="number">20150923</span>/GMOV0120150923200361.ts</span><br><span class="line">                  URL: /vod/trans/<span class="number">20150923</span>/GMOV0120150923200361/GTIT0120150923200361_1500.m3u8</span><br><span class="line">             Priority: <span class="number">6</span></span><br><span class="line">              Percent: <span class="number">100</span></span><br><span class="line">       VideoCodecInfo: H264</span><br><span class="line">       AudioCodecInfo: AAC</span><br><span class="line">              MuxInfo: hls</span><br><span class="line">          RunTimeInfo: <span class="number">00</span>:<span class="number">46</span>:<span class="number">9</span></span><br><span class="line">       ResolutionInfo: <span class="number">1280</span>*<span class="number">720</span></span><br><span class="line">          BitRateInfo: <span class="number">1500</span></span><br><span class="line">               Status: <span class="number">4</span></span><br><span class="line">              AddTime: <span class="number">2015</span><span class="number">-09</span><span class="number">-24</span> <span class="number">05</span>:<span class="number">31</span>:<span class="number">37</span></span><br><span class="line">            subset_id: NULL</span><br><span class="line">copyright_modify_time: NULL</span><br><span class="line">*************************** <span class="number">3.</span> row ***************************</span><br><span class="line">                   ID: <span class="number">1249683</span></span><br><span class="line">               TaskID: <span class="number">1249678</span></span><br><span class="line">             Title_ID: GTIT0120150923200361</span><br><span class="line">          Provider_ID: <span class="number">10014</span></span><br><span class="line">               MOV_ID: GMOV0120150923200361</span><br><span class="line">             Asset_ID: GIPC0120150923200361</span><br><span class="line">           Asset_Name: 冰与火的青春<span class="number">03</span></span><br><span class="line">            AssetType: SYNC</span><br><span class="line">            TransType: <span class="number">1</span></span><br><span class="line">              Reso_ID: <span class="number">1</span></span><br><span class="line">                CT_ID: NULL</span><br><span class="line">              MovieID: <span class="number">624689</span></span><br><span class="line">              Chapter: <span class="number">3</span></span><br><span class="line">                 Path: /vod/media/<span class="number">20150923</span>/GMOV0120150923200361.ts</span><br><span class="line">                  URL: /vod/trans/<span class="number">20150923</span>/GMOV0120150923200361/GTIT0120150923200361_1200.m3u8</span><br><span class="line">             Priority: <span class="number">6</span></span><br><span class="line">              Percent: <span class="number">100</span></span><br><span class="line">       VideoCodecInfo: H264</span><br><span class="line">       AudioCodecInfo: AAC</span><br><span class="line">              MuxInfo: hls</span><br><span class="line">          RunTimeInfo: <span class="number">00</span>:<span class="number">46</span>:<span class="number">9</span></span><br><span class="line">       ResolutionInfo: <span class="number">720</span>*<span class="number">576</span></span><br><span class="line">          BitRateInfo: <span class="number">1200</span></span><br><span class="line">               Status: <span class="number">4</span></span><br><span class="line">              AddTime: <span class="number">2015</span><span class="number">-09</span><span class="number">-24</span> <span class="number">05</span>:<span class="number">31</span>:<span class="number">37</span></span><br><span class="line">            subset_id: NULL</span><br><span class="line">copyright_modify_time: NULL</span><br><span class="line">*************************** <span class="number">4.</span> row ***************************</span><br><span class="line">                   ID: <span class="number">1249685</span></span><br><span class="line">               TaskID: <span class="number">1249678</span></span><br><span class="line">             Title_ID: GTIT0120150923200361</span><br><span class="line">          Provider_ID: <span class="number">10014</span></span><br><span class="line">               MOV_ID: GMOV0120150923200361</span><br><span class="line">             Asset_ID: GIPD0120150923200361</span><br><span class="line">           Asset_Name: 冰与火的青春<span class="number">03</span></span><br><span class="line">            AssetType: SYNC</span><br><span class="line">            TransType: <span class="number">1</span></span><br><span class="line">              Reso_ID: <span class="number">1</span></span><br><span class="line">                CT_ID: NULL</span><br><span class="line">              MovieID: <span class="number">624689</span></span><br><span class="line">              Chapter: <span class="number">3</span></span><br><span class="line">                 Path: /vod/media/<span class="number">20150923</span>/GMOV0120150923200361.ts</span><br><span class="line">                  URL: /vod/trans/<span class="number">20150923</span>/GMOV0120150923200361/GTIT0120150923200361_800.m3u8</span><br><span class="line">             Priority: <span class="number">6</span></span><br><span class="line">              Percent: <span class="number">100</span></span><br><span class="line">       VideoCodecInfo: H264</span><br><span class="line">       AudioCodecInfo: AAC</span><br><span class="line">              MuxInfo: hls</span><br><span class="line">          RunTimeInfo: <span class="number">00</span>:<span class="number">46</span>:<span class="number">9</span></span><br><span class="line">       ResolutionInfo: <span class="number">640</span>*<span class="number">480</span></span><br><span class="line">          BitRateInfo: <span class="number">800</span></span><br><span class="line">               Status: <span class="number">4</span></span><br><span class="line">              AddTime: <span class="number">2015</span><span class="number">-09</span><span class="number">-24</span> <span class="number">05</span>:<span class="number">31</span>:<span class="number">37</span></span><br><span class="line">            subset_id: NULL</span><br><span class="line">copyright_modify_time: NULL</span><br><span class="line">====================================================================================================================================</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/12/05/rclone使用方法/" rel="next" title="rclone使用方法">
+                <i class="fa fa-chevron-left"></i> rclone使用方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ruopu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">264</span>
+                    <span class="site-state-item-name">文章</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分類</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">184</span>
+                    <span class="site-state-item-name">標籤</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方法"><span class="nav-number">2.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">2.1.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ruopu</span>
+
+  
+
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+  <span class="post-meta-divider">|</span>
+  <span id="busuanzi_container_site_pv">
+    本站总访问量: <span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 強力驅動 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主題 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Gemini</a> v6.4.0</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="訪客總數">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="總瀏覽次數">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
